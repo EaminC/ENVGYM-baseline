@@ -1,0 +1,71 @@
+codex exec  -s danger-full-access  "Please take a careful look into the current hardware and whole repo, and create a new dockerfile named envgym.dockerfile at the root of this repo that, when built, puts me in a /bin/bash cli setting at the root of the repository, with the repository installed."
+
+codex exec --full-auto  -s danger-full-access  "Create an empty file name hello.txt"
+codex exec  -s danger-full-access  "Create an empty file name hello.txt"
+
+
+帮我写一个脚本 他在@data/ 执行
+他会1.cd进一个repo 比如acto
+2.记录一下当前的时间（注意时区）
+例如2025-08-26T08:01:40.097385+00:00
+3.执行
+./../../claude-code-forge/start_claude_code.sh 
+4.记录一下结束的时间
+5.执行一下
+curl "https://api.anthropic.com/v1/organizations/usage_report/messages?\
+starting_at=2025-08-31T03:51:44Z&\
+ending_at=2025-08-31T03:57:44Z&\
+bucket_width=1m"   --header "anthropic-version: 2023-06-01"   --header "x-api-key: xxx"
+6.返回结果类似
+{"data":[{"starting_at":"2025-08-31T03:52:00Z","ending_at":"2025-08-31T03:53:00Z","results":[{"uncached_input_tokens":11,"cache_creation":{"ephemeral_1h_input_tokens":0,"ephemeral_5m_input_tokens":134},"cache_read_input_tokens":29220,"output_tokens":111,"server_tool_use":{"web_search_requests":0},"api_key_id":null,"workspace_id":null,"model":null,"service_tier":null,"context_window":null}]},{"starting_at":"2025-08-31T03:53:00Z","ending_at":"2025-08-31T03:54:00Z","results":[]},{"starting_at":"2025-08-31T03:54:00Z","ending_at":"2025-08-31T03:55:00Z","results":[]}],"has_more":false,"next_page":null}
+
+
+请你计算一下各项总和
+7.在data/result.csv里写下求和后各项数据 包含token消耗和时间
+repo_name,start_time,end_time,total_tokens,total_input_tokens,total_output_tokens,total_cached_tokens,total_duration,total_cost 这是列名
+8.下一个repo
+
+2025-08-30T05:38:52.423484+00:00,2025-08-30T05:39:28.685327+00:00
+curl -X GET "https://api.forge.tensorblock.co/v1/statistic/usage/realtime" \
+  -H "Authorization: Bearer xxx" \
+  -G \
+  --data-urlencode "provider_name=Azure" \
+  --data-urlencode "model_name=gpt-4.1" \
+  --data-urlencode "started_at=2025-08-30T05:38:52.423484+00:00" \
+  --data-urlencode "ended_at=2025-08-30T05:39:28.685327+00:00" \
+  --data-urlencode "linit=2000"
+
+
+
+
+
+
+
+帮我写一个脚本 他在@ccdata/ 执行
+他会1.cd进一个repo 比如acto
+2.记录一下当前的时间（注意时区）
+例如2025-08-26T08:01:40.097385+00:00
+3.执行
+ ./../../claude-code-forge/start_claude_code.sh  
+4.记录一下结束的时间
+5.执行一下
+curl "https://api.anthropic.com/v1/organizations/usage_report/messages?\
+starting_at=2025-08-31T03:51:44Z&\
+ending_at=2025-08-31T03:57:44Z&\
+bucket_width=1m"   --header "anthropic-version: 2023-06-01"   --header "x-api-key: sk-ant-admin01--xxx"
+6.返回结果类似
+{"data":[{"starting_at":"2025-08-31T03:52:00Z","ending_at":"2025-08-31T03:53:00Z","results":[{"uncached_input_tokens":11,"cache_creation":{"ephemeral_1h_input_tokens":0,"ephemeral_5m_input_tokens":134},"cache_read_input_tokens":29220,"output_tokens":111,"server_tool_use":{"web_search_requests":0},"api_key_id":null,"workspace_id":null,"model":null,"service_tier":null,"context_window":null}]},{"starting_at":"2025-08-31T03:53:00Z","ending_at":"2025-08-31T03:54:00Z","results":[]},{"starting_at":"2025-08-31T03:54:00Z","ending_at":"2025-08-31T03:55:00Z","results":[]}],"has_more":false,"next_page":null}
+请你根据格式计算一下各项总和
+7.在ccdata/result.csv里写下求和后各项数据 包含token消耗和时间
+repo_name,start_time,end_time,total_tokens,total_input_tokens,total_output_tokens,total_cached_tokens,total_duration,total_cost 这是列名
+8.下一个repo
+
+2025-08-30T05:38:52.423484+00:00,2025-08-30T05:39:28.685327+00:00
+curl -X GET "https://api.forge.tensorblock.co/v1/statistic/usage/realtime" \
+  -H "Authorization: Bearer xxx" \
+  -G \
+  --data-urlencode "provider_name=Azure" \
+  --data-urlencode "model_name=gpt-4.1" \
+  --data-urlencode "started_at=2025-08-30T05:38:52.423484+00:00" \
+  --data-urlencode "ended_at=2025-08-30T05:39:28.685327+00:00" \
+  --data-urlencode "linit=2000"
