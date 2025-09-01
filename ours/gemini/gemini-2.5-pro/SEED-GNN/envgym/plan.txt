@@ -1,0 +1,496 @@
+Here is the adjusted environment setup plan, updated to be compatible with your specified hardware and environment.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    *   **Git:** To clone the project repository.
+    *   **Python:** Version 3.8 or higher is recommended.
+    *   **NVIDIA CUDA Toolkit:** **Not required.** The installation will be configured for a CPU-only environment as no compatible NVIDIA GPU is available.
+    *   **Project Source Code:** From the official repository (confirmed by `.git/config`): `https://github.com/henryzhongsc/gnn_editing`.
+    *   **Python Packages:**
+        *   `torch==2.0.0` (**CPU version**)
+        *   `torchvision==0.15.1` (**CPU version**)
+        *   `torchaudio==2.0.1` (**CPU version**)
+        *   `torch-scatter==2.1.1` (PyG dependency, **CPU version**)
+        *   `torch-cluster==1.6.1` (PyG dependency, **CPU version**)
+        *   `torch-spline-conv==1.2.2` (PyG dependency, **CPU version**)
+        *   `torch-sparse==0.6.17` (PyG dependency, **CPU version**)
+        *   `torch-geometric==2.3.1`
+        *   `numpy==1.24.4`
+        *   `pandas==2.0.3`
+        *   `ogb==1.3.6`
+    *   **Datasets:** (e.g., Cora, Amazon Computers, Amazon Photo, CoauthorCS, ogbn-arxiv, ogbn-products, etc.). These will likely be downloaded automatically by the scripts into a specified directory.
+
+2.  FILES TO CREATE:
+    *   This project uses existing configuration files from the `config/` directory. No new configuration files need to be created from scratch.
+    *   The project is configured to place all generated outputs, such as model checkpoints and experiment results, into a single top-level directory to keep the project root clean. These generated files are intended to be ignored by version control, as indicated by the `.gitignore` file.
+    *   **Directory:** Create a directory for datasets: `./data`.
+    *   **Directory:** Create a single root directory for all outputs: `./outputs`. The scripts will automatically create subdirectories inside `./outputs` for checkpoints (e.g., `edit_ckpts`) and results (e.g., `results`).
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    *   **Environment Verification Test:** Create a Python script (`check_env.py`) to import core libraries and verify their versions and CPU-only compatibility.
+        *   `import torch`, `import torch_scatter`, `import torch_cluster`, `import torch_sparse`, `import torch_geometric`, `import ogb`
+        *   Print `torch.__version__` to confirm it is `2.0.0`.
+        *   Print `torch_geometric.__version__` to confirm it is `2.3.1`.
+        *   Print `ogb.__version__` to confirm it is `1.3.6`.
+        *   Print `torch.cuda.is_available()` to confirm it returns `False`.
+        *   Print `torch.version.cuda` to confirm it is `None` (or not present).
+    *   **Pre-training Test:** Run the pre-training script for a minimal number of epochs on a small dataset like Cora (`scripts/pretrain/seed_gnn/cora.sh`, which trains GCN, SAGE, GIN, and GAT models) and a larger one like `ogbn-arxiv` (e.g., `scripts/pretrain/egnn/gat/arxiv.sh`) to ensure the training pipeline works and model checkpoints are saved successfully for different configurations. A test for the new dataset combinations (e.g., `scripts/pretrain/seed_gnn/amazoncomputers.sh`, `scripts/pretrain/seed_gnn/amazonphoto.sh`, `scripts/pretrain/seed_gnn/arxiv.sh`, `scripts/pretrain/seed_gnn/coauthorcs.sh`, `scripts/pretrain/seed_gnn/products.sh`, `scripts/pretrain/egnn/gat/amazoncomputers.sh`, `scripts/pretrain/egnn/gat/amazonphoto.sh`, `scripts/pretrain/egnn/gat/coauthorcs.sh`, `scripts/pretrain/egnn/gat/cora.sh`, `scripts/pretrain/egnn/gat/products.sh`, `scripts/pretrain/egnn/gcn/amazoncomputers.sh`, `scripts/pretrain/egnn/gcn/amazonphoto.sh`, `scripts/pretrain/egnn/gcn/arxiv.sh`, `scripts/pretrain/egnn/gcn/coauthorcs.sh`, `scripts/pretrain/egnn/gcn/cora.sh`, `scripts/pretrain/egnn/gcn/products.sh`, `scripts/pretrain/egnn/gin/amazoncomputers.sh`, `scripts/pretrain/egnn/gin/amazonphoto.sh`, `scripts/pretrain/egnn/gin/arxiv.sh`, `scripts/pretrain/egnn/gin/coauthorcs.sh`, `scripts/pretrain/egnn/gin/cora.sh`, `scripts/pretrain/egnn/gin/products.sh`, `scripts/pretrain/egnn/sage/amazoncomputers.sh`, `scripts/pretrain/egnn/sage/amazonphoto.sh`, `scripts/pretrain/egnn/sage/arxiv.sh`, `scripts/pretrain/egnn/sage/coauthorcs.sh`, `scripts/pretrain/egnn/sage/cora.sh`, and `scripts/pretrain/egnn/sage/products.sh`) should also be performed. **Note: These tests will run on the CPU and may take a significant amount of time.**
+    *   **Single-Edit Test (SEED-GNN):** Modify an editing script (e.g., `scripts/edit/seed_gnn/gcn/cora.sh`) to run for only one or two edits. This tests the core editing logic for the SEED-GNN method.
+    *   **Single-Edit Test (SEED-GNN with GCN on Amazon Computers):** Modify the `scripts/edit/seed_gnn/gcn/amazoncomputers.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GCN on Amazon Photo):** Modify the `scripts/edit/seed_gnn/gcn/amazonphoto.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GCN on Arxiv):** Modify the `scripts/edit/seed_gnn/gcn/arxiv.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GCN on CoauthorCS):** Modify the `scripts/edit/seed_gnn/gcn/coauthorcs.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GCN on Products):** Modify the `scripts/edit/seed_gnn/gcn/products.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GAT on Amazon Computers):** Modify the `scripts/edit/seed_gnn/gat/amazoncomputers.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GAT on Amazon Photo):** Modify the `scripts/edit/seed_gnn/gat/amazonphoto.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GAT on Arxiv):** Modify the `scripts/edit/seed_gnn/gat/arxiv.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GAT on CoauthorCS):** Modify the `scripts/edit/seed_gnn/gat/coauthorcs.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GAT on Cora):** Modify the `scripts/edit/seed_gnn/gat/cora.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GAT on Products):** Modify the `scripts/edit/seed_gnn/gat/products.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GIN on Amazon Computers):** Modify the `scripts/edit/seed_gnn/gin/amazoncomputers.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GIN on Amazon Photo):** Modify the `scripts/edit/seed_gnn/gin/amazonphoto.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GIN on Arxiv):** Modify the `scripts/edit/seed_gnn/gin/arxiv.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GIN on CoauthorCS):** Modify the `scripts/edit/seed_gnn/gin/coauthorcs.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GIN on Cora):** Modify the `scripts/edit/seed_gnn/gin/cora.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with GIN on Products):** Modify the `scripts/edit/seed_gnn/gin/products.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with SAGE on Amazon Computers):** Modify the `scripts/edit/seed_gnn/sage/amazoncomputers.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with SAGE on Amazon Photo):** Modify the `scripts/edit/seed_gnn/sage/amazonphoto.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with SAGE on Arxiv):** Modify the `scripts/edit/seed_gnn/sage/arxiv.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with SAGE on CoauthorCS):** Modify the `scripts/edit/seed_gnn/sage/coauthorcs.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with SAGE on Cora):** Modify the `scripts/edit/seed_gnn/sage/cora.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (SEED-GNN with SAGE on Products):** Modify the `scripts/edit/seed_gnn/sage/products.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN):** Modify an EGNN editing script (e.g., `scripts/edit/egnn/gat/amazoncomputers.sh`) to run for only one or two edits. This tests the core editing logic for the EGNN method on different datasets.
+    *   **Single-Edit Test (EGNN with GAT on Amazon Photo):** Modify the `scripts/edit/egnn/gat/amazonphoto.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN on Arxiv):** Modify the `scripts/edit/egnn/gat/arxiv.sh` script to run for only one or two edits to test the editing logic on the `ogbn-arxiv` dataset.
+    *   **Single-Edit Test (EGNN on CoauthorCS):** Modify the `scripts/edit/egnn/gat/coauthorcs.sh` script to run for only one or two edits to test the editing logic on the `CoauthorCS` dataset.
+    *   **Single-Edit Test (EGNN on Cora):** Modify the `scripts/edit/egnn/gat/cora.sh` script to run for only one or two edits to test the editing logic for the EGNN method on the `Cora` dataset.
+    *   **Single-Edit Test (EGNN on Products):** Modify the `scripts/edit/egnn/gat/products.sh` script to run for only one or two edits to test the editing logic on the `ogbn-products` dataset.
+    *   **Single-Edit Test (EGNN with GCN on Amazon Computers):** Modify the `scripts/edit/egnn/gcn/amazoncomputers.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with GCN on Amazon Photo):** Modify the `scripts/edit/egnn/gcn/amazonphoto.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with GCN on Arxiv):** Modify the `scripts/edit/egnn/gcn/arxiv.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with GCN on CoauthorCS):** Modify the `scripts/edit/egnn/gcn/coauthorcs.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with GCN on Cora):** Modify the `scripts/edit/egnn/gcn/cora.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with GCN on Products):** Modify the `scripts/edit/egnn/gcn/products.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with GIN on Amazon Computers):** Modify the `scripts/edit/egnn/gin/amazoncomputers.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with GIN on Amazon Photo):** Modify the `scripts/edit/egnn/gin/amazonphoto.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with GIN on Arxiv):** Modify the `scripts/edit/egnn/gin/arxiv.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with GIN on CoauthorCS):** Modify the `scripts/edit/egnn/gin/coauthorcs.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with GIN on Cora):** Modify the `scripts/edit/egnn/gin/cora.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with GIN on Products):** Modify the `scripts/edit/egnn/gin/products.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with SAGE on Amazon Computers):** Modify the `scripts/edit/egnn/sage/amazoncomputers.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with SAGE on Amazon Photo):** Modify the `scripts/edit/egnn/sage/amazonphoto.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with SAGE on Arxiv):** Modify the `scripts/edit/egnn/sage/arxiv.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with SAGE on CoauthorCS):** Modify the `scripts/edit/egnn/sage/coauthorcs.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with SAGE on Cora):** Modify the `scripts/edit/egnn/sage/cora.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Single-Edit Test (EGNN with SAGE on Products):** Modify the `scripts/edit/egnn/sage/products.sh` script to run for only one or two edits to test the editing logic for this specific combination.
+    *   **Evaluation Test (Amazon Computers):** Run an evaluation script (e.g., `scripts/eval/edit_gnn/amazoncomputers.sh`) that uses the `config/eval_config/edit_gnn/amazoncomputers.json` file. This test confirms that the evaluation pipeline can process results from a prior editing run and generate artifacts like `result_vis.png`.
+    *   **Evaluation Test (Amazon Photo):** Run an evaluation script (e.g., `scripts/eval/edit_gnn/amazonphoto.sh`) that uses the `config/eval_config/edit_gnn/amazonphoto.json` file. This test confirms that the evaluation pipeline can process results from a prior editing run on the Amazon Photo dataset.
+    *   **Evaluation Test (Arxiv):** Run an evaluation script (e.g., `scripts/eval/edit_gnn/arxiv.sh`) that uses the `config/eval_config/edit_gnn/arxiv.json` file. This test confirms that the evaluation pipeline can process results from a prior editing run on the Arxiv dataset.
+    *   **Evaluation Test (CoauthorCS):** Run an evaluation script (e.g., `scripts/eval/edit_gnn/coauthorcs.sh`) that uses the `config/eval_config/edit_gnn/coauthorcs.json` file. This test confirms that the evaluation pipeline can process results from a prior editing run on the CoauthorCS dataset.
+    *   **Evaluation Test (Cora):** Run an evaluation script (e.g., `scripts/eval/edit_gnn/cora.sh`) that uses the `config/eval_config/edit_gnn/cora.json` file. This test confirms that the evaluation pipeline can process results from a prior editing run on the Cora dataset.
+    *   **Evaluation Test (Products):** Run an evaluation script (e.g., `scripts/eval/edit_gnn/products.sh`) that uses the `config/eval_config/edit_gnn/products.json` file. This test confirms that the evaluation pipeline can process results from a prior editing run on the Products dataset.
+    *   **Configuration Loading Test:** Verify that the `main.py` script can correctly parse arguments and load the specified `.json` configuration files from the `config/pipeline_config/` and `config/eval_config/` directories without errors for all combinations, including `seed_gnn`, `seed_gnn` with `gcn` on `amazoncomputers`, `seed_gnn` with `gcn` on `amazonphoto`, `seed_gnn` with `gcn` on `arxiv`, `seed_gnn` with `gcn` on `coauthorcs`, `seed_gnn` with `gcn` on `products`, `seed_gnn` with `gat` on `amazoncomputers`, `seed_gnn` with `gat` on `amazonphoto`, `seed_gnn` with `gat` on `arxiv`, `seed_gnn` with `gat` on `coauthorcs`, `seed_gnn` with `gat` on `cora`, `seed_gnn` with `gat` on `products`, `seed_gnn` with `gin` on `amazoncomputers`, `seed_gnn` with `gin` on `amazonphoto`, `seed_gnn` with `gin` on `arxiv`, `seed_gnn` with `gin` on `coauthorcs`, `seed_gnn` with `gin` on `cora`, `seed_gnn` with `gin` on `products`, `seed_gnn` with `sage` on `amazoncomputers`, `seed_gnn` with `sage` on `amazonphoto`, `seed_gnn` with `sage` on `arxiv`, `seed_gnn` with `sage` on `coauthorcs`, `seed_gnn` with `sage` on `cora`, `seed_gnn` with `sage` on `products`, `egnn`, `egnn` with `gat` on `amazonphoto`, `egnn` on `arxiv`, `egnn` on `coauthorcs`, `egnn` on `cora`, `egnn` on `products`, `egnn` with `gcn` on `amazoncomputers`, `egnn` with `gcn` on `amazonphoto`, `egnn` with `gcn` on `arxiv`, `egnn` with `gcn` on `coauthorcs`, `egnn` with `gcn` on `cora`, `egnn` with `gcn` on `products`, `egnn` with `gin` on `amazoncomputers`, `egnn` with `gin` on `amazonphoto`, `egnn` with `gin` on `arxiv`, `egnn` with `gin` on `coauthorcs`, `egnn` with `gin` on `cora`, `egnn` with `gin` on `products`, `egnn` with `sage` on `amazoncomputers`, `egnn` with `sage` on `amazonphoto`, `egnn` with `sage` on `arxiv`, `egnn` with `sage` on `coauthorcs`, `egnn` with `sage` on `cora`, `egnn` with `sage` on `products`, and the evaluation configs `edit_gnn` on `amazoncomputers`, `amazonphoto`, `arxiv`, `coauthorcs`, `cora`, and `products`.
+
+4.  COMPLETE TODO LIST:
+    *   **Step 1: Install System Prerequisites**
+        *   Install Git, Python 3.8+, and pip.
+        *   **Note:** NVIDIA drivers and CUDA Toolkit are **not** needed for this CPU-only installation.
+
+    *   **Step 2: Locate the Project Repository**
+        *   Open a terminal.
+        *   The project working directory is `/home/cc/EnvGym/data/SEED-GNN`. If the project is not already there, clone it:
+            ```bash
+            # Ensure you are in the parent directory /home/cc/EnvGym/data
+            git clone https://github.com/henryzhongsc/gnn_editing.git SEED-GNN
+            ```
+        *   Navigate into the project directory: `cd /home/cc/EnvGym/data/SEED-GNN`
+
+    *   **Step 3: Create and Activate a Python Virtual Environment**
+        *   Create the environment: `python -m venv venv`
+        *   Activate it: `source venv/bin/activate`
+        *   Verification: Your terminal prompt should now be prefixed with `(venv)`.
+
+    *   **Step 4: Install Python Dependencies (CPU Version)**
+        *   Install PyTorch for CPU: `pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cpu`
+        *   Install PyTorch Geometric dependencies for the **CPU version** of PyTorch 2.0.0.
+            ```bash
+            pip install torch-scatter==2.1.1 torch-cluster==1.6.1 torch-spline-conv==1.2.2 torch-sparse==0.6.17 -f https://data.pyg.org/whl/torch-2.0.0+cpu.html
+            ```
+        *   Install remaining requirements from the file: `pip install -r requirements.txt`
+        *   Verification: Run `pip list` to see the installed packages. Create and run the `check_env.py` script described in the test cases section to confirm library versions and CPU status (`torch.cuda.is_available()` should be `False`).
+
+    *   **Step 5: Prepare Data and Output Directories**
+        *   From the project root (`/home/cc/EnvGym/data/SEED-GNN`), create directories for datasets and results.
+            ```bash
+            mkdir data
+            mkdir outputs
+            ```
+
+    *   **Step 6: Run Pre-training to Obtain Baseline Models**
+        *   **Important:** All experiments will run on the CPU. This will be significantly slower than running on a GPU, especially for large datasets like `ogbn-products`. Be prepared for extended run times.
+        *   Each editing experiment requires a corresponding pre-trained model. Execute the pre-training script for the model/dataset combination you wish to edit. The checkpoints will be saved into the `./outputs/edit_ckpts` directory.
+        *   **Example 1 (All models (GCN, SAGE, GIN, GAT) on Cora for SEED-GNN):**
+            ```bash
+            bash scripts/pretrain/seed_gnn/cora.sh ./outputs ./data
+            ```
+        *   **Example 2 (All models on Amazon Computers for SEED-GNN):**
+            ```bash
+            bash scripts/pretrain/seed_gnn/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 3 (All models on Amazon Photo for SEED-GNN):**
+            ```bash
+            bash scripts/pretrain/seed_gnn/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 4 (All models on Arxiv for SEED-GNN):**
+            ```bash
+            bash scripts/pretrain/seed_gnn/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 5 (All models on CoauthorCS for SEED-GNN):**
+            ```bash
+            bash scripts/pretrain/seed_gnn/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 6 (All models on Products for SEED-GNN):**
+            ```bash
+            bash scripts/pretrain/seed_gnn/products.sh ./outputs ./data
+            ```
+        *   **Example 7 (GAT on Amazon Computers for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gat/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 8 (GAT on Amazon Photo for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gat/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 9 (GAT on Arxiv for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gat/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 10 (GAT on CoauthorCS for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gat/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 11 (GAT on Cora for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gat/cora.sh ./outputs ./data
+            ```
+        *   **Example 12 (GAT on Products for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gat/products.sh ./outputs ./data
+            ```
+        *   **Example 13 (GCN on Amazon Computers for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gcn/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 14 (GCN on Amazon Photo for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gcn/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 15 (GCN on Arxiv for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gcn/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 16 (GCN on CoauthorCS for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gcn/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 17 (GCN on Cora for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gcn/cora.sh ./outputs ./data
+            ```
+        *   **Example 18 (GCN on Products for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gcn/products.sh ./outputs ./data
+            ```
+        *   **Example 19 (GIN on Amazon Computers for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gin/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 20 (GIN on Amazon Photo for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gin/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 21 (GIN on Arxiv for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gin/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 22 (GIN on CoauthorCS for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gin/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 23 (GIN on Cora for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gin/cora.sh ./outputs ./data
+            ```
+        *   **Example 24 (GIN on Products for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/gin/products.sh ./outputs ./data
+            ```
+        *   **Example 25 (SAGE on Amazon Computers for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/sage/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 26 (SAGE on Amazon Photo for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/sage/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 27 (SAGE on Arxiv for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/sage/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 28 (SAGE on CoauthorCS for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/sage/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 29 (SAGE on Cora for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/sage/cora.sh ./outputs ./data
+            ```
+        *   **Example 30 (SAGE on Products for EGNN):**
+            ```bash
+            bash scripts/pretrain/egnn/sage/products.sh ./outputs ./data
+            ```
+        *   Verification: After each script finishes, check for model checkpoint files (e.g., `.pt` files) inside the `./outputs/edit_ckpts` directory.
+
+    *   **Step 7: Run an Editing Experiment**
+        *   Execute the main editing script for your desired method, model, and dataset. This will use the pre-trained models from Step 6.
+        *   **Example 1 (SEED-GNN with GCN on Cora):** This experiment uses the configuration defined in `config/pipeline_config/seed_gnn/gcn/cora.json`.
+            ```bash
+            bash scripts/edit/seed_gnn/gcn/cora.sh ./outputs ./data
+            ```
+        *   **Example 2 (SEED-GNN with GCN on Amazon Computers):**
+            ```bash
+            bash scripts/edit/seed_gnn/gcn/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 3 (SEED-GNN with GCN on Amazon Photo):**
+            ```bash
+            bash scripts/edit/seed_gnn/gcn/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 4 (SEED-GNN with GCN on Arxiv):**
+            ```bash
+            bash scripts/edit/seed_gnn/gcn/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 5 (SEED-GNN with GCN on CoauthorCS):**
+            ```bash
+            bash scripts/edit/seed_gnn/gcn/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 6 (SEED-GNN with GCN on Products):**
+            ```bash
+            bash scripts/edit/seed_gnn/gcn/products.sh ./outputs ./data
+            ```
+        *   **Example 7 (SEED-GNN with GAT on Amazon Computers):**
+            ```bash
+            bash scripts/edit/seed_gnn/gat/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 8 (SEED-GNN with GAT on Amazon Photo):**
+            ```bash
+            bash scripts/edit/seed_gnn/gat/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 9 (SEED-GNN with GAT on Arxiv):**
+            ```bash
+            bash scripts/edit/seed_gnn/gat/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 10 (SEED-GNN with GAT on CoauthorCS):**
+            ```bash
+            bash scripts/edit/seed_gnn/gat/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 11 (SEED-GNN with GAT on Cora):**
+            ```bash
+            bash scripts/edit/seed_gnn/gat/cora.sh ./outputs ./data
+            ```
+        *   **Example 12 (SEED-GNN with GAT on Products):**
+            ```bash
+            bash scripts/edit/seed_gnn/gat/products.sh ./outputs ./data
+            ```
+        *   **Example 13 (SEED-GNN with GIN on Amazon Computers):**
+            ```bash
+            bash scripts/edit/seed_gnn/gin/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 14 (SEED-GNN with GIN on Amazon Photo):**
+            ```bash
+            bash scripts/edit/seed_gnn/gin/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 15 (SEED-GNN with GIN on Arxiv):**
+            ```bash
+            bash scripts/edit/seed_gnn/gin/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 16 (SEED-GNN with GIN on CoauthorCS):**
+            ```bash
+            bash scripts/edit/seed_gnn/gin/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 17 (SEED-GNN with GIN on Cora):**
+            ```bash
+            bash scripts/edit/seed_gnn/gin/cora.sh ./outputs ./data
+            ```
+        *   **Example 18 (SEED-GNN with GIN on Products):** This experiment uses the configuration defined in `config/pipeline_config/seed_gnn/gin/products.json`.
+            ```bash
+            bash scripts/edit/seed_gnn/gin/products.sh ./outputs ./data
+            ```
+        *   **Example 19 (SEED-GNN with SAGE on Amazon Computers):**
+            ```bash
+            bash scripts/edit/seed_gnn/sage/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 20 (SEED-GNN with SAGE on Amazon Photo):**
+            ```bash
+            bash scripts/edit/seed_gnn/sage/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 21 (SEED-GNN with SAGE on Arxiv):** This experiment uses the configuration defined in `config/pipeline_config/seed_gnn/sage/arxiv.json`.
+            ```bash
+            bash scripts/edit/seed_gnn/sage/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 22 (SEED-GNN with SAGE on CoauthorCS):** This experiment uses the configuration defined in `config/pipeline_config/seed_gnn/sage/coauthorcs.json`.
+            ```bash
+            bash scripts/edit/seed_gnn/sage/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 23 (SEED-GNN with SAGE on Cora):** This experiment uses the configuration defined in `config/pipeline_config/seed_gnn/sage/cora.json`.
+            ```bash
+            bash scripts/edit/seed_gnn/sage/cora.sh ./outputs ./data
+            ```
+        *   **Example 24 (SEED-GNN with SAGE on Products):** This experiment uses the configuration defined in `config/pipeline_config/seed_gnn/sage/products.json`.
+            ```bash
+            bash scripts/edit/seed_gnn/sage/products.sh ./outputs ./data
+            ```
+        *   **Example 25 (EGNN with GAT on Amazon Computers):**
+            ```bash
+            bash scripts/edit/egnn/gat/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 26 (EGNN with GAT on Amazon Photo):**
+            ```bash
+            bash scripts/edit/egnn/gat/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 27 (EGNN with GAT on Arxiv):**
+            ```bash
+            bash scripts/edit/egnn/gat/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 28 (EGNN with GAT on CoauthorCS):**
+            ```bash
+            bash scripts/edit/egnn/gat/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 29 (EGNN with GAT on Cora):**
+            ```bash
+            bash scripts/edit/egnn/gat/cora.sh ./outputs ./data
+            ```
+        *   **Example 30 (EGNN with GAT on Products):**
+            ```bash
+            bash scripts/edit/egnn/gat/products.sh ./outputs ./data
+            ```
+        *   **Example 31 (EGNN with GCN on Amazon Computers):**
+            ```bash
+            bash scripts/edit/egnn/gcn/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 32 (EGNN with GCN on Amazon Photo):**
+            ```bash
+            bash scripts/edit/egnn/gcn/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 33 (EGNN with GCN on Arxiv):**
+            ```bash
+            bash scripts/edit/egnn/gcn/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 34 (EGNN with GCN on CoauthorCS):**
+            ```bash
+            bash scripts/edit/egnn/gcn/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 35 (EGNN with GCN on Cora):**
+            ```bash
+            bash scripts/edit/egnn/gcn/cora.sh ./outputs ./data
+            ```
+        *   **Example 36 (EGNN with GCN on Products):**
+            ```bash
+            bash scripts/edit/egnn/gcn/products.sh ./outputs ./data
+            ```
+        *   **Example 37 (EGNN with GIN on Amazon Computers):**
+            ```bash
+            bash scripts/edit/egnn/gin/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 38 (EGNN with GIN on Amazon Photo):**
+            ```bash
+            bash scripts/edit/egnn/gin/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 39 (EGNN with GIN on Arxiv):**
+            ```bash
+            bash scripts/edit/egnn/gin/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 40 (EGNN with GIN on CoauthorCS):**
+            ```bash
+            bash scripts/edit/egnn/gin/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 41 (EGNN with GIN on Cora):**
+            ```bash
+            bash scripts/edit/egnn/gin/cora.sh ./outputs ./data
+            ```
+        *   **Example 42 (EGNN with GIN on Products):**
+            ```bash
+            bash scripts/edit/egnn/gin/products.sh ./outputs ./data
+            ```
+        *   **Example 43 (EGNN with SAGE on Amazon Computers):**
+            ```bash
+            bash scripts/edit/egnn/sage/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example 44 (EGNN with SAGE on Amazon Photo):**
+            ```bash
+            bash scripts/edit/egnn/sage/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example 45 (EGNN with SAGE on Arxiv):**
+            ```bash
+            bash scripts/edit/egnn/sage/arxiv.sh ./outputs ./data
+            ```
+        *   **Example 46 (EGNN with SAGE on CoauthorCS):**
+            ```bash
+            bash scripts/edit/egnn/sage/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example 47 (EGNN with SAGE on Cora):**
+            ```bash
+            bash scripts/edit/egnn/sage/cora.sh ./outputs ./data
+            ```
+        *   **Example 48 (EGNN with SAGE on Products):**
+            ```bash
+            bash scripts/edit/egnn/sage/products.sh ./outputs ./data
+            ```
+
+    *   **Step 8: Run an Evaluation Experiment (Optional)**
+        *   After running an editing experiment, you can run a corresponding evaluation script to aggregate and visualize results.
+        *   **Example (Evaluate results on Cora):**
+            ```bash
+            bash scripts/eval/edit_gnn/cora.sh ./outputs ./data
+            ```
+        *   **Example (Evaluate results on Amazon Computers):**
+            ```bash
+            bash scripts/eval/edit_gnn/amazoncomputers.sh ./outputs ./data
+            ```
+        *   **Example (Evaluate results on Amazon Photo):**
+            ```bash
+            bash scripts/eval/edit_gnn/amazonphoto.sh ./outputs ./data
+            ```
+        *   **Example (Evaluate results on Arxiv):**
+            ```bash
+            bash scripts/eval/edit_gnn/arxiv.sh ./outputs ./data
+            ```
+        *   **Example (Evaluate results on CoauthorCS):**
+            ```bash
+            bash scripts/eval/edit_gnn/coauthorcs.sh ./outputs ./data
+            ```
+        *   **Example (Evaluate results on Products):**
+            ```bash
+            bash scripts/eval/edit_gnn/products.sh ./outputs ./data
+            ```
+
+    *   **Step 9: Verify Experiment Results**
+        *   Monitor the terminal for real-time printouts during each run. After a script concludes, navigate to the relevant output folder to inspect the generated files.
+        *   **For Editing Experiments (Step 7):**
+            *   **Example Paths:**
+                *   `./outputs/results/seed_gnn/gcn/cora/`
+                *   `./outputs/results/seed_gnn/sage/arxiv/`
+                *   `./outputs/results/seed_gnn/sage/products/`
+            *   **Files to Check:**
+                *   `exp.log` (contains the full log)
+                *   `output_config.json` (contains key metrics under the `eval_results` key)
+                *   `raw_results.json` (contains detailed per-edit results)
+                *   `input_config/` directory with copies of the input JSON configs.
+            *   Check the `eval_results` section in `output_config.json` to confirm that metrics like `bef_edit_tst_acc` and `average_success_rate` have been populated.
+        *   **For Evaluation Experiments (Step 8):**
+            *   **Example Paths:** `./outputs/results/edit_gnn/cora/`, `./outputs/results/edit_gnn/amazoncomputers/`, `./outputs/results/edit_gnn/amazonphoto/`, `./outputs/results/edit_gnn/arxiv/`, `./outputs/results/edit_gnn/coauthorcs/`, or `./outputs/results/edit_gnn/products/`
+            *   **Files to Check:**
+                *   `exp.log` (contains the evaluation script's log)
+                *   `output_config.json` (contains aggregated evaluation metrics)
+                *   `result_vis.png` (a visualization of the results)
+        *   The environment is now fully configured and verified.

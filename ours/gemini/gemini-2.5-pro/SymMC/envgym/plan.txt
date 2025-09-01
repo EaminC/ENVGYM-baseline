@@ -1,0 +1,165 @@
+Based on the provided hardware information, here is the complete adjusted environment setup plan. The plan has been optimized for the specified `x86_64` architecture, Ubuntu 20.04 base, and high-performance multi-core CPU.
+
+***
+
+### ADJUSTED ENVIRONMENT SETUP PLAN
+
+**System Profile:**
+*   **Architecture:** `x86_64` / `amd64`
+*   **Operating System Base:** Ubuntu 20.04
+*   **CPU:** 96 Cores
+*   **Memory:** 187.5 GB
+*   **Project Root Directory:** `/home/cc/EnvGym/data/SymMC`
+
+This plan confirms that all required software is fully compatible with the target hardware and leverages the high core count for accelerated compilation. The available memory is more than sufficient for all build and execution steps.
+
+---
+
+**1. DOWNLOADS NEEDED:**
+
+*   **SymMC-Tool Source Code**: The project repository itself. Assumed to be located at `/home/cc/EnvGym/data/SymMC`. This includes necessary Java libraries within the `Enhanced_Kodkod/lib/` directory and Eclipse project settings. The required libraries are:
+    *   `org.alloytools.alloy.dist.jar`
+    *   `java-cup-11a.jar`
+    *   `org.sat4j.core.jar`
+    *   `org.sat4j.core-src.jar`
+*   **Java Development Kit (JDK)**: Version 1.8 (OpenJDK 8). This is a strict requirement for `Enhanced_Kodkod`. The `openjdk-8-jdk` package is available in the standard Ubuntu 20.04 repositories.
+*   **Apache Ant**: A Java build tool, available via the `ant` package on Ubuntu 20.04.
+*   **(Optional) Eclipse IDE for Java Developers**: For development on the `Enhanced_Kodkod` Java module.
+*   **C++ Build Toolchain & Dependencies**: Required for the `Enumerator_Estimator` module.
+    *   A C++17 compliant compiler. The default GCC/g++ compiler on Ubuntu 20.04 (version 9.x) satisfies this requirement.
+    *   `make`.
+    *   `cmake`.
+    *   **ZLIB Library (Development files)**: Provided by the `zlib1g-dev` package on Ubuntu.
+    *   **GNU Multiple Precision Arithmetic Library (GMP) (Development files)**: Provided by the `libgmp-dev` package on Ubuntu.
+
+**2. FILES TO CREATE:**
+
+*   No manual configuration files need to be created. The build process will generate the necessary executables and intermediate directories.
+    *   `Enhanced_Kodkod/bin/`: Contains compiled Java class files.
+    *   `Enumerator_Estimator/cmake-build-release/`: Contains C++ build artifacts and the `minisat` executable.
+*   The usage scripts will generate output files (SAT formulas and symmetry information) at user-specified file paths.
+
+**3. NECESSARY TEST CASES IN THE CODEBASE:**
+
+*   **Test Case 1: Build Verification**
+    *   **Goal**: Ensure both main modules compile successfully.
+    *   **Steps**:
+        1.  Run the build process for `Enhanced_Kodkod`.
+        2.  Run the build process for `Enumerator_Estimator`.
+    *   **Success Criteria**:
+        1.  The `Enhanced_Kodkod` compilation completes successfully, and the `Enhanced_Kodkod/bin` directory is populated with `.class` files.
+        2.  The `Enumerator_Estimator` compilation completes successfully and creates the executable `Enumerator_Estimator/cmake-build-release/minisat`.
+
+*   **Test Case 2: End-to-End Workflow with Sample Specification**
+    *   **Goal**: Verify the full pipeline from an Alloy specification to a final analysis output.
+    *   **Steps**:
+        1.  Use `Enhanced_Kodkod/run.sh` to process a sample `.als` file.
+        2.  Use the generated SAT formula and symmetry file as input for the `Enumerator_Estimator` module.
+    *   **Success Criteria**:
+        1.  The `Enhanced_Kodkod/run.sh` script successfully generates a `.cnf` and a `.sym` file.
+        2.  The `Enumerator_Estimator/cmake-build-release/minisat` command runs without errors and produces console output.
+
+*   **Test Case 3: `Enumerator_Estimator` Module with Pre-generated Data**
+    *   **Goal**: Test the three functionalities of the `Enumerator_Estimator` module.
+    *   **Steps**:
+        1.  Select a matching pair of files from `Datasets/cnfs_PSB/` and `Datasets/syms/`.
+        2.  Run the `minisat` executable with the `-getmcFSB`, `-getmcNSB`, and `-kodkodpruning` flags respectively.
+    *   **Success Criteria**: All three commands execute without runtime errors and produce their respective analysis outputs.
+
+**4. COMPLETE TODO LIST:**
+
+*   **Step 1: Navigate to the Project Root Directory**
+    *   Action: All subsequent commands should be executed from the project's root directory.
+    *   Command: `cd /home/cc/EnvGym/data/SymMC`
+    *   Verification: The `pwd` command shows `/home/cc/EnvGym/data/SymMC`.
+
+*   **Step 2: Install Java and Ant Dependencies**
+    *   Action: Install OpenJDK 8 and Ant using the system package manager. These commands are for the specified Ubuntu 20.04 base environment.
+    *   Command (for Ubuntu): `sudo apt-get update && sudo apt-get install -y openjdk-8-jdk ant`
+    *   Verification:
+        *   Run `java -version`. The output should include "1.8.0".
+        *   Run `ant -version`. The output should show the Apache Ant version.
+
+*   **Step 3 (Optional): Import Java Module into Eclipse IDE**
+    *   Action: For an enhanced development experience, import the `Enhanced_Kodkod` Java module into Eclipse. The repository includes the necessary configuration files.
+    *   Steps:
+        1.  Launch Eclipse IDE.
+        2.  Go to `File -> Import... -> General -> Existing Projects into Workspace`.
+        3.  Select the `Enhanced_Kodkod` directory within the project root.
+        4.  Click `Finish`.
+    *   Verification: The `GenAlloySBP` project appears in Eclipse without build errors.
+
+*   **Step 4: Install C++ Build Toolchain and Dependencies**
+    *   Action: Install the C++ compiler, build tools, and required libraries. The `build-essential` package provides `g++` and `make`. The default g++ (9.x) on Ubuntu 20.04 fully supports C++17.
+    *   Command (for Ubuntu): `sudo apt-get install -y build-essential cmake libgmp-dev zlib1g-dev`
+    *   Verification:
+        *   Run `g++ --version`.
+        *   Run `cmake --version`.
+        *   All commands should execute and display version information.
+
+*   **Step 5: Build the `Enhanced_Kodkod` Module**
+    *   Action: Navigate to the `Enhanced_Kodkod` directory and execute its Ant build script.
+    *   Commands:
+        ```bash
+        cd Enhanced_Kodkod
+        ./build.sh
+        cd ..
+        ```
+    *   Verification: The script completes without errors. The `Enhanced_Kodkod/bin` directory is created and populated with `.class` files.
+
+*   **Step 6: Build the `Enumerator_Estimator` Module (Optimized)**
+    *   Action: Compile the C++ source code using CMake and Make. The `make` command is adjusted to use all 96 available CPU cores (`-j96`) for a significantly faster parallel build.
+    *   Commands:
+        ```bash
+        cd Enumerator_Estimator
+        mkdir -p cmake-build-release
+        cd cmake-build-release
+        cmake ..
+        make -j96
+        cd ../..
+        ```
+    *   Verification: The commands complete without errors. The executable `Enumerator_Estimator/cmake-build-release/minisat` is created.
+
+*   **Step 7: Execute End-to-End Test Case**
+    *   Action: Run the full workflow on a sample Alloy specification to verify the integration between the two modules.
+    *   Commands:
+        ```bash
+        # Create a directory for generated files
+        mkdir -p temp_output
+
+        # Define paths for a sample spec and the output files
+        SPEC_FILE="Datasets/specs/Alloy/farmer.als"
+        SAT_FILE="temp_output/farmer.cnf"
+        SYM_FILE="temp_output/farmer.sym"
+       
+        # Step 1: Run Enhanced_Kodkod
+        echo "--- Running Enhanced_Kodkod ---"
+        Enhanced_Kodkod/run.sh "$SPEC_FILE" "$SAT_FILE" "$SYM_FILE"
+
+        # Step 2: Run Enumerator_Estimator with the generated files
+        echo "--- Running Enumerator_Estimator ---"
+        Enumerator_Estimator/cmake-build-release/minisat -getmcFSB "$SAT_FILE" "$SYM_FILE"
+        ```
+    *   Verification: Both steps complete without errors. The `farmer.cnf` and `farmer.sym` files are created in `temp_output`, and the final command prints analysis results to the console.
+
+*   **Step 8: Execute Test Case with Pre-generated Datasets**
+    *   Action: Test all three operational modes of the `Enumerator_Estimator` using the provided datasets.
+    *   Commands:
+        ```bash
+        # Define paths to pre-generated dataset files
+        SAT_FILE="Datasets/cnfs_PSB/addressBook-2.cnf"
+        SYM_FILE="Datasets/syms/addressBook-2.sym"
+
+        # Test 1: Non-isomorphic count
+        echo "--- Testing Non-isomorphic Counting (-getmcFSB) ---"
+        Enumerator_Estimator/cmake-build-release/minisat -getmcFSB $SAT_FILE $SYM_FILE
+
+        # Test 2: Isomorphic count
+        echo "--- Testing Isomorphic Counting (-getmcNSB) ---"
+        Enumerator_Estimator/cmake-build-release/minisat -getmcNSB $SAT_FILE $SYM_FILE
+
+        # Test 3: Pruning quantification
+        echo "--- Testing Pruning Quantification (-kodkodpruning) ---"
+        Enumerator_Estimator/cmake-build-release/minisat -kodkodpruning $SAT_FILE $SYM_FILE
+        ```
+    *   Verification: All three commands run successfully and print their respective outputs. The environment is now fully configured, optimized, and verified.

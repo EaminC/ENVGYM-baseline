@@ -1,0 +1,332 @@
+This is our current plan:
+=== ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    -   **Development Environment (Choose one)**:
+        -   **Recommended: Dev Container**: Requires **Docker** and **Visual Studio Code** with the **Dev Containers extension**. This approach automates much of the setup.
+        -   **Manual Setup**: Requires direct installation of the tools below.
+    -   **Node.js**: Version `22.x`, as specified in the `.nvmrc`, `.devcontainer/devcontainer.json`, and `.github/workflows/` files. For manual setup, it is strongly recommended to use a version manager like `nvm`.
+    -   **npm**: A compatible package manager. `npm` is included with the Node.js installation.
+    -   **Git**: Required for version control, cloning the repository, and for `husky` git hooks to function correctly.
+    -   **Vercel CLI**: Required for local development and testing. The project is designed to be deployed on Vercel as serverless functions, and the `vercel dev` command uses the `vercel.json` file to accurately simulate this environment locally.
+    -   **Python**: Required to run the deployment preparation script (`.github/workflows/deploy-prep.py`) used in the CI/CD pipeline.
+    -   **Recommended VS Code Extensions**: For an enhanced development experience. If using the Dev Container, these are installed automatically. If not, VS Code will prompt you to install them based on the `.vscode/extensions.json` file.
+        -   `yzhang.markdown-all-in-one`: Provides enhanced Markdown editing features. The project's `.vscode/settings.json` configures its Table of Contents generation.
+        -   `esbenp.prettier-vscode`: For automatic code formatting. Works with the project's Prettier configuration defined in `.prettierrc.json` and is enabled for format-on-save in `.vscode/settings.json`.
+        -   `dbaeumer.vscode-eslint`: Integrates ESLint into the editor, providing real-time feedback on code quality based on the `eslint.config.mjs` rules.
+
+2.  FILES TO CREATE:
+    -   **File Path**: `./.env` (in the root of the project)
+    -   **Description**: This file is necessary for storing environment variables, which are loaded by the `dotenv` package. It is ignored by Git (as confirmed by `.gitignore`) and is also ignored by Vercel deployments (as specified in `.vercelignore`), reinforcing its use for local development only. It should contain a GitHub Personal Access Token to increase API rate limits. For CI/CD automation that commits back to the repository (like theme documentation generation), a token with `contents: write` permissions is required.
+    -   **Example Content**:
+        ```
+        # GitHub Personal Access Token (PAT) for accessing the GitHub API
+        # Create one at https://github.com/settings/tokens
+        # For local development, no scopes are needed. For automated commits, 'repo' or 'contents: write' scope is required.
+        GITHUB_TOKEN=your_personal_access_token_here
+        ```
+    -   **(Optional) File Path**: `./vercel_token`
+    -   **Description**: Based on the `.gitignore`, this optional file can be used to store a Vercel authentication token. This is typically used for programmatic deployments or linking a local project to a Vercel project from a CI/CD environment.
+    -   **Existing File to Note**: `.prettierrc.json`
+    -   **Description**: This file provides the central configuration for Prettier, the code formatter. It defines specific style rules, such as enforcing trailing commas (`"trailingComma": "all"`) and disallowing tabs (`"useTabs": false`). The VS Code Prettier extension and the project's linting scripts use this file as the source of truth for all formatting decisions.
+    -   **Existing File to Note**: `.prettierignore`
+    -   **Description**: This file specifies which files and directories Prettier should completely ignore. It is configured to exclude build artifacts (`coverage/`, `.vercel/`), dependencies (`node_modules/`), and file types like JSON and Markdown that are not intended to be auto-formatted by this project's Prettier setup. This ensures that the `npm run format` and `npm run format:check` commands, as well as the Prettier VS Code extension, only target relevant source code files.
+    -   **Existing File to Note**: `vercel.json`
+    -   **Description**: This file is already present in the repository and configures the project's deployment on the Vercel platform. It defines serverless function settings (like memory and timeout for API endpoints) and sets up redirects. It is crucial for the `vercel dev` command to run the project locally.
+    -   **Existing File to Note**: `.vercelignore`
+    -   **Description**: This file specifies which files and directories should *not* be uploaded to Vercel during deployment. It is configured to exclude the local `.env` file, the `coverage/` directory, and, most importantly, the `package-lock.json` file. Ignoring the lock file means that Vercel will install dependencies based on the `package.json` file, potentially using different sub-dependency versions than those locked locally or in CI. This makes post-deployment E2E testing critical for catching any dependency-related issues.
+    -   **Existing File to Note**: `.devcontainer/devcontainer.json`
+    -   **Description**: This file defines a containerized development environment. When opened in a compatible editor like VS Code, it automatically sets up a consistent environment with all necessary tools (Node.js, Vercel CLI, Python) and dependencies pre-installed, simplifying the setup process significantly.
+    -   **Existing File to Note**: `.github/dependabot.yml`
+    -   **Description**: This file configures Dependabot, a GitHub service that automatically creates pull requests to keep dependencies up-to-date. It is configured to check for weekly updates for both `npm` packages and the GitHub Actions used in workflows. This automation emphasizes the need for a robust CI pipeline and test suite to catch any regressions introduced by dependency updates.
+    -   **Existing File to Note**: `.github/workflows/test.yml`
+    -   **Description**: This file defines the project's Continuous Integration (CI) pipeline using GitHub Actions. It is triggered on every push and pull request to the `master` branch. The workflow automates the validation process by running a series of checks: installing dependencies with `npm ci`, running the test suite (`npm test`), checking code quality (`npm run lint`), verifying formatting (`npm run format:check`), and executing performance benchmarks (`npm run bench`). A pull request must pass all these checks before it can be merged.
+    -   **Existing File to Note**: `.github/workflows/deploy-prep.yml`
+    -   **Description**: This GitHub Actions workflow automates the preparation of files for deployment. It is triggered on pushes to the `master` branch and runs a Python script (`deploy-prep.py`) to generate or modify deployment-specific configurations. The resulting changes are then force-pushed to a dedicated `vercel` branch, from which the Vercel platform deploys the application. This separates the development source from the final deployment build.
+    -   **Existing File to Note**: `.github/workflows/e2e-test.yml`
+    -   **Description**: This GitHub Actions workflow is triggered after a successful deployment (e.g., on Vercel). It runs the End-to-End (E2E) test suite (`npm run test:e2e`) against the live preview URL provided by the `VERCEL_PREVIEW_URL` environment variable. This serves as a final validation gate, ensuring the deployed application is functioning correctly in a production-like environment.
+    -   **Existing File to Note**: `.github/workflows/codeql-analysis.yml`
+    -   **Description**: This GitHub Actions workflow integrates CodeQL, a static analysis engine, to find security vulnerabilities in the codebase. It runs automatically on pushes and pull requests to the `master` branch. Any potential security issues it flags must be addressed for a pull request to be merged, serving as an automated security audit.
+    -   **Existing File to Note**: `.github/workflows/ossf-analysis.yml`
+    -   **Description**: This GitHub Actions workflow integrates the Open Source Security Foundation (OSSF) Scorecard. It runs on pushes and pull requests to the `master` branch, performing an automated analysis of the project's security health based on a series of checks (e.g., dependency pinning, code review practices). The results are uploaded to GitHub's code scanning alerts, providing another layer of automated security validation.
+    -   **Existing File to Note**: `.github/workflows/empty-issues-closer.yml`
+    -   **Description**: This GitHub Actions workflow automates repository maintenance by closing issues that are created empty or that do not follow the prescribed issue templates. It helps ensure that all reported issues contain the necessary information for them to be actionable. This workflow is part of the project's contribution process and encourages contributors to provide complete and well-structured bug reports and feature requests.
+    -   **Existing File to Note**: `.github/workflows/generate-theme-doc.yml`
+    -   **Description**: This GitHub Actions workflow automates the generation and updating of theme documentation. It is triggered only when the `themes/index.js` file is changed on the `master` branch. It runs the `npm run theme-readme-gen` script to create the documentation and then uses a shell script (`./scripts/push-theme-readme.sh`) to commit the updated files back to the repository, ensuring the documentation always stays in sync with the available themes.
+    -   **Existing File to Note**: `.github/workflows/label-pr.yml`
+    -   **Description**: This GitHub Actions workflow automates the process of labeling pull requests. Triggered on every new PR, it uses the `actions/labeler` action to apply labels based on the paths of the files changed. The rules for this mapping are defined in the `.github/labeler.yml` configuration file. This helps in automatically categorizing PRs (e.g., as 'documentation', 'bugfix', 'feature'), streamlining the review process.
+    -   **Existing File to Note**: `.github/labeler.yml`
+    -   **Description**: This file provides the configuration for the `actions/labeler` GitHub Action, which is executed by the `label-pr.yml` workflow. It defines a set of rules that map specific file paths to labels. For example, any change to `themes/index.js` will automatically apply the `themes` label to the pull request. This system automates the categorization of pull requests, helping maintainers quickly identify the nature of a contribution (e.g., `documentation`, `ci`, `stats-card`).
+    -   **Existing File to Note**: `.github/workflows/preview-theme.yml`
+    -   **Description**: This GitHub Actions workflow automates the process of providing visual feedback for theme changes. It is triggered on pull requests that modify the `themes/index.js` file. The workflow runs the `npm run preview-theme` script, which generates preview images of the new or updated themes and posts them as a comment on the pull request. This allows for immediate visual review without needing to deploy the changes.
+    -   **Existing File to Note**: `.github/workflows/prs-cache-clean.yml`
+    -   **Description**: This GitHub Actions workflow automates CI/CD resource management. It is triggered whenever a pull request is closed. The workflow uses the `gh` CLI and a specialized extension to find and delete all GitHub Actions caches that were created for that specific pull request. This helps to keep the repository's cache storage clean and prevent the accumulation of outdated cache data.
+    -   **Existing File to Note**: `.github/workflows/stale.yml` (inferred)
+    -   **Description**: This GitHub Actions workflow runs on a schedule to manage inactive issues. It uses the configuration from `.github/stale.yml` to automatically label issues as 'stale' after a period of inactivity and close them if they remain inactive. This helps keep the issue tracker focused on current, actionable items.
+    -   **Existing File to Note**: `.github/stale.yml`
+    -   **Description**: This file configures the `actions/stale` GitHub Action. It defines the rules for repository maintenance, specifying how long an issue can be inactive before being marked as stale (`daysUntilStale: 30`), how long before a stale issue is closed (`daysUntilClose: 7`), and which labels exempt an issue from this process (e.g., `bug`, `feature`). It also customizes the comment posted when an issue is marked as stale.
+    -   **Existing File to Note**: `.github/workflows/stale-theme-pr-closer.yml`
+    -   **Description**: This GitHub Actions workflow runs on a schedule (every 7 days) to automatically close theme-related pull requests that have been labeled as 'invalid' and have been inactive for a specified period (e.g., 20 days). It helps maintain the repository by cleaning up abandoned or incorrect theme submissions.
+    -   **Existing File to Note**: `.github/workflows/theme-prs-closer.yml`
+    -   **Description**: This GitHub Actions workflow automates a key repository policy. It is triggered whenever a pull request is labeled with "themes". The workflow immediately closes the pull request and posts a comment explaining that new theme additions are currently paused. This serves as an automated gatekeeper to manage the scope of contributions.
+    -   **Existing File to Note**: `.github/workflows/top-issues-dashboard.yml`
+    -   **Description**: This GitHub Actions workflow runs on a schedule to automatically identify and label top-voted issues, bugs, features, and pull requests. It helps with repository maintenance by highlighting popular items and updating a central dashboard issue. It is configured to run only on the main repository, not on forks, and does not impact local development workflows.
+    -   **Existing File to Note**: `.github/workflows/update-langs.yml`
+    -   **Description**: This GitHub Actions workflow automates keeping the project's language data up-to-date. It runs on a schedule (every 30 days) on the main repository. It executes the `npm run generate-langs-json` script to fetch the latest language definitions from GitHub's Linguist library and then automatically creates a pull request with any updates. This ensures the Top Languages card accurately reflects current language usage statistics.
+    -   **Existing File to Note**: `jest.config.js`
+    -   **Description**: This file configures the Jest testing framework for unit and integration tests. It specifies the test environment (`jsdom`) and, importantly, separates the main test suite from End-to-End (E2E) tests by using `testPathIgnorePatterns` to exclude the `/tests/e2e/` directory. This means that running `npm test` will execute unit and integration tests, while E2E tests must be run with a separate command (`npm run test:e2e`) that uses its own configuration file (`jest.e2e.config.js`).
+    -   **Existing File to Note**: `jest.e2e.config.js`
+    -   **Description**: This file provides a dedicated Jest configuration specifically for End-to-End (E2E) tests. It works in tandem with `jest.config.js`, which ignores the E2E test paths. This config specifies the `node` test environment and uses `testMatch` to target only the files within the `/tests/e2e/` directory. This separation allows unit tests and E2E tests to be run independently with different settings.
+    -   **Existing File to Note**: `jest.bench.config.js`
+    -   **Description**: This file provides a dedicated Jest configuration for performance benchmark tests. It uses the `jest-bench` library and its specific test environment and reporter to measure the performance of functions. The configuration targets files ending in `.bench.js`, ensuring that benchmark tests are run separately from unit, integration, and E2E tests, using the `npm run bench` command.
+    -   **Existing File to Note**: `eslint.config.mjs`
+    -   **Description**: This file configures ESLint using the modern "flat config" format. It defines a comprehensive set of rules for code quality and error prevention. It uses the `@eslint/eslintrc` `FlatCompat` utility to extend Prettier's configuration, ensuring that ESLint focuses on code-quality rules while Prettier, guided by `.prettierrc.json`, handles all code formatting. This prevents rule conflicts. It also explicitly integrates the `eslint-plugin-jsdoc` plugin to enforce documentation standards.
+    -   **Existing File to Note**: `codecov.yml`
+    -   **Description**: This file configures the Codecov service, which provides test coverage reports. It defines quality gates for pull requests, such as requiring CI to pass and setting a threshold for how much the total project coverage is allowed to decrease (e.g., 5%). This configuration connects the locally generated coverage reports to the project's overall quality standards enforced in the CI/CD pipeline.
+    -   **Existing File to Note**: `.husky/pre-commit`
+    -   **Description**: This is a script executed automatically by Git before a commit is finalized. It is configured to run `npm test`, `npm run lint`, and `npx lint-staged`. This ensures that no code that fails tests, violates linting rules, or is improperly formatted can be committed to the repository, enforcing code quality standards automatically.
+    -   **Existing File to Note**: `lint-staged` configuration (in `package.json` or a dedicated file)
+    -   **Description**: This configuration defines the commands that `lint-staged` runs on staged files during the pre-commit hook. It is typically set up to run Prettier for formatting and ESLint for linting, ensuring that only clean code that adheres to project standards is committed.
+    -   **Existing File to Note**: `.vscode/extensions.json`
+    -   **Description**: This file lists recommended VS Code extensions for the project. When the repository is opened in VS Code, the editor will prompt the user to install any missing extensions from this list, streamlining the setup of the development environment.
+    -   **Existing File to Note**: `.vscode/settings.json`
+    -   **Description**: This file contains workspace-specific settings for VS Code to ensure a consistent editor configuration. It automatically enables format-on-save (`"editor.formatOnSave": true`) and sets the Prettier extension (`esbenp.prettier-vscode`) as the default formatter. This ensures that any saved file is automatically formatted according to the rules in `.prettierrc.json`, providing immediate feedback and maintaining code style consistency during development. It also includes settings for recommended extensions, like Markdown TOC levels.
+    -   **Existing File to Note**: `.gitattributes`
+    -   **Description**: This file provides attributes for specific paths in the repository. It is configured to ensure that files in the `dist/` directory are not treated as "vendored" by GitHub's Linguist library (`linguist-vendored=false`). This means the code within `dist/` will be included in the repository's language statistics, which is important for projects that commit build artifacts.
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    -   **Code Quality and Linting**:
+        -   The entire codebase must pass static analysis checks defined in `eslint.config.mjs`.
+        -   Run `npm run lint` to verify adherence to code quality rules, such as preventing unused variables, enforcing consistent returns, and ensuring proper JSDoc documentation.
+        -   Run `npm run format:check` to ensure code formatting is consistent with the rules defined in `.prettierrc.json`. This check respects the `.prettierignore` file, so files like JSON and Markdown are intentionally skipped. The development experience is enhanced by `.vscode/settings.json`, which enables automatic formatting on save, helping developers meet this requirement effortlessly.
+        -   These checks are automatically enforced by a pre-commit hook configured in `.husky/pre-commit` and validated in the CI pipeline defined in `.github/workflows/test.yml`.
+    -   **Static Security Analysis (CodeQL)**:
+        -   The codebase is automatically scanned for security vulnerabilities by the CodeQL workflow defined in `.github/workflows/codeql-analysis.yml`.
+        -   This check runs on every pull request to the `master` branch. Any identified vulnerabilities must be resolved before the pull request can be merged.
+    -   **OSSF Scorecard Security Analysis**:
+        -   The project's security posture is automatically assessed by the OSSF Scorecard workflow defined in `.github/workflows/ossf-analysis.yml`.
+        -   This check runs on every pull request to `master` and provides a score based on various security best practices, with results being available in the GitHub repository's security tab.
+    -   **API Data Fetching**:
+        -   Write tests to verify successful data fetching from the GitHub API (e.g., user stats, repository data, language usage).
+        -   Mock API requests using `axios-mock-adapter` to test error scenarios, such as user not found (404), API rate limit exceeded (403), and server errors (500).
+    -   **Card SVG Rendering**:
+        -   Create unit tests for each card type (Stats, Top Languages, WakaTime, etc.).
+        -   Use snapshot testing (`jest -u`) to ensure the generated SVG structure and content are consistent and do not change unexpectedly after code modifications.
+        -   Test rendering with various data inputs, including edge cases like zero commits or no public repositories.
+    -   **Theming and Customization**:
+        -   Test that all built-in themes are applied correctly, verifying colors for background, text, icons, etc.
+        -   Test custom query parameters (e.g., `hide_border`, `show_icons`, `title_color`) and ensure they correctly modify the final SVG output.
+        -   Use `color-contrast-checker` to programmatically verify that theme color combinations meet accessibility standards.
+    -   **Error Handling**:
+        -   Test the application's response to invalid user input, such as invalid GitHub usernames, confirmed by the `github-username-regex` dependency.
+        -   Verify that proper error messages and error card SVGs are generated when API calls fail or required data is missing.
+    -   **GitHub Action Workflow**:
+        -   As indicated by the `@actions/core` and `@actions/github` dependencies, create tests to simulate the execution of the project as a GitHub Action.
+        -   Test the action's inputs, outputs, and behavior in a mocked workflow environment.
+    -   **Serverless Function Testing**:
+        -   Test the behavior of API endpoints (`api/*.js`) within the constraints defined in `vercel.json`.
+        -   Verify that functions execute within the `maxDuration` limit and handle potential timeouts gracefully.
+    -   **Code Coverage Analysis**:
+        -   The project uses Codecov to track test coverage, with rules defined in `codecov.yml`.
+        -   Run `npm test` to generate a local coverage report in the `coverage/` directory.
+        -   Developers should inspect the `coverage/lcov-report/index.html` report to ensure new code is adequately tested and to avoid significant drops in overall coverage, which could fail the CI checks on a pull request.
+    -   **Pre-commit Hook Validation**:
+        -   Verify that the Husky pre-commit hook functions correctly.
+        -   Attempt to commit a file with a known linting or formatting error. The commit should be blocked, and the hook's output should indicate the failure (e.g., from ESLint or Jest).
+        -   After fixing the error, the commit should proceed successfully. This confirms that `lint-staged`, `npm run lint`, and `npm test` are correctly integrated into the pre-commit workflow.
+    -   **End-to-End (E2E) Tests**:
+        -   As defined by the dual-config setup (`jest.config.js` and `jest.e2e.config.js`), E2E tests are separate from the main suite and are executed with `npm run test:e2e`. These tests simulate real user requests to the API endpoints, validating the entire flow from request to final SVG response.
+        -   In the CI/CD pipeline, as configured in `.github/workflows/e2e-test.yml`, these tests are run *after* a successful deployment against the live Vercel preview URL. This provides critical post-deployment validation. This is especially important because the `.vercelignore` file causes Vercel to install dependencies without a lock file, so these tests are the final guarantee that the application works with the exact dependencies installed in production.
+        -   Locally, developers can run these tests against their `vercel dev` server to catch issues before deployment.
+    -   **Deployment Preparation Script**:
+        -   Test the execution of the `.github/workflows/deploy-prep.py` script to ensure it runs without errors.
+        -   Verify that the file modifications generated by the script are correct and match expectations. This ensures that the automated deployment process is reliable and predictable.
+    -   **Theme Documentation Generation**:
+        -   Test the `npm run theme-readme-gen` script to ensure it executes successfully.
+        -   Verify that the generated documentation accurately reflects the themes defined in `themes/index.js`.
+        -   When adding or modifying a theme, run the script and check the diff of the output to ensure the changes are correct. This validates the process automated by the `.github/workflows/generate-theme-doc.yml` workflow.
+    -   **Language Data Generation**:
+        -   Test the `npm run generate-langs-json` script to ensure it executes successfully.
+        -   Verify that it fetches and correctly processes the upstream language data from GitHub's Linguist.
+        -   Check the diff of the generated JSON file to ensure the changes are as expected (e.g., new languages added, colors updated). This validates the process automated by the `.github/workflows/update-langs.yml` workflow. The accuracy of these statistics on the GitHub repository page is also influenced by the `.gitattributes` file, which ensures generated files are correctly analyzed.
+    -   **Dependency Update Validation**: The comprehensive test suite is crucial for validating automated dependency updates submitted by Dependabot. CI workflows running these tests ensure that updated `npm` packages or GitHub Actions do not introduce breaking changes, maintaining project stability.
+    -   **Performance Benchmarking**: The CI workflow in `.github/workflows/test.yml` explicitly runs performance benchmarks using `npm run bench`. These tests, defined in files ending with `*.bench.js` and configured by `jest.bench.config.js`, must pass for a pull request to be merged. This ensures that code changes do not introduce performance regressions in card rendering functions.
+    -   **Automated Repository Management**:
+        -   Verify the behavior of the workflow defined in `.github/workflows/empty-issues-closer.yml`. On the GitHub repository, creating an empty issue should result in it being automatically closed. Editing it to add content should trigger a reopen.
+        -   Verify the behavior of the workflow defined in `.github/workflows/label-pr.yml`. Create a pull request that modifies files matching a rule in the `.github/labeler.yml` configuration file (e.g., changes to `readme.md` should trigger the 'documentation' label). The workflow should automatically apply the corresponding label to the pull request.
+        -   **Theme Preview Generation**: Verify the behavior of the workflow defined in `.github/workflows/preview-theme.yml`. Create a pull request that modifies `themes/index.js`. The workflow should automatically post a comment on the pull request containing image previews of the theme changes. This confirms that the `npm run preview-theme` script is functioning correctly within the CI environment.
+        -   **Cache Cleanup**: Verify the behavior of the workflow defined in `.github/workflows/prs-cache-clean.yml`. After a pull request is closed, check the 'Actions' tab in the GitHub repository to confirm that the 'prs cache clean' workflow was triggered and completed successfully, deleting the caches associated with that pull request.
+        -   **Stale Issue Management**: Verify the behavior of the Stale workflow by observing the repository's issues. An issue that has no activity for 30 days and does not have an exempt label (like `bug` or `feature`) should be automatically labeled as `stale` and receive a comment. If it remains inactive for another 7 days, it should be closed. This confirms the rules in `.github/stale.yml` are being correctly applied.
+        -   **Stale PR Closer**: Verify the behavior of the workflow defined in `.github/workflows/stale-theme-pr-closer.yml`. This can be tested locally by running the `npm run close-stale-theme-prs` script with a `GITHUB_TOKEN` environment variable. The test should mock the GitHub API to ensure the script correctly identifies pull requests with the 'invalid' label that are older than the `STALE_DAYS` threshold and attempts to close them.
+        -   **Theme PR Closer**: Verify the behavior of the workflow defined in `.github/workflows/theme-prs-closer.yml`. On a fork of the repository, create a pull request. Apply the "themes" label. The workflow should trigger and automatically close the pull request with a standard comment, confirming the repository's policy enforcement is working.
+        -   **Top Issues Dashboard**: Verify the behavior of the workflow defined in `.github/workflows/top-issues-dashboard.yml`. This workflow is scheduled and can also be manually triggered via the GitHub Actions tab (using `workflow_dispatch`). After a run, check the repository's issues and pull requests to confirm that items with high reaction counts have been correctly labeled (e.g., as "top-issue"). Also, verify that the designated dashboard issue (if configured) has been updated with the latest lists. This check is primarily for repository maintainers.
+        -   **Language Data Update**: Verify the behavior of the workflow defined in `.github/workflows/update-langs.yml`. This workflow runs on a schedule. To test the underlying script locally, run `npm run generate-langs-json`. After execution, use `git status` to check if the language data file has been modified. This confirms the script part of the automation is working correctly.
+
+4.  COMPLETE TODO LIST:
+    This project can be set up using a Dev Container (recommended) or manually.
+
+    ---
+    ### **Option A: Using the Dev Container (Recommended)**
+    This method uses Docker to create a consistent, pre-configured development environment.
+
+    1.  **Install Prerequisites**:
+        -   Action: Install **Docker Engine** or **Docker Desktop** for your operating system.
+        -   Action: Install **Visual Studio Code**.
+        -   Action: Install the **"Dev Containers"** extension from the VS Code Marketplace.
+        -   Verification: Ensure the Docker daemon is running.
+
+    2.  **Clone the Project Repository**:
+        -   Action: Navigate to your projects directory (e.g., `/home/cc/EnvGym/data/`) and run `git clone https://github.com/anuraghazra/github-readme-stats.git`.
+        -   Verification: A new directory named `github-readme-stats` will be created at `/home/cc/EnvGym/data/github-readme-stats`.
+
+    3.  **Launch the Dev Container**:
+        -   Action: Open the `github-readme-stats` folder in VS Code.
+        -   Action: A notification will appear in the bottom-right corner asking to "Reopen in Container". Click it. VS Code will now build the Docker image and configure the environment. This will automatically install Node.js v22, the Vercel CLI, Python, the GitHub CLI, and all npm dependencies (`npm install`), which also sets up Husky pre-commit hooks. This process also respects the `.vscode/extensions.json` and `.vscode/settings.json` files, fully configuring your editor for features like format-on-save.
+        -   Verification: Once complete, the bottom-left corner of VS Code will show "Dev Container: GitHub Readme Stats Dev". Open the integrated terminal (Ctrl+` or Cmd+`) – you are now inside the container. Verify Node.js with `node -v` (should be v22), Vercel CLI with `vercel --version`, Python with `python --version`, and GitHub CLI with `gh --version`.
+
+    4.  **Configure Environment Variables**:
+        -   Action: Inside VS Code (which is now connected to the container), create a new file named `.env` in the root of the project.
+        -   Action: Add `GITHUB_TOKEN=your_personal_access_token_here` to the `.env` file, replacing the placeholder with your actual GitHub Personal Access Token.
+        -   Verification: The `.env` file should exist in the project root and contain your token.
+
+    5.  **Verify Editor Configuration (Format on Save)**:
+        -   Action: Open any `.js` file in the editor.
+        -   Action: Intentionally mess up the formatting (e.g., add extra spaces or incorrect indentation).
+        -   Action: Save the file (Ctrl+S or Cmd+S).
+        -   Verification: The code should instantly and automatically be reformatted to match the project's style defined in `.prettierrc.json`. This confirms the VS Code settings are applied correctly. Note that files like `.json` or `.md` will not be formatted on save, as they are explicitly excluded in the `.prettierignore` file.
+
+    6.  **Perform All CI Checks Locally**:
+        -   Action: In the VS Code integrated terminal, run all the checks that the CI pipeline will execute:
+            -   `npm run format:check` (checks formatting against `.prettierrc.json`)
+            -   `npm run lint` (checks for code quality issues against `eslint.config.mjs`)
+            -   `npm test` (runs the main test suite)
+            -   `npm run bench` (runs performance benchmark tests)
+        -   Verification: All commands should complete without errors, and all tests should pass. A `coverage` directory will be generated. Open `coverage/lcov-report/index.html` in a browser to inspect the local test coverage. Note that additional checks, like the CodeQL and OSSF Scorecard security scans, run automatically on GitHub when you create a pull request.
+        -   Action: Verify the pre-commit hook. Stage a file with a deliberate formatting error (e.g., remove a semicolon) using `git add <filename>`. Then, try to commit it with `git commit -m "test"`.
+        -   Verification: The commit should be blocked by the hook. The output will show failures from tests or linting. `lint-staged` may auto-correct formatting issues. After fixing any errors, re-stage the file and commit again; it should now succeed.
+
+    7.  **Start the Local Development Server**:
+        -   Action: In the integrated terminal, run the command `vercel dev`.
+        -   Verification: Open your browser and navigate to `http://localhost:3000` (VS Code may prompt you to open it automatically). You should be redirected to the project's GitHub page. Test an API endpoint like `http://localhost:3000/api?username=anuraghazra`.
+
+    8.  **Run End-to-End Tests Locally**:
+        -   Action: While the `vercel dev` server is running in one terminal, open a *new* integrated terminal. Run the command `npm run test:e2e`.
+        -   Verification: The E2E test suite should execute and pass, making requests to your local server running at `http://localhost:3000`.
+
+    9.  **(Optional) Simulate Deployment Preparation**:
+        -   Action: To understand the final deployment step, run the preparation script: `python ./.github/workflows/deploy-prep.py`.
+        -   Verification: After the script runs, check for modified files using `git status`. This will show you the changes that are automatically committed to the `vercel` branch for deployment.
+
+    10. **(Optional) Simulate Theme Documentation Generation**:
+        -   Action: If you have modified `themes/index.js`, run `npm run theme-readme-gen` to regenerate the theme documentation locally.
+        -   Verification: Check the generated documentation file for correctness. Use `git status` to see the file changes. This simulates the automated process in the `generate-theme-doc.yml` workflow.
+
+    11. **(Optional) Simulate Language Data Update**:
+        -   Action: To test the script that updates the language definitions, run `npm run generate-langs-json`.
+        -   Verification: Use `git status` to see if the language data file was modified. This simulates the automated process in the `update-langs.yml` workflow.
+
+    12. **(Optional) Simulate Theme Preview Generation**:
+        -   Action: If you have modified `themes/index.js`, you can test the preview script by running `npm run preview-theme`. Note that this script is primarily designed to run in a GitHub Actions environment and may require specific environment variables to post comments.
+        -   Verification: The script should execute without errors and output information related to the theme previews it would generate. This simulates the automated process in the `preview-theme.yml` workflow.
+
+    13. **(Optional) Simulate Stale PR Cleanup**:
+        -   Action: If you need to test the stale PR closing logic, you can run the script locally: `npm run close-stale-theme-prs`. This requires the `GITHUB_TOKEN` in your `.env` file to have permissions to manage pull requests on the target repository.
+        -   Verification: The script should execute and log its actions, such as which PRs it is checking and which it would close. This simulates the automated process in the `stale-theme-pr-closer.yml` workflow.
+
+    14. **(Optional) Simulate Theme PR Closer Workflow**:
+        -   Action: To test the logic from `theme-prs-closer.yml`, you can use the GitHub CLI (`gh`) which is pre-installed in the Dev Container. Run `gh auth login` to authenticate. Then, on a fork, you can manually run a command like `gh pr close <PR_NUMBER> -c "Test comment"` to simulate the action.
+        -   Verification: The target pull request on your fork should be closed with the comment you provided.
+
+    15. **(Optional) Verify Repository Automation Workflows**:
+        -   Action: Many repository management tasks are automated via GitHub Actions. These run on GitHub's servers and are not part of the local development loop, but it is useful to be aware of them.
+        -   Verification:
+            -   **Top Issues Dashboard**: A maintainer can manually trigger the `.github/workflows/top-issues-dashboard.yml` workflow from the 'Actions' tab on GitHub to see how it labels popular issues.
+            -   **Stale Issue Management**: Review the `.github/stale.yml` configuration to understand how inactive issues are automatically marked as stale and eventually closed. This is handled by the Stale GitHub Action and runs on a schedule.
+
+    ---
+    ### **Option B: Manual Local Setup**
+    Follow these steps if you are not using the Dev Container feature.
+
+    1.  **Install Prerequisites**:
+        -   Action: Install Node Version Manager (`nvm`). This is the recommended way to manage Node.js versions.
+        -   Action: Install Git from the official website if not already present.
+        -   Action: Install Python.
+        -   Action: Install the Vercel CLI globally by running `npm install -g vercel`.
+        -   Action (Optional): Install the GitHub CLI (`gh`) to simulate certain CI workflows.
+        -   Verification: Run `nvm --version`, `git --version`, `python --version`, `vercel --version`, and optionally `gh --version` in your terminal to confirm they are installed.
+
+    2.  **Clone the Project Repository**:
+        -   Action: Navigate to your projects directory (e.g., `/home/cc/EnvGym/data/`) and run the command: `git clone https://github.com/anuraghazra/github-readme-stats.git`
+        -   Verification: A new directory named `github-readme-stats` will be created at `/home/cc/EnvGym/data/github-readme-stats`.
+
+    3.  **Navigate to Project Directory**:
+        -   Action: Change your current directory to the newly cloned project folder: `cd github-readme-stats`
+        -   Verification: Your terminal prompt should now show that you are inside the `github-readme-stats` directory.
+
+    4.  **Set Up Correct Node.js Version**:
+        -   Action: In the project root, run `nvm install`. This command will automatically read the `22` from the `.nvmrc` file and install the correct version of Node.js.
+        -   Action: Run `nvm use` to activate the correct version for your current terminal session.
+        -   Verification: Run `node -v`. The output should start with `v22`.
+
+    5.  **Install Project Dependencies**:
+        -   Action: Run the command `npm install`. This will download all packages listed in `package.json`. It will also automatically trigger the `prepare` script, which sets up Husky git hooks as defined in `.husky/pre-commit`.
+        -   Verification: A `node_modules` directory will be created in the project root. The command should complete without any errors.
+
+    6.  **Configure Environment Variables**:
+        -   Action: Create a new file named `.env` in the root of the project directory.
+        -   Action: Add `GITHUB_TOKEN=your_personal_access_token_here` to the `.env` file, replacing the placeholder with your actual GitHub Personal Access Token.
+        -   Verification: The `.env` file should exist in the project root and contain your token.
+
+    7.  **Configure VS Code Editor**:
+        -   Action: Open the project folder in VS Code.
+        -   Action: VS Code will show a notification in the bottom-right corner recommending extensions based on the `.vscode/extensions.json` file. Click "Install All" to install them.
+        -   Verification: The `Prettier - Code formatter` and `ESLint` extensions should appear in your list of installed extensions.
+        -   Action: Open any `.js` file. Intentionally mess up the formatting and save the file (Ctrl+S or Cmd+S).
+        -   Verification: The code should automatically reformat. This confirms that the settings in `.vscode/settings.json` (like `editor.formatOnSave`) are working correctly with the installed extensions. Note that files like `.json` or `.md` will not be formatted on save, as they are explicitly excluded in the `.prettierignore` file.
+
+    8.  **Run All CI Checks Locally**:
+        -   Action: Run the code formatter check: `npm run format:check`.
+        -   Action: Run the linter: `npm run lint`.
+        -   Action: Execute all project unit and integration tests: `npm test`.
+        -   Action: Run performance benchmarks: `npm run bench`.
+        -   Verification: All commands should complete without reporting any errors. If `format:check` fails, run `npm run format` to fix it. A `coverage` directory will be generated after running tests; you can open `coverage/lcov-report/index.html` in a browser to inspect your local test coverage. Note that additional checks, like the CodeQL and OSSF Scorecard security scans, run automatically on GitHub when you create a pull request.
+        -   Action: Verify the automated pre-commit hook. Stage a file with a deliberate linting error (e.g., add an unused variable) and run `git commit -m "test"`.
+        -   Verification: The commit must be blocked. The terminal output should show the errors reported by ESLint and/or Jest, which are triggered by the hook.
+
+    9.  **Start the Local Development Server**:
+        -   Action: Run the command `vercel dev`.
+        -   Verification: Open your browser and navigate to `http://localhost:3000`. You should be redirected. Then, test an API endpoint by visiting `http://localhost:3000/api?username=anuraghazra`. An SVG card should be displayed.
+
+    10. **Run End-to-End Tests Locally**:
+        -   Action: While the `vercel dev` server is running in one terminal, open a *new* terminal. Run the command `npm run test:e2e`.
+        -   Verification: The E2E test suite should execute and pass, making requests to your local server running at `http://localhost:3000`.
+
+    11. **(Optional) Run Deployment Preparation Script**:
+        -   Action: To see how files are prepared for deployment, run the command: `python ./.github/workflows/deploy-prep.py`.
+        -   Verification: Use `git status` to see the files that were modified by the script. These are the changes that get pushed to the deployment branch.
+
+    12. **(Optional) Run Theme Documentation Generation**:
+        -   Action: If you have made changes to themes in `themes/index.js`, run the command `npm run theme-readme-gen` to update the documentation.
+        -   Verification: Use `git status` to see the changes to the documentation file. This confirms the script is working as expected before you push your changes.
+
+    13. **(Optional) Simulate Language Data Update**:
+        -   Action: To test the script that updates the language definitions, run `npm run generate-langs-json`.
+        -   Verification: Use `git status` to see if the language data file was modified. This simulates the automated process in the `update-langs.yml` workflow.
+
+    14. **(Optional) Simulate Theme Preview Generation**:
+        -   Action: If you have modified `themes/index.js`, you can test the preview script by running `npm run preview-theme`. Note that this script is primarily designed to run in a GitHub Actions environment and may require specific environment variables to post comments.
+        -   Verification: The script should execute without errors and output information related to the theme previews it would generate. This simulates the automated process in the `preview-theme.yml` workflow.
+
+    15. **(Optional) Simulate Stale PR Cleanup**:
+        -   Action: If you need to test the stale PR closing logic, you can run the script locally: `npm run close-stale-theme-prs`. This requires the `GITHUB_TOKEN` in your `.env` file to have permissions to manage pull requests on the target repository.
+        -   Verification: The script should execute and log its actions, such as which PRs it is checking and which it would close. This simulates the automated process in the `stale-theme-pr-closer.yml` workflow.
+
+    16. **(Optional) Simulate Theme PR Closer Workflow**:
+        -   Action: To test the logic from `theme-prs-closer.yml`, you must have the GitHub CLI (`gh`) installed. Run `gh auth login` to authenticate. Then, on a fork of the repository, you can manually run a command like `gh pr close <PR_NUMBER> -c "Test comment"` to simulate the workflow's action.
+        -   Verification: The target pull request on your fork should be closed with the comment you provided, confirming you can manually replicate the workflow's behavior.
+
+    17. **(Optional) Verify Repository Automation Workflows**:
+        -   Action: Many repository management tasks are automated via GitHub Actions. These run on GitHub's servers and are not part of the local development loop, but it is useful to be aware of them.
+        -   Verification:
+            -   **Top Issues Dashboard**: A maintainer can manually trigger the `.github/workflows/top-issues-dashboard.yml` workflow from the 'Actions' tab on GitHub to see how it labels popular issues.
+            -   **Stale Issue Management**: Review the `.github/stale.yml` configuration to understand how inactive issues are automatically marked as stale and eventually closed. This is handled by the Stale GitHub Action and runs on a schedule.

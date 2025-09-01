@@ -1,0 +1,94 @@
+=== Docker Execution Log - 20250828_020946 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756346983
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.12kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [builder 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:b1a741487078b369e78119849663d7f1a5341ef2768798f7b7406c4240f86aef
+#4 DONE 0.0s
+
+#5 [builder 2/4] WORKDIR /home/cc/EnvGym/data/alibaba_fastjson2
+#5 CACHED
+
+#6 [builder 3/4] RUN apt-get update &&     apt-get install -y --no-install-recommends     openjdk-11-jdk     maven     git     gcc     make     && rm -rf /var/lib/apt/lists/*
+#6 0.366 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+#6 0.383 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+#6 0.383 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+#6 0.489 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8793 kB]
+#6 0.575 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+#6 0.669 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [277 kB]
+#6 1.480 Fetched 9331 kB in 1s (8230 kB/s)
+#6 1.480 Reading package lists...
+#6 1.911 Reading package lists...
+#6 2.357 Building dependency tree...
+#6 2.459 Reading state information...
+#6 2.465 E: Unable to locate package openjdk-11-jdk
+#6 ERROR: process "/bin/sh -c apt-get update &&     apt-get install -y --no-install-recommends     openjdk-11-jdk     maven     git     gcc     make     && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
+
+#7 [stage-1 3/4] RUN apt-get update &&     apt-get install -y --no-install-recommends     openjdk-11-jdk-headless     git     && rm -rf /var/lib/apt/lists/*
+#7 0.371 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+#7 0.394 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+#7 0.394 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+#7 0.497 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8793 kB]
+#7 0.984 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+#7 0.985 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [277 kB]
+#7 1.862 Fetched 9331 kB in 2s (6156 kB/s)
+#7 1.862 Reading package lists...
+#7 2.313 Reading package lists...
+#7 CANCELED
+------
+ > [builder 3/4] RUN apt-get update &&     apt-get install -y --no-install-recommends     openjdk-11-jdk     maven     git     gcc     make     && rm -rf /var/lib/apt/lists/*:
+0.366 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+0.383 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+0.383 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+0.489 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8793 kB]
+0.575 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+0.669 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [277 kB]
+
+2.357 Building dependency tree...
+2.459 Reading state information...
+2.465 E: Unable to locate package openjdk-11-jdk
+------
+envgym.dockerfile:8
+--------------------
+   7 |     # Install build dependencies
+   8 | >>> RUN apt-get update && \
+   9 | >>>     apt-get install -y --no-install-recommends \
+  10 | >>>     openjdk-11-jdk \
+  11 | >>>     maven \
+  12 | >>>     git \
+  13 | >>>     gcc \
+  14 | >>>     make \
+  15 | >>>     && rm -rf /var/lib/apt/lists/*
+  16 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c apt-get update &&     apt-get install -y --no-install-recommends     openjdk-11-jdk     maven     git     gcc     make     && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

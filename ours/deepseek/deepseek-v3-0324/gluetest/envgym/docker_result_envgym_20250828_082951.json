@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250828_082951",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756369788",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 1.32kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/ubuntu:22.04\n#2 DONE 0.2s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/13] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0\n#4 DONE 0.0s\n\n#5 [ 6/13] RUN bash -c \"source /home/cc/.sdkman/bin/sdkman-init.sh     && sdk install java 11.0.11.hs-adpt     && sdk install maven 3.8.6     && sdk install gradle 7.5.1\"\n#5 CACHED\n\n#6 [ 3/13] RUN useradd -m -d /home/cc -s /bin/bash cc\n#6 CACHED\n\n#7 [ 4/13] WORKDIR /home/cc\n#7 CACHED\n\n#8 [ 5/13] RUN curl -s \"https://get.sdkman.io\" | bash     && chown -R cc:cc /home/cc/.sdkman\n#8 CACHED\n\n#9 [ 7/13] RUN mkdir -p /home/cc/EnvGym/data/gluetest     && mkdir -p /home/cc/.m2/repository\n#9 CACHED\n\n#10 [ 2/13] RUN apt-get update && apt-get install -y     git     wget     curl     unzip     zip     openjdk-11-jdk     maven     python3     python3-pip     python3-venv     build-essential     zlib1g-dev     libncurses5-dev     libgdbm-dev     libnss3-dev     libssl-dev     libreadline-dev     libffi-dev     libsqlite3-dev     libbz2-dev     && rm -rf /var/lib/apt/lists/*\n#10 CACHED\n\n#11 [ 8/13] WORKDIR /home/cc/EnvGym/data/gluetest\n#11 CACHED\n\n#12 [internal] load build context\n#12 transferring context: 169.61MB 1.1s done\n#12 DONE 1.1s\n\n#13 [ 9/13] COPY . /home/cc/EnvGym/data/gluetest/\n#13 DONE 0.9s\n\n#14 [10/13] RUN pip3 install --user -r /home/cc/EnvGym/data/gluetest/requirements.txt\n#14 0.521 ERROR: Could not open requirements file: [Errno 2] No such file or directory: '/home/cc/EnvGym/data/gluetest/requirements.txt'\n#14 ERROR: process \"/bin/sh -c pip3 install --user -r $GLUETEST/requirements.txt\" did not complete successfully: exit code: 1\n------\n > [10/13] RUN pip3 install --user -r /home/cc/EnvGym/data/gluetest/requirements.txt:\n0.521 ERROR: Could not open requirements file: [Errno 2] No such file or directory: '/home/cc/EnvGym/data/gluetest/requirements.txt'\n------\nenvgym.dockerfile:51\n--------------------\n  49 |     COPY . $GLUETEST/\n  50 |     \n  51 | >>> RUN pip3 install --user -r $GLUETEST/requirements.txt\n  52 |     \n  53 |     RUN mvn -f $GLUETEST/pom.xml clean install\n--------------------\nERROR: failed to solve: process \"/bin/sh -c pip3 install --user -r $GLUETEST/requirements.txt\" did not complete successfully: exit code: 1\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

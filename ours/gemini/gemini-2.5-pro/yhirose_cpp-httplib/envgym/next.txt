@@ -1,0 +1,5 @@
+current progress
+A multi-stage Dockerfile has been created. The `builder` stage installs all necessary system and language dependencies. The `production` stage uses a minimal `distroless` image. However, a previous build attempt failed during the `apt-get install` step. The current Dockerfile compiles the application using a direct `g++` command with an incorrect include path (`-I.`), which bypasses the CMake build system detailed in the project plan.
+
+next step
+Replace the direct `g++` command in the `builder` stage with the intended CMake build process. This involves adding `RUN` commands to configure the project with CMake (e.g., `RUN cmake -S . -B /build`) and then build it (e.g., `RUN cmake --build /build`). Finally, update the `COPY` command for the production stage to copy the executable from CMake's output directory (e.g., `/build/server`) instead of `/app/server`.

@@ -1,0 +1,1248 @@
+This is our current plan:
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - **Git**: For cloning the source code repository and its submodules (e.g., Oniguruma). Version 2.x or later is recommended.
+   - **C Compiler / Build Tools**:
+     - **Debian/Ubuntu**: `build-essential`, `pkg-config`. For building with system Oniguruma: `libonig-dev`. For memory debugging: `valgrind`. For static analysis: `clang`, `clang-tools`. For debugging core dumps: `gdb`. For code coverage: `lcov`. For cross-compiling: `crossbuild-essential-<arch>` (e.g., `crossbuild-essential-arm64`). For Windows targets: `mingw-w64`.
+     - **RedHat/CentOS**: `Development Tools` group (`yum groupinstall "Development Tools"`), `pkg-config`, and `rpm-build` for creating RPM packages. For building with system Oniguruma: `oniguruma-devel`. For memory debugging: `valgrind`. For static analysis: `clang`. For debugging core dumps: `gdb`. For code coverage: `lcov`.
+     - **macOS**: Xcode Command Line Tools. Required for standard builds and essential for iOS cross-compilation (provides `xcrun`, `clang`, `lipo`, and iOS SDKs). `pkg-config` can be installed via Homebrew. For building with system Oniguruma: `oniguruma` (via Homebrew). For debugging: `gdb` (via Homebrew). For code coverage: `lcov` (via Homebrew).
+     - **Windows**: `msys2` with the appropriate toolchain (e.g., `ucrt64/mingw-w64-ucrt-x86_64-toolchain`) and `pkg-config` (`ucrt64/mingw-w64-ucrt-x86_64-pkg-config`). A Clang toolchain is also available (`ucrt64/mingw-w64-ucrt-x86_64-clang`).
+     - **Cross-Compilation Toolchains**: Specific toolchains for the target architecture are required when cross-compiling (e.g., `x86_64-w64-mingw32-gcc`).
+   - **GNU Build System Tools**:
+     - `make`: To execute build recipes.
+     - `autoconf`: Version 2.65 or later is required.
+     - `automake`: Version 1.11.2 or later is required.
+     - `libtool`: A generic library support script.
+     - `bison`: A YACC-compatible parser generator. Version 3.0 or later is required for building from a git clone.
+     - `flex`: A tool for generating lexical analyzers, required for building from a git clone.
+   - **Standard Unix Utilities**:
+     - `curl`: Required by the iOS build script to download dependencies.
+     - `tar`: Required by the iOS build script to extract archives.
+     - `file`: Useful for verifying the architecture of cross-compiled binaries.
+   - **Docker**: For running `jq` in a containerized environment. Latest stable version recommended.
+   - **(Optional) QEMU for Docker**: Required for building multi-architecture Docker images locally (e.g., via `docker buildx create --use`).
+   - **(Optional) Prebuilt Binary**: Can be downloaded directly from the project's GitHub releases page as an alternative to building from source.
+   - **(Optional) Documentation Tools**:
+     - `Python`: For building the man pages and documentation. Version 3.11 or later is recommended.
+     - `pipenv`: For managing the Python dependencies via the `docs/Pipfile`.
+     - `virtualenv`: May be needed to manually set up the Python environment for `pipenv`.
+     - **Python Packages (managed by pipenv)**: `jinja2`, `pyyaml`, `markdown`, `lxml`, `jsonschema`, `importlib_resources`. These are required to regenerate man pages or update manual-based tests if documentation source files are modified.
+   - **(Optional) Valgrind**: A memory debugging and profiling tool, useful for development builds.
+   - **(Optional) Code Navigation Tools**:
+     - `ctags` / `cscope`: For generating index files that facilitate source code navigation in text editors.
+
+2. FILES TO CREATE:
+   - **File Path**: `./.gitignore`
+   - **Content Description**: Specifies intentionally untracked files to be ignored by Git. This includes build artifacts, logs, temporary files, and local configuration.
+   - **Sample Content**:
+     ```
+     *.o
+     *.a
+     *.lo
+     *.la
+     *.lai
+     *.so
+     *.so.*
+     *.gcda
+     *.gcno
+     *.gcov
+     *~
+     .*.sw[a-p]
+     tags
+
+     jq
+     !tests/modules/lib/jq/
+     jq.1
+
+     # Generated source
+     src/builtin.inc
+     src/config_opts.inc
+     *.pc
+
+     # Autotools junk
+     .libs
+     .deps
+     .dirstamp
+     libtool
+     *.log
+     stamp-h1
+     config.log
+     config.status
+     autom4te.cache
+     confdefs.h
+     conftest*
+     INSTALL
+     Makefile
+     jq-*.tar.gz
+     jq-*.zip
+     configure
+     aclocal.m4
+     Makefile.in
+     version.h
+     .remake-version-h
+     config.cache
+     *.rpm
+     m4/libtool.m4
+     m4/ltoptions.m4
+     m4/ltsugar.m4
+     m4/ltversion.m4
+     m4/lt~obsolete.m4
+     tests/*.trs
+
+     # Docs output
+     docs/output
+
+     cscope.in.out
+     cscope.out
+     cscope.po.out
+     jq.dSYM
+     ```
+   - **File Path**: `./package.json`
+   - **Content Description**: A sample JSON file to be used for testing the `jq` installation.
+   - **Sample Content**:
+     ```json
+     {
+       "name": "jq-test-project",
+       "version": "1.7.1",
+       "description": "A test file for jq.",
+       "main": "index.js",
+       "author": "",
+       "license": "ISC"
+     }
+     ```
+   - **File Path**: `./Dockerfile.build`
+   - **Content Description**: Defines a multi-stage Docker build to compile a minimal, statically-linked `jq` executable from source. It initializes the required `oniguruma` submodule before compilation.
+   - **Sample Content**:
+     ```dockerfile
+     # This Dockerfile builds jq from source inside a container.
+     FROM debian:12-slim AS builder
+
+     ENV DEBIAN_FRONTEND=noninteractive \
+         DEBCONF_NONINTERACTIVE_SEEN=true \
+         LC_ALL=C.UTF-8 \
+         LANG=C.UTF-8
+
+     RUN apt-get update \
+      && apt-get install -y \
+           build-essential \
+           pkg-config \
+           autoconf \
+           automake \
+           libtool \
+           bison \
+           flex \
+           git \
+      && apt-get clean \
+      && rm -rf /var/lib/apt/lists/*
+
+     WORKDIR /app
+     COPY . /app
+     RUN git submodule update --init \
+      && autoreconf -i \
+      && ./configure \
+           --disable-docs \
+           --with-oniguruma=builtin \
+           --enable-static \
+           --enable-all-static \
+           --prefix=/usr/local \
+      && make -j$(nproc) \
+      && make check VERBOSE=yes \
+      && make install-strip
+
+     FROM scratch
+
+     COPY --from=builder /app/AUTHORS /app/COPYING /usr/local/bin/jq /
+     RUN ["/jq", "--version"]
+     ENTRYPOINT ["/jq"]
+     ```
+   - **File Path**: `./Dockerfile.multiarch`
+   - **Content Description**: Defines a Docker image for packaging pre-built static binaries, supporting multi-architecture builds. This mimics the official CI/CD pipeline. Requires binaries to be placed in architecture-specific subdirectories (e.g., `./linux/amd64/jq`).
+   - **Sample Content**:
+      ```dockerfile
+      # This Dockerfile packages a pre-built binary.
+      FROM scratch
+      ARG TARGETPLATFORM
+      COPY AUTHORS COPYING $TARGETPLATFORM/jq /
+      RUN ["/jq", "--version"]
+      ENTRYPOINT ["/jq"]
+      ```
+   - **File Path**: `./compile-ios.sh`
+   - **Content Description**: A shell script for macOS to cross-compile `jq` and its dependency Oniguruma into universal static libraries for multiple iOS architectures.
+   - **Sample Content**:
+     ```bash
+     #!/usr/bin/env bash
+     # Mac C. compile-ios.sh for JQ.
+
+     # Defaults
+     set -e
+     oniguruma='6.9.10'
+
+     unset CFLAGS
+     unset CXXFLAGS
+     unset LDFLAGS
+
+     # Parse args.
+     usage(){
+     cat << EOF
+     ${0##*/}: usage
+
+         Description:
+            This simple script builds oniguruma and jq for all *-apple-darwin devices.
+
+         Arguments:
+         --extra-cflags <arg>: Pass defines or includes to clang.
+         --extra-ldflags <arg>: Pass libs or includes to ld64.
+
+         --with-oniguruma <arg>: Change default version of onigurma from ${oniguruma}.
+     EOF
+     exit 1
+     }
+
+     while (( $# )); do
+        case "$1" in
+           --with-oniguruma) shift; oniguruma="${1}" ;;
+
+           --extra-cflags) shift; export CFLAGS_="${1}" ;;
+           --extra-ldflags) shift; export LDFLAGS_="${1}" ;;
+
+           --help) usage ;;
+           *) echo -e "Unknown option: ${1}\n"; usage ;;
+        esac
+        shift
+     done
+
+     # Start building.
+     echo "Building..."
+     MAKEJOBS="$(sysctl -n hw.ncpu || echo 1)"
+     CC_="$(xcrun -f clang || echo clang)"
+
+     onig_url="https://github.com/kkos/oniguruma/releases/download/v${oniguruma}/onig-${oniguruma}.tar.gz"
+     builddir="${TMPDIR:-/tmp}/${RANDOM:-'xxxxx'}-compile-ios-build"
+     cwd="$(realpath ${PWD} 2>/null || echo ${PWD})"
+
+     t_exit() {
+     cat << EOF
+
+     A error as occurred.
+         oniguruma location: ${builddir}/onig/onig-${oniguruma}
+         jq location: ${cwd}
+
+         Provide config.log and console logs when posting a issue.
+
+     EOF
+     }
+     trap t_exit ERR
+
+     #  Onig.
+     mkdir -p "${builddir}/onig"
+     cd "${builddir}/"
+      curl -L ${onig_url} | tar xz
+      for arch in i386 x86_64 armv7 armv7s arm64; do
+          if [[ "$arch" = "i386" || "$arch" = "x86_64" ]]; then
+              SYSROOT=$(xcrun -f --sdk iphonesimulator --show-sdk-path)
+          else
+              SYSROOT=$(xcrun -f --sdk iphoneos --show-sdk-path)
+          fi
+          HOST="${arch}-apple-darwin"
+          [[ "${arch}" = "arm64" ]] && HOST="aarch64-apple-darwin"
+
+          CFLAGS="-arch ${arch} -miphoneos-version-min=9.0 -isysroot ${SYSROOT} ${CFLAGS_} -D_REENTRANT"
+          LDFLAGS="-arch ${arch} -miphoneos-version-min=9.0 -isysroot ${SYSROOT} ${LDFLAGS_}"
+          CC="${CC_} ${CFLAGS}"
+
+          # ./configure; make install
+          cd "${builddir}/onig-${oniguruma}"
+          CC=${CC} LDFLAGS=${LDFLAGS} \
+          ./configure --host=${HOST} --build=$(./config.guess) --enable-shared=no --enable-static=yes --prefix=/
+          make -j${MAKEJOBS} install DESTDIR="${cwd}/ios/onig/${arch}"
+          make clean
+          
+          # Jump back to JQ.
+          cd ${cwd}
+          [[ ! -f ./configure ]] && autoreconf -ivf
+          CC=${CC} LDFLAGS=${LDFLAGS} \
+          ./configure --host=${HOST} --build=$(./config/config.guess) --enable-docs=no --enable-shared=no --enable-static=yes --prefix=/ --with-oniguruma=${cwd}/ios/onig/${arch} $(test -z ${BISON+x} || echo '--enable-maintainer-mode')
+          make -j${MAKEJOBS} install DESTDIR="${cwd}/ios/jq/${arch}"
+          make clean
+      done
+
+     mkdir -p "${cwd}/ios/dest/lib"
+     # lipo, make a static lib.
+     lipo -create -output ${cwd}/ios/dest/lib/libonig.a ${cwd}/ios/onig/{i386,x86_64,armv7,armv7s,arm64}/lib/libonig.a
+     lipo -create -output ${cwd}/ios/dest/lib/libjq.a ${cwd}/ios/jq/{i386,x86_64,armv7,armv7s,arm64}/lib/libjq.a
+
+     # Take the arm64 headers- the most common target.
+     cp -r ${cwd}/ios/jq/arm64/include ${cwd}/ios/dest/
+     rm -rf ${cwd}/build/ios/{i386,x86_64,armv7,armv7s,arm64}
+
+     echo "Output to ${cwd}/ios/dest"
+     ```
+   - **File Path**: `./scripts/crosscompile`
+   - **Content Description**: A shell script to simplify cross-compiling `jq` for different target platforms (e.g., Windows from Linux). It automates the process of creating a build directory, running `./configure` with the correct host flags, and extracting the final binary. This version is optimized to use all available CPU cores.
+   - **Sample Content**:
+     ```bash
+     #!/bin/sh
+
+     # This script is used to cross-compile binaries for
+     # platforms other than the current one
+
+     # Usage: $0 <platformname> <configure options>
+     # <platformname> is arbitrary, it is the name
+     # of the directory which will be created to contain
+     # the output binaries.
+
+     # e.g. $0 win64 --host=i686-w64-mingw32
+
+     set -e
+     cd `dirname "$0"`/../build
+
+     plat="$1"
+     [ -z "$plat" ] && exit 1
+     shift
+
+     case "$plat" in
+     */*) echo "platform name must not be a path"; exit 1;;
+     *..*) echo "platform name must not be a path"; exit 1;;
+     *) plat=$PWD/$plat;;
+     esac
+
+     [ -d "$plat" ] || mkdir "$plat"
+     rm -rf "$plat/tmp"
+     mkdir "$plat/tmp"
+     cd "$plat/tmp"
+     ../../../configure "$@"
+     make -j"$(nproc)" DESTDIR=$plat install
+     set -x
+     for jq in `find . -type f \( -name jq -o -name jq.exe \) -print`; do
+         cp "$jq" ..
+     done
+     cd ..
+     rm -rf tmp
+     ```
+   - **File Path**: `./jq.spec`
+   - **Content Description**: An RPM spec file for building `jq` packages on RedHat-based systems (e.g., Fedora, CentOS, RHEL).
+   - **Sample Content**:
+     ```spec
+     # This is spec file maintained by developers of JQ, not by a OS distro.
+     # Your OS of choice will likely ignore this RPM spec file.
+     Summary: Command-line JSON processor
+     Name: jq
+     Version: %{myver}
+     Release: %{myrel}%{?dist}
+     Source0: jq-%{myver}.tar.gz
+     URL: https://jqlang.org
+     License: MIT AND ICU AND CC-BY-3.0
+     AutoReqProv: no
+     #BuildPrereq: autoconf, libtool, automake, flex, bison, python, pkg-config
+
+     Group: Applications/System
+     # Requires:
+
+     # Disables debug packages and stripping of binaries:
+     %global _enable_debug_package 0
+     %global debug_package %{nil}
+     %global __os_install_post %{nil}
+
+     # Crank up the compression
+     %define _binary_payload w7.lzdio
+
+     %description
+     jq is a command-line JSON processor
+
+     %prep
+     %setup
+
+     %build
+     echo "Building in: \"$(pwd)\""
+     %if "%{devbuild}" == "yes"
+     ./configure --prefix=%{_prefix} --enable-devel
+     %else
+     ./configure --prefix=%{_prefix}
+     %endif
+     make
+
+     %install
+     echo "Installing to: \"%{buildroot}\""
+     make install DESTDIR=%{buildroot}
+
+     %clean
+     rm -rf %{buildroot}
+
+     %files
+     %defattr(-,root,root)
+     %{_bindir}/jq
+     %if "%{devbuild}" == "yes"
+     %{_libexecdir}/%{name}/jq_test
+     %{_libexecdir}/%{name}/testdata
+     %endif
+     %{_datadir}/doc/%{name}/AUTHORS
+     %{_datadir}/doc/%{name}/COPYING
+     %{_datadir}/doc/%{name}/README.md
+     %{_datadir}/man/man1/jq.1
+     %{_includedir}/jq.h
+     %{_includedir}/jv.h
+     %{_libdir}/pkgconfig/libjq.pc
+     %{_prefix}/lib/libjq.a
+     %{_prefix}/lib/libjq.la
+     %{_prefix}/lib/libjq.so
+     %{_prefix}/lib/libjq.so.1
+     %{_prefix}/lib/libjq.so.1.0.4
+
+     %changelog
+
+     %pre
+
+     %post
+     ```
+   - **File Path**: `./test_libjq.c`
+   - **Content Description**: A simple C program to test linking against the installed `libjq` library using `pkg-config`.
+   - **Sample Content**:
+     ```c
+     #include <stdio.h>
+     #include <jq.h>
+     #include <jv.h>
+
+     int main() {
+         jq_state *jq = jq_init();
+         if (jq == NULL) {
+             perror("jq_init");
+             return 1;
+         }
+
+         const char *json_string = "{\"message\": \"hello world\"}";
+         const char *filter_string = ".message";
+
+         if (!jq_compile(jq, filter_string)) {
+             fprintf(stderr, "Error compiling filter\n");
+             jq_teardown(&jq);
+             return 1;
+         }
+
+         jv input = jv_parse(json_string);
+         if (!jv_is_valid(input)) {
+             fprintf(stderr, "Error parsing JSON\n");
+             jv_free(input);
+             jq_teardown(&jq);
+             return 1;
+         }
+
+         jq_start(jq, input, 0);
+         jv result = jq_next(jq);
+
+         if (jv_is_valid(result)) {
+             jv result_dumped = jv_dump_string(result, 0);
+             printf("Result: %s\n", jv_string_value(result_dumped));
+             jv_free(result_dumped);
+         } else {
+             fprintf(stderr, "No result or error during execution\n");
+         }
+
+         jv_free(result);
+         jq_teardown(&jq);
+         return 0;
+     }
+     ```
+   - **File Path**: `./.github/workflows/decnum.yml`
+   - **Content Description**: A GitHub Actions workflow to test the build process and runtime behavior when the decimal number support feature is disabled via the `--disable-decnum` configure flag.
+   - **Sample Content**:
+     ```yaml
+     name: decnum
+     on:
+       push:
+         branches:
+           - master
+       pull_request:
+
+     jobs:
+       disabled:
+         runs-on: ubuntu-24.04
+         steps:
+           - name: Clone repository
+             uses: actions/checkout@v5
+             with:
+               submodules: true
+           - name: Install packages
+             run: |
+               sudo apt-get update
+               sudo apt-get install -y automake autoconf libtool
+           - name: Build
+             run: |
+               autoreconf -i
+               ./configure \
+                 --disable-docs \
+                 --disable-maintainer-mode \
+                 --disable-decnum
+               make -j"$(nproc)"
+               make check
+               file ./jq
+           - name: Test
+             run: |
+               diff <(echo 100000000000000000000 | ./jq) <(echo 1e+20)
+               git diff --exit-code
+     ```
+   - **File Path**: `./.github/workflows/manpage.yml`
+   - **Content Description**: A GitHub Actions workflow to build and validate the man page and its associated tests, ensuring they are up-to-date with the source documentation files.
+   - **Sample Content**:
+     ```yaml
+     name: Building man page, man.test, manonig.test
+     on:
+       push:
+         paths:
+           - '.github/workflows/manpage.yml'
+           - 'docs/**'
+           - 'tests/man.test'
+           - 'tests/manonig.test'
+           - 'jq.1.prebuilt'
+       pull_request:
+         paths:
+           - '.github/workflows/manpage.yml'
+           - 'docs/**'
+           - 'tests/man.test'
+           - 'tests/manonig.test'
+           - 'jq.1.prebuilt'
+
+     jobs:
+       manpages:
+         runs-on: ubuntu-latest
+         steps:
+           - name: Checkout code
+             uses: actions/checkout@v5
+           - name: Setup Python
+             uses: actions/setup-python@v5
+             with:
+               python-version: '3.11'
+               cache: pipenv
+           - name: Install pipenv
+             run: pip install pipenv
+           - name: Install dependencies
+             run: pipenv sync
+             working-directory: docs
+           - name: Validate manual schema
+             run: pipenv run python3 validate_manual_schema.py content/manual/**/*.yml
+             working-directory: docs
+           - name: Configure
+             run: |
+               autoreconf -i
+               ./configure --enable-docs
+           - name: Build man page, man.test, manonig.test
+             run: |
+               mv jq.1.prebuilt jq.1.old
+               rm -f tests/man.test manonig.test
+               make jq.1.prebuilt tests/man.test tests/manonig.test
+           - name: Make sure that jq.1.prebuilt, man.test, manonig.test are up to date
+             run: |
+               git diff --exit-code tests/man.test tests/manonig.test
+               # skip build date in jq.1.prebuilt
+               test -s jq.1.prebuilt
+               diff -- <(tail -n +3 jq.1.old) <(tail -n +3 jq.1.prebuilt)
+     ```
+   - **File Path**: `./.github/workflows/oniguruma.yml`
+   - **Content Description**: A GitHub Actions workflow to test building `jq` with different Oniguruma (regex library) configurations: linked against a system-installed version and with support disabled entirely.
+   - **Sample Content**:
+     ```yaml
+     name: oniguruma
+     on:
+       push:
+         branches:
+           - master
+       pull_request:
+
+     # Since builtin oniguruma is tested in the CI workflow,
+     # we test other options for --with-oniguruma here.
+     jobs:
+       installed:
+         runs-on: ubuntu-24.04
+         steps:
+           - name: Clone repository
+             uses: actions/checkout@v5
+           - name: Install packages
+             run: |
+               sudo apt-get update
+               sudo apt-get install -y automake autoconf libtool valgrind libonig-dev
+           - name: Build
+             run: |
+               autoreconf -i
+               ./configure \
+                 --disable-docs \
+                 --enable-valgrind \
+                 --with-oniguruma=yes
+               make -j"$(nproc)"
+               file ./jq
+           - name: Test
+             run: |
+               ./jq -n '"" | test("")'
+               make check VERBOSE=yes
+               git diff --exit-code
+           - name: Upload Test Logs
+             if: ${{ failure() }}
+             uses: actions/upload-artifact@v4
+             with:
+               name: test-logs-oniguruma-installed
+               retention-days: 7
+               path: |
+                 test-suite.log
+                 tests/*.log
+
+       disabled:
+         runs-on: ubuntu-24.04
+         steps:
+           - name: Clone repository
+             uses: actions/checkout@v5
+           - name: Install packages
+             run: |
+               sudo apt-get update
+               sudo apt-get install -y automake autoconf libtool valgrind
+           - name: Build
+             run: |
+               autoreconf -i
+               ./configure \
+                 --disable-docs \
+                 --enable-valgrind \
+                 --with-oniguruma=no
+               make -j"$(nproc)"
+               file ./jq
+           - name: Test
+             run: |
+               ! ./jq -n '"" | test("")'
+               make check VERBOSE=yes
+               git diff --exit-code
+           - name: Upload Test Logs
+             if: ${{ failure() }}
+             uses: actions/upload-artifact@v4
+             with:
+               name: test-logs-oniguruma-disabled
+               retention-days: 7
+               path: |
+                 test-suite.log
+                 tests/*.log
+     ```
+   - **File Path**: `./.github/workflows/scanbuild.yml`
+   - **Content Description**: A GitHub Actions workflow to run the Clang static analyzer (`scan-build`) against the codebase to find potential bugs.
+   - **Sample Content**:
+     ```yaml
+     name: Clang scan-build Static Analyzer Build
+
+     on:
+       push:
+         branches:
+           - master
+
+     jobs:
+       scan-build:
+         runs-on: ubuntu-latest
+         steps:
+           - name: Clone repository
+             uses: actions/checkout@v5
+             with:
+               submodules: true
+           - name: Install packages
+             run: |
+               sudo apt-get update -qq
+               sudo apt-get install -y automake autoconf gdb valgrind clang clang-tools
+               echo "CC=clang" >> "$GITHUB_ENV"
+           - name: Build
+             run: |
+               autoreconf -i
+               ./configure --enable-valgrind CFLAGS="-g -O0"
+               scan-build --keep-going --exclude vendor/ make -j"$(nproc)"
+           - name: Test
+             run: |
+               ulimit -c unlimited
+               scan-build --keep-going --exclude vendor/ make -j"$(nproc)" check
+           - name: Core dump stacks
+             run: |
+               if [[ -f core ]]; then
+                 gdb -batch -ex "thread apply all bt" \
+                   "$(file core | sed "s/^[^']*'//; s/[ '].*$//")" core
+                 exit 1
+               fi
+           - name: Test logs
+             if: ${{ failure() }}
+             run: |
+               cat test-suite.log tests/*.log
+           - name: Upload Logs
+             uses: actions/upload-artifact@v4
+             with:
+               name: Scan-Build Reports
+               path: /tmp/scan-build*
+               if-no-files-found: ignore
+               retention-days: 7
+     ```
+   - **File Path**: `./.github/workflows/valgrind.yml`
+   - **Content Description**: A GitHub Actions workflow to compile `jq` with Valgrind support enabled and run the test suite under Valgrind to detect memory leaks and other memory-related errors.
+   - **Sample Content**:
+     ```yaml
+     name: valgrind
+     on:
+       push:
+         branches:
+           - master
+       pull_request:
+
+     jobs:
+       linux:
+         runs-on: ubuntu-24.04
+         steps:
+           - name: Clone repository
+             uses: actions/checkout@v5
+             with:
+               submodules: true
+           - name: Install packages
+             run: |
+               sudo apt-get update
+               sudo apt-get install -y automake autoconf libtool valgrind
+           - name: Build
+             run: |
+               autoreconf -i
+               ./configure \
+                 --disable-docs \
+                 --enable-valgrind \
+                 --with-oniguruma=builtin
+               make -j"$(nproc)"
+               file ./jq
+           - name: Test
+             run: |
+               make check VERBOSE=yes
+               git diff --exit-code
+           - name: Upload Test Logs
+             if: ${{ failure() }}
+             uses: actions/upload-artifact@v4
+             with:
+               name: test-logs-valgrind-linux
+               retention-days: 7
+               path: |
+                 test-suite.log
+                 tests/*.log
+     ```
+   - **File Path**: `./.github/workflows/website.yml`
+   - **Content Description**: A GitHub Actions workflow to build the project website from the `docs/` directory and deploy it to GitHub Pages.
+   - **Sample Content**:
+     ```yaml
+     name: Update website
+     on:
+       push:
+         branches:
+           - master
+         paths:
+           - 'docs/**'
+     concurrency: website
+
+     jobs:
+       build:
+         runs-on: ubuntu-latest
+         defaults:
+           run:
+             working-directory: docs
+         steps:
+           - name: Checkout code
+             uses: actions/checkout@v5
+           - name: Setup Python
+             uses: actions/setup-python@v5
+             with:
+               python-version: '3.11'
+               cache: pipenv
+           - name: Install pipenv
+             run: pip install pipenv
+           - name: Install dependencies
+             run: pipenv sync
+           - name: Build website
+             run: pipenv run python3 build_website.py
+           - name: Upload pages artifact
+             uses: actions/upload-pages-artifact@v4
+             with:
+               path: docs/output/
+
+       deploy:
+         needs: build
+         permissions:
+           pages: write
+           id-token: write
+         environment:
+           name: github-pages
+           url: ${{ steps.deployment.outputs.page_url }}
+         runs-on: ubuntu-latest
+         steps:
+           - name: Deploy to GitHub Pages
+             uses: actions/deploy-pages@v4
+             id: deployment
+     ```
+   - **File Path**: `./.github/dependabot.yml`
+   - **Content Description**: A GitHub Dependabot configuration file to automatically create pull requests for updating dependencies, including Python packages for documentation and GitHub Actions.
+   - **Sample Content**:
+     ```yaml
+     version: 2
+     updates:
+       - package-ecosystem: "pip"
+         directory: "docs/"
+         schedule:
+           interval: "monthly"
+       - package-ecosystem: "github-actions"
+         directory: "/"
+         schedule:
+           interval: "weekly"
+         groups:
+           official-actions:
+             patterns: ["actions/*"]
+     ```
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - **Test Case 1: Built-in Test Suite (for source builds)**
+     - **Description**: Executes the comprehensive test suite included with the `jq` source code.
+     - **Execution Command**: `make check VERBOSE=yes`
+     - **Expected Outcome**: The command should complete without errors, indicating all internal tests have passed.
+   - **Test Case 2: Distribution Quality Check (for source builds)**
+     - **Description**: A thorough test provided by autotools that creates a source distribution archive, unpacks it, and runs a full build and test cycle from the unpacked source to ensure portability.
+     - **Execution Command**: `make distcheck`
+     - **Expected Outcome**: The command completes successfully, confirming the source distribution is valid.
+   - **Test Case 3: Source Tree Cleanliness Check (for developers)**
+     - **Description**: Verifies that the build process has not modified any version-controlled files.
+     - **Execution Command**: `git diff --exit-code`
+     - **Expected Outcome**: The command should exit with a status code of 0, indicating no differences.
+   - **Test Case 4: Basic JSON Processing**
+     - **Description**: Verifies that the `jq` executable can parse a simple JSON string and extract a value.
+     - **Execution Command**: `echo '{"status": "ok"}' | ./jq '.status'`
+     - **Expected Outcome**: The command should output `"ok"`.
+   - **Test Case 5: File-based JSON Processing**
+     - **Description**: Tests `jq`'s ability to read from a file and extract a specific field.
+     - **Execution Command**: `./jq '.version' package.json`
+     - **Expected Outcome**: The command should output `"1.7.1"`.
+   - **Test Case 6: Custom Docker Image Build and Execution**
+     - **Description**: Verifies that a custom Docker image can be built from source and that the resulting container can process JSON.
+     - **Execution Commands**:
+       1. `docker build -t my-jq -f Dockerfile.build .`
+       2. `echo '{"status": "ok"}' | docker run --rm -i my-jq '.status'`
+     - **Expected Outcome**: The build command completes successfully. The run command outputs `"ok"`.
+   - **Test Case 7: Documentation Schema Validation (for developers)**
+     - **Description**: Validates that the YAML source files for the manual conform to the required schema.
+     - **Prerequisites**: Python dependencies must be installed via `pipenv sync` in the `docs/` directory.
+     - **Execution Command**: `(cd docs && pipenv run python3 validate_manual_schema.py content/manual/**/*.yml)`
+     - **Expected Outcome**: The script completes with a status code of 0, indicating the schema is valid.
+   - **Test Case 8: Man Page Generation (for developers)**
+     - **Description**: Verifies that the project's pre-built man page and its associated test files can be successfully regenerated from the source documentation.
+     - **Prerequisites**: Build must be configured with `--enable-docs`.
+     - **Execution Command**: `make jq.1.prebuilt tests/man.test tests/manonig.test`
+     - **Expected Outcome**: The command completes without errors, and the files `jq.1.prebuilt`, `tests/man.test`, and `tests/manonig.test` are created or updated.
+   - **Test Case 9: Website Generation (for developers)**
+     - **Description**: Verifies that the project website can be successfully generated using the Python-based build script.
+     - **Prerequisites**: Python dependencies must be installed via `pipenv sync` in the `docs/` directory.
+     - **Execution Command**: `(cd docs && pipenv run python3 build_website.py)`
+     - **Expected Outcome**: The command completes without errors, and the static website content is generated in the `docs/output/` directory.
+   - **Test Case 10: Man Page Up-to-Date Check (for developers)**
+     - **Description**: Verifies that the pre-built man page (`jq.1.prebuilt`) and its associated test files (`tests/man.test`, `tests/manonig.test`) are up-to-date with the source documentation files.
+     - **Execution Commands**:
+       1. `mv jq.1.prebuilt jq.1.old`
+       2. `make jq.1.prebuilt tests/man.test tests/manonig.test`
+       3. `git diff --exit-code tests/man.test tests/manonig.test`
+       4. `diff -- <(tail -n +3 jq.1.old) <(tail -n +3 jq.1.prebuilt)`
+     - **Expected Outcome**: Both the `git diff` and `diff` commands should exit with a status code of 0, confirming that the committed files are current.
+   - **Test Case 11: iOS Static Library Build (macOS only)**
+     - **Description**: Verifies that universal static libraries for `jq` and Oniguruma can be successfully cross-compiled for target iOS architectures. This test is only applicable on macOS hosts.
+     - **Execution Commands**:
+       1. `./compile-ios.sh`
+       2. (Optional) `lipo -info ios/dest/lib/libjq.a`
+     - **Expected Outcome**: The script completes without errors. The universal libraries `ios/dest/lib/libjq.a` and `ios/dest/lib/libonig.a` are created. The optional `lipo` command should list the compiled architectures (e.g., i386, x86_64, armv7, arm64).
+   - **Test Case 12: Cross-Compilation Build**
+     - **Description**: Verifies that `jq` can be successfully cross-compiled for a different target using the `crosscompile` script. This example targets 64-bit Windows from a Linux host.
+     - **Prerequisites**: A cross-compiler must be installed (e.g., `mingw-w64` on Debian/Ubuntu).
+     - **Execution Commands**:
+       1. `mkdir -p build scripts`
+       2. Create the `scripts/crosscompile` file and make it executable (`chmod +x scripts/crosscompile`).
+       3. `./scripts/crosscompile win64 --host=x86_64-w64-mingw32 --with-oniguruma=builtin --enable-all-static`
+       4. `file build/win64/jq.exe`
+     - **Expected Outcome**: The script completes without errors. The `jq.exe` binary is created in `build/win64/`. The `file` command should identify it as a Windows executable (e.g., "PE32+ executable (console) x86-64, for MS Windows").
+   - **Test Case 13: RPM Package Build (RedHat-based systems)**
+     - **Description**: Verifies that an RPM package can be built using the provided `jq.spec` file.
+     - **Prerequisites**: `rpm-build` tool must be installed (e.g., `sudo yum install rpm-build`).
+     - **Execution Commands**:
+       1. Create a source tarball: `make dist-gzip`
+       2. Copy the tarball to the RPM sources directory: `cp jq-*.tar.gz $(rpm --eval "%{_sourcedir}")`
+       3. Build the RPM: `rpmbuild -ba jq.spec --define "myver $(git describe --tags --abbrev=0)" --define "myrel 1"`
+     - **Expected Outcome**: The `rpmbuild` command completes successfully. Binary and source RPM files are created in the user's `rpmbuild` directory (e.g., `~/rpmbuild/RPMS/x86_64/` and `~/rpmbuild/SRPMS/`).
+   - **Test Case 14: `pkg-config` Integration and Library Linking**
+     - **Description**: Verifies that `libjq` is correctly installed with its `pkg-config` file, allowing other C programs to easily compile and link against it.
+     - **Prerequisites**: `jq` must be built and installed from source (see Method C).
+     - **Execution Commands**:
+       1. Create the `test_libjq.c` file as described in "2. FILES TO CREATE".
+       2. Compile the program: `gcc -o test_libjq test_libjq.c $(pkg-config --cflags --libs libjq)`
+       3. Execute the compiled program: `./test_libjq`
+     - **Expected Outcome**: The program compiles without errors. The program runs and outputs `Result: "hello world"`.
+   - **Test Case 15: Large Number Handling (without decnum support)**
+     - **Description**: Verifies that when `jq` is compiled with decimal number support disabled, it handles large numbers by converting them to standard floating-point scientific notation.
+     - **Prerequisites**: `jq` must be configured with `--disable-decnum`.
+     - **Execution Commands**:
+       1. `./configure --disable-decnum --with-oniguruma=builtin`
+       2. `make -j$(nproc)`
+       3. `diff <(echo 100000000000000000000 | ./jq) <(echo 1e+20)`
+     - **Expected Outcome**: The `diff` command should produce no output, indicating that the output from `jq` matches the expected scientific notation.
+   - **Test Case 16: Regex Support with System-Installed Oniguruma**
+     - **Description**: Verifies that `jq` can be compiled against a version of the Oniguruma library provided by the operating system and that regex functions are available.
+     - **Prerequisites**: The Oniguruma development library must be installed (e.g., `libonig-dev` on Debian/Ubuntu, `oniguruma-devel` on RedHat).
+     - **Execution Commands**:
+       1. `./configure --with-oniguruma=yes`
+       2. `make -j$(nproc)`
+       3. `./jq -n '"" | test("")'`
+     - **Expected Outcome**: The `jq` command executes successfully and outputs `true`, confirming that the `test` function provided by Oniguruma is working.
+   - **Test Case 17: Build without Regex Support**
+     - **Description**: Verifies that `jq` can be compiled with all Oniguruma-based regular expression support disabled.
+     - **Prerequisites**: `jq` must be configured with `--with-oniguruma=no`.
+     - **Execution Commands**:
+       1. `./configure --with-oniguruma=no`
+       2. `make -j$(nproc)`
+       3. `! ./jq -n '"" | test("")'`
+     - **Expected Outcome**: The `jq` command fails with an error indicating that `test` is not a valid function. The `!` inverts the exit code, so the overall command succeeds, confirming the expected failure.
+   - **Test Case 18: Static Analysis Build**
+     - **Description**: Runs the Clang static analyzer (`scan-build`) over the codebase to find potential bugs.
+     - **Prerequisites**: `clang` and `clang-tools` must be installed.
+     - **Execution Commands**:
+       1. `autoreconf -i`
+       2. `CC=clang ./configure --enable-valgrind CFLAGS="-g -O0"`
+       3. `scan-build --keep-going --exclude vendor/ make -j$(nproc)`
+       4. `scan-build --keep-going --exclude vendor/ make -j$(nproc)" check`
+     - **Expected Outcome**: The build and tests complete. `scan-build` should report "no bugs found" or provide a link to an HTML report detailing any potential issues. The process should not generate a `core` file.
+   - **Test Case 19: Memory Error Detection with Valgrind**
+     - **Description**: Compiles `jq` with Valgrind instrumentation and runs the test suite to detect memory management issues like leaks, invalid reads/writes, and use-after-free errors.
+     - **Prerequisites**: `valgrind` must be installed.
+     - **Execution Commands**:
+       1. `autoreconf -i`
+       2. `./configure --enable-valgrind --with-oniguruma=builtin`
+       3. `make -j$(nproc)`
+       4. `make check VERBOSE=yes`
+     - **Expected Outcome**: The test suite (`make check`) completes successfully. The Valgrind summary in the test logs (e.g., `test-suite.log`) should report "ERROR SUMMARY: 0 errors from 0 contexts".
+   - **Test Case 20: Local Website Serving and Verification (for developers)**
+     - **Description**: Verifies that the generated website can be served locally using Python's built-in web server.
+     - **Prerequisites**: Website must be generated by completing Test Case 9.
+     - **Execution Command**: `(cd docs && python3 -m http.server -d output)`
+     - **Expected Outcome**: The command starts a web server, typically on port 8000. Accessing the provided URL (e.g., `http://0.0.0.0:8000`) in a web browser should display the `jq` project website. The process can be stopped with `Ctrl+C`.
+   - **Test Case 21: Code Coverage Analysis (for developers)**
+     - **Description**: Compiles `jq` with code coverage instrumentation, runs the test suite, and generates an HTML report showing test coverage.
+     - **Prerequisites**: `lcov` must be installed.
+     - **Execution Commands**:
+       1. `./configure --enable-coverage`
+       2. `make`
+       3. `make check`
+       4. `lcov --capture --directory . --output-file coverage.info`
+       5. `genhtml coverage.info --output-directory coverage-report`
+     - **Expected Outcome**: All commands complete successfully. An HTML report is generated in the `coverage-report/` directory which can be opened in a web browser to inspect code coverage.
+   - **Test Case 22: Build Artifact Cleanup**
+     - **Description**: Verifies that generated build artifacts can be cleaned from the source tree.
+     - **Execution Commands**:
+       1. `./configure && make`
+       2. `make clean`
+       3. `make distclean`
+     - **Expected Outcome**: After `make clean`, object files and the `jq` executable are removed. After `make distclean`, all files generated by `./configure` (like `Makefile`) are also removed, returning the directory to a pristine state. Both commands should complete without errors.
+
+4. COMPLETE TODO LIST:
+   - **Step 0: Choose Your Installation Method**
+     - Review the methods below and choose the one that best suits your needs.
+
+   ---
+   ### **Method A: Installation via Prebuilt Binary (Recommended for most users)**
+   - **Step A.1: Download the Binary**
+     - Navigate to the `jq` GitHub releases page: `https://github.com/jqlang/jq/releases`.
+     - Download the appropriate binary for your OS and architecture (e.g., `jq-linux-amd64`).
+   - **Step A.2: Make the Binary Executable**
+     - Open a terminal and run: `chmod +x jq-linux-amd64`.
+   - **Step A.3: Place the Binary in Your PATH**
+     - Command: `sudo mv jq-linux-amd64 /usr/local/bin/jq`
+   - **Step A.4: Verify Installation**
+     - Run: `jq --version`
+     - **Verification**: The command should output the downloaded version number.
+
+   ---
+   ### **Method B: Setup via Pre-built Docker Image**
+   - **Step B.1: Install Docker**
+     - Follow the official guide at `https://docs.docker.com/get-docker/`.
+   - **Step B.2: Pull the `jq` Docker Image**
+     - Run: `docker pull --platform linux/amd64 ghcr.io/jqlang/jq:latest`
+   - **Step B.3: Verify the Docker Image**
+     - Create the `package.json` file as described in "2. FILES TO CREATE".
+     - Run: `docker run --rm -i ghcr.io/jqlang/jq:latest < package.json '.version'`
+     - **Verification**: The command should output `"1.7.1"`.
+
+   ---
+   ### **Method C: Building from Source (For local development)**
+   - **Step C.1: Install Build Dependencies**
+     - **For Debian/Ubuntu**: `sudo apt-get update && sudo apt-get install -y git make autoconf automake libtool bison flex build-essential pkg-config valgrind libonig-dev python3.11 python3-pip pipenv virtualenv lcov`
+     - **For RedHat/CentOS**: `sudo yum groupinstall -y "Development Tools" && sudo yum install -y git autoconf automake libtool bison flex pkg-config valgrind oniguruma-devel python3 python3-pip rpm-build lcov && sudo pip3 install pipenv virtualenv`
+   - **Step C.2: Clone the Repository**
+     - To ensure the project is cloned into the correct working directory, run the following commands:
+     - `cd /home/cc/EnvGym/data`
+     - `git clone https://github.com/jqlang/jq.git jqlang_jq`
+     - `cd jqlang_jq`
+     - Create the `.gitignore` file as described in "2. FILES TO CREATE".
+   - **Step C.3: Initialize Submodules**
+     - `git submodule update --init`
+     - **Note**: This command is critical for the default build. It downloads the source code for the Oniguruma regular expression library. This step can be skipped if you intend to use a system library (`--with-oniguruma=yes`) or disable regex support (`--with-oniguruma=no`).
+   - **Step C.4: Generate Configuration Scripts**
+     - `autoreconf -i`
+     - **Verification**: Command completes without errors.
+   - **Step C.5: Configure the Build**
+     - Review the following options and choose one.
+     - **Production Static Build (Recommended, uses submodule)**: `./configure --with-oniguruma=builtin --disable-docs --enable-all-static CFLAGS="-O2 -pthread -fstack-protector-all"`
+     - **Standard Build (with shared libs, docs, and submodule)**: `./configure --with-oniguruma=builtin --enable-docs`. Requires Python/pipenv dependencies (see Method E).
+     - **Build with System Oniguruma**: `./configure --with-oniguruma=yes`. Requires `libonig-dev` or equivalent to be installed.
+     - **Build without Regex Support**: `./configure --with-oniguruma=no`
+     - **Development Build (with tests)**: `./configure --with-oniguruma=builtin --enable-devel`
+     - **Debug Build with AddressSanitizer**: `./configure --with-oniguruma=builtin --disable-docs --enable-asan`
+     - **Debug Build with Valgrind**: `./configure --with-oniguruma=builtin --enable-valgrind`
+     - **Verification**: The script finishes with a confirmation message.
+   - **Step C.6: Compile the Source Code**
+     - Run `make -j$(nproc)` to compile using all available CPU cores.
+     - **Verification**: Compilation completes without fatal errors. The executable `jq` is created.
+   - **Step C.7: Run the Built-in Tests**
+     - `make check VERBOSE=yes`
+     - **Verification**: All tests should pass.
+     - `make distcheck` (Optional but recommended for validating source integrity)
+     - **Verification**: Command completes successfully.
+   - **Step C.8: Install `jq` System-Wide**
+     - `sudo make install-strip` (using `install-strip` removes debug symbols for a smaller binary).
+     - **Note**: This command installs the `jq` executable, the `libjq` library (`.a` and/or `.so`), its headers (`jq.h`, `jv.h`), and the `pkg-config` file (`libjq.pc`).
+   - **Step C.9: Final Verification**
+     - Open a new terminal.
+     - `jq --version`
+     - Create `package.json` (see "2. FILES TO CREATE").
+     - `jq '.version' package.json`
+     - **Verification**: The version command shows the correct version, and the file processing command outputs `"1.7.1"`.
+   - **Step C.10: (Optional) Clean the Build Directory**
+     - To remove generated object files and executables: `make clean`.
+     - To remove all files generated by `./configure` and `make`: `make distclean`.
+
+   ---
+   ### **Method D: Building a Custom Docker Image from Source**
+   - **Step D.1: Install Docker**
+     - Follow the official guide at `https://docs.docker.com/get-docker/`.
+   - **Step D.2: Navigate to the Source Code Directory**
+     - `cd /home/cc/EnvGym/data/jqlang_jq`
+   - **Step D.3: Create the Build Dockerfile**
+     - Create a file named `Dockerfile.build` in the current directory with the content from "2. FILES TO CREATE".
+   - **Step D.4: Build the Docker Image**
+     - Run the command: `docker build --platform linux/amd64 -t my-jq -f Dockerfile.build .`
+     - **Verification**: The build process should complete successfully. Check the logs to ensure the `git submodule update --init` and `make check` steps passed.
+   - **Step D.5: Test the Custom Image**
+     - Create the `package.json` file as described in "2. FILES TO CREATE".
+     - Run the command: `docker run --rm -i my-jq < package.json '.version'`
+     - **Verification**: The command should output `"1.7.1"`.
+
+   ---
+   ### **Method E: Building and Validating Documentation and Website (Optional)**
+   - **Step E.1: Install Python and Pipenv**
+     - If not already installed in Method C, follow the dependency installation steps for your OS in **Step C.1**. Ensure Python 3.11 or later is used.
+   - **Step E.2: Navigate to the Repository**
+     - `cd /home/cc/EnvGym/data/jqlang_jq`
+   - **Step E.3: Install Python Dependencies**
+     - Navigate to the docs directory: `cd docs`.
+     - Run `pipenv sync` to create a virtual environment and install the exact package versions from `Pipfile.lock`.
+     - **Note**: On some systems, you may first need to manually create and activate a virtual environment: `virtualenv -p python3 venv` followed by `source venv/bin/activate` before running `pipenv sync`.
+     - **Verification**: The command completes successfully and a virtual environment is created.
+   - **Step E.4: Validate Documentation Schema**
+     - From the `docs` directory, run the validation script: `pipenv run python3 validate_manual_schema.py content/manual/**/*.yml`.
+     - **Verification**: The script should exit silently with a status code of 0.
+   - **Step E.5: Build the Website**
+     - From the `docs` directory, run the website build script: `pipenv run python3 build_website.py`.
+     - **Verification**: The command completes successfully, and static website files are generated in the `docs/output/` directory.
+   - **Step E.6: Build the Man Page**
+     - From the project's root directory (not `docs/`), configure the build to include docs: `autoreconf -i && ./configure --enable-docs`.
+     - Regenerate the pre-built man page and its associated tests: `make jq.1.prebuilt tests/man.test tests/manonig.test`.
+     - **Verification**: The commands complete without errors.
+   - **Step E.7: Check if Generated Files are Up-to-Date (for contributors)**
+     - After modifying documentation source files and running the `make` command from the previous step, check that the changes have been correctly propagated to the version-controlled files.
+     - Run `git diff --exit-code jq.1.prebuilt tests/man.test tests/manonig.test`.
+     - **Verification**: The command should exit with a status code of 1 (indicating changes). You should then commit these generated files. If the exit code is 0, no changes were needed.
+   - **Step E.8: Serve the Website Locally (Optional)**
+     - From the `docs` directory, run: `python3 -m http.server -d output`.
+     - **Verification**: The command starts a local web server. Open the URL provided (usually `http://0.0.0.0:8000`) in a web browser to view the generated site. Press `Ctrl+C` to stop the server.
+
+   ---
+   ### **Method F: Building Static Libraries for iOS (macOS Only)**
+   - **Note**: This method is for cross-compiling on a macOS host and is not compatible with the specified `linux/amd64` hardware. It is included for informational purposes.
+   - **Step F.1: Install Host Dependencies**
+     - Ensure you are on a macOS system.
+     - Install Xcode Command Line Tools: `xcode-select --install`.
+     - Install GNU build tools via Homebrew if not already present: `brew install autoconf automake libtool`.
+   - **Step F.2: Clone the Source Code**
+     - `git clone https://github.com/jqlang/jq.git`
+     - `cd jq`
+   - **Step F.3: Create the iOS Build Script**
+     - Create a file named `compile-ios.sh` in the `jq` directory with the content from "2. FILES TO CREATE".
+     - Make the script executable: `chmod +x compile-ios.sh`.
+   - **Step F.4: Execute the Build Script**
+     - Run the script: `./compile-ios.sh`.
+   - **Step F.5: Verify the Output**
+     - The script should complete with the message "Output to .../ios/dest".
+     - (Optional) Inspect the architectures in the universal library: `lipo -info ios/dest/lib/libjq.a`.
+     - **Verification**: The output should list architectures such as `i386 x86_64 armv7 armv7s arm64`.
+
+   ---
+   ### **Method G: Cross-Compiling from Source**
+   - **Step G.1: Install Host and Cross-Compile Dependencies**
+     - Install the standard build dependencies for your host OS as described in **Step C.1**.
+     - Install the appropriate cross-compilation toolchain for your target.
+     - **Example (Debian/Ubuntu targeting 64-bit Windows)**: `sudo apt-get install -y mingw-w64`
+   - **Step G.2: Navigate to the Repository**
+     - `cd /home/cc/EnvGym/data/jqlang_jq`
+   - **Step G.3: Initialize Submodules and Generate Scripts**
+     - `git submodule update --init`
+     - `autoreconf -i`
+   - **Step G.4: Create the Cross-Compile Script**
+     - Create the directory structure: `mkdir -p scripts build`
+     - Create a file named `scripts/crosscompile` with the content from "2. FILES TO CREATE".
+     - Make the script executable: `chmod +x scripts/crosscompile`.
+   - **Step G.5: Execute the Cross-Compile Script**
+     - Run the script with the target platform name and configure flags. The `--host` flag is critical for telling the build system which platform to target.
+     - **Example (Targeting 64-bit Windows)**: `./scripts/crosscompile win64 --host=x86_64-w64-mingw32 --with-oniguruma=builtin --enable-all-static`
+   - **Step G.6: Verify the Output**
+     - The script should complete without errors.
+     - Check for the compiled binary in the `build/<platformname>` directory.
+     - **Verification**: `ls -l build/win64/jq.exe` should show the file.
+     - Use the `file` utility to inspect the binary's architecture.
+     - **Verification**: `file build/win64/jq.exe` should output something similar to `PE32+ executable (console) x86-64, for MS Windows`.
+
+   ---
+   ### **Method H: Building an RPM Package from Source (RedHat-based systems)**
+   - **Step H.1: Install Build Dependencies**
+     - Ensure you are on a RedHat-based system (e.g., Fedora, CentOS).
+     - Install all necessary build tools as described in **Step C.1** for RedHat/CentOS. The `rpm-build` package is essential.
+   - **Step H.2: Navigate to the Repository**
+     - `cd /home/cc/EnvGym/data/jqlang_jq`
+     - `git submodule update --init`
+     - `autoreconf -i`
+   - **Step H.3: Create the Source Tarball**
+     - Run `make dist-gzip` to create a source archive that `rpmbuild` can use.
+     - **Verification**: A file named `jq-<version>.tar.gz` is created.
+   - **Step H.4: Prepare for RPM Build**
+     - Create the `jq.spec` file in the current directory with the content from "2. FILES TO CREATE".
+     - Copy the source tarball to the directory `rpmbuild` expects: `cp jq-*.tar.gz $(rpm --eval "%{_sourcedir}")`.
+   - **Step H.5: Build the RPM Package**
+     - Execute the `rpmbuild` command, defining the version and release variables.
+     - `rpmbuild -ba jq.spec --define "myver $(git describe --tags --abbrev=0)" --define "myrel 1"`
+   - **Step H.6: Verify the Output**
+     - The command should complete without errors.
+     - **Verification**: Run `ls -l $(rpm --eval "%{_rpmdir}")/*/jq-*.rpm`. This should list the newly created binary RPM package.
+
+   ---
+   ### **Method I: Using `libjq` in a C Program (Development)**
+   - **Step I.1: Install `jq` and `libjq`**
+     - Follow all steps in **Method C: Building from Source** to compile and install `jq` on your system. This makes the library, headers, and `pkg-config` file available.
+   - **Step I.2: Create a Test C Program**
+     - `cd /home/cc/EnvGym/data/jqlang_jq`
+     - Create the `test_libjq.c` file as specified in "2. FILES TO CREATE".
+   - **Step I.3: Compile the Program using `pkg-config`**
+     - The `pkg-config` tool retrieves the correct compiler and linker flags for `libjq`.
+     - Run: `gcc -o test_libjq test_libjq.c $(pkg-config --cflags --libs libjq)`
+     - **Verification**: The command should complete without any compilation or linking errors. An executable named `test_libjq` will be created.
+   - **Step I.4: Run the Test Program**
+     - Execute the program: `./test_libjq`
+     - **Verification**: The program should run and print `Result: "hello world"` to the console.
+
+   ---
+   ### **Method J: Building and Testing with Decimal Number Support Disabled**
+   - **Step J.1: Install Build Dependencies**
+     - Follow the instructions in **Step C.1** for your operating system.
+   - **Step J.2: Navigate to the Repository**
+     - `cd /home/cc/EnvGym/data/jqlang_jq`
+     - `git submodule update --init`
+   - **Step J.3: Generate Configuration Scripts**
+     - `autoreconf -i`
+   - **Step J.4: Configure the Build**
+     - Run the configure script with the `--disable-decnum` flag.
+     - `./configure --with-oniguruma=builtin --disable-decnum`
+   - **Step J.5: Compile the Source Code**
+     - `make -j$(nproc)`
+   - **Step J.6: Verify Large Number Handling**
+     - Run the test command from the CI workflow.
+     - `diff <(echo 100000000000000000000 | ./jq) <(echo 1e+20)`
+     - **Verification**: The command should produce no output and exit with a status code of 0.
+   
+   ---
+   ### **Method K: Building and Testing with Different Oniguruma Configurations**
+   - This method covers building `jq` against a system-provided regex library or with regex support disabled entirely.
+
+   #### **Scenario 1: Using System-Installed Oniguruma**
+   - **Step K.1.1: Install Dependencies**
+     - Install the build dependencies for your OS from **Step C.1**, ensuring the Oniguruma development package (`libonig-dev`, `oniguruma-devel`, etc.) is included.
+   - **Step K.1.2: Navigate to the Repository**
+     - `cd /home/cc/EnvGym/data/jqlang_jq`
+   - **Step K.1.3: Generate and Run Configuration Scripts**
+     - `autoreconf -i`
+     - `./configure --with-oniguruma=yes`
+   - **Step K.1.4: Compile the Source**
+     - `make -j$(nproc)`
+   - **Step K.1.5: Verify Regex Support**
+     - Run: `./jq -n '"" | test("")'`
+     - **Verification**: The command should execute successfully and output `true`.
+
+   #### **Scenario 2: Disabling Oniguruma (No Regex Support)**
+   - **Step K.2.1: Install Dependencies**
+     - Install the basic build dependencies for your OS from **Step C.1**. You do not need any Oniguruma package.
+   - **Step K.2.2: Navigate to the Repository**
+     - `cd /home/cc/EnvGym/data/jqlang_jq`
+   - **Step K.2.3: Generate and Run Configuration Scripts**
+     - `autoreconf -i`
+     - `./configure --with-oniguruma=no`
+   - **Step K.2.4: Compile the Source**
+     - `make -j$(nproc)`
+   - **Step K.2.5: Verify Lack of Regex Support**
+     - Run: `! ./jq -n '"" | test("")'`
+     - **Verification**: The `jq` command will fail and print an error like `jq: error: test/1 is not defined`. The `!` inverts the non-zero exit code, so the overall command succeeds with an exit code of 0.
+
+   ---
+   ### **Method L: Performing Static Analysis with Clang scan-build (Development)**
+   - **Step L.1: Install Static Analysis Dependencies**
+     - Install the standard build tools from **Step C.1**.
+     - **For Debian/Ubuntu**: `sudo apt-get install -y clang clang-tools gdb`
+     - **For RedHat/CentOS**: `sudo yum install -y clang gdb`
+   - **Step L.2: Navigate to the Repository**
+     - `cd /home/cc/EnvGym/data/jqlang_jq`
+     - `git submodule update --init`
+   - **Step L.3: Generate Configuration Scripts**
+     - `autoreconf -i`
+   - **Step L.4: Configure the Build for Analysis**
+     - `CC=clang ./configure --enable-valgrind CFLAGS="-g -O0"`
+   - **Step L.5: Run the Static Analyzer**
+     - `scan-build --keep-going --exclude vendor/ make -j$(nproc)`
+     - `scan-build --keep-going --exclude vendor/ make check`
+   - **Step L.6: Review Results**
+     - If `scan-build` finds potential issues, it will print a message like "scan-build: ... report(s) stored at '/tmp/scan-build-...'".
+     - **Verification**: The process completes. Ideally, it reports "no bugs found".
+   - **Step L.7: (Optional) Debugging Crashes with GDB**
+     - Enable core dumps: `ulimit -c unlimited`. If `make check` crashes, load the core file: `gdb ./jq core`. Inside `gdb`, run `bt` to get a backtrace.
+
+   ---
+   ### **Method M: Running Tests with Valgrind for Memory Debugging (Development)**
+   - **Step M.1: Install Dependencies**
+     - Install the standard build tools and Valgrind as described in **Step C.1**.
+   - **Step M.2: Navigate to the Repository**
+     - `cd /home/cc/EnvGym/data/jqlang_jq`
+     - `git submodule update --init`
+   - **Step M.3: Generate Configuration Scripts**
+     - `autoreconf -i`
+   - **Step M.4: Configure the Build for Valgrind**
+     - `./configure --enable-valgrind --with-oniguruma=builtin --disable-docs`
+   - **Step M.5: Compile the Source Code**
+     - `make -j$(nproc)`
+   - **Step M.6: Run the Test Suite under Valgrind**
+     - `make check VERBOSE=yes`
+   - **Step M.7: Review Results**
+     - **Verification**: The `test-suite.log` file should contain a Valgrind summary showing "ERROR SUMMARY: 0 errors from 0 contexts".
+
+   ---
+   ### **Method N: Generating Code Coverage Reports (Development)**
+   - **Step N.1: Install Dependencies**
+     - Install the standard build tools and `lcov` as described in **Step C.1**.
+   - **Step N.2: Navigate to the Repository**
+     - `cd /home/cc/EnvGym/data/jqlang_jq`
+     - `git submodule update --init`
+   - **Step N.3: Generate Configuration Scripts**
+     - `autoreconf -i`
+   - **Step N.4: Configure the Build for Coverage**
+     - `./configure --enable-coverage --with-oniguruma=builtin --disable-docs`
+   - **Step N.5: Compile and Run Tests**
+     - `make -j$(nproc)`
+     - `make check`
+   - **Step N.6: Generate the Coverage Report**
+     - `lcov --capture --directory . --output-file coverage.info`
+     - `genhtml coverage.info --output-directory coverage-report`
+   - **Step N.7: Review the Report**
+     - Open `coverage-report/index.html` in a web browser.
+     - **Verification**: A web-based report showing line-by-line code coverage is displayed.

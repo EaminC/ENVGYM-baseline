@@ -1,0 +1,191 @@
+Based on the provided hardware information and the goal of creating a reproducible, containerized environment, the setup plan has been adjusted. The new plan focuses on using Docker to encapsulate the environment, addressing pathing, data management, and service execution in a container-friendly way.
+
+***
+
+### **ENVIRONMENT SETUP PLAN (Adjusted for Docker-based Deployment)**
+
+This plan is adapted for building a Docker container on an `x86_64` Linux host without GPU support. It replaces manual host setup with a reproducible `Dockerfile` and uses volume mounting for large datasets and persistent results.
+
+**1. DOWNLOADS AND ASSETS:**
+
+*   **Base Docker Image:** A standard `x86_64` compatible image. `ubuntu:20.04` is recommended for its broad package support.
+*   **System Packages (via `apt-get`):**
+    *   `git`, `bash`, `curl`, `bzip2`: Core utilities required for setup scripts and source code management within the container.
+*   **Micromamba:** A lightweight Conda installer, downloaded via a `curl` script during the Docker build. This will manage the Python environments.
+*   **Baleen Source Code:** Copied directly from the host's build context (`/home/cc/EnvGym/data/Baleen`) into the Docker image using a `COPY` instruction. This includes all submodules (e.g., `BCacheSim`) and configuration files.
+*   **Trace and Result Data (Managed on Host):** Large dataset files (`storage_0.1.tar.gz`, etc.) are to be downloaded to the host machine using the provided script (`data/get-tectonic.sh`). This data will be mounted into the container as a volume at runtime to avoid creating an excessively large image.
+
+**2. FILES TO CREATE / MANAGE:**
+
+*   **`Dockerfile` (Primary file to create):** This will be the central file defining the environment. It will contain all instructions to install system packages, set up the Conda environment, copy the source code, and configure the container's runtime behavior.
+*   **Pre-existing Configuration Files (Copied into Image):** The `COPY` instruction in the Dockerfile will bring all necessary repository files into the image. No manual creation is needed. Key files include:
+    *   `runs/example/rejectx/config.json`
+    *   `runs/example/baleen/prefetch_ml-on-partial-hit/config.json`
+    *   `BCacheSim/install/env_cachelib-py-3.11.yaml` (used to create the Conda environment)
+    *   `.gitignore` files (these will be present in the image but primarily affect host-side development).
+*   **Generated Files (Handled via Volumes):** To persist results and models outside the container's lifecycle, the following directories will be managed using Docker volumes:
+    *   `data/`: For mounting the pre-downloaded trace data.
+    *   `runs/`: For storing simulation outputs, logs, and results.
+    *   `tmp/`: For storing trained ML models.
+    *   `notebooks/paper-figs/figs/`: For storing generated paper figures.
+
+**3. NECESSARY TEST CASES (Post-Build, Inside Container):**
+
+These tests verify that the containerized environment is fully functional. They should be executed inside the running container.
+
+*   **Baseline Simulation:** Run the `RejectX` simulation to ensure the core simulation engine is functional within the container.
+*   **ML Model Training:** Execute the training script to verify the CPU-only machine learning toolchain (e.g., scikit-learn, PyTorch-CPU) is correctly installed and configured.
+*   **ML-based Simulation:** Run the simulator with the trained Baleen models to test the integration of ML components.
+*   **Result Visualization:** Connect to the JupyterLab instance served by the container and run the example notebook to confirm data processing and plotting libraries are working.
+*   **Full Reproduction Simulation (Main Figures):** Execute `notebooks/reproduce/reproduce_commands.sh` inside the container to perform a comprehensive test.
+*   **Paper Figure Generation:** After reproduction, run the corresponding notebooks in JupyterLab to ensure the entire analysis and plotting pipeline is functional.
+*   **Container Service Verification:** Check that the container is running and the JupyterLab port is correctly exposed and accessible from the host's browser.
+
+**4. COMPLETE TODO LIST:**
+
+---
+
+### **Part I: Host Machine Preparation**
+
+**1. Prepare the Build Context:**
+   - Clone the repository and its submodules into the specified working directory. This directory will serve as the Docker build context.
+     ```bash
+     # Navigate to the parent directory
+     cd /home/cc/EnvGym/data
+     # Clone the repository with its submodules
+     git clone --recurse-submodules https://github.com/wonglkd/Baleen-FAST24.git Baleen
+     ```
+   - **Verification:** Ensure the directory `/home/cc/EnvGym/data/Baleen` exists and its `BCacheSim` subdirectory is not empty.
+
+**2. Download Trace Data on the Host:**
+   - Run the download script on the host machine. This data will be mounted into the container later, not built into the image.
+     ```bash
+     # Navigate into the data directory within the cloned repo
+     cd /home/cc/EnvGym/data/Baleen/data
+     # Execute the download script
+     bash get-tectonic.sh
+     cd ../.. # Return to the parent directory
+     ```
+   - **Verification:** Confirm that the `data/tectonic/` directory is populated with trace files.
+
+---
+
+### **Part II: Docker Environment Setup**
+
+**3. Create the `Dockerfile`:**
+   - In the root of the repository (`/home/cc/EnvGym/data/Baleen`), create a file named `Dockerfile` with the following content:
+
+     ```dockerfile
+     # Use a standard Ubuntu base image for x86_64 architecture
+     FROM ubuntu:20.04
+
+     # Set environment variables to prevent interactive prompts during build
+     ENV DEBIAN_FRONTEND=noninteractive
+     ENV LANG=C.UTF-8
+
+     # Install system dependencies
+     RUN apt-get update && apt-get install -y --no-install-recommends \
+         bash \
+         bzip2 \
+         curl \
+         git \
+         && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+     # Set up a working directory
+     WORKDIR /app
+
+     # Install Micromamba (lightweight Conda)
+     RUN curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba
+     # Note: We are using linux-64 explicitly for the x86_64 architecture
+
+     # Copy the environment definition file first to leverage Docker layer caching
+     COPY BCacheSim/install/env_cachelib-py-3.11.yaml .
+
+     # Create the Conda environment using the yaml file
+     # The environment will be installed in /opt/conda/envs/cachelib-py-3.11
+     # Since no GPU is available, ensure any GPU-specific packages like pytorch-cuda are not installed.
+     # The provided YAML file is assumed to install CPU-compatible versions.
+     RUN ./bin/micromamba create -f env_cachelib-py-3.11.yaml -p /opt/conda/envs/cachelib-py-3.11 -y && \
+         ./bin/micromamba clean -a -y
+
+     # Copy the rest of the application code
+     COPY . .
+
+     # Configure the shell to use the Conda environment by default
+     SHELL ["/bin/bash", "-c"]
+     ENTRYPOINT ["/app/bin/micromamba", "run", "-p", "/opt/conda/envs/cachelib-py-3.11"]
+
+     # Set the default command to start a JupyterLab server
+     # This replaces the need for a systemd service
+     CMD ["python", "-m", "jupyterlab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''"]
+     ```
+
+**4. Build the Docker Image:**
+   - Navigate to the build context directory and run the `docker build` command.
+     ```bash
+     cd /home/cc/EnvGym/data/Baleen
+     docker build -t baleen-env .
+     ```
+   - **Verification:** Run `docker images` and confirm that the `baleen-env` image was created successfully.
+
+---
+
+### **Part III: Running and Using the Environment**
+
+**5. Run the JupyterLab Container:**
+   - Start the container, mapping the JupyterLab port and mounting volumes for data and results to ensure they persist.
+     ```bash
+     docker run -d --name baleen-container \
+       -p 8888:8888 \
+       -v "/home/cc/EnvGym/data/Baleen/data:/app/data" \
+       -v "/home/cc/EnvGym/data/Baleen/runs:/app/runs" \
+       -v "/home/cc/EnvGym/data/Baleen/tmp:/app/tmp" \
+       -v "/home/cc/EnvGym/data/Baleen/notebooks:/app/notebooks" \
+       baleen-env
+     ```
+   - **Verification:** Run `docker ps` to see `baleen-container` in the list of running containers. Access JupyterLab in your browser at `http://localhost:8888`.
+
+**6. Execute the Quickstart Example (inside the container):**
+   - Use `docker exec` to run commands inside the running container.
+
+   - **a. Run the Baseline `RejectX` Simulation (~4 minutes):**
+     ```bash
+     docker exec baleen-container ./BCacheSim/run_py.sh py -B -m BCacheSim.cachesim.simulate_ap --config runs/example/rejectx/config.json
+     ```
+     *Verification:* Check the host directory `runs/example/rejectx/` for new result files.
+
+   - **b. Train Baleen's ML Models (~1 minute):**
+     ```bash
+     docker exec baleen-container ./BCacheSim/run_py.sh py -B -m BCacheSim.episodic_analysis.train --exp example --policy PolicyUtilityServiceTimeSize2 --region Region1 --sample-ratio 0.1 --sample-start 0 --trace-group 201910 --supplied-ea physical --target-wrs 34 50 100 75 20 10 60 90 30 --target-csizes 366.475 --output-base-dir runs/example/baleen --eviction-age 5892.856 --rl-init-kwargs filter_=prefetch --train-target-wr 35.599 --train-models admit prefetch --train-split-secs-start 0 --train-split-secs-end 86400 --ap-acc-cutoff 15 --ap-feat-subset meta+block+chunk
+     ```
+     *Verification:* Check the host directory `tmp/example/` for new `.model` files.
+
+   - **c. Run the Baleen ML-based Simulation (~30 minutes):**
+     ```bash
+     docker exec baleen-container ./BCacheSim/run_py.sh py -B -m BCacheSim.cachesim.simulate_ap --config runs/example/baleen/prefetch_ml-on-partial-hit/config.json
+     ```
+     *Verification:* Check `runs/example/baleen/prefetch_ml-on-partial-hit/` for results.
+
+**7. Visualize and Verify Results in JupyterLab:**
+   - Open `http://localhost:8888` in your browser.
+   - Navigate to `notebooks/example/` and open `example.ipynb`.
+   - Click "Cell" -> "Run All".
+   - **Verification:** The notebook should execute without errors, generating plots and tables from the simulation results stored in the mounted `runs` volume.
+
+**8. (Optional) Run Full Paper Reproduction:**
+   - These are long-running commands. Execute them inside the container.
+
+   - **Option A (Main Figures):**
+     ```bash
+     docker exec baleen-container bash notebooks/reproduce/reproduce_commands.sh
+     ```
+   - **Option B (All Results):**
+     ```bash
+     docker exec baleen-container bash notebooks/reproduce/reproduce_commands_all.sh
+     ```
+   - **Verification:** Monitor the container logs with `docker logs -f baleen-container`. After completion, check the host's `runs/` directory for extensive new results.
+
+**9. (Optional) Generate Paper Figures:**
+   - After the reproduction scripts finish, open JupyterLab at `http://localhost:8888`.
+   - Navigate to `notebooks/paper-figs/`, open the relevant notebooks, and run them.
+   - **Verification:** Check the host directory `notebooks/paper-figs/figs/` for the generated figure files (`.pdf`, `.png`).

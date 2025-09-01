@@ -1,0 +1,100 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.7 (amd64 version)
+   - Tofino Switch SDE 9.7.0 (x86_64 version)
+   - BCC (for Linux kernel 5.15.0, x86_64)
+   - Bison 3.8.2
+   - Flex 2.6.4
+   - Scapy 2.4.5
+   - ncat (from nmap package)
+   - Ubuntu 20.04.1 LTS (amd64 version)
+   - make (for NetCL compiler rebuild)
+   - g++ (for NetCL compiler)
+   - libfl-dev (flex library)
+
+2. FILES TO CREATE:
+   - /home/cc/.bashrc (to set SDE environment variables)
+     Content:
+     export SDE=/home/cc/bf-sde-9.7.0/
+     export SDE_INSTALL=/home/cc/bf-sde-9.7.0/install
+   - /home/cc/EnvGym/data/P4Ctl/host_agent/host_agent_config.json
+     Content: Network interface names and default labels
+   - /home/cc/EnvGym/data/P4Ctl/compiler/netcl.y
+   - /home/cc/EnvGym/data/P4Ctl/compiler/netcl.l
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - P4 program compilation test
+   - Switch control plane connectivity test
+   - eBPF host agent attachment test
+   - Cross-host attack simulation test
+   - NetCL rule compilation test
+   - NetCL compiler rebuild test
+   - Custom packet send/receive test
+   - NetCL grammar parsing test
+   - NetCL lexer tokenization test
+   - NetCL compiler binary generation test
+
+4. COMPLETE TODO LIST:
+   - Install Ubuntu 20.04.1 LTS (amd64) on all three hosts
+   - Install Python 3.7 and required packages (bison, flex, scapy, make, g++, libfl-dev)
+   - Install BCC for Linux kernel 5.15.0 (x86_64 version)
+   - Download and install Tofino Switch SDE 9.7.0 (x86_64 version) in /home/cc/
+   - Set environment variables in /home/cc/.bashrc
+   - Configure host IP addresses:
+     - Host1: 10.0.0.1
+     - Host2: 10.0.0.2
+     - Host3: 10.0.0.3
+   - Build P4 program:
+     - cd /home/cc/bf-sde-9.7.0/
+     - ./p4_build.sh -p switch/p4control.p4
+     - Verify successful build
+   - Run switch program:
+     - ./run_switchd.sh -p p4control
+     - Verify switchd process is running
+   - Start control plane:
+     - python3 /home/cc/EnvGym/data/P4Ctl/switch/controller.py
+     - Verify connection to switch
+   - Update host agent:
+     - Get bash PID using 'ps'
+     - Update TAGGED_TERMINAL in host_agent_ebpf.c
+     - Verify PID is correct
+   - Run host agent on all hosts:
+     - python3 /home/cc/EnvGym/data/P4Ctl/host_agent/host_agent.py
+     - Verify eBPF programs are attached (using bpftool)
+   - Test cross-host attack:
+     - Start ncat listeners on Host2 and Host3
+     - Attempt connections from Host1
+     - Verify blocking of Host1->Host3 traffic
+   - Build NetCL compiler:
+     - cd /home/cc/EnvGym/data/P4Ctl/compiler/
+     - make netcl
+     - Verify netcl-compile binary is generated
+   - Test NetCL rule compilation:
+     - ./netcl-compile -i <netcl_rules> -o <compiled_rules>
+     - Verify output file generation
+     - Update switch/netcl.py
+     - Restart control plane and verify new rules
+   - Rebuild NetCL compiler when modified:
+     - cd /home/cc/EnvGym/data/P4Ctl/compiler/
+     - make clean
+     - make netcl
+     - Verify successful rebuild and binary generation
+   - Test compiler grammar:
+     - Create test input files
+     - Verify parser output matches expected
+   - Test lexer tokens:
+     - Create test input files
+     - Verify tokenization output matches expected
+   - Test custom tools:
+     - Run custom-receive.py on one host
+     - Run custom-send.py from another host
+     - Verify received packet contents
+
+Key adjustments made:
+1. Updated all paths to reflect /home/cc/ working directory
+2. Specified amd64/x86_64 versions for all downloads
+3. Removed any GPU-related considerations
+4. Ensured all file paths match the given working directory structure
+5. Confirmed compatibility with Docker version 28.1.1
+6. Maintained all original functionality while adapting to the hardware specs

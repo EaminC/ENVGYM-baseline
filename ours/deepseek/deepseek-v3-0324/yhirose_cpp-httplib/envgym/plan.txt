@@ -1,0 +1,116 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - cpp-httplib.h from GitHub (latest version)
+   - OpenSSL 3.0+ (for SSL support)
+   - libssl-dev (Debian/Ubuntu) or openssl-dev (Alpine)
+   - libcrypto (for SSL support)
+   - zlib (for compression support)
+   - libbrotli (optional, for Brotli compression)
+   - libzstd (optional, for Zstd compression)
+   - CMake 3.14+ (for building)
+   - Meson 0.63.0+ (for alternative build system)
+   - g++ or clang++ (C++11 compatible)
+   - yhirose4dockerhub/ubuntu-builder Docker image (amd64 version)
+   - Static C++ libraries for Docker build
+   - Docker Engine (28.1.1) for containerization
+   - Docker Compose (for multi-container orchestration)
+   - Git for version control
+   - Python 3 (for header splitting if HTTPLIB_COMPILE is ON)
+   - PkgConfig (for zstd detection)
+   - Brotli development libraries (if Brotli support needed)
+   - zstd development libraries (if Zstd support needed)
+   - libanl (Linux non-blocking DNS)
+   - Alpine Linux base image (amd64 version)
+   - GNU Make
+   - brotli runtime libraries
+   - Squid proxy server image (amd64 version)
+   - Basic authentication tools
+   - Digest authentication tools
+   - Squid package for Alpine Linux
+   - Authentication configuration files
+
+2. FILES TO CREATE:
+   (Same as original plan, adjusted for x86_64 platform)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   (Same as original plan, excluding Windows/macOS specific tests)
+
+4. COMPLETE TODO LIST:
+   - Download cpp-httplib.h from GitHub
+   - Install OpenSSL 3.0+ and development packages (Debian/Ubuntu/Alpine variants)
+   - Verify OpenSSL installation with openssl version command
+   - Install Meson build system (0.63.0+)
+   - Create CMakeLists.txt with proper configurations
+   - Configure meson.build with required options (x86_64 specific)
+   - Create meson_options.txt with feature flags
+   - Build and verify basic HTTP server example
+   - Generate self-signed certificates for HTTPS testing
+   - Test HTTPS server functionality
+   - Add compression support in CMakeLists.txt if needed
+   - Implement file upload/download test cases
+   - Pull yhirose4dockerhub/ubuntu-builder image (amd64)
+   - Create docker/main.cc with server implementation
+   - Create docker/html/index.html with default content
+   - Build and test Docker container (amd64)
+   - Verify static binary functionality in container
+   - Configure CI/CD pipeline (GitHub Actions or similar)
+   - Test Linux compatibility (Debian/Ubuntu/Alpine)
+   - Implement proper error handling in examples
+   - Add logging configuration for debugging
+   - Test with different keep-alive settings
+   - Verify SIGPIPE handling on Linux
+   - Verify minimal container deployment
+   - Install Docker Compose
+   - Create docker-compose.yml configuration
+   - Test Docker Compose service startup
+   - Verify volume mounting functionality
+   - Test port mapping configuration
+   - Create and configure .gitignore file
+   - Create and configure .gitattributes file
+   - Install Python 3 for header splitting if needed
+   - Install PkgConfig for zstd detection
+   - Configure Brotli support if needed
+   - Configure Zstd support if needed
+   - Test non-blocking DNS resolution (Linux only)
+   - Verify Meson build system functionality
+   - Test LTO build optimization
+   - Verify warning level configurations
+   - Verify pkgconfig generation
+   - Test header splitting functionality
+   - Verify feature auto-detection behavior
+   - Create example/hello.cc
+   - Create example/Makefile
+   - Create Dockerfile.hello (Alpine amd64)
+   - Test Alpine-based container build
+   - Verify hello example functionality
+   - Test Makefile build process
+   - Verify Alpine runtime dependencies
+   - Test multi-stage build process
+   - Verify minimal Alpine image size
+   - Create test/proxy/docker-compose.yml
+   - Configure Squid proxy services (amd64)
+   - Test basic authentication proxy
+   - Test digest authentication proxy
+   - Verify proxy port mappings
+   - Test proxy service orchestration
+   - Create test/proxy/Dockerfile (Alpine amd64)
+   - Create basic_squid.conf configuration
+   - Create digest_squid.conf configuration
+   - Create basic_passwd credentials file
+   - Create digest_passwd credentials file
+   - Final verification of all test cases
+   - Clean up temporary files and build artifacts
+   - Verify header-only vs compiled library behavior
+
+Removed items:
+- All Windows-specific components (ws2_32, MSVC)
+- All macOS-specific components (CFNetwork, CoreFoundation, Security)
+- macOS keychain certificate loading tests
+- 32-bit platform compatibility tests
+- GPU-related components (not applicable)
+
+Added platform-specific notes:
+- All Docker images specified as amd64 version
+- Adjusted package names for Debian/Ubuntu/Alpine variants
+- Focused on Linux-only features and tests

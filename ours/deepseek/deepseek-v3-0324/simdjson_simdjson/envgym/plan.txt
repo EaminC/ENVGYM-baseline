@@ -1,0 +1,73 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - All existing downloads from previous plan except:
+     - Remove OrbStack (not needed on Linux)
+     - Remove Windows SDK and MinGW (no Windows builds needed)
+     - Remove Windows headers (not needed for Linux/amd64)
+   - Keep all x86_64-compatible tools:
+     - libFuzzer, Clang, Ninja, AFL, Valgrind, kcov
+     - Debian 12 base image (amd64 version)
+     - GCC 10 base image (amd64 version)
+   - Add:
+     - x86_64-specific optimization libraries if needed
+     - Linux perf tools (already in list)
+
+2. FILES TO CREATE:
+   - All existing files from previous plan except:
+     - Remove Windows-specific files:
+       - windows/CMakeLists.txt
+       - Windows header test files
+       - getopt.h compatibility layer
+     - Remove Windows DLL test configurations
+   - Keep all Linux/amd64 specific files
+   - Add:
+     - x86_64-specific optimization flags in CMake files
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - All existing test cases from previous plan except:
+     - Remove Windows-specific tests:
+       - Windows DLL compatibility test
+       - Visual Studio compatibility test
+       - MinGW compatibility test
+       - CRT_SECURE_NO_WARNINGS test
+       - Windows headers interface test
+     - Keep all Linux/amd64 specific tests
+   - Add:
+     - x86_64-specific optimization tests
+     - CPU feature detection tests
+
+4. COMPLETE TODO LIST:
+   - All existing tasks from previous plan except:
+     - Remove Windows-specific tasks:
+       - All Windows build configurations
+       - Windows DLL compatibility checks
+       - Visual Studio compatibility setup
+       - MinGW compatibility setup
+     - Remove OrbStack setup
+   - Add:
+     - x86_64-specific optimization tasks
+     - CPU feature detection implementation
+     - Linux perf tool integration
+   - Modify:
+     - Container builds to use amd64 base images exclusively
+     - All platform checks to verify x86_64 architecture
+     - Toolchain setup for Linux/amd64 optimization
+
+Key adjustments made:
+1. Removed all Windows-specific components since we're targeting Linux/amd64
+2. Removed macOS-specific tools (OrbStack)
+3. Kept all x86_64-optimized components
+4. Added specific x86_64 optimization considerations
+5. Maintained all Docker/BuildKit compatible components
+6. Focused on Debian/Ubuntu compatible packages
+7. Removed GPU-related considerations since none is present
+8. Kept standard Linux performance tools
+9. Ensured all components are compatible with Docker 28.1.1 on x86_64
+
+The plan is now optimized for:
+- x86_64 architecture
+- Linux environment
+- Docker containers
+- Standard CPU features without GPU acceleration
+- Debian/Ubuntu-based toolchains

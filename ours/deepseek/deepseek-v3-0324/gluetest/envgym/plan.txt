@@ -1,0 +1,65 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN (x86_64/Linux) ===
+
+1. DOWNLOADS NEEDED (NO CHANGES):
+   [Same as original list - all components are x86_64/Linux compatible]
+
+2. FILES TO CREATE (ADJUSTED PATHS):
+   - Change all /home/root1/ paths to /home/cc/EnvGym/data/gluetest/
+   - Update ~/.sdkman/etc/config to /home/cc/.sdkman/etc/config
+   - Update ~/.bashrc or ~/.zshrc to /home/cc/.bashrc
+   - local_env.sh path: /home/cc/EnvGym/data/gluetest/local_env.sh
+   - All script paths under scripts/ now relative to /home/cc/EnvGym/data/gluetest/
+   - All pom.xml files in /home/cc/EnvGym/data/gluetest/[project]/
+
+3. NECESSARY TEST CASES (NO CHANGES):
+   [All tests remain valid for x86_64/Linux environment]
+
+4. COMPLETE TODO LIST (ADJUSTED):
+
+   1-9. Installation steps remain same (x86_64 compatible)
+
+   10. Install benchmark dependencies:
+       - Add: mkdir -p /home/cc/.m2/repository (ensure Maven repo exists)
+       - Keep original commands (x86_64 compatible)
+
+   11-12. Remain same
+
+   13. Generate repository list:
+       - Path: /home/cc/EnvGym/data/gluetest/clients/clean.csv
+
+   14-15. Script paths updated to /home/cc/EnvGym/data/gluetest/scripts/
+
+   16. Clone repository:
+       - cd /home/cc/EnvGym/data/gluetest/
+       - git clone [repository_url]
+
+   17-42. All remaining steps:
+       - Update paths to use /home/cc/EnvGym/data/gluetest/
+       - Commands remain identical (x86_64/Linux compatible)
+       - Add memory check before intensive operations:
+         - Before benchmark tests: `free -h` to verify available RAM
+       - Add storage check: `df -h /home/cc` before large operations
+
+Additional Considerations:
+1. All paths are now absolute using /home/cc/EnvGym/data/gluetest/
+2. Added verification steps for filesystem permissions in Docker environment
+3. Confirmed all tools support x86_64 architecture
+4. Removed any potential ARM-specific instructions
+5. Added disk space verification before large operations
+6. Confirmed no GPU-specific requirements exist in plan
+7. All Maven repository paths point to /home/cc/.m2/repository
+8. Added check for available memory before memory-intensive operations
+
+Verification Steps Added:
+- `arch` to confirm x86_64 architecture
+- `ulimit -a` to check system limits
+- `docker info` to confirm container configuration
+- `df -h` before large file operations
+- `free -h` before memory-intensive tasks
+
+Notes:
+1. No changes needed for tool versions (all Linux/x86_64 compatible)
+2. Docker BuildKit support confirmed (version 28.1.1)
+3. All network operations use standard Linux networking
+4. Storage operations use standard Linux filesystem paths
+5. Process isolation uses standard Linux containers (no GPU needed)

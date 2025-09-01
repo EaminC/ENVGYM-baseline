@@ -1,0 +1,62 @@
+=== Docker Execution Log - 20250829_103621 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756463780
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.48kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/9] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [2/9] RUN apt-get update &&     apt-get install -y --no-install-recommends     build-essential     ca-certificates     cmake     git     libcurl4-openssl-dev     libssl-dev     libfuse-dev     pkg-config     uuid-dev     libgtest-dev     libcurl4     libssl1.1     libfuse2 &&     apt-get clean &&     rm -rf /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [3/9] WORKDIR /app
+#6 CACHED
+
+#7 [4/9] RUN git clone https://github.com/s3fs-fuse/fuse-t.git .
+#7 0.242 Cloning into '.'...
+#7 0.378 fatal: could not read Username for 'https://github.com': No such device or address
+#7 ERROR: process "/bin/sh -c git clone https://github.com/s3fs-fuse/fuse-t.git ." did not complete successfully: exit code: 128
+------
+ > [4/9] RUN git clone https://github.com/s3fs-fuse/fuse-t.git .:
+0.242 Cloning into '.'...
+0.378 fatal: could not read Username for 'https://github.com': No such device or address
+------
+envgym.dockerfile:32
+--------------------
+  30 |     
+  31 |     # Clone the source code into the working directory.
+  32 | >>> RUN git clone https://github.com/s3fs-fuse/fuse-t.git .
+  33 |     
+  34 |     # Check out a specific, stable version of the software.
+--------------------
+ERROR: failed to solve: process "/bin/sh -c git clone https://github.com/s3fs-fuse/fuse-t.git ." did not complete successfully: exit code: 128
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

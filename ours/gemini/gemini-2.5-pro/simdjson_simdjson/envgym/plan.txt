@@ -1,0 +1,1211 @@
+This is our current plan:
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - **CMake**: Version 3.14 or newer. (Version 3.25 or newer is required for the experimental `SIMDJSON_STATIC_REFLECTION` feature). On Debian-based systems, a recent version can be installed from the `simdjson/debian-ppa` PPA.
+   - **Standard C++ Compiler**: A compiler with support for C++11 or later.
+     - **Linux**: GCC or Clang. (Tested versions include GCC 8, 9, 10, 11, 12, 13 and Clang 6, 7, 8, 9, 10, 11, 13, 14, 16, 19). For advanced fuzzing, Clang 19 or newer is recommended and can be installed via the official LLVM APT repository (`llvm.sh` script). Builds are tested on `amd64`, `arm64` (`aarch64`), `ppc64le`, `loongarch64`, `riscv64`, and `s390x` architectures. This includes standard glibc-based distributions (like Debian, Ubuntu 20.04, Ubuntu 22.04, Ubuntu 24.04) and musl-based distributions (like Alpine Linux).
+     - **macOS**: Apple Clang (via Xcode Command Line Tools).
+     - **Windows**:
+       - Microsoft Visual Studio 2015, 2017, 2019, or 2022 (with "Desktop development with C++" workload). For the ClangCL toolchain, the "C++ Clang tools for Windows" component must also be installed. For ARM64/ARM64EC cross-compilation, the appropriate ARM64/ARM64EC build tools and a recent Windows SDK (e.g., version 10.0.22621.0 or newer) must also be installed via the Visual Studio Installer.
+       - MSYS2 with MinGW-w64 toolchains (GCC or Clang). Required packages include `mingw-w64-x86_64-cmake`, `mingw-w64-x86_64-ninja`, and a compiler like `mingw-w64-x86_64-gcc` or `mingw-w64-x86_64-clang`.
+     - **FreeBSD**: Clang (default system compiler).
+     - **WebAssembly**: Emscripten SDK (emsdk).
+     - **LoongArch64 Cross-Compiler**: Loongson GCC toolchain (e.g., version `2023.08.08` from `https://github.com/loongson/build-tools`).
+   - **Experimental C++ Compiler (for P2996 features)**:
+     - **Source Code**: Clang from `https://github.com/bloomberg/clang-p2996.git` (commit `d77eff1cbd78fd065668acf93b1f5f400d39134d` or later).
+     - **Build Dependencies (Debian-based)**: `build-essential`, `cmake`, `ninja-build`, `python3`, `zlib1g-dev`, `git`, `subversion`.
+   - **Rust Toolchain (for static reflection benchmarks)**:
+     - **Rust Compiler (`rustc`) and Package Manager (`cargo`)**: Required for building the Rust-based `serde` benchmark, which is used for comparison with the experimental `SIMDJSON_STATIC_REFLECTION` feature. The recommended installation method is via `rustup`.
+   - **Build Tool**:
+     - **Linux/macOS/FreeBSD**: `make` or `Ninja`. `make` is required for non-CMake example builds. `Ninja` is recommended for its speed and automatic parallelism, which is ideal for multi-core systems.
+     - **Windows**: MSBuild (included with Visual Studio) or `Ninja` (can be installed via package managers or with MSYS2).
+   - **Git**: For cloning project repositories.
+   - **pkg-config**: For locating the installed library on Unix-like systems.
+   - **Docker & CI Environments**: For creating containerized build environments.
+     - Pre-built compiler images like `gcc:9`, `conanio/clang9`, `pauldreik/llvm-11`, `conanio/gcc10`, `alpine:latest`, `debian:testing`, `ubuntu:20.04`, `ubuntu:22.04`, or `ubuntu:24.04` can be used to replicate CI environments.
+     - The OSS-Fuzz/CIFuzz environment (e.g., `gcr.io/oss-fuzz-base/base-builder`) is used for continuous fuzz testing within CI. See also the OSS-Fuzz local testing guide at `https://google.github.io/oss-fuzz/getting-started/new-project-guide/#testing-locally`.
+     - QEMU-based emulation (e.g., via `uraimo/run-on-arch-action`) is used for cross-architecture testing (`aarch64`, `ppc64le`, `riscv64`, `s390x`) within GitHub Actions.
+   - **Source Code**: The simdjson project from `https://github.com/simdjson/simdjson`.
+   - **Unix-like Command-line Tools (for running all tests)**:
+     - On Linux, macOS, and FreeBSD, `find`, `file`, `grep`, `nm`, `sh`, `cp`, and `rm` are typically pre-installed. `bash` is also required for some scripts, but can be disabled at build time.
+     - On Windows, these tools are required for developer-mode tests. Install them via Git Bash (included with Git for Windows), MSYS2, or Windows Subsystem for Linux (WSL).
+   - **Developer Tools**:
+     - **EditorConfig-compatible code editor**: A code editor or IDE that supports `.editorconfig` for consistent code styling. Most modern editors, including Visual Studio Code, Visual Studio, and JetBrains IDEs, support it either natively or through a free plugin.
+     - **Visual Studio Code**: Recommended code editor for an integrated development experience.
+     - **VS Code Extensions**: A set of recommended extensions is defined in `.vscode/extensions.json` to provide a consistent development environment. Key extensions include:
+       - `ms-vscode.cmake-tools` (CMake integration)
+       - `llvm-vs-code-extensions.vscode-clangd` (C++ IntelliSense and diagnostics). This extension will automatically use the project's `.clangd` configuration file to provide highly accurate, project-specific code analysis.
+       - `xaver.clang-format` (Code formatting)
+       - `twxs.cmake` (CMake syntax highlighting)
+       - `ms-python.python` (Python language support)
+       - `github.vscode-github-actions` (GitHub Actions integration)
+     - **Python 3**: For running helper scripts and for regenerating the single-header (amalgamated) library files via the `amalgamate.py` script.
+     - **Node.js**: For running helper scripts (e.g., for large JSON generation) and as a dependency for the Emscripten SDK tooling.
+     - **npm (Node Package Manager)**: Included with Node.js. Used to install JavaScript dependencies listed in `package.json` files.
+     - **clang-format**: For running the code style check.
+     - **wget, zip, unzip**: Required for setting up fuzzing tests with a pre-existing corpus and for downloading cross-compilation toolchains.
+     - **Valgrind**: For memory error detection tests.
+     - **Doxygen**: For generating API documentation.
+     - **Graphviz**: A dependency for Doxygen to generate diagrams.
+     - **LaTeX Distribution**: (e.g., TeX Live, MiKTeX). Optional, but required to build PDF documentation from the LaTeX output generated by Doxygen.
+     - **Debian-specific (for advanced fuzzing/CI replication)**: `lsb-release`, `software-properties-common`, `gnupg`.
+     - **Google Benchmark (Optional)**: Required for running the performance benchmark suite. This is typically handled automatically by the CMake build system (via CPM) when `SIMDJSON_ALLOW_DOWNLOADS=ON`. If downloads are disabled, it must be installed system-wide or found via `find_package`.
+     - **cxxopts (Optional)**: A C++ command-line parser library. Required for building the command-line tools. This is typically handled automatically by the CMake build system (via CPM) when `SIMDJSON_ALLOW_DOWNLOADS=ON`. If downloads are disabled, it must be installed system-wide (e.g., `libcxxopts-dev` on Debian-based systems) or found via `find_package`.
+     - **Comparison JSON Libraries (Optional)**: For running comprehensive comparison benchmarks, other JSON libraries are needed. These are typically fetched automatically by CMake when `SIMDJSON_COMPETITION=ON` and `SIMDJSON_ALLOW_DOWNLOADS=ON`. If downloads are disabled, they may need to be installed system-wide. The list includes:
+       - `yyjson`
+       - `rapidjson` (Note: May be disabled with GCC 14+)
+       - `sajson`
+       - `nlohmann_json`
+       - `Boost.JSON` (Requires `-DSIMDJSON_USE_BOOST_JSON=ON`)
+       - `cJSON`
+       - `fastjson`
+       - `gason`
+       - `jsmn`
+       - `jsoncpp` (Bundled with the source code)
+       - `ujson4c`
+     - **simdjson-data (Test Data)**: A repository containing JSON data files for benchmarks. This is downloaded automatically by the CMake build system.
+
+2. FILES TO CREATE:
+   - **`.appveyor.yml`**: A configuration file for the AppVeyor CI service, detailing the Windows build matrix.
+     - **Path**: `.appveyor.yml`
+     - **Content Description**: Defines the automated build and test matrix for Windows environments. It specifies jobs for Visual Studio 2015, 2017, and 2019, across platforms (x64, Win32, ARM64), and various build configurations (static/shared, threads/no-threads, exceptions/no-exceptions). Serves as a reference for supported Windows environments.
+   - **`benchmark/static_reflect/serde-benchmark/Cargo.lock`**: An automatically generated lock file for the Rust `serde` benchmark.
+     - **Path**: `benchmark/static_reflect/serde-benchmark/Cargo.lock`
+     - **Content Description**: This file pins the exact versions of all Rust dependencies (e.g., `serde`, `serde_json`, `libc`, `itoa`, `ryu`) defined in `Cargo.toml`. This ensures that `cargo build` produces a reproducible and identical build of the benchmark library across different environments, preventing unexpected issues from dependency updates and guaranteeing a consistent baseline for performance comparisons.
+   - **`benchmark/static_reflect/serde-benchmark/Cargo.toml`**: The manifest file for the Rust-based `serde` benchmark.
+     - **Path**: `benchmark/static_reflect/serde-benchmark/Cargo.toml`
+     - **Content Description**: Defines a Rust library crate used for performance comparison against the experimental static reflection feature. It lists dependencies like `serde`, `serde_json`, and `libc`, and specifies that it should be compiled into a C-compatible dynamic library (`cdylib`). It requires the Rust toolchain (`cargo`) to be built.
+       ```toml
+       [package]
+       name = "serde-benchmark"
+       version = "0.1.0"
+
+       [lib]
+       path = "lib.rs"
+       crate-type = ["cdylib"]
+
+       [dependencies]
+       serde = { version = "1.0", features = ["derive"] }
+       libc = "0.2"
+       serde_json = "1.0"
+
+       [profile.release]
+       opt-level = 3
+       debug = false
+       lto = true
+       ```
+   - **`build.bat` (for Windows)**: A batch script for building with Visual Studio.
+     - **Path**: Project root directory.
+     - **Content Description**:
+       ```batch
+       @echo off
+       setlocal
+
+       :: Configuration
+       set BUILD_TYPE=Release
+       set ENABLE_DEVELOPER_MODE=ON
+
+       :: Clean and Create build directory
+       if exist build rmdir /s /q build
+       mkdir build
+       cd build
+
+       :: Configure with CMake (assumes Visual Studio 2019 or later)
+       cmake .. -G "Visual Studio 16 2019" -A x64 ^
+         -DSIMDJSON_DEVELOPER_MODE=%ENABLE_DEVELOPER_MODE%
+
+       :: Build
+       cmake --build . --config %BUILD_TYPE%
+
+       :: Run tests (only if developer mode is enabled)
+       if "%ENABLE_DEVELOPER_MODE%"=="ON" (
+         echo "Running tests..."
+         ctest --output-on-failure -C %BUILD_TYPE%
+       )
+
+       endlocal
+       ```
+   - **`build.sh` (for Linux/macOS)**: A shell script to automate the build and test process.
+     - **Path**: Project root directory.
+     - **Content Description**:
+       ```bash
+       #!/bin/bash
+       set -e # Exit immediately if a command exits with a non-zero status.
+
+       # Configuration
+       BUILD_TYPE="Release"
+       ENABLE_DEVELOPER_MODE="ON" # Set to OFF to build only the library
+       EXTRA_CMAKE_FLAGS="" # e.g., "-DBUILD_SHARED_LIBS=ON"
+
+       # Clean and Create build directory
+       rm -rf build
+       mkdir -p build
+       cd build
+
+       # Configure with CMake
+       cmake .. \
+         -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+         -DSIMDJSON_DEVELOPER_MODE=${ENABLE_DEVELOPER_MODE} \
+         ${EXTRA_CMAKE_FLAGS}
+
+       # Build (leverages high core count by using all available processors)
+       cmake --build . --config ${BUILD_TYPE} -j $(nproc)
+
+       # Run tests (only if developer mode is enabled)
+       if [ "${ENABLE_DEVELOPER_MODE}" == "ON" ]; then
+         echo "Running tests..."
+         ctest --output-on-failure -C ${BUILD_TYPE}
+       fi
+       ```
+   - **`.circleci/config.yml`**: A configuration file for the CircleCI continuous integration service.
+     - **Path**: `.circleci/config.yml`
+     - **Content Description**: Defines the automated build and test matrix for Linux/macOS. It specifies various jobs that run against different compilers (GCC 8/9/10, Clang 6/10), build configurations (static, dynamic, sanitize, no-exceptions, single-threaded), and architectures. It serves as a reference for supported environments and build flags.
+   - **`.clangd`**: A configuration file for the `clangd` C++ language server.
+     - **Path**: `.clangd`
+     - **Content Description**: Configures the `clangd` language server, which provides code completion, navigation, and diagnostics in compatible editors like VS Code. It instructs `clangd` to find compile commands in the `build` directory, enabling highly accurate code analysis. It also enforces a strict set of compiler warnings (`-Werror`, `-Wall`, etc.) and suppresses specific, non-critical diagnostics to provide a clean and consistent development experience.
+       ```yaml
+       CompileFlags:
+           CompilationDatabase: build
+           Add:
+               - -Werror -Wall -Wextra -Weffc++ -Wsign-compare -Wshadow -Wwrite-strings -Wpointer-arith -Winit-self -Wconversion -Wno-sign-conversion
+               - -Wundefined-inline
+       Diagnostics:
+           Suppress:
+               - misc-unused-alias-decls
+               - misc-unused-using-decls
+               - misc-definitions-in-headers # TODO fix and remove these violations
+       ---
+       If:
+           PathMatch:
+               - include/.*
+               - src/.*
+           PathExclude:
+               - include/simdjson.h
+               - src/simdjson.cpp
+       CompileFlags:
+           Add:
+               - -Wno-unneeded-internal-declaration
+               - -Wno-undefined-internal # TODO fix and remove these violations
+               - -Wno-unused-function
+               - -Wno-unused-const-variable
+       Diagnostics:
+           Suppress:
+               - pp_including_mainfile_in_preamble
+               - unused-includes
+       ---
+       # Amalgamated files that require or partly define an implementation
+       If:
+           PathMatch:
+               - .*/(arm64|fallback|haswell|icelake|ppc64|westmere)/begin.h
+               - .*/generic/.*
+       Diagnostics:
+           Suppress:
+               - pragma_attribute_no_pop_eof
+       ---
+       # clang has a bad time detecting the push/pop together in src/ for some reason
+       If:
+           PathMatch:
+               - include/simdjson/.*/end.h
+               - src/(arm64|fallback|haswell|icelake|ppc64|westmere).cpp
+       Diagnostics:
+           Suppress:
+               - pragma_attribute_no_pop_eof
+               - pragma_attribute_stack_mismatch
+       ```
+   - **`.clang-format`**: A configuration file for the clang-format code formatting tool.
+     - **Path**: `.clang-format`
+     - **Content Description**: Configures the `clang-format` tool to automatically enforce a consistent C++ coding style. By specifying `BasedOnStyle: LLVM`, it ensures that all code formatting adheres to the widely-used LLVM style guide. This file is used by both the `run-clang-format.py` script for CI checks and by editor integrations (like the recommended VS Code `xaver.clang-format` extension) to provide real-time formatting assistance to developers.
+       ```
+       BasedOnStyle: LLVM
+       ```
+   - **`.cirrus.yml`**: A configuration file for the Cirrus CI service.
+     - **Path**: `.cirrus.yml`
+     - **Content Description**: Defines the automated build and test process for FreeBSD. It specifies the OS image, dependencies (`cmake`, `git`, `bash`), and the build steps, including a special configuration (`-DSIMDJSON_BASH=OFF -DSIMDJSON_GIT=OFF`). Serves as a reference for supported FreeBSD environments.
+   - **`cmake/developer-options.cmake`**: A CMake file that defines developer-centric build options.
+     - **Path**: `cmake/developer-options.cmake`
+     - **Content Description**: This file centralizes the definition of numerous CMake options primarily intended for library developers and CI environments. It manages project-wide compiler and linker flags. Key options include:
+       - **Sanitizers**: `SIMDJSON_SANITIZE` (Address + Undefined), `SIMDJSON_SANITIZE_UNDEFINED`, `SIMDJSON_SANITIZE_MEMORY`, and `SIMDJSON_SANITIZE_THREADS` (Thread + Undefined).
+       - **Performance/Feature Toggles**: `SIMDJSON_AVX512_ALLOWED` and `SIMDJSON_SKIPUTF8VALIDATION`.
+       - **Compiler Flags**: Sets strict warning levels for GCC/Clang (`-Werror`, `-Wall`, etc.) and MSVC (`/WX`, `/W3`).
+       - **C++ Standard**: Manages the C++ standard, defaulting to C++17.
+       - **Windows-Specific**: Defines options like `SIMDJSON_VISUAL_STUDIO_BUILD_WITH_DEBUG_INFO_FOR_PROFILING`.
+       - **Other**: Includes options like `SIMDJSON_GLIBCXX_ASSERTIONS`, `SIMDJSON_USE_LIBCPP`, and `SIMDJSON_CHECK_EOF`.
+   - **`cmake/simdjson-config.cmake.in`**: A template file used by CMake to generate a package configuration file.
+     - **Path**: `cmake/simdjson-config.cmake.in`
+     - **Content Description**: This is a template for the `simdjson-config.cmake` file that gets installed for downstream consumption. It is used by client projects when they call `find_package(simdjson)`. Its primary role is to load the CMake targets for the library and to find and propagate any transitive public dependencies. For example, it ensures that if `simdjson` was built with thread support, any project linking against it will also be linked with the required `Threads` library.
+       ```cmake
+       include(CMakeFindDependencyMacro)
+       if("@SIMDJSON_ENABLE_THREADS@")
+         find_dependency(Threads)
+       endif()
+
+       include("${CMAKE_CURRENT_LIST_DIR}/simdjsonTargets.cmake")
+       include("${CMAKE_CURRENT_LIST_DIR}/simdjson_staticTargets.cmake" OPTIONAL)
+       ```
+   - **`dependencies/CMakeLists.txt`**: The CMake file for managing and downloading external dependencies.
+     - **Path**: `dependencies/CMakeLists.txt`
+     - **Content Description**: Manages external dependencies using CPM.cmake. It defines options to control this behavior, most notably `SIMDJSON_ALLOW_DOWNLOADS`. When enabled, this script automatically fetches and builds dependencies like Google Benchmark (for performance tests), cxxopts (for command-line tools), and a wide range of third-party JSON libraries (`rapidjson`, `yyjson`, `nlohmann_json`, etc.) for competitive benchmarking. This automates the setup process for a full developer build.
+   - **`.dockerignore`**: A file to optimize Docker image builds by excluding unnecessary files.
+     - **Path**: Project root directory.
+     - **Content Description**:
+       ```
+       *
+       !.git
+       !Makefile
+       !amalgamate.py
+       !benchmark
+       !dependencies
+       !include
+       !jsonchecker
+       !jsonexamples
+       !scripts
+       !singleheader
+       !src
+       !style
+       !tests
+       !tools
+       ```
+   - **`.drone.yml`**: A configuration file for the Drone CI service.
+     - **Path**: `.drone.yml`
+     - **Content Description**: Defines the automated build and test matrix for Linux on `amd64` and `arm64` architectures. It specifies jobs for various compilers (GCC 8/9, Clang 6/7/9/11) and build configurations (static/shared, sanitize, no-exceptions, C++20 with libc++). Serves as an additional reference for supported Linux environments.
+   - **`Doxyfile`**: A configuration file for the Doxygen documentation generator.
+     - **Path**: Project root directory.
+     - **Content Description**: Defines the settings for generating the project's API documentation. Key configurations include:
+       - **Input**: Specifies source directories (`include/`, `doc/`) and the main page (`doc/basics_doxygen.md`).
+       - **Output**: Sets the output directory to `doc/api`, with HTML in `doc/api/html` and LaTeX in `doc/api/latex`.
+       - **Content**: Enables source browsing, excludes internal symbols (`simdjson::internal`), and configures the preprocessor to parse the code as if exceptions are enabled (`SIMDJSON_EXCEPTIONS=1`).
+       - **Appearance**: Enables a navigation treeview, uses a custom theme (`doxygen-awesome-css`), and includes a project logo.
+       - **Diagrams**: Enables class diagrams. It is recommended to have the `dot` tool (Graphviz) installed for full-featured diagrams.
+       - **Formats**: Generates both HTML and LaTeX output.
+   - **`.editorconfig`**: A configuration file to enforce consistent coding styles across different editors.
+     - **Path**: `.editorconfig`
+     - **Content Description**: Helps maintain consistent coding styles for multiple developers. It enforces settings for C++ source, header, and Markdown files, including UTF-8 character set, LF line endings, 2-space indentation, trimming trailing whitespace, and ensuring a final newline at the end of the file. This automates code style adherence and complements other tools like `clang-format`.
+       ```
+       # https://editorconfig.org/
+       root = true
+       # Conservatively avoid changing defaults for other file types, e.g. raw json files for test cases,
+       # Makefiles, etc.
+       [*.{cpp,h,md}]
+       charset                  = utf-8
+       end_of_line              = lf
+       indent_size              = 2
+       indent_style             = space
+       insert_final_newline     = true
+       tab_width                = 2
+       trim_trailing_whitespace = true
+       ```
+   - **`examples/CMakeLists.txt`**: The CMake file for building the example applications.
+     - **Path**: `examples/CMakeLists.txt`
+     - **Content Description**: This file orchestrates the building of example applications by including their respective subdirectories. This is processed when `-DSIMDJSON_DEVELOPER_MODE=ON` is enabled.
+       ```cmake
+       add_subdirectory(quickstart)
+       ```
+   - **`examples/quickstart/CMakeLists.txt`**: The CMake file for the `quickstart` example.
+     - **Path**: `examples/quickstart/CMakeLists.txt`
+     - **Content Description**: Defines the `quickstart` executable target and links it against the `simdjson` library. This allows the example to be built as part of the main project when developer mode is enabled.
+       ```cmake
+       add_executable(quickstart quickstart.cpp)
+       target_link_libraries(quickstart PRIVATE simdjson)
+       ```
+   - **`examples/quickstart/Makefile`**: A Makefile for building the `quickstart` example without CMake.
+     - **Path**: `examples/quickstart/Makefile`
+     - **Content Description**: Provides a simple, non-CMake method for compiling and testing the `quickstart` example on Unix-like systems. It demonstrates two ways to build the library: by compiling against the single-header (amalgamated) version, and by compiling directly against the library's source files. It includes targets to test the build with different C++ standards (`-std=c++11`, `-std=c++14`, `-std=c++17`), serving as a reference for manual integration.
+   - **`fuzz/build_like_ossfuzz.sh`**: A shell script to emulate the OSS-Fuzz build environment for local testing.
+     - **Path**: `fuzz/build_like_ossfuzz.sh`
+     - **Content Description**: This script sets up environment variables (`CC`, `CXX`, `CFLAGS`, `CXXFLAGS`, `LIB_FUZZING_ENGINE`) to match the Google OSS-Fuzz build environment. It uses `clang` with AddressSanitizer, UndefinedBehaviorSanitizer, and libFuzzer flags, then invokes the main `fuzz/ossfuzz.sh` build script. This is intended for developers to locally reproduce and debug issues related to the OSS-Fuzz integration.
+       ```sh
+       #!/bin/sh
+       #
+       # This script emulates how oss fuzz invokes the build
+       # process, handy for trouble shooting cmake issues and possibly
+       # recreating testcases. For proper debugging of the oss fuzz
+       # build, follow the procedure at https://google.github.io/oss-fuzz/getting-started/new-project-guide/#testing-locally
+
+       set -eu
+
+       ossfuzz=$(readlink -f $(dirname $0))/ossfuzz.sh
+
+       mkdir -p ossfuzz-out
+       export OUT=$(pwd)/ossfuzz-out
+       export CC=clang
+       export CXX="clang++"
+       export CFLAGS="-fsanitize=fuzzer-no-link"
+       export CXXFLAGS="-fsanitize=fuzzer-no-link,address,undefined -O1 -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION"
+       export LIB_FUZZING_ENGINE="-fsanitize=fuzzer"
+
+       $ossfuzz
+
+       echo "look at the results in $OUT"
+       ```
+   - **`fuzz/CMakeLists.txt`**: The CMake file for defining the fuzzer executables.
+     - **Path**: `fuzz/CMakeLists.txt`
+     - **Content Description**: Defines the build targets for all fuzzer executables. It introduces several CMake options to control the fuzzing build:
+       - `SIMDJSON_ENABLE_FUZZING`: A master switch to enable building fuzzers (defaults to `ON` except on legacy Windows environments).
+       - `SIMDJSON_FUZZ_LINKMAIN`: A critical option that toggles between two build modes. When `ON` (default), it links a `main.cpp` function, creating a standalone executable useful for reproducing crashes, debugging with GDB, or running under Valgrind. When `OFF`, it omits the `main` function, allowing the fuzzer to be linked against a fuzzing engine like libFuzzer.
+       - `SIMDJSON_FUZZ_LDFLAGS`: Used to pass linker flags (like `-fsanitize=fuzzer`) specifically to the fuzzer targets.
+       - This file defines numerous fuzzer targets, including `fuzz_parser`, `fuzz_ondemand`, `fuzz_minify`, `fuzz_utf8`, and `fuzz_implementations`.
+   - **`fuzz/ossfuzz.sh`**: The core build script for the OSS-Fuzz environment.
+     - **Path**: `fuzz/ossfuzz.sh`
+     - **Content Description**: This script contains the main build logic (CMake configuration and build commands) for creating the fuzzing targets within the OSS-Fuzz environment. It is designed to be executed by the OSS-Fuzz service or by the local emulation script (`fuzz/build_like_ossfuzz.sh`), which sets the necessary compiler and sanitizer environment variables before invoking it.
+   - **`.github/workflows/aarch64.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/aarch64.yml`
+     - **Content Description**: Defines an automated build and test process for Linux on the `aarch64` architecture using QEMU emulation. It specifies the dependencies (`cmake`, `make`, `g++`) and the build steps, including a test with the Undefined Behavior Sanitizer (`-DSIMDJSON_SANITIZE_UNDEFINED=ON`). Serves as a reference for supported `aarch64` environments.
+   - **`.github/workflows/alpine.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/alpine.yml`
+     - **Content Description**: Defines an automated build and test process for Alpine Linux (musl libc) using a Docker container. It specifies dependencies (`build-base`, `cmake`, `g++`, `linux-headers`, `git`, `bash`) and the build/test steps. It serves as a reference for supported Alpine environments.
+   - **`.github/workflows/cifuzz.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/cifuzz.yml`
+     - **Content Description**: Defines an automated fuzz testing process that runs on pull requests. It uses the Google OSS-Fuzz CIFuzz action to build the fuzzing targets and run them for a short duration to catch regressions and new bugs caused by malformed inputs.
+   - **`.github/workflows/debian.yaml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/debian.yaml`
+     - **Content Description**: Defines an automated build and test process within a `debian:testing` container. It installs the library and verifies that it can be found and used via `pkg-config` by compiling an example application. This serves as a reference for `pkg-config` integration.
+   - **`.github/workflows/documentation.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/documentation.yml`
+     - **Content Description**: Defines an automated process to generate Doxygen API documentation and deploy it to GitHub Pages. This workflow runs on new releases and can be triggered manually. It installs `doxygen` and `graphviz`, runs a theme preparation script, and generates the documentation.
+   - **`.github/workflows/emscripten.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/emscripten.yml`
+     - **Content Description**: Defines an automated build process for the WebAssembly target using the Emscripten SDK. It installs dependencies (`node`, `emsdk`), configures the project with `emcmake`, and performs a build to verify compilation. This is a build-only check.
+   - **`.github/workflows/fix-trailing-whitespace.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/fix-trailing-whitespace.yml`
+     - **Content Description**: Defines an automated check that runs on every push and pull request to detect trailing whitespace in source files. It uses the `scripts/remove_trailing_whitespace.sh` script and fails if any changes are detected, ensuring code cleanliness.
+   - **`.github/workflows/fuzzers.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/fuzzers.yml`
+     - **Content Description**: Defines an extensive, scheduled fuzzing and memory checking suite that runs on Ubuntu. It uses a recent Clang version to build multiple fuzzer variants (fast, sanitized, replay), runs them against specific SIMD implementations, manages a corpus of test cases, and uses Valgrind for deep memory error analysis. Serves as a reference for a robust, long-running fuzzing setup.
+   - **`.github/workflows/loongarch64.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/loongarch64.yml`
+     - **Content Description**: Defines an automated build-only check for the `loongarch64` architecture. It uses a specific cross-compilation toolchain to verify that the project compiles successfully for this target. Serves as a reference for cross-compiling to LoongArch64.
+   - **`.github/workflows/macos.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/macos.yml`
+     - **Content Description**: Defines the automated build and test matrix for macOS. It specifies jobs for Debug and Release builds, static and shared libraries. It includes comprehensive post-installation tests, verifying direct compilation against the installed library as well as CMake's `find_package` mechanism.
+   - **`.github/workflows/msys2-clang.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/msys2-clang.yml`
+     - **Content Description**: Defines the automated build and test matrix for Windows using the MSYS2 environment with the MINGW64 toolchain. It specifically tests with Clang and Ninja across multiple build types (`Release`, `Debug`, `RelWithDebInfo`) and a forcefully single-threaded configuration. Serves as a reference for MinGW-w64/Clang builds on Windows.
+   - **`.github/workflows/msys2.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/msys2.yml`
+     - **Content Description**: Defines the automated build and test matrix for Windows using the MSYS2 environment with the MINGW64 toolchain. It specifically tests with GCC and Ninja across multiple build types (`Release`, `Debug`, `RelWithDebInfo`) and a forcefully single-threaded, static-only configuration. Serves as a reference for MinGW-w64/GCC builds on Windows.
+   - **`.github/workflows/ppc64.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ppc64.yml`
+     - **Content Description**: Defines an automated build and test process for Linux on the `ppc64le` architecture using QEMU emulation. It specifies the dependencies (`cmake`, `make`, `g++`) and build steps with flags like `-DSIMDJSON_COMPETITION=OFF`. Serves as a reference for supported `ppc64le` environments, particularly with GCC 11 on Ubuntu.
+   - **`.github/workflows/riscv64.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/riscv64.yml`
+     - **Content Description**: Defines an automated build and test process for Linux on the `riscv64` architecture using QEMU emulation. It specifies the dependencies (`cmake`, `make`, `g++`) and build steps. Serves as a reference for supported `riscv64` environments on Ubuntu.
+   - **`.github/workflows/s390x.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/s390x.yml`
+     - **Content Description**: Defines an automated build and test process for Linux on the `s390x` architecture using QEMU emulation. It specifies the dependencies (`cmake`, `make`, `g++`) and build steps with flags like `-DSIMDJSON_COMPETITION=OFF`. Serves as a reference for supported `s390x` environments on Ubuntu.
+   - **`.github/workflows/ubuntu22.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu22.yml`
+     - **Content Description**: Defines a comprehensive build and test process for Ubuntu 22.04 using its default compiler (GCC 11). It validates multiple build configurations: a Release build with developer mode off (library-only), a Debug build with developer mode on, and a Release build with developer mode on. It performs extensive post-installation tests for both library-only and developer builds, including manual linking/execution and CMake `find_package` integration.
+   - **`.github/workflows/ubuntu22-clang13.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu22-clang13.yml`
+     - **Content Description**: Defines an automated build and test process for Ubuntu 22.04 using Clang 13. It serves as a reference for a modern Ubuntu/Clang environment.
+   - **`.github/workflows/ubuntu22-clang14.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu22-clang14.yml`
+     - **Content Description**: Defines an automated build and test process for Ubuntu 22.04 using Clang 14. It serves as a reference for a modern Ubuntu/Clang environment.
+   - **`.github/workflows/ubuntu22-cxx20.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu22-cxx20.yml`
+     - **Content Description**: Defines an automated build and test process for Ubuntu 22.04 using GCC 12 with the C++20 standard. It builds both Debug and Release static library configurations and performs comprehensive post-installation tests, including manual linking and CMake's `find_package` mechanism.
+   - **`.github/workflows/ubuntu22-gcc12.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu22-gcc12.yml`
+     - **Content Description**: Defines an automated build and test process for Ubuntu 22.04 using GCC 12. It serves as a reference for a modern Ubuntu/GCC environment.
+   - **`.github/workflows/ubuntu22-glibcxxassertions.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu22-glibcxxassertions.yml`
+     - **Content Description**: Defines an automated build and test process for Ubuntu 22.04 using GCC 12 with `libstdc++` debug assertions enabled (`-DSIMDJSON_GLIBCXX_ASSERTIONS=ON`). This is a `Debug` build that helps catch standard library usage errors.
+   - **`.github/workflows/ubuntu22-threadsani.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu22-threadsani.yml`
+     - **Content Description**: Defines an automated build and test process for Ubuntu 22.04 using GCC 12 with the Thread Sanitizer (`-DSIMDJSON_SANITIZE_THREADS=ON`) enabled to detect data races. It specifically builds and runs tests related to multi-threaded parsing (`document_stream_tests`, `parse_many_test`).
+   - **`.github/workflows/ubuntu24.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu24.yml`
+     - **Content Description**: Defines a comprehensive build and test matrix for Ubuntu 24.04. It tests across multiple axes: compilers (GCC 13, Clang 16), build types (Debug, Release, RelWithDebInfo), library types (static, shared), and with the Address Sanitizer enabled or disabled. This ensures broad compatibility and robustness on the latest Ubuntu LTS release.
+   - **`.github/workflows/ubuntu24-checkperf.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu24-checkperf.yml`
+     - **Content Description**: Defines an automated process to check for performance regressions. It runs on Ubuntu 24.04 (with its default compiler, GCC 13) and builds the library with strict pedantic compiler flags (`-Werror=old-style-cast -pedantic -Wpedantic`). It then builds and runs the `checkperf` test suite.
+   - **`.github/workflows/ubuntu24-cxx20.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu24-cxx20.yml`
+     - **Content Description**: Defines an automated build and test matrix for Ubuntu 24.04 using the C++20 standard. It tests against both GCC 13 and Clang 16. Serves as a reference for C++20 support on the latest Ubuntu LTS with modern compilers.
+   - **`.github/workflows/ubuntu24-noexcept.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu24-noexcept.yml`
+     - **Content Description**: Defines an automated build and test process on Ubuntu 24.04 with exceptions disabled (`-DSIMDJSON_EXCEPTIONS=OFF`). It validates both Debug and Release static builds and performs comprehensive post-installation tests, including manual linking and CMake `find_package` integration, to ensure the library is fully functional in a no-exceptions environment.
+   - **`.github/workflows/ubuntu24-nothread.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu24-nothread.yml`
+     - **Content Description**: Defines an automated build and test process on Ubuntu 24.04 with threading explicitly disabled (`-DSIMDJSON_ENABLE_THREADS=OFF`). It validates both Debug and Release static builds and performs comprehensive post-installation tests, including manual linking and CMake `find_package` integration, to ensure the library is fully functional in a single-threaded environment.
+   - **`.github/workflows/ubuntu24-sani.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/ubuntu24-sani.yml`
+     - **Content Description**: Defines an automated build and test process on Ubuntu 24.04 to check for memory and undefined behavior errors. It contains two separate jobs: one that builds and tests with the Address Sanitizer (`-DSIMDJSON_SANITIZE=ON`) and another that builds and tests with the Undefined Behavior Sanitizer (`-DSIMDJSON_SANITIZE_UNDEFINED=ON`). Both are Debug builds.
+   - **`.github/workflows/vs17-arm-ci.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/vs17-arm-ci.yml`
+     - **Content Description**: Defines an automated build-only check for Windows on the `ARM64` and `ARM64EC` architectures. It uses Visual Studio to cross-compile the library with exceptions disabled. Serves as a reference for Windows ARM64/ARM64EC cross-compilation.
+   - **`.github/workflows/vs17-ci.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/vs17-ci.yml`
+     - **Content Description**: Defines a comprehensive build and test matrix for Windows using Visual Studio 2022. It tests across `x64` and `Win32` architectures, `Debug`, `Release`, and `RelWithDebInfo` build types, and both static and shared library configurations. It includes a post-installation `find_package` test to ensure downstream usability.
+   - **`.github/workflows/vs17-ci-cxx20.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/vs17-ci-cxx20.yml`
+     - **Content Description**: Defines an automated build and test matrix for Windows using Visual Studio 2022 and the C++20 standard. It tests across `x64` and `Win32` architectures for both static and shared library builds. It runs tests for both Debug and Release configurations and performs a post-installation `find_package` test to ensure downstream usability.
+   - **`.github/workflows/vs17-clang-ci.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/vs17-clang-ci.yml`
+     - **Content Description**: Defines an automated build and test matrix for Windows using Visual Studio 2022 with the ClangCL toolchain (`-T ClangCL`). It tests across the `x64` architecture for `Debug`, `Release`, and `RelWithDebInfo` build types. It includes a post-installation `find_package` test to ensure downstream usability with this toolchain.
+   - **`.github/workflows/vs17-clang-ci-cxx20.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/vs17-clang-ci-cxx20.yml`
+     - **Content Description**: Defines an automated build and test matrix for Windows using Visual Studio 2022 with the ClangCL toolchain (`-T ClangCL`) and the C++20 standard. It tests across the `x64` architecture and `Debug`, `Release`, and `RelWithDebInfo` build types. It includes a post-installation `find_package` test to ensure downstream usability with this toolchain.
+   - **`.github/workflows/vs17-noexcept-ci.yml`**: A configuration file for the GitHub Actions CI service.
+     - **Path**: `.github/workflows/vs17-noexcept-ci.yml`
+     - **Content Description**: Defines an automated build and test process for Windows using Visual Studio 2022 with exceptions disabled (`-DSIMDJSON_EXCEPTIONS=OFF`). It validates a Release build on the `x64` architecture. Serves as a reference for no-exceptions support in the MSVC environment.
+   - **`.gitignore`**: A file that specifies intentionally untracked files to be ignored by Git.
+     - **Path**: `.gitignore`
+     - **Content Description**: Defines patterns for files and directories that should be excluded from version control. This is crucial for maintaining a clean repository by ignoring local configuration, build artifacts, and temporary files. Key ignored patterns include:
+       - **IDE-specific files**: For Eclipse (`.cproject`), JetBrains (`.idea/`), Visual Studio (`/.vs/`), and XCode (`DerivedData`, `xcuserdata`).
+       - **Editor temporary files**: For Emacs (`*~`) and Vim (`.*.swp`).
+       - **Build output directories**: `build/`, `build*/`, `cmake-build-debug/`, `cmake-build-release/`, `visual_studio/`.
+       - **Compiled objects and libraries**: `*.o`, `*.obj`, `*.a`, `*.lib`, `*.so`, `*.dll`, `*.exe`, `*.out`.
+       - **Generated documentation**: The `/doc/api` directory, which is the output target for Doxygen.
+       - **Fuzzer outputs**: `corpus.zip`, `ossfuzz-out/`, and `out/`.
+       - **Tool caches**: `.cache` (for `clangd`) and `.history`.
+       - **VS Code files**: It specifically ignores the entire `.vscode/` directory *except* for key configuration files (`settings.json`, `extensions.json`, `tasks.json`, `launch.json`) that are intended to be shared across the team.
+       ```
+       # eclipse project files
+       .cproject
+       .project
+       .settings
+
+       # emacs temp files
+       *~
+
+       # vim temp files
+       .*.swp
+
+       # XCode
+       ^build/
+       *.pbxuser
+       !default.pbxuser
+       *.mode1v3
+       !default.mode1v3
+       *.mode2v3
+       !default.mode2v3
+       *.perspectivev3
+       !default.perspectivev3
+       xcuserdata
+       *.xccheckout
+       *.moved-aside
+       DerivedData
+       *.hmap
+       *.ipa
+       *.xcuserstate
+       *.DS_Store
+
+       # IDE specific folder for JetBrains IDEs
+       .idea/
+       cmake-build-debug/
+       cmake-build-release/
+
+       # Visual Studio Code artifacts
+       .vscode/*
+       .history/
+
+       # Visual Studio artifacts
+       /.vs/
+
+       # C/C++ build outputs
+       .build/
+       bins
+       gens
+       libs
+       objs
+
+       # C++ ignore from https://github.com/github/gitignore/blob/master/C%2B%2B.gitignore
+
+       # Prerequisites
+       *.d
+
+       # Compiled Object files
+       *.slo
+       *.lo
+       *.o
+       *.obj
+
+       # Precompiled Headers
+       *.gch
+       *.pch
+
+       # Compiled Dynamic libraries
+       *.so
+       *.dylib
+       *.dll
+
+       # Fortran module files
+       *.mod
+       *.smod
+
+       # Compiled Static libraries
+       *.lai
+       *.la
+       *.a
+       *.lib
+
+       # Executables
+       *.exe
+       *.out
+       *.app
+
+
+       # CMake files that may be specific to our installation
+
+       # Build outputs
+       /build*/
+       /visual_studio/
+
+       # Fuzzer outputs generated by instructions in fuzz/Fuzzing.md
+       /corpus.zip
+       /ossfuzz-out/
+       /out/
+
+       # Generated docs
+       /doc/api
+       *.orig
+
+       # VSCode workspace files
+       .vscode/*
+       !.vscode/settings.json
+       !.vscode/tasks.json
+       !.vscode/launch.json
+       !.vscode/extensions.json
+
+       # clangd
+       .cache
+       ```
+   - **`p2996/Dockerfile`**: A Dockerfile to create a Debian 12 environment with a custom-built Clang compiler for experimental features.
+     - **Path**: `p2996/Dockerfile`
+     - **Content Description**: Defines a multi-stage Docker build to provide a reproducible environment for testing experimental C++ P2996 features.
+   - **`p2996/run_docker.sh`**: A helper script to build and run commands within the experimental P2996 Docker environment.
+     - **Path**: `p2996/run_docker.sh`
+     - **Content Description**: This shell script simplifies interaction with the custom Clang Docker environment defined in `p2996/Dockerfile`. It automatically builds the Docker image if it doesn't exist, naming it based on the current user. It then runs a user-provided command inside a container, mounting the current directory and the user's SSH credentials. This allows developers to easily compile and test the project with the experimental compiler without manual Docker commands.
+       ```bash
+       #!/usr/bin/env bash
+
+       if [ -z "$1" ]
+         then
+           echo "The run-docker-station script takes a command as a argument. E.g., try ./run-docker-station 'ls' "
+           exit 1
+       fi
+
+       set -o noglob
+       SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+
+       COMMAND=$@
+
+       tuser=$(echo $USER | tr -dc 'a-z')
+
+       container_name=${CONTAINER_NAME:-"debian12-clang-p2996-programming_station-for-$tuser-simdjson"}
+
+       command -v docker >/dev/null 2>&1 || { echo >&2 "Please install docker. E.g., go to https://www.docker.com/products/docker-desktop Type 'docker' to diagnose the problem."; exit 1; }
+
+       docker info >/dev/null 2>&1 || { echo >&2 "Docker server is not running? type 'docker info'."; exit 1; }
+
+       SSHPARAM=""
+       [ -e "${SSH_AUTH_SOCK}" ] && SSHPARAM="--volume /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock  --env SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock"
+       [ -e "${HOME}/.ssh" ] && SSHPARAM="--volume ${HOME}/.ssh:/home/$tuser/.ssh:ro"
+
+
+       docker image inspect $container_name >/dev/null 2>&1 || ( echo "instantiating the container" ; docker build --no-cache -t $container_name -f $SCRIPTPATH/Dockerfile --build-arg USER_NAME="$tuser"  --build-arg USER_ID=$(id -u)  --build-arg GROUP_ID=$(id -g) .  )
+
+       if [ -t 0 ]; then DOCKER_ARGS=-it; fi
+       docker run --rm $DOCKER_ARGS -h $container_name $SSHPARAM -v $(pwd):$(pwd):Z --privileged  -w $(pwd)  $container_name sh -c "$COMMAND"
+       ```
+   - **`scripts/javascript/package-lock.json`**: An automatically generated lock file for npm.
+     - **Path**: `scripts/javascript/package-lock.json`
+     - **Content Description**: This file pins the exact versions of the JavaScript dependencies (`faker`, `fs`) defined in `package.json`. This ensures that running `npm install` will result in a reproducible and identical set of installed packages across different environments, preventing unexpected issues from dependency updates.
+       ```json
+       {
+         "name": "generatelargejson",
+         "version": "1.0.0",
+         "lockfileVersion": 1,
+         "requires": true,
+         "dependencies": {
+           "faker": {
+             "version": "4.1.0",
+             "resolved": "https://registry.npmjs.org/faker/-/faker-4.1.0.tgz",
+             "integrity": "sha1-HkW7vsxndLPBlfrSg1EJxtdIzD8="
+           },
+           "fs": {
+             "version": "0.0.1-security",
+             "resolved": "https://registry.npmjs.org/fs/-/fs-0.0.1-security.tgz",
+             "integrity": "sha1-invTcYa23d84E/I4WLV+yq9eQdQ="
+           }
+         }
+       }
+       ```
+   - **`scripts/javascript/package.json`**: A Node.js package manifest for helper scripts.
+     - **Path**: `scripts/javascript/package.json`
+     - **Content Description**: Defines the dependencies for a Node.js script used to generate large, fake JSON data for testing purposes. It requires Node.js and the `npm` package manager to install dependencies like `faker`.
+       ```json
+       {
+         "name": "generatelargejson",
+         "version": "1.0.0",
+         "description": "",
+         "main": "generatelargejson.js",
+         "dependencies": {
+           "faker": "^4.1.0",
+           "fs": "0.0.1-security"
+         },
+         "devDependencies": {},
+         "scripts": {
+           "test": "echo \"Error: no test specified\" && exit 1"
+         },
+         "author": "",
+         "license": "ISC"
+       }
+       ```
+   - **`simdjson.pc.in`**: A template file used by CMake to generate a `pkg-config` file.
+     - **Path**: Project root directory (or similar source location).
+     - **Content Description**: This is a template processed by CMake during the installation step. It generates a `simdjson.pc` file populated with the correct installation prefix, library/include directories, version, and necessary compiler/linker flags. This generated file allows downstream projects on Unix-like systems to easily find and link against the `simdjson` library using the `pkg-config` tool.
+   - **`singleheader/CMakeLists.txt`**: The CMake file for managing the single-header (amalgamated) version of the library.
+     - **Path**: `singleheader/CMakeLists.txt`
+     - **Content Description**: Manages the creation and testing of the single-header version of the library (`simdjson.h` and `simdjson.cpp`). If Python 3 is found, it uses the `amalgamate.py` script to generate these files in the build directory. If Python 3 is not found, it falls back to copying the pre-existing files from the source directory. It defines a special `amalgamate` target (`cmake --build . --target amalgamate`) for developers to manually update the single-header files in the source repository. It also defines several tests (`amalgamate_demo`, `simdjson-singleheader`) to validate both the generated and pre-existing single-header files. These tests are disabled on legacy Visual Studio and when building a Windows DLL.
+   - **`tests/CMakeLists.txt`**: The main CMake file for defining the test suite.
+     - **Path**: `tests/CMakeLists.txt`
+     - **Content Description**: This file orchestrates the entire test suite. It includes subdirectories for different test categories (`dom`, `ondemand`, `builder`, `compilation_failure_tests`) and defines core test executables such as `unicode_tests`, `minify_tests`, `padded_string_tests`, `prettify_tests`, and `checkimplementation`. It also handles Windows-specific logic for running tests against shared libraries (DLLs) by copying the DLL into the test directory. Serves as a reference for the structure and scope of the project's tests.
+   - **`tests/docker/Dockerfile`**: A Dockerfile for creating a standard test environment with GCC 10.
+     - **Path**: `tests/docker/Dockerfile`
+     - **Content Description**: Defines a Docker image based on `gcc:10` (Debian Buster) and installs necessary dependencies like a recent version of CMake.
+   - **`tools/CMakeLists.txt`**: The CMake file for building the command-line tools.
+     - **Path**: `tools/CMakeLists.txt`
+     - **Content Description**: This file defines the build targets for several command-line utility applications (`json2json`, `jsonstats`, `jsonpointer`, `minify`). The build is conditional on the presence of the `cxxopts` library for command-line argument parsing. If `cxxopts` is found (either via `find_package` or by being downloaded by CMake), the tools are built and linked against `simdjson`. This is typically enabled as part of a developer build (`-DSIMDJSON_DEVELOPER_MODE=ON`).
+   - **`.travis.yml`**: A configuration file for the Travis CI service.
+     - **Path**: `.travis.yml`
+     - **Content Description**: Defines the automated build and test matrix for Linux on the `ppc64le` architecture. It specifies jobs for various compilers (GCC 8/9/10, Clang 6/7/8/9/10) and build configurations (static). It serves as a reference for supported PowerPC environments and compiler flags (`-maltivec`, `-mcpu=power9`).
+   - **`.vscode/extensions.json`**: A configuration file recommending Visual Studio Code extensions.
+     - **Path**: `.vscode/extensions.json`
+     - **Content Description**: This file suggests a set of VS Code extensions to provide a consistent and productive development environment. When the project is opened in VS Code, the editor will prompt the user to install these recommended extensions, which include tools for C++ language support (`clangd`), CMake integration (`ms-vscode.cmake-tools`), code formatting (`xaver.clang-format`), Python, and GitHub Actions integration.
+       ```json
+       {
+       	// See https://go.microsoft.com/fwlink/?LinkId=827846 to learn about workspace recommendations.
+       	// Extension identifier format: ${publisher}.${name}. Example: vscode.csharp
+
+       	// List of extensions which should be recommended for users of this workspace.
+       	"recommendations": [
+       		// C++
+       		"llvm-vs-code-extensions.vscode-clangd",
+       		"xaver.clang-format",
+       		// Python
+       		"ms-python.python",
+       		// .github/*
+       		"github.vscode-github-actions",
+       		// cmake
+       		"ms-vscode.cmake-tools",
+       		"twxs.cmake"
+       	],
+       	// List of extensions recommended by VS Code that should not be recommended for users of this workspace.
+       	"unwantedRecommendations": [
+
+       	]
+       }
+       ```
+   - **`.vscode/settings.json`**: A configuration file for Visual Studio Code.
+     - **Path**: `.vscode/settings.json`
+     - **Content Description**: Provides recommended settings for developers using the Visual Studio Code editor. It enhances the development experience by automating configuration and code style enforcement.
+       - **`cmake.configureArgs`**: Automatically passes `-DSIMDJSON_DEVELOPER_MODE=ON` to CMake when using the CMake Tools extension, ensuring that tests, examples, and benchmarks are configured by default.
+       - **`files.trimTrailingWhitespace`**: Automatically removes trailing whitespace when saving files, helping to satisfy the project's CI checks for code cleanliness.
+       - **`editor.rulers`**: Adds visual guidelines in the editor to encourage adherence to line length conventions.
+       - **`files.associations`**: Ensures a wide range of file types are correctly identified as C++, enabling proper syntax highlighting and IntelliSense.
+       ```json
+       {
+           "editor.rulers": [
+               {"column": 95 },
+               {"column": 120 }
+           ],
+           "cmake.configureArgs": [
+               "-DSIMDJSON_DEVELOPER_MODE=ON"
+           ],
+           "files.trimTrailingWhitespace": true,
+           "files.associations": {
+               ".clangd": "yaml",
+               "array": "cpp",
+               "iterator": "cpp",
+               "chrono": "cpp",
+               "optional": "cpp",
+               "__locale": "cpp",
+               "__tuple": "cpp",
+               "__bit_reference": "cpp",
+               "__config": "cpp",
+               "__debug": "cpp",
+               "__errc": "cpp",
+               "__functional_base": "cpp",
+               "__hash_table": "cpp",
+               "__mutex_base": "cpp",
+               "__node_handle": "cpp",
+               "__nullptr": "cpp",
+               "__split_buffer": "cpp",
+               "__string": "cpp",
+               "__threading_support": "cpp",
+               "__tree": "cpp",
+               "algorithm": "cpp",
+               "atomic": "cpp",
+               "bit": "cpp",
+               "bitset": "cpp",
+               "cctype": "cpp",
+               "cinttypes": "cpp",
+               "clocale": "cpp",
+               "cmath": "cpp",
+               "codecvt": "cpp",
+               "complex": "cpp",
+               "condition_variable": "cpp",
+               "cstdarg": "cpp",
+               "cstddef": "cpp",
+               "cstdint": "cpp",
+               "cstdio": "cpp",
+               "cstdlib": "cpp",
+               "cstring": "cpp",
+               "ctime": "cpp",
+               "cwchar": "cpp",
+               "cwctype": "cpp",
+               "deque": "cpp",
+               "exception": "cpp",
+               "forward_list": "cpp",
+               "fstream": "cpp",
+               "functional": "cpp",
+               "initializer_list": "cpp",
+               "iomanip": "cpp",
+               "ios": "cpp",
+               "iosfwd": "cpp",
+               "iostream": "cpp",
+               "istream": "cpp",
+               "limits": "cpp",
+               "list": "cpp",
+               "locale": "cpp",
+               "map": "cpp",
+               "memory": "cpp",
+               "mutex": "cpp",
+               "new": "cpp",
+               "numeric": "cpp",
+               "ostream": "cpp",
+               "random": "cpp",
+               "ratio": "cpp",
+               "regex": "cpp",
+               "set": "cpp",
+               "sstream": "cpp",
+               "stack": "cpp",
+               "stdexcept": "cpp",
+               "streambuf": "cpp",
+               "string": "cpp",
+               "string_view": "cpp",
+               "system_error": "cpp",
+               "thread": "cpp",
+               "tuple": "cpp",
+               "type_traits": "cpp",
+               "typeinfo": "cpp",
+               "unordered_map": "cpp",
+               "unordered_set": "cpp",
+               "utility": "cpp",
+               "valarray": "cpp",
+               "vector": "cpp",
+               "*.ipp": "cpp",
+               "__functional_base_03": "cpp",
+               "filesystem": "cpp",
+               "*.inc": "cpp",
+               "compare": "cpp",
+               "concepts": "cpp",
+               "variant": "cpp",
+               "__bits": "cpp",
+               "csignal": "cpp",
+               "future": "cpp",
+               "queue": "cpp",
+               "shared_mutex": "cpp",
+               "ranges": "cpp",
+               "span": "cpp",
+               "__verbose_abort": "cpp",
+               "charconv": "cpp",
+               "source_location": "cpp",
+               "strstream": "cpp",
+               "typeindex": "cpp",
+               "*.tcc": "cpp",
+               "memory_resource": "cpp",
+               "numbers": "cpp",
+               "semaphore": "cpp",
+               "stop_token": "cpp",
+               "cfenv": "cpp",
+               "format": "cpp",
+               "xlocmes": "cpp",
+               "xlocmon": "cpp",
+               "xlocnum": "cpp",
+               "xloctime": "cpp",
+               "xutility": "cpp",
+               "coroutine": "cpp",
+               "xfacet": "cpp",
+               "xhash": "cpp",
+               "xiosbase": "cpp",
+               "xlocale": "cpp",
+               "xlocbuf": "cpp",
+               "xlocinfo": "cpp",
+               "xmemory": "cpp",
+               "xstring": "cpp",
+               "xtr1common": "cpp",
+               "xtree": "cpp"
+           }
+       }
+       ```
+   - **`windows/CMakeLists.txt`**: The CMake file for managing Windows-specific build configurations.
+     - **Path**: `windows/CMakeLists.txt`
+     - **Content Description**: Defines an `INTERFACE` library to handle Windows-specific build requirements for both MSVC and MinGW compilers. It adds the `windows/` directory to the include path for platform-specific headers (e.g., a `getopt.h` implementation) and defines `_CRT_SECURE_NO_WARNINGS` to suppress common warnings from the Microsoft C Runtime library, ensuring a cleaner compilation process on Windows.
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - **Unit and Integration Tests**: Located in the `tests` subdirectory and run via `ctest`. The tests are organized into subdirectories such as `dom`, `ondemand`, `builder`, and `compilation_failure_tests`. Key test executables include `unicode_tests`, `minify_tests`, `padded_string_tests`, and `prettify_tests`. Tests are categorized using labels (`acceptance`, `assert`, `per_implementation`, `singleheader`). Some tests may be labeled `explicitonly` and skipped in certain CI runs using the `ctest -LE explicitonly` flag. Some builds may exclude tests by regex, e.g., `ctest -E avoid_`. Some CI jobs may run a specific subset of tests using `ctest -R <test_regex>` to focus on functionality like thread safety (`document_stream_tests`, `parse_many_test`).
+   - **Implementation-Specific Tests**: Must be run for each supported SIMD implementation (e.g., `icelake`, `haswell`, `westmere`, `arm64`, `ppc64`, `riscv64`, `s390x`, `fallback`). This is achieved by setting the `SIMDJSON_FORCE_IMPLEMENTATION` environment variable before running `ctest` with the `per_implementation` label. The suite includes a dedicated `checkimplementation` test to programmatically verify that the environment variable has correctly forced the intended implementation, ensuring the test results are valid.
+   - **Build Configuration Matrix**: The library must be tested under various build configurations controlled by CMake flags:
+     - **Operating Systems/Platforms**: Test on Linux (`amd64`, `arm64`/`aarch64`, `ppc64le`, `loongarch64`, `riscv64`, `s390x`), including glibc (e.g., Debian, Ubuntu 20.04, Ubuntu 22.04, Ubuntu 24.04) and musl libc variants (e.g., Alpine Linux), macOS, FreeBSD, Windows (`x64`, `Win32`, `ARM64`, `ARM64EC` with MSVC; `x64` with ClangCL via Visual Studio; `x86_64` with MSYS2/MinGW64 using GCC and Clang), and WebAssembly (via Emscripten). The build system automatically applies necessary platform-specific definitions (e.g., `_CRT_SECURE_NO_WARNINGS` on Windows) and compiler flags (e.g., `/WX /permissive-` on modern MSVC) to ensure clean compilation. Ubuntu 24.04 and Visual Studio 2022 are used for comprehensive test matrices covering multiple compilers, build types, linkage types, and sanitizers. Note that `loongarch64`, WebAssembly, and Windows `ARM64`/`ARM64EC` are currently build-only checks in CI. The `ppc64le`, `aarch64`, `riscv64`, and `s390x` architectures are tested via emulation on GitHub Actions.
+     - **Build Types**: Test with `CMAKE_BUILD_TYPE=Debug`, `CMAKE_BUILD_TYPE=Release`, and `CMAKE_BUILD_TYPE=RelWithDebInfo`.
+     - **Static vs. Dynamic Library**: `-DBUILD_SHARED_LIBS=OFF` (default) and `-DBUILD_SHARED_LIBS=ON`. On Windows, testing with shared libraries is critical, as a post-build step is required to copy the `simdjson.dll` next to the test executables so they can run correctly.
+     - **Sanitizer Builds**:
+       - AddressSanitizer: `-DSIMDJSON_SANITIZE=ON`. On GCC/Clang, this enables both Address and Undefined Behavior sanitizers. On AppleClang, it enables only the Address sanitizer.
+       - ThreadSanitizer: `-DSIMDJSON_SANITIZE_THREADS=ON`. This enables both Thread and Undefined Behavior sanitizers. It is specifically used on Ubuntu 22.04 with GCC 12 to run thread-safety tests like `document_stream_tests` and `parse_many_test` to find data races.
+       - Undefined Behavior Sanitizer: `-DSIMDJSON_SANITIZE_UNDEFINED=ON`.
+       - MemorySanitizer: `-DSIMDJSON_SANITIZE_MEMORY=ON`.
+       - These are typically built with `CMAKE_BUILD_TYPE=Debug`. ASan and UBSan are explicitly tested on Ubuntu 24.04. A comprehensive matrix on Ubuntu 24.04 also tests ASan across `Debug`, `Release`, and `RelWithDebInfo` build types with both static and shared libraries. When running ASan, the `ASAN_OPTIONS="detect_leaks=0"` environment variable may be needed. For UBSan in fuzzing, `UBSAN_OPTIONS="halt_on_error=1"` is used.
+     - **libstdc++ Debug Mode**: `-DSIMDJSON_GLIBCXX_ASSERTIONS=ON` enables extra debugging checks in the GNU C++ standard library. This is typically used with `CMAKE_BUILD_TYPE=Debug`.
+     - **No-Exceptions Build**: `-DSIMDJSON_EXCEPTIONS=OFF`. Must be tested in both Debug and Release configurations. This is explicitly verified on Ubuntu 24.04 and on Windows with Visual Studio 2022.
+     - **Single-Threaded Builds**: Test with `-DSIMDJSON_ENABLE_THREADS=OFF` and the more forceful `-DSIMDJSON_DO_NOT_USE_THREADS_NO_MATTER_WHAT=ON`. These builds must also undergo comprehensive post-installation tests to ensure downstream usability.
+     - **C++ Standard and Standard Library**: Test with different C++ standards (e.g., C++17, C++20 using `-DSIMDJSON_CXX_STANDARD=20`) and standard libraries (e.g., `libstdc++` vs. `libc++` with Clang, using `-DSIMDJSON_USE_LIBCPP=ON`). C++20 is specifically tested on Ubuntu 22.04 (GCC 12), Ubuntu 24.04 (GCC 13, Clang 16), and Windows (Visual Studio 2022).
+     - **Architecture-Specific Flags**: Test with flags required for specific architectures, such as `-maltivec -mcpu=power9` for PowerPC, and with specific implementation lists like `-DSIMDJSON_IMPLEMENTATION="ppc64;fallback"`.
+     - **Strict/Pedantic Builds**: Test with strict compiler flags to ensure code quality and standard compliance (e.g., `-Werror=old-style-cast -pedantic -Wpedantic`). The build system enables these by default on GCC/Clang.
+     - **Disabled Tool Dependencies**: `-DSIMDJSON_BASH=OFF` and `-DSIMDJSON_GIT=OFF` to test builds in minimal environments.
+     - **Developer vs. Library-Only Builds**: Test with `-DSIMDJSON_DEVELOPER_MODE=ON` (builds library, tests, examples, benchmarks, and tools if dependencies are met) and `-DSIMDJSON_DEVELOPER_MODE=OFF` (builds only the library, suitable for downstream consumption). The successful compilation of example applications (e.g., `quickstart`) when developer mode is enabled serves as an additional integration test. The `-DSIMDJSON_JUST_LIBRARY=ON` flag provides an even more minimal build.
+     - **Fuzzing Builds**: Test with `-DSIMDJSON_ENABLE_FUZZING=ON` (the default on most platforms). This enables building the fuzzer executables. The build can be further configured with `-DSIMDJSON_FUZZ_LINKMAIN=ON` (for standalone replay/debug builds) or `-DSIMDJSON_FUZZ_LINKMAIN=OFF` (for linking with a fuzzing engine like libFuzzer).
+     - **Other Feature Flags**: Test with other documented flags like:
+       - `-DSIMDJSON_COMPETITION=ON/OFF`
+       - `-DSIMDJSON_GOOGLE_BENCHMARKS=ON/OFF`
+       - `-DSIMDJSON_ENABLE_DOM_CHECKPERF=ON`
+       - `-DSIMDJSON_AVX512_ALLOWED=OFF` (to test disabled AVX-512)
+       - `-DSIMDJSON_SKIPUTF8VALIDATION=ON` (to test with UTF-8 validation disabled)
+       - `-DSIMDJSON_CHECK_EOF=ON` (note: expected to fail tests)
+       - `-DSIMDJSON_VISUAL_STUDIO_BUILD_WITH_DEBUG_INFO_FOR_PROFILING=ON` (Windows-specific)
+       The `SIMDJSON_COMPETITION` flag, when enabled, will trigger the automatic download of numerous third-party JSON libraries for benchmarking.
+     - **Dependency Management Flags**: Test with `SIMDJSON_ALLOW_DOWNLOADS=ON` (default, enables automatic dependency fetching) and `SIMDJSON_ALLOW_DOWNLOADS=OFF` (for offline builds that rely on system-installed dependencies). Test `-DSIMDJSON_USE_BOOST_JSON=ON` to include Boost.JSON in competition benchmarks.
+     - **Experimental Features**:
+       - Static Reflection: `-DSIMDJSON_STATIC_REFLECTION=ON`. Requires CMake 3.25+ and a Rust toolchain (`cargo`). This may set the C++ standard to 26. This will trigger a build of the `serde-benchmark` Rust library and link it into the C++ benchmarks for comparison.
+     - **Compiler Versions**: Test with a matrix of compilers (e.g., GCC 8/9/10/11/12/13, Clang 6/7/8/9/10/11/13/14/16/19, Visual Studio 2015/2017/2019/2022 with MSVC and ClangCL toolchains, Emscripten).
+     - **Cross-Compilation**: Test cross-compilation for targets like ARM64 and LoongArch64 by setting CMake toolchain variables. For Windows ARM64/ARM64EC, this involves flags like `-A ARM64EC`, `-DCMAKE_SYSTEM_VERSION="10.0.22621.0"`, and `-DCMAKE_CROSSCOMPILING=1`. For other targets, variables like `CMAKE_SYSTEM_NAME`, `CMAKE_SYSTEM_PROCESSOR`, `CMAKE_C_COMPILER`, and `CMAKE_CXX_COMPILER` are used.
+   - **Benchmarks and Performance Tests**: Located in the `benchmark` subdirectory and enabled with `-DSIMDJSON_DEVELOPER_MODE=ON` and `-DSIMDJSON_GOOGLE_BENCHMARKS=ON`.
+     - **Performance Regression Tests**: Run via `ctest -R checkperf`. Enabled with `-DSIMDJSON_ENABLE_DOM_CHECKPERF=ON`. These are run as part of CI on Ubuntu 24.04 to guard against performance regressions.
+     - **General Benchmarks**: A suite of executables for detailed performance analysis, including `benchfeatures`, `get_corpus_benchmark`, `bench_parse_call`, `bench_dom_api`, and `bench_ondemand`.
+     - **Comparison Benchmarks**: The `bench_ondemand` executable can link against other JSON libraries for performance comparisons. Building these requires `SIMDJSON_COMPETITION=ON` and exceptions enabled. The build system will automatically download most comparison libraries (`yyjson`, `rapidjson`, `sajson`, `nlohmann_json`, `cJSON`, `fastjson`, etc.). To include `Boost.JSON`, the `-DSIMDJSON_USE_BOOST_JSON=ON` flag must also be set.
+     - **C++20 Specific Benchmarks**: Additional benchmarks located in the `benchmark/from` and `benchmark/car_builder` directories are built only when both exceptions are enabled (`-DSIMDJSON_EXCEPTIONS=ON`) and the compiler supports C++20.
+   - **Static Reflection Benchmarks**: Located in `benchmark/static_reflect`. These benchmarks compare the performance of the experimental static reflection feature against other libraries, including a Rust-based `serde` implementation. This requires enabling `-DSIMDJSON_STATIC_REFLECTION=ON` during CMake configuration, which in turn requires the Rust toolchain to be installed to build the `serde-benchmark` dynamic library. The presence of a `Cargo.lock` file ensures the Rust benchmark is built with specific, tested dependency versions, guaranteeing a consistent performance baseline for comparison.
+   - **Large File/Stress Tests**: The project includes a Node.js script (`scripts/javascript/generatelargejson.js`) to generate very large JSON files. These files can be used as input for benchmarks and tests to validate performance and robustness when handling large data sets.
+   - **Post-Installation Tests**: After installing the library, multiple checks must be performed to ensure it is usable by downstream projects. These checks are critical for various build configurations, including static vs. shared, builds with exceptions enabled vs. disabled, and single-threaded builds.
+     - **Manual Linkage Test**: A sample application must be compiled, linked, and run against the installed library to verify that headers are installed correctly and the library is linkable and usable. This should be tested with different C++ standards (e.g., C++17, C++20). An example is compiling a simple `tmp.cpp` file and running it against a sample JSON file.
+     - **`pkg-config` Integration Test (Unix-like)**: Verify that the installed `simdjson.pc` file (generated from the `simdjson.pc.in` template) is correct by compiling a sample application using the flags provided by `pkg-config --cflags --libs simdjson`. This confirms that the installation paths (`prefix`, `includedir`, `libdir`) and linker flags are correctly populated.
+     - **CMake `find_package` Test**: Verify that the installed CMake configuration files are correct by building a sample CMake project (e.g., from `tests/installation_tests/find`) that uses `find_package(simdjson REQUIRED)` to locate and link against the library. This test is crucial for verifying that the generated `simdjson-config.cmake` file (from the `simdjson-config.cmake.in` template) correctly sets up targets and propagates transitive dependencies like the `Threads` library. This should be tested for both static and shared builds, as well as for both developer and library-only installations on platforms including Linux, macOS, and Windows.
+   - **Non-CMake Build Test (Makefile)**: The `examples/quickstart/Makefile` provides a way to test building the library without CMake on Unix-like systems.
+     - **Single-Header Build**: Run `make test` to verify that the example can be built by compiling against the amalgamated `simdjson.h` and `simdjson.cpp` files from the `singleheader` directory.
+     - **Direct Source Build**: Run `make test11`, `make test14`, and `make test17` to verify that the example can be built by compiling directly against the library's source files (`src/simdjson.cpp`) with different C++ standards. This validates manual integration from the source repository.
+   - **Command-Line Tool Tests**: The executables built from the `tools` directory (`json2json`, `jsonstats`, `jsonpointer`, `minify`) must be tested. This involves running them with sample JSON files and verifying their output and exit codes. The build process must also be tested both with and without the `cxxopts` dependency to ensure the tools are built conditionally as expected. The build system can download `cxxopts` automatically.
+   - **Fuzzing Targets**: Located in the `fuzz` subdirectory. These provide continuous regression testing against malformed inputs.
+     - **Targets**: The suite includes a wide range of fuzzing targets, such as `fuzz_parser`, `fuzz_ondemand`, `fuzz_minify`, `fuzz_minifyimpl`, `fuzz_utf8`, `fuzz_implementations`, `fuzz_ndjson`, `fuzz_atpointer`, and `fuzz_element`.
+     - **Build Modes**: Fuzzers are built using Clang and can be configured in two primary ways via the `SIMDJSON_FUZZ_LINKMAIN` CMake option:
+       - **`libFuzzer` Build (`-DSIMDJSON_FUZZ_LINKMAIN=OFF`):** This is the standard mode for active fuzzing. It builds the fuzzer targets without a `main` function, designed to be linked with a fuzzing engine like `libFuzzer` by passing flags like `-fsanitize=fuzzer` to the linker.
+       - **Replay/Debug Build (`-DSIMDJSON_FUZZ_LINKMAIN=ON`):** This is the default mode. It links a `main.cpp` into each fuzzer, creating a standalone executable. This is used to reproduce crashes with specific input files, for debugging with GDB, and for memory analysis with Valgrind.
+     - **OSS-Fuzz Build Emulation**: A specific build configuration defined in `fuzz/build_like_ossfuzz.sh` must be tested to ensure compatibility with the Google OSS-Fuzz environment. This build uses Clang with AddressSanitizer, UndefinedBehaviorSanitizer, and specific flags like `-O1` and `-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION`.
+     - **Lightweight Fuzzing (CI)**: The `cifuzz` GitHub Action runs on pull requests for a short duration to catch immediate regressions.
+     - **Comprehensive Fuzzing**: A more in-depth process involving multiple build variants (`fast`, `sanitized`, `replay`) built via `fuzz/build_fuzzer_variants.sh`. The sanitized build is run against specific SIMD implementations (`haswell`, `westmere`, `fallback`) to find bugs.
+     - **Corpus Management**: The test process includes creating a seed corpus (`fuzz/build_corpus.sh`), expanding it through fuzzing runs, and minimizing it (`-merge=1` flag).
+   - **Memory Error Detection with Valgrind**: Run fuzzer targets from a `replay` build configuration (built with `-DSIMDJSON_FUZZ_LINKMAIN=ON`) under `valgrind` with a subset of the fuzzing corpus to detect memory leaks and other subtle memory errors.
+   - **Code Sanity Tests**:
+     - **`just_ascii` test**: Verifies source files contain only ASCII characters.
+     - **Symbol Presence Tests (`avoid_abort`, etc.)**: Verifies the compiled library does not link against forbidden functions.
+     - **Style Check**: Verifies code formatting by running the `./style/run-clang-format.py` script. This script uses the configuration from the `.clang-format` file to ensure consistency.
+     - **File Format Consistency**: The `.editorconfig` file helps enforce consistent file formats (UTF-8 encoding, LF line endings) for developers using compatible editors, reducing cross-platform issues.
+     - **Trailing Whitespace Check**: Verifies that no source files contain trailing whitespace by running the `./scripts/remove_trailing_whitespace.sh` script and checking for a clean `git diff`. Using an editor configured with settings like those in `.vscode/settings.json` or any EditorConfig-compatible editor can automate this cleanup on save.
+     - **Editor Diagnostics Consistency**: For developers using an editor with the `clangd` language server, the `.clangd` configuration file ensures consistent static analysis and diagnostics, helping to catch potential issues before compilation.
+     - **Documentation Generation**: Verifies that the Doxygen API documentation can be generated successfully. This involves running the `doxygen` command, which uses the `Doxyfile` configuration. The test should confirm the creation of output in the `doc/api/html/` directory. Optionally, it can also verify the creation of LaTeX sources in `doc/api/latex/`.
+   - **Single-Header (Amalgamation) Tests**: A set of tests to validate the single-header distribution of the library. These tests are labeled `singleheader`.
+     - **`amalgamate_demo`**: An executable test that builds and runs a demo using the `simdjson.h` and `simdjson.cpp` files generated in the build directory. This validates the amalgamation script and the resulting files.
+     - **`simdjson-singleheader`**: A compile-only test that builds a static library from the generated single-header files.
+     - **`amalgamate_demo_direct_from_repository`**: An executable test that builds and runs the same demo but uses the pre-existing single-header files directly from the source repository. This ensures the checked-in files are valid.
+     - **Conditions**: These tests are disabled on legacy Visual Studio environments and when the project is configured to build a Windows DLL (`-DBUILD_SHARED_LIBS=ON`).
+
+4. COMPLETE TODO LIST:
+   - **Method A: Local Setup with VS Code (Recommended for Developers)**
+     1.  **Install Prerequisites**: Install Git, CMake, a C++ compiler, and Visual Studio Code.
+     2.  **Install Recommended VS Code Extensions**: When you open the project folder in VS Code, a notification should appear in the bottom-right corner prompting you to install the recommended extensions listed in `.vscode/extensions.json`. Click "Install" to set up your editor with tools for C++ (clangd), CMake, Python, code formatting, and GitHub Actions integration. If you miss the notification, you can find the recommendations in the Extensions view (Ctrl+Shift+X) under the "Workspace Recommendations" section.
+     3.  **Clone Source Code**: `git clone https://github.com/simdjson/simdjson.git` and open the `simdjson` folder in VS Code. The repository's `.gitignore` file will ensure that build artifacts and local editor files are not tracked by Git.
+     4.  **Configure the Project**: VS Code may prompt you to configure the project. If not, open the Command Palette (Ctrl+Shift+P), type "CMake: Configure", and press Enter. The CMake Tools extension will automatically use the settings from `.vscode/settings.json`, including `-DSIMDJSON_DEVELOPER_MODE=ON`, and generate the `compile_commands.json` file needed by `clangd`. It will ask you to select a "kit" (compiler toolchain).
+     5.  **Verification (Editor Integration)**: Once configuration is complete, the `clangd` extension will use the `.clangd` file and the generated compilation database to provide accurate, in-editor diagnostics. Your editor will also automatically apply formatting rules from `.editorconfig` and `.clang-format`.
+     6.  **Build the Project**: Click the "Build" button in the VS Code status bar, or run "CMake: Build" from the Command Palette. This will leverage multiple cores for a fast build.
+     7.  **Run Tests**: Click the "Run CTest" button in the status bar, or run "CMake: Run CTest" from the Command Palette. The results will appear in the output terminal.
+     8.  **Verification**: The project builds successfully and all tests pass within the VS Code interface. You can also run and debug individual test or example executables from the "CMake" side panel.
+
+   - **Method B: Standard Local Setup (Command Line)**
+     1.  **Install Prerequisites**:
+         - **Linux (Ubuntu 20.04)**: `sudo apt-get update && sudo apt-get install -y build-essential cmake git ninja-build g++ python3 nodejs npm clang-format pkg-config curl make`
+         - **Linux (Ubuntu 22.04/24.04)**: `sudo apt-get update && sudo apt-get install -y build-essential cmake git ninja-build g++ python3 nodejs npm clang-format pkg-config curl make`
+         - **Linux (Alpine)**: `sudo apk add build-base cmake g++ linux-headers git bash pkgconf nodejs npm curl python3 make`
+         - **macOS**: Install Xcode Command Line Tools: `xcode-select --install`. Then install other tools via Homebrew: `brew install cmake ninja git python node clang-format pkg-config rust`.
+         - **FreeBSD**: `sudo pkg install -y cmake git bash python3 pkgconf node npm rust gmake`.
+         - **Windows**: Install Visual Studio (2015-2022), CMake, Git for Windows, Python, and Node.js.
+         - **Rust (All Platforms)**: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh` and follow the instructions.
+         - **Editor**: Ensure your code editor or IDE supports EditorConfig to automatically adhere to the project's coding style.
+     2.  **Clone Source Code**: `git clone https://github.com/simdjson/simdjson.git` and `cd simdjson`. The repository's `.gitignore` file will ensure that subsequent build artifacts are not tracked by Git.
+     3.  **Configure the Build**: **Note on Storage:** Given the limited storage, it is highly recommended to clean the build directory (`rm -rf build`) before creating a new one for a different configuration. The provided `build.sh` script automates this.
+         `mkdir build && cd build`. Run CMake with desired options. The default configuration (`-DSIMDJSON_ALLOW_DOWNLOADS=ON`) will automatically download dependencies. To enable editor integration with tools like `clangd`, add `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`.
+         - **Linux/macOS Standard Release**: `cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DSIMDJSON_DEVELOPER_MODE=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
+         - **Offline/System Dependency Build**: `cmake .. -G "Ninja" -DSIMDJSON_ALLOW_DOWNLOADS=OFF -DSIMDJSON_DEVELOPER_MODE=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
+         - **Linux GCC 11 on Ubuntu 22.04 (Debug)**: `cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Debug -DSIMDJSON_GOOGLE_BENCHMARKS=OFF -DSIMDJSON_DEVELOPER_MODE=ON`
+         - **Linux GCC 12 C++20 on Ubuntu 22.04**: `CXX=g++-12 cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DSIMDJSON_CXX_STANDARD=20 -DSIMDJSON_DEVELOPER_MODE=ON`
+         - **Linux GCC 12 with Thread Sanitizer**: `CXX=g++-12 cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Debug -DSIMDJSON_DEVELOPER_MODE=ON -DSIMDJSON_SANITIZE_THREADS=ON`
+         - **Linux GCC 13 on Ubuntu 24.04 (Performance Check)**: `CXX=g++-13 cmake .. -G "Ninja" -DSIMDJSON_DEVELOPER_MODE=ON -DSIMDJSON_ENABLE_DOM_CHECKPERF=ON -DCMAKE_CXX_FLAGS="-Werror=old-style-cast -pedantic -Wpedantic" -DSIMDJSON_GOOGLE_BENCHMARKS=ON -DBUILD_SHARED_LIBS=OFF`
+         - **Linux Ubuntu 24.04 (No-Exceptions)**: `cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DSIMDJSON_DEVELOPER_MODE=ON -DSIMDJSON_EXCEPTIONS=OFF`
+         - **Linux Ubuntu 24.04 (Address Sanitizer)**: `cmake .. -G "Ninja" -DSIMDJSON_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DSIMDJSON_GOOGLE_BENCHMARKS=OFF -DSIMDJSON_DEVELOPER_MODE=ON -DBUILD_SHARED_LIBS=OFF`
+         - **Linux (Static Reflection Benchmark)**: `cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DSIMDJSON_STATIC_REFLECTION=ON`
+         - **Windows VS 2022 (x64, Static, Debug)**: `cmake .. -G "Visual Studio 17 2022" -A x64 -DSIMDJSON_DEVELOPER_MODE=ON -DSIMDJSON_COMPETITION=OFF -DBUILD_SHARED_LIBS=OFF`
+     4.  **Compile the Project**: `cmake --build . --config Release`. If using Ninja, this will automatically use all available CPU cores, which is ideal for the high core count of your hardware.
+     5.  **Execute Tests**: From the `build` directory:
+         - **Simple Run**: `ctest --output-on-failure -C Release`. This will execute the full suite, including tests like `unicode_tests`, `minify_tests`, `singleheader` tests, etc.
+         - **CI-style Run**: `ctest --output-on-failure -C Release -LE explicitonly -j`.
+         - **Thread Sanitizer Run**: `ctest --output-on-failure -C Debug -R "parse_many_test|document_stream_tests"`.
+         - **Performance Check Run**: `ctest --output-on-failure -C Release -R checkperf`.
+         - **Staged Implementation Run**:
+           ```sh
+           # Run general tests
+           ctest --output-on-failure -C Release -L acceptance -LE per_implementation
+           # Run tests for each specific implementation (examples for x86_64)
+           SIMDJSON_FORCE_IMPLEMENTATION=haswell ctest --output-on-failure -C Release -L per_implementation
+           SIMDJSON_FORCE_IMPLEMENTATION=westmere ctest --output-on-failure -C Release -L per_implementation
+           SIMDJSON_FORCE_IMPLEMENTATION=fallback ctest --output-on-failure -C Release -L per_implementation
+           # Run all remaining tests
+           ctest --output-on-failure -C Release -LE "acceptance|per_implementation"
+           ```
+         - **Sanitizer Run**: `ASAN_OPTIONS="detect_leaks=0" ctest --output-on-failure -C Debug`.
+         - **Verification**: All selected tests should pass. If developer mode was enabled, check for the presence of example executables like `quickstart` and tool executables like `json2json`.
+     6.  **Install the Library**: `cmake --install . --config Release --prefix ../install`.
+         - **Verification**: Headers and library files should appear in the `install` directory.
+
+   - **Method C: CI-like Docker Setup**
+     1.  **Install Docker**: Follow the official installation guide.
+     2.  **Clone Source Code**: `git clone https://github.com/simdjson/simdjson.git` and `cd simdjson`.
+     3.  **Run Container with Desired Compiler**:
+         ```sh
+         # Example using Ubuntu 20.04
+         docker run -it --rm -v "$(pwd):/work" -w /work ubuntu:20.04 /bin/bash
+         ```
+     4.  **Configure and Build (Inside Container)**: Install dependencies and run the build.
+         - **For Ubuntu 20.04 container**:
+           ```sh
+           # Install dependencies
+           apt-get update && apt-get install -y build-essential cmake g++ python3 ninja-build
+           # Configure Debug Build
+           cmake -B builddebug -G "Ninja" -DCMAKE_BUILD_TYPE=Debug -DSIMDJSON_GOOGLE_BENCHMARKS=OFF -DSIMDJSON_DEVELOPER_MODE=ON ..
+           # Build and Test Debug (Ninja will use all available cores)
+           cmake --build builddebug
+           ctest --test-dir builddebug --output-on-failure
+           ```
+     5.  **Verification**: The project should compile and all tests should pass within the container.
+     6.  **Cleanup**: After finishing Docker-based tasks, reclaim disk space by running `docker system prune` to remove stopped containers, unused networks, and dangling images.
+
+   - **Method D: Experimental Setup with Custom Clang (via Docker)**
+     1.  **Install Docker**: Follow the official installation guide and ensure the Docker daemon is running.
+     2.  **Clone Source Code**: `git clone https://github.com/simdjson/simdjson.git` and `cd simdjson`.
+     3.  **Make Script Executable**: `chmod +x p2996/run_docker.sh`.
+     4.  **Run Build and Test**: Use the `run_docker.sh` script to execute the entire build and test process within the container. The script will automatically build the Docker image on its first run.
+         ```sh
+         # Ninja will automatically leverage the high core count inside the container
+         ./p2996/run_docker.sh 'mkdir -p build && cd build && cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DSIMDJSON_DEVELOPER_MODE=ON && ninja && ctest --output-on-failure'
+         ```
+     5.  **Verification**: The script should complete successfully, with the final `ctest` step reporting that all tests have passed.
+     6.  **Cleanup**: Run `docker system prune` to manage disk space used by the custom Docker image.
+
+   - **Method E: WebAssembly Build with Emscripten (CI-like)**
+     1.  **Install Prerequisites**: Follow the official Emscripten SDK guide to install `emsdk`. Also ensure `cmake` and `node` are installed.
+     2.  **Clone Source Code**: `git clone https://github.com/simdjson/simdjson.git` and `cd simdjson`.
+     3.  **Activate Emscripten Environment**: In your shell, run `source /path/to/emsdk/emsdk_env.sh`.
+     4.  **Configure the Build**: `emcmake cmake -B build`.
+     5.  **Compile the Project**: `cmake --build build -j $(nproc)`.
+     6.  **Verification**: The build process should complete successfully without any compilation errors. This method only verifies the build.
+
+   - **Method F: LoongArch64 Cross-Compilation (CI-like)**
+     1.  **Install Prerequisites**: `cmake` and `wget`.
+     2.  **Clone Source Code**: `git clone https://github.com/simdjson/simdjson.git` and `cd simdjson`.
+     3.  **Download and Extract Toolchain**:
+         ```sh
+         TOOLCHAIN_VERSION="2023.08.08"
+         TOOLCHAIN_URL="https://github.com/loongson/build-tools/releases/download/${TOOLCHAIN_VERSION}/x86_64-cross-tools-loongarch64-gcc-libc.tar.xz"
+         wget "$TOOLCHAIN_URL" -O /tmp/toolchain.tar.xz
+         sudo mkdir -p /opt/cross-tools
+         sudo tar -C /opt -x -f /tmp/toolchain.tar.xz --strip-components=1
+         ```
+     4.  **Configure the Build**: Use CMake with flags pointing to the cross-compiler.
+         ```sh
+         export PATH="/opt/cross-tools/bin:$PATH"
+         cmake -B build \
+           -DCMAKE_SYSTEM_NAME=Linux \
+           -DCMAKE_SYSTEM_PROCESSOR=loongarch64 \
+           -DCMAKE_C_COMPILER=loongarch64-unknown-linux-gnu-gcc \
+           -DCMAKE_CXX_COMPILER=loongarch64-unknown-linux-gnu-g++
+         ```
+     5.  **Compile the Project**: `cmake --build build -j $(nproc)`.
+     6.  **Verification**: The build process should complete successfully. This method only verifies the build.
+
+   - **Method G: Windows Setup with MSYS2/MinGW64 (CI-like)**
+     1.  **Install MSYS2**: Download and run the installer from the official MSYS2 website.
+     2.  **Install Prerequisites**: Open an MSYS2 shell and install the MINGW64 toolchain and build tools.
+         ```sh
+         pacman -Syu
+         pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-ninja git
+         ```
+     3.  **Clone Source Code**: From a MINGW64 shell: `git clone https://github.com/simdjson/simdjson.git` and `cd simdjson`.
+     4.  **Configure the Build**:
+         ```sh
+         mkdir build && cd build
+         cmake .. -G "Ninja" \
+           -DCMAKE_BUILD_TYPE=Release \
+           -DSIMDJSON_DEVELOPER_MODE=ON \
+           -DBUILD_SHARED_LIBS=OFF \
+           -DSIMDJSON_DO_NOT_USE_THREADS_NO_MATTER_WHAT=ON
+         ```
+     5.  **Compile the Project**: `ninja`.
+     6.  **Execute Tests**: `ctest -j4 --output-on-failure -LE explicitonly`.
+     7.  **Verification**: The project should compile and all selected tests should pass.
+
+   - **Task H: Code Style Check**
+     1.  Ensure `python3` and `clang-format` are installed (see Method B, Step 1).
+     2.  From the project root directory, run the script: `./style/run-clang-format.py -r include/ benchmark/ src/ tests/`
+     3.  **Verification**: The script should complete without reporting any formatting errors.
+
+   - **Task I: Trailing Whitespace Check**
+     1.  Ensure `git` and a Unix shell are available.
+     2.  From the project root directory, run the script: `./scripts/remove_trailing_whitespace.sh`.
+     3.  Check for changes: `git diff`.
+     4.  **Verification**: The `git diff` command should produce no output.
+
+   - **Task J: Advanced Fuzzing and Valgrind Analysis (CI-like)**
+     1.  **Install Prerequisites (Debian/Ubuntu)**:
+         ```sh
+         sudo apt-get update
+         sudo apt-get install -y ninja-build valgrind zip unzip wget software-properties-common gnupg
+         wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh 19
+         ```
+     2.  **Create Seed Corpus**: From the project root, run `fuzz/build_corpus.sh` to generate `corpus.zip`.
+     3.  **Build Fuzzers for libFuzzer**:
+         ```sh
+         mkdir build-fuzzer && cd build-fuzzer
+         export CXX=clang++-19 CC=clang-19
+         export LDFLAGS="-fsanitize=address,undefined"
+         export CXXFLAGS="-fsanitize=fuzzer-no-link,address,undefined"
+         export CFLAGS="-fsanitize=fuzzer-no-link,address,undefined"
+         cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Debug \
+           -DSIMDJSON_ENABLE_FUZZING=On \
+           -DSIMDJSON_FUZZ_LINKMAIN=Off \
+           -DSIMDJSON_FUZZ_LDFLAGS=-fsanitize=fuzzer
+         ninja
+         ```
+     4.  **Run Fuzzing with libFuzzer**: `export SIMDJSON_FORCE_IMPLEMENTATION=haswell && export UBSAN_OPTIONS="halt_on_error=1" && ./fuzz/fuzz_parser ../fuzz/corpus -max_total_time=60`.
+     5.  **Build Fuzzers for Valgrind/Replay**:
+         ```sh
+         cd .. && rm -rf build-replay && mkdir build-replay && cd build-replay
+         export CXX=clang++-19 CC=clang-19
+         cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Debug
+         ninja
+         cd ..
+         ```
+     6.  **Run under Valgrind**: `valgrind build-replay/fuzz/fuzz_parser fuzz/corpus/0*`.
+     7.  **Verification**: Fuzzer runs complete without crashing. Valgrind reports no definite memory leaks or errors.
+
+   - **Task K: Documentation Generation**
+     1.  **Install prerequisites**: `doxygen`, `graphviz`.
+     2.  From the project root directory, prepare the Doxygen theme: `./tools/prepare_doxygen.sh`.
+     3.  Generate the documentation by running `doxygen` from the project root.
+     4.  **Verification**: The process should complete without errors. Check for generated HTML in `doc/api/html/`.
+
+   - **Task L: Final Integration Check (Applies after installation in any method)**
+     1.  **Install the library** (e.g., into a local `destination` directory).
+     2.  **Test with Manual Linking**:
+         - Create `tmp.cpp`:
+           ```cpp
+           #include <simdjson.h>
+           #include <iostream>
+           int main(int argc, char** argv) {
+               if (argc < 2) { return 1; }
+               simdjson::dom::parser parser;
+               simdjson::dom::element doc;
+               auto error = parser.load(argv[1]).get(doc);
+               if (error) { std::cerr << "Error: " << error << std::endl; return 1; }
+               std::cout << "Parsed successfully." << std::endl;
+               return 0;
+           }
+           ```
+         - Compile and run:
+           ```sh
+           c++ tmp.cpp -Idestination/include -Ldestination/lib -Wl,-rpath,$(pwd)/destination/lib -o linkandrun -lsimdjson -std=c++17
+           ./linkandrun jsonexamples/twitter.json
+           ```
+         - **Verification**: The program should compile and run successfully.
+     3.  **Test with pkg-config**:
+         - Compile and run:
+           ```sh
+           export PKG_CONFIG_PATH=$(pwd)/destination/lib/pkgconfig
+           g++ examples/quickstart/quickstart.cpp -o quickstart_test $(pkg-config --cflags --libs simdjson)
+           ./quickstart_test
+           ```
+         - **Verification**: The program should compile and run without errors.
+     4.  **Test with CMake `find_package`**:
+         - Build and run test project:
+           ```sh
+           cd tests/installation_tests/find
+           cmake -B build -DCMAKE_INSTALL_PREFIX=$(pwd)/../../../destination
+           cmake --build build
+           ```
+         - **Verification**: The test project should build successfully.
+
+   - **Task M: Setup for Large JSON Generation Script**
+     1.  **Ensure Node.js and npm are installed**.
+     2.  **Navigate to the script directory**: `cd scripts/javascript`.
+     3.  **Install dependencies**: `npm install`.
+     4.  **Run the script**: `node generatelargejson.js > ../../large_test.json`.
+     5.  **Use the generated file** for benchmarks: `./build/benchmark/parse ../large_test.json`.
+     6.  **Verification**: The script runs and the generated file is successfully parsed.
+
+   - **Task N: Build and Run Static Reflection Benchmarks (with Rust)**
+     1.  **Ensure Rust toolchain and CMake 3.25+ are installed**.
+     2.  **Configure**: `cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DSIMDJSON_STATIC_REFLECTION=ON`.
+     3.  **Compile**: `cmake --build build`.
+     4.  **Run tests**: `ctest --test-dir build --output-on-failure -R static_reflect`.
+     5.  **Verification**: The C++/Rust project compiles and tests pass.
+
+   - **Task O: Build and Run Full Benchmark Suite**
+     1.  **Ensure prerequisites are installed**.
+     2.  **Configure**:
+         ```sh
+         cmake -B build -G "Ninja" \
+           -DCMAKE_BUILD_TYPE=Release \
+           -DSIMDJSON_DEVELOPER_MODE=ON \
+           -DSIMDJSON_GOOGLE_BENCHMARKS=ON \
+           -DSIMDJSON_COMPETITION=ON \
+           -DSIMDJSON_USE_BOOST_JSON=ON \
+           -DSIMDJSON_CXX_STANDARD=20
+         ```
+     3.  **Compile**: `cmake --build build`.
+     4.  **Run**: `./build/benchmark/bench_ondemand jsonexamples/twitter.json`.
+     5.  **Verification**: Benchmarks compile and run without errors.
+
+   - **Task P: Build and Run Command-Line Tools**
+     1.  **Configure**: `cmake -B build -G "Ninja" -DSIMDJSON_DEVELOPER_MODE=ON`.
+     2.  **Compile**: `cmake --build build`.
+     3.  **Verification**: Tool executables are in `build/tools/`.
+     4.  **Run**: `./build/tools/json2json < jsonexamples/twitter.json > /dev/null`. The command should complete successfully.
+
+   - **Task Q: Managing Single-Header (Amalgamated) Files**
+     1.  **Ensure Python 3 is installed**.
+     2.  To update the single-header files in the source repository, run the `amalgamate` target:
+         ```sh
+         cmake -B build
+         cmake --build build --target amalgamate
+         ```
+     3.  **Verification**: Check `git diff` to see updates in `singleheader/simdjson.h` and `singleheader/simdjson.cpp`.
+
+   - **Task R: Non-CMake Build Verification (via Makefile)**
+     1.  **Ensure `make` and a C++ compiler are installed**.
+     2.  **Navigate**: `cd examples/quickstart`.
+     3.  **Run tests**: `make clean && make test && make test11 && make test14 && make test17`.
+     4.  **Verification**: All `make test*` commands complete successfully.
+
+   - **Task S: OSS-Fuzz Build Emulation**
+     1.  **Ensure a recent version of Clang is installed**.
+     2.  From the project root directory, run the script: `fuzz/build_like_ossfuzz.sh`.
+     3.  **Verification**: The script completes successfully, and fuzzer binaries are present in the `ossfuzz-out` directory.

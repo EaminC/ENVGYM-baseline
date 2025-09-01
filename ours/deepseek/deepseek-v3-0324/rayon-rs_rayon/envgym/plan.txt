@@ -1,0 +1,68 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED (ADJUSTED):
+   - Rust toolchain (version 1.80.0 or higher) [x86_64-unknown-linux-gnu]
+   - Cargo package manager (Linux x86_64)
+   - All Rust crates remain unchanged (compatible with x86_64)
+   - Removed GPU-related dependencies (no CUDA support needed)
+   - Added specific Linux development tools:
+     * build-essential (for GCC toolchain)
+     * pkg-config (for system library detection)
+   - Added Linux-specific debugging tools:
+     * gdb (alternative to lldb)
+     * strace (for system call monitoring)
+   - Removed Windows-specific dependencies (winapi)
+   - Added Linux-specific perf tools:
+     * linux-tools-common
+     * linux-tools-generic
+   - Added xz-utils for benchmark data decompression
+
+2. FILES TO CREATE (ADJUSTED):
+   - All file paths adjusted to Linux-style paths (/home/cc/EnvGym/data/rayon-rs_rayon/)
+   - Added Linux-specific CI configuration in .github/workflows:
+     * Use ubuntu-latest runner
+     * Set up proper Linux build environment
+   - Added .cargo/config.toml with:
+     ```toml
+     [target.x86_64-unknown-linux-gnu]
+     runner = "env LD_LIBRARY_PATH=/usr/local/lib"
+     ```
+   - Updated test scripts to use Linux tools (gdb instead of lldb)
+
+3. NECESSARY TEST CASES (UNCHANGED):
+   - All test cases remain valid for x86_64 Linux
+   - Added note to run tests with:
+     ```sh
+     RUST_TEST_THREADS=<num_cores> cargo test
+     ```
+   - Added Linux-specific performance monitoring commands:
+     ```sh
+     perf stat cargo test --release
+     ```
+
+4. COMPLETE TODO LIST (ADJUSTED):
+   - All commands prefixed with proper Linux paths:
+     ```sh
+     cd /home/cc/EnvGym/data/rayon-rs_rayon && cargo test...
+     ```
+   - Added Linux-specific setup steps:
+     51. Install Linux development tools:
+         ```sh
+         sudo apt-get update && sudo apt-get install -y build-essential pkg-config linux-tools-generic gdb strace xz-utils
+         ```
+     52. Configure perf permissions:
+         ```sh
+         sudo sysctl kernel.perf_event_paranoid=1
+         ```
+   - Updated benchmark commands to use Linux perf:
+     ```sh
+     perf stat -B -e cache-references,cache-misses,cycles,instructions,branches,branch-misses cargo bench --features iterator_bench
+     ```
+
+NOTES:
+- All paths are now absolute and match the provided working directory
+- GPU-related components removed (no Matrox-specific configuration needed)
+- Windows-specific components removed
+- Added Linux-specific tooling and configurations
+- Memory and storage requirements unchanged (standard Linux x86_64 environment sufficient)
+- Docker configuration remains compatible with provided version (28.1.1)

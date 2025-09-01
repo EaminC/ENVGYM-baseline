@@ -1,0 +1,49 @@
+```markdown
+# Adjusted Environment Setup Plan
+
+## System Requirements
+- **OS**: Ubuntu 22.04 LTS (x86_64 compatible)
+- **Docker**: Version 28.1.1 (already installed)
+- **CPU**: x86_64 architecture
+- **GPU**: No CUDA support needed (Matrox GPU present)
+- **Storage**: Ensure at least 10GB free space in /home/cc/EnvGym/data/
+- **Memory**: Minimum 4GB RAM recommended
+
+## Configuration Steps
+
+1. **Base Setup**
+   - Use lightweight Docker base image: `node:18-alpine` (x86_64 compatible)
+   - Verify working directory exists: `/home/cc/EnvGym/data/anuraghazra_github-readme-stats`
+
+2. **Docker Configuration**
+   ```dockerfile
+   FROM node:18-alpine
+   WORKDIR /app
+   COPY . /home/cc/EnvGym/data/anuraghazra_github-readme-stats
+   ```
+
+3. **Dependencies**
+   - Install only CPU-compatible packages
+   - Skip all GPU/CUDA related dependencies
+
+4. **Build & Run**
+   - Use standard Docker build command:
+     ```bash
+     docker build -t github-stats .
+     ```
+   - Run with:
+     ```bash
+     docker run -v /home/cc/EnvGym/data/anuraghazra_github-readme-stats:/app github-stats
+     ```
+
+## Verification
+- Check architecture compatibility: `uname -m` (should show x86_64)
+- Verify Node.js version in container: `node -v` (should show v18.x)
+- Confirm working directory mapping in container
+
+## Notes
+- All paths adjusted for provided working directory
+- No GPU optimizations included
+- Using Alpine-based image for smaller footprint
+- BuildKit supported by Docker version 28.1.1
+```

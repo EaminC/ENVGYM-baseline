@@ -1,0 +1,5 @@
+current progress
+The Dockerfile has been created to automate the environment setup according to the plan. System dependencies like `git` and `libsystemd-dev` are installed successfully. However, the Docker build fails during the execution of the main `RUN` instruction responsible for installing the Rust toolchain and additional cargo tools (`cargo-nextest`, `cargo-hack`, etc.). The specific command within this chained instruction that causes the failure is not yet identified.
+
+next step
+To debug the build failure, modify the Dockerfile by splitting the single large `RUN` command (lines 27-40) into multiple, smaller `RUN` instructions. Separate the `rustup` installation from the `cargo install` commands, and give each `cargo install` its own `RUN` line. This will isolate the failing command and provide a more specific error message in the build log. Additionally, correct the path in the `cargo check` command on line 45 from `tracing/test_static_max_level_features` to `test_static_max_level_features` to match the project structure.

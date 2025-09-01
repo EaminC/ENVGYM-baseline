@@ -1,0 +1,76 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Node.js (LTS version or higher, minimum v15) [x86_64 Linux version]
+   - Git (for source code checkout) [Linux compatible version]
+   - Chrome or Firefox browser (for extension testing) [Linux versions]
+   - Deno (optional, experimental support) [Linux x86_64]
+   - npm (comes with Node.js)
+   - Puppeteer Core (for browser testing) [Linux compatible]
+   - TypeScript (v5.8.3 or compatible)
+   - Jest (v30.0.4 or compatible)
+   - Rollup (v4.45.1 or compatible)
+
+2. FILES TO CREATE:
+   - /home/cc/EnvGym/data/darkreader_darkreader/.env
+   - /home/cc/EnvGym/data/darkreader_darkreader/test/test-config.js
+   - /home/cc/EnvGym/data/darkreader_darkreader/build/custom-flags.json
+   - /home/cc/EnvGym/data/darkreader_darkreader/deno.json
+   - /home/cc/EnvGym/data/darkreader_darkreader/eslint.config.js
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - DarkReader.enable() functionality test
+   - DarkReader.disable() functionality test
+   - DarkReader.auto() system color scheme test
+   - CSS generation verification test
+   - Extension build verification test
+   - Cross-browser compatibility test
+   - Chrome MV2/MV3 compatibility tests
+   - Firefox compatibility tests
+   - Unit tests with Jest
+   - Browser automation tests with Puppeteer [Headless mode recommended]
+   - Code style verification with ESLint
+   - API endpoint tests
+
+4. COMPLETE TODO LIST:
+   1. Install Node.js (Linux x86_64 version)
+      - Verify with: node -v
+   2. Clone repository to working directory: git clone https://github.com/darkreader/darkreader.git /home/cc/EnvGym/data/darkreader_darkreader
+      - Verify with: ls /home/cc/EnvGym/data/darkreader_darkreader
+   3. Navigate to project root: cd /home/cc/EnvGym/data/darkreader_darkreader
+   4. Install dependencies: npm install
+      - Verify with: ls node_modules
+   5. Build extension: npm run build
+      - Verify files exist: ls /home/cc/EnvGym/data/darkreader_darkreader/build/release/
+   6. For Firefox testing:
+      - Build Firefox version: npm run build:firefox
+      - Verify: /home/cc/EnvGym/data/darkreader_darkreader/build/release/darkreader-firefox.xpi exists
+   7. For Chrome testing:
+      - Build Chrome version: npm run build
+      - Verify: /home/cc/EnvGym/data/darkreader_darkreader/build/release/darkreader-chrome.zip exists
+   8. Optional Deno setup:
+      - Install Deno: npm run deno:bootstrap
+      - Verify: deno --version
+   9. For website integration:
+      - Install npm package: npm install darkreader
+      - Verify: ls /home/cc/EnvGym/data/darkreader_darkreader/node_modules/darkreader
+   10. Run unit tests: npm test
+       - Verify all tests pass
+   11. Run browser tests in headless mode: npm run test:browser
+       - Verify all browser tests pass
+   12. Run lint checks: npm run lint
+       - Verify no linting errors
+   13. For development watching:
+       - Start watch mode: npm run debug:watch
+   14. Create test HTML file to verify API functionality
+       - Verify: Manual testing in browser console
+   15. Check code coverage: npm run test:coverage
+       - Verify coverage meets requirements
+
+Changes made:
+- Added specific Linux x86_64 architecture requirements
+- Updated all paths to use the full /home/cc/EnvGym/data/darkreader_darkreader working directory
+- Recommended headless mode for browser tests (no GPU available)
+- Confirmed standard Linux compatibility for all tools
+- Removed any GPU-specific considerations (none were needed)
+- Maintained Docker compatibility (though not required for this setup)

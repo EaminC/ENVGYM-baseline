@@ -1,0 +1,96 @@
+=== Docker Execution Log - 20250827_235353 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756338831
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.39kB done
+#1 WARN: LegacyKeyValueFormat: "ENV key=value" should be used instead of legacy "ENV key value" format (line 16)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/continuumio/miniconda3:4.9.2
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/13] FROM docker.io/continuumio/miniconda3:4.9.2@sha256:7838d0ce65783b0d944c19d193e2e6232196bada9e5f3762dc7a9f07dc271179
+#4 CACHED
+
+#5 [internal] load build context
+#5 transferring context: 235.96kB 0.0s done
+#5 DONE 0.0s
+
+#6 [ 2/13] RUN apt-get update -y || apt-get update -y
+#6 0.309 Ign:1 http://security.debian.org/debian-security buster/updates InRelease
+#6 0.310 Ign:2 http://deb.debian.org/debian buster InRelease
+#6 0.314 Ign:3 http://deb.debian.org/debian buster-updates InRelease
+#6 0.314 Err:4 http://security.debian.org/debian-security buster/updates Release
+#6 0.314   404  Not Found [IP: 151.101.66.132 80]
+#6 0.321 Err:5 http://deb.debian.org/debian buster Release
+#6 0.321   404  Not Found [IP: 151.101.66.132 80]
+#6 0.326 Err:6 http://deb.debian.org/debian buster-updates Release
+#6 0.326   404  Not Found [IP: 151.101.66.132 80]
+#6 0.332 Reading package lists...
+#6 0.761 E: The repository 'http://security.debian.org/debian-security buster/updates Release' no longer has a Release file.
+#6 0.761 E: The repository 'http://deb.debian.org/debian buster Release' no longer has a Release file.
+#6 0.761 E: The repository 'http://deb.debian.org/debian buster-updates Release' no longer has a Release file.
+#6 0.820 Ign:1 http://security.debian.org/debian-security buster/updates InRelease
+#6 0.823 Err:2 http://security.debian.org/debian-security buster/updates Release
+#6 0.823   404  Not Found [IP: 151.101.2.132 80]
+#6 0.840 Ign:3 http://deb.debian.org/debian buster InRelease
+#6 0.847 Ign:4 http://deb.debian.org/debian buster-updates InRelease
+#6 0.852 Err:5 http://deb.debian.org/debian buster Release
+#6 0.852   404  Not Found [IP: 151.101.194.132 80]
+#6 0.855 Err:6 http://deb.debian.org/debian buster-updates Release
+#6 0.855   404  Not Found [IP: 151.101.194.132 80]
+#6 0.862 Reading package lists...
+#6 1.292 E: The repository 'http://security.debian.org/debian-security buster/updates Release' no longer has a Release file.
+#6 1.292 E: The repository 'http://deb.debian.org/debian buster Release' no longer has a Release file.
+#6 1.292 E: The repository 'http://deb.debian.org/debian buster-updates Release' no longer has a Release file.
+#6 ERROR: process "/bin/sh -c apt-get update -y || apt-get update -y" did not complete successfully: exit code: 100
+------
+ > [ 2/13] RUN apt-get update -y || apt-get update -y:
+0.761 E: The repository 'http://deb.debian.org/debian buster-updates Release' no longer has a Release file.
+0.820 Ign:1 http://security.debian.org/debian-security buster/updates InRelease
+0.823 Err:2 http://security.debian.org/debian-security buster/updates Release
+0.823   404  Not Found [IP: 151.101.2.132 80]
+0.840 Ign:3 http://deb.debian.org/debian buster InRelease
+0.847 Ign:4 http://deb.debian.org/debian buster-updates InRelease
+
+1.292 E: The repository 'http://security.debian.org/debian-security buster/updates Release' no longer has a Release file.
+1.292 E: The repository 'http://deb.debian.org/debian buster Release' no longer has a Release file.
+1.292 E: The repository 'http://deb.debian.org/debian buster-updates Release' no longer has a Release file.
+------
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - LegacyKeyValueFormat: "ENV key=value" should be used instead of legacy "ENV key value" format (line 16)
+envgym.dockerfile:4
+--------------------
+   2 |     
+   3 |     # Update package lists with retry logic
+   4 | >>> RUN apt-get update -y || apt-get update -y
+   5 |     
+   6 |     # Install basic dependencies one by one with error handling
+--------------------
+ERROR: failed to solve: process "/bin/sh -c apt-get update -y || apt-get update -y" did not complete successfully: exit code: 100
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

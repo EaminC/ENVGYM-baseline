@@ -1,0 +1,156 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Nushell (version 0.106.2)
+   - Homebrew (for Linux installation)
+   - Rust toolchain (1.87.0 via rust-toolchain.toml)
+   - Supported plugins (from awesome-nu repo)
+   - Docker (for containerized deployment)
+   - Debian bookworm base image (primary container build)
+   - Ubuntu 20.04 base image (alternative container build)
+   - wget (for container installation)
+   - Git (version 2.30.2 or later)
+   - OpenSSL (for static linking if needed)
+   - Perl (for OpenSSL build if static linking)
+   - SQLite development libraries
+   - Rust dependencies (from Cargo.toml workspace.dependencies)
+   - cross-rs (for x86_64 cross-compilation)
+   - clang (for cross-compilation)
+   - dpkg (for Debian-based cross-compilation setup)
+   - libssl-dev (for gnu target cross-compilation)
+   - rustfmt (included in default profile)
+   - clippy (included in default profile)
+   - typos-cli (for spell checking)
+   - Carapace (for external completions)
+   - nu-highlight (for config documentation viewing)
+   - less (for documentation paging)
+   - serde (for configuration serialization)
+   - serde derive macros (for config structs)
+   - Bash (for build script execution)
+   - coreutils (for readlink in build script)
+   - Plugin dependencies (for nu_plugin_example, nu_plugin_gstat, etc.)
+   - std/log (for build script logging)
+
+2. FILES TO CREATE:
+   - config.nu (default location based on $nu.config-path)
+   - env.nu (for backwards compatibility and pre-config loading)
+   - default_env.nu (from crates/nu-utils/src/default_files/)
+   - doc_config.nu (from crates/nu-utils/src/default_files/)
+   - doc_env.nu (from crates/nu-utils/src/default_files/)
+   - scaffold_config.nu (from crates/nu-utils/src/default_files/)
+   - scaffold_env.nu (from crates/nu-utils/src/default_files/)
+   - docker/Dockerfile (Debian-based)
+   - docker/ubuntu.Dockerfile (Ubuntu-based alternative)
+   - .cargo/config.toml
+   - Cross.toml (x86_64 specific)
+   - rust-toolchain.toml
+   - typos.toml
+   - crates/nu-protocol/src/config/mod.rs
+   - scripts/build-all-linux.sh (build script for plugins and main binary)
+   - scripts/install-all.sh (Bash installation script)
+   - scripts/uninstall-all.sh (Bash uninstallation script)
+   - Plugin configuration files for each built plugin
+
+3. NECESSARY TEST CASES IN THE CODEBASE (x86_64 specific):
+   - Pipeline functionality tests
+   - Command parsing tests
+   - Structured data handling tests
+   - Debian/Ubuntu compatibility tests
+   - Plugin integration tests
+   - Containerized environment tests
+   - Automated build verification tests
+   - SQLite command tests
+   - TLS implementation tests
+   - OpenSSL static linking tests
+   - Feature flag validation tests
+   - Workspace crate integration tests
+   - x86_64 cross-compilation tests
+   - Static linking verification tests
+   - Rust toolchain version compatibility tests
+   - Default profile component tests
+   - Toolchain override verification tests
+   - Color configuration rendering tests
+   - Terminal output formatting tests
+   - Prompt rendering tests
+   - Path formatting tests
+   - Default environment override tests
+   - Editor mode tests
+   - Completion algorithm tests
+   - Error display format tests
+   - Table formatting and trimming tests
+   - Hook execution tests
+   - Environment variable conversion tests
+   - Library and plugin directory resolution tests
+   - Config documentation viewing tests
+   - Environment config placement validation tests
+   - Documentation highlighting tests
+   - Environment loading order tests
+   - External command highlighting tests
+   - Plugin-specific configuration tests
+   - Configuration update error handling tests
+   - Build script execution tests
+   - Plugin build verification tests
+   - Repository structure validation tests
+   - Build dependency verification tests
+   - Bash script execution tests
+   - Plugin installation path validation tests
+   - Local installation verification tests
+   - Uninstallation script tests
+   - Plugin cleanup verification tests
+
+4. COMPLETE TODO LIST:
+   1. Install Rust toolchain (1.87.0)
+   2. Install Nushell
+   3. Set up default configuration
+   4. Customize configuration
+   5. Install additional plugins
+   6. Set up development environment
+   7. Container deployment (Debian/Ubuntu)
+   8. Feature-specific setup
+   9. x86_64 cross-compilation setup
+   10. Spell checking configuration
+   11. Build script setup:
+      - Create scripts/build-all-linux.sh
+      - Create scripts/install-all.sh
+      - Create scripts/uninstall-all.sh
+      - Add plugin build targets to scripts
+      - Configure scripts to handle locked dependencies
+      - Verify repository structure detection
+      - Test script execution in clean environment
+      - Add build scripts to container builds
+      - Verify plugin builds in container environment
+      - Document build script usage
+      - Test Bash script execution
+      - Verify plugin installation path handling
+      - Test local installation path resolution
+      - Test uninstallation script execution
+      - Verify complete cleanup after uninstallation
+   12. Plugin build verification:
+      - Test building all listed plugins
+      - Verify plugin functionality after build
+      - Check plugin compatibility with main binary
+      - Test plugin loading order
+      - Verify plugin configuration options
+      - Test plugin garbage collection behavior
+      - Check plugin performance impact
+      - Validate plugin error handling
+      - Test plugin container compatibility
+      - Verify plugin builds in Debian/Ubuntu
+      - Test locked dependency installation
+      - Validate plugin installation path handling
+      - Test local installation path resolution
+      - Verify forced reinstallation behavior
+      - Test plugin cleanup during uninstallation
+      - Verify complete plugin removal
+
+Key Adjustments Made:
+1. Removed Windows-specific components (winget, cmd.exe, PowerShell)
+2. Focused on x86_64 architecture support only
+3. Prioritized Debian/Ubuntu over Alpine for containers
+4. Removed GPU/CUDA related considerations
+5. Simplified build scripts to Linux-only variants
+6. Removed ARM-specific cross-compilation mentions
+7. Adjusted container images to match available x86_64 architecture
+8. Removed Windows-specific test cases
+9. Streamlined dependencies for Linux environment
+10. Removed macOS-specific components while keeping Homebrew for Linux

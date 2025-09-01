@@ -1,0 +1,102 @@
+=== Docker Execution Log - 20250828_192602 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756409156
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.34kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/debian:stable-slim
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/9] FROM docker.io/library/debian:stable-slim@sha256:8810492a2dd16b7f59239c1e0cc1e56c1a1a5957d11f639776bd6798e795608b
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 311.58kB 0.0s done
+#5 DONE 0.0s
+
+#6 [4/9] RUN python3 -c "import urllib.request; urllib.request.urlopen('https://pypi.org')" || (echo "Network connectivity check failed" && exit 1)
+#6 CACHED
+
+#7 [2/9] WORKDIR /home/cc/EnvGym
+#7 CACHED
+
+#8 [3/9] RUN apt-get update &&     apt-get install -y     build-essential     cmake     git     libsystemd-dev     pkg-config     python3     python3-pip     python3-venv     && rm -rf /var/lib/apt/lists/*
+#8 CACHED
+
+#9 [5/9] RUN python3 -m pip install --upgrade pip --no-cache-dir --default-timeout=100 --verbose 2>&1 | tee pip-upgrade.log &&     python3 -m pip install --upgrade setuptools wheel --no-cache-dir --default-timeout=100 --verbose 2>&1 | tee setuptools-install.log ||     (echo "Pip installation failed, check pip-upgrade.log and setuptools-install.log" && exit 1)
+#9 CACHED
+
+#10 [6/9] COPY . .
+#10 DONE 0.1s
+
+#11 [7/9] RUN python3 -m pip install --no-cache-dir --verbose -r requirements.txt --default-timeout=100 2>&1 | tee requirements-install.log ||     (echo "Requirements installation failed, check requirements-install.log" && exit 1)
+#11 0.446 error: externally-managed-environment
+#11 0.446 
+#11 0.446 × This environment is externally managed
+#11 0.446 ╰─> To install Python packages system-wide, try apt install
+#11 0.446     python3-xyz, where xyz is the package you are trying to
+#11 0.446     install.
+#11 0.446     
+#11 0.446     If you wish to install a non-Debian-packaged Python package,
+#11 0.446     create a virtual environment using python3 -m venv path/to/venv.
+#11 0.446     Then use path/to/venv/bin/python and path/to/venv/bin/pip. Make
+#11 0.446     sure you have python3-full installed.
+#11 0.446     
+#11 0.446     If you wish to install a non-Debian packaged Python application,
+#11 0.446     it may be easiest to use pipx install xyz, which will manage a
+#11 0.446     virtual environment for you. Make sure you have pipx installed.
+#11 0.446     
+#11 0.446     See /usr/share/doc/python3.13/README.venv for more information.
+#11 0.446 
+#11 0.446 note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
+#11 0.446 hint: See PEP 668 for the detailed specification.
+#11 DONE 0.5s
+
+#12 [8/9] RUN mkdir -p build &&     cd build &&     (cmake .. 2>&1 | tee cmake.log) &&     (make 2>&1 | tee make.log) &&     (make install 2>&1 | tee make-install.log) ||     (echo "Build failed, check cmake.log, make.log, and make-install.log" && exit 1)
+#12 0.348 CMake Warning:
+#12 0.348   Ignoring extra path from command line:
+#12 0.348 
+#12 0.348    ".."
+#12 0.348 
+#12 0.348 
+#12 0.348 CMake Error: The source directory "/home/cc/EnvGym" does not appear to contain CMakeLists.txt.
+#12 0.348 Specify --help for usage, or press the help button on the CMake GUI.
+#12 0.353 make: *** No targets specified and no makefile found.  Stop.
+#12 0.357 make: *** No rule to make target 'install'.  Stop.
+#12 DONE 0.4s
+
+#13 [9/9] WORKDIR /home/cc/EnvGym
+#13 DONE 0.0s
+
+#14 exporting to image
+#14 exporting layers
+#14 exporting layers 3.7s done
+#14 writing image sha256:154217281ff92802e4456867d50e3cf5e768cbd8944e404d02fe7e7ef2d0935b done
+#14 naming to docker.io/library/envgym_test_1756409156 done
+#14 DONE 3.7s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

@@ -1,0 +1,161 @@
+Based on the provided hardware and environment information, which strongly indicates a containerized setup using Docker, the original plan requires significant adjustments to ensure feasibility. The following revised plan is tailored for an `x86_64` architecture using Docker containers on a Linux host, replacing physical multi-host dependencies with a simulated container network and a software switch model instead of hardware drivers.
+
+***
+
+### **ADJUSTED ENVIRONMENT SETUP PLAN**
+
+**Context:** This plan is adapted for a containerized environment managed by Docker. The "Switch Management Machine" and "Hosts" (Host1, Host2, Host3) will be run as separate Docker containers. The working directory `/home/cc/EnvGym/data/P4Ctl` is the Docker build context.
+
+1.  DOWNLOADS NEEDED:
+    *   **Base Docker Image:** `ubuntu:22.04` (LTS). This is recommended over 20.04 to ensure a more recent host kernel is available, which is critical for eBPF/BCC compatibility with kernel versions like 5.15.0+. Docker containers share the host's kernel.
+    *   **P4 Switch Software:** Tofino Switch SDE 9.7.0 (Requires access from Intel/Barefoot). For this containerized environment, we will use the **Tofino behavioral model (`modeld`)** included in the SDE, not the physical hardware driver (`switchd`).
+    *   **eBPF Toolchain:** BCC (Bionic Compiler Collection). Must be compatible with the **host machine's Linux Kernel**.
+    *   **Programming Language:** Python 3.7.
+    *   **Python Libraries:** Scapy 2.4.5.
+    *   **Compiler Tools:** Bison 3.8.2, Flex 2.6.4, `g++` (from `build-essential`), `libfl-dev`.
+    *   **Networking Tools:** `ncat` (from `nmap`), `iproute2` (for `ip a`).
+    *   **Source Code:** The P4Control project repository from `https://github.com/peng-gao-lab/p4control`.
+
+2.  FILES TO CREATE/MODIFY (Within the Container Filesystem):
+    *   **File to Modify:** `host_agent/host_agent.py`
+        *   **Path:** Within the cloned `p4control` repository, on each of the three "host" containers.
+        *   **Description:** This file must be edited to specify the correct network interface name. In a standard Docker container network, this is typically **`"eth0"`**. Search for the interface name variable and update its value accordingly.
+
+    *   **File to Modify (Dynamically):** `host_agent/host_agent_ebpf.c`
+        *   **Path:** Within the cloned `p4control` repository, on each of the three "host" containers.
+        *   **Description:** Before running the host agent, the `TAGGED_TERMINAL` macro must be updated with the PID of the shell process *inside the specific container*. This is found by running `ps` after attaching to the container's shell.
+
+    *   **File to Modify (for Custom Policies):** `switch/netcl.py`
+        *   **Path:** Within the cloned `p4control` repository, in the "switch" container.
+        *   **Description:** To apply custom network policies, compile them using the `netcl-compile` tool. The output must be copied into this Python file, replacing the existing rules.
+
+    *   **File to Create (Executable):** `compiler/netcl-compile`
+        *   **Path:** Within the cloned `p4control` repository, in the `compiler/` subdirectory inside the "switch" container.
+        *   **Description:** This compiler executable is built from source using the provided Makefile. It must be built before the switch controller can be run with custom policies.
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    *   **(No changes)** The logic of the test cases remains the same, but they will be executed between containers on a Docker network instead of between physical hosts.
+
+4.  COMPLETE TODO LIST:
+    *   **Phase 1: Docker Image and Environment Preparation (On Host Machine)**
+        1.  **Create a Dockerfile:** In a new directory, create a `Dockerfile` to build a base image with all common dependencies.
+            ```Dockerfile
+            # Use Ubuntu 22.04 for better kernel compatibility for eBPF
+            FROM ubuntu:22.04
+
+            # Avoid interactive prompts during build
+            ENV DEBIAN_FRONTEND=noninteractive
+
+            # Install common dependencies and add repository for Python 3.7
+            RUN apt-get update && \
+                apt-get install -y software-properties-common && \
+                add-apt-repository ppa:deadsnakes/ppa && \
+                apt-get update && \
+                apt-get install -y git python3.7 python3.7-distutils python3.7-dev nmap build-essential libfl-dev iproute2 curl && \
+                rm -rf /var/lib/apt/lists/*
+
+            # Install pip for Python 3.7
+            RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+                python3.7 get-pip.py && \
+                rm get-pip.py
+
+            # Install required Python library
+            RUN python3.7 -m pip install scapy==2.4.5
+
+            # Set a working directory
+            WORKDIR /root
+            ```
+        2.  **Build the Base Docker Image:**
+            ```bash
+            docker build -t p4control-base .
+            ```
+        3.  **Prepare Project and SDE:**
+            *   Clone the P4Control project into the build context directory: `git clone https://github.com/peng-gao-lab/p4control /home/cc/EnvGym/data/P4Ctl`.
+            *   Download and extract the Tofino SDE 9.7.0 into the build context as well, so it can be copied into the switch container.
+        4.  **Create Docker Network:** Create a dedicated network for the containers to communicate.
+            ```bash
+            docker network create --subnet=10.0.0.0/24 p4control-net
+            ```
+
+    *   **Phase 2: Launch Containers**
+        1.  **Launch the Switch Container:** This container will run the Tofino model and the controller.
+            ```bash
+            docker run -itd --name p4switch --net p4control-net -v /home/cc/EnvGym/data/P4Ctl:/root/p4control --cap-add=ALL --privileged p4control-base
+            ```
+        2.  **Launch the Host Containers:**
+            ```bash
+            docker run -itd --name host1 --net p4control-net --ip 10.0.0.1 -v /home/cc/EnvGym/data/P4Ctl:/root/p4control --cap-add=ALL --privileged p4control-base
+            docker run -itd --name host2 --net p4control-net --ip 10.0.0.2 -v /home/cc/EnvGym/data/P4Ctl:/root/p4control --cap-add=ALL --privileged p4control-base
+            docker run -itd --name host3 --net p4control-net --ip 10.0.0.3 -v /home/cc/EnvGym/data/P4Ctl:/root/p4control --cap-add=ALL --privileged p4control-base
+            ```
+        3.  **Verification:**
+            ```bash
+            docker ps # Should show p4switch, host1, host2, and host3 running
+            ```
+
+    *   **Phase 3: Tofino SDE and Host Environment Setup**
+        1.  **On the Switch Container (`p4switch`):**
+            *   Copy the SDE into the container (if not mounted via volume) and install it according to vendor instructions.
+            *   Set environment variables. It's best to do this by attaching to the container:
+                ```bash
+                docker exec -it p4switch bash
+                # Inside the container:
+                echo 'export SDE=/path/to/bf-sde-9.7.0/' >> ~/.bashrc
+                echo 'export SDE_INSTALL=/path/to/bf-sde-9.7.0/install' >> ~/.bashrc
+                source ~/.bashrc
+                exit
+                ```
+        2.  **On Each Host Container (`host1`, `host2`, `host3`):**
+            *   Attach to the container: `docker exec -it <container_name> bash`.
+            *   Install build tools (Bison, Flex) and BCC as described in the original plan. The host's kernel must be compatible.
+            *   Configure Host Agent: Edit `/root/p4control/host_agent/host_agent.py` and set the interface name to `"eth0"`.
+
+    *   **Phase 4: Build P4 Program and Start Switch Simulator (in `p4switch` container)**
+        1.  Attach to the switch container: `docker exec -it p4switch bash`.
+        2.  Navigate to the project directory: `cd /root/p4control`.
+        3.  Build the P4 program: `./p4_build.sh -p switch/p4control.p4`.
+        4.  Run the **Tofino behavioral model** in the background.
+            ```bash
+            ./run_tofino_model.sh -p p4control &
+            ```
+        5.  **Verification:** The model should be running without errors.
+
+    *   **Phase 5: Compile Policy and Run Controller (in `p4switch` container)**
+        1.  While still inside the `p4switch` container, navigate to `compiler`: `cd compiler`.
+        2.  Build the policy compiler: `make netcl`.
+        3.  Compile the policy and copy the output rules.
+        4.  Paste the new rules into `switch/netcl.py`.
+        5.  Navigate to the project root and start the controller:
+            ```bash
+            cd ..
+            python3.7 switch/controller.py
+            ```
+        6.  **Verification:** The controller should log its connection to the switch model and the insertion of rules.
+
+    *   **Phase 6: Deploy Host Agents (in `host1`, `host2`, `host3` containers)**
+        1.  For each host container (e.g., `host1`):
+            *   Attach an interactive shell: `docker exec -it host1 bash`.
+            *   Get the PID of this shell: `ps`. Note the PID for the `bash` process.
+            *   Edit `/root/p4control/host_agent/host_agent_ebpf.c` and set `TAGGED_TERMINAL` to this PID.
+            *   In the same shell, run the agent: `sudo python3.7 host_agent/host_agent.py`.
+        2.  **Verification:** The agent should start without eBPF compilation or attachment errors.
+        3.  Repeat this process for `host2` and `host3` in separate terminal windows.
+
+    *   **Phase 7: Execute Verification Test Case**
+        1.  **On Host2 and Host3:** In the shells where the agents are running, start `ncat` listeners.
+            ```bash
+            # In host2's attached shell
+            sudo ncat -nlvp 9999 -e /bin/bash
+            # In host3's attached shell
+            sudo ncat -nlvp 9999 -e /bin/bash
+            ```
+        2.  **On Host1:** In its attached shell, connect to Host2.
+            ```bash
+            sudo ncat 10.0.0.2 9999
+            ```
+        3.  **Verification:** You should get a shell prompt from Host2 inside the Host1 terminal.
+        4.  **From the session on Host1 (now connected to Host2):** Attempt to connect to Host3.
+            ```bash
+            ncat 10.0.0.3 9999
+            ```
+        5.  **Final Verification:** This connection must fail (hang or timeout). This confirms the P4Control policy, enforced by the Tofino model, has correctly blocked the prohibited information flow between containers.

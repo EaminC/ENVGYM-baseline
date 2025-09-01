@@ -1,0 +1,69 @@
+=== Docker Execution Log - 20250827_223125 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756333884
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 794B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [2/6] RUN mkdir -p /home/cc/EnvGym/data
+#5 CACHED
+
+#6 [3/6] WORKDIR /home/cc/EnvGym/data/ELECT
+#6 CACHED
+
+#7 [4/6] RUN apt-get update && apt-get install -y     build-essential     cmake     git     wget     python3     python3-pip     python3-dev     && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [5/6] COPY requirements.txt .
+#8 ERROR: failed to calculate checksum of ref c15302f4-694d-41bc-81e2-a6ac2297ecef::cak5xzwfha2kj63db8wkfqw73: "/requirements.txt": not found
+
+#9 [1/6] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#9 resolve docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214 done
+#9 sha256:c664f8f86ed5a386b0a340d981b8f81714e21a8b9c73f658c4bea56aa179d54a 424B / 424B done
+#9 sha256:b7bab04fd9aa0c771e5720bf0cc7cbf993fd6946645983d9096126e5af45d713 2.30kB / 2.30kB done
+#9 sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214 6.69kB / 6.69kB done
+#9 CANCELED
+------
+ > [5/6] COPY requirements.txt .:
+------
+envgym.dockerfile:30
+--------------------
+  28 |     
+  29 |     # Install Python dependencies
+  30 | >>> COPY requirements.txt .
+  31 |     RUN pip3 install --no-cache-dir -r requirements.txt
+  32 |     
+--------------------
+ERROR: failed to solve: failed to compute cache key: failed to calculate checksum of ref c15302f4-694d-41bc-81e2-a6ac2297ecef::cak5xzwfha2kj63db8wkfqw73: "/requirements.txt": not found
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

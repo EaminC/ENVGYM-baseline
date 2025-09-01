@@ -1,0 +1,133 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust toolchain (version 1.88.0 or newer, including stable, beta, nightly)
+   - ripgrep binary (latest stable release)
+   - MUSL library (for static builds on Linux)
+   - musl-gcc (for static builds on Linux)
+   - Cross (v0.2.5 for cross-compilation)
+   - cargo-deb (for Debian package creation)
+   - 7z (for archive creation)
+   - QEMU (for cross-architecture emulation)
+   - Docker (for builds)
+   - GitHub CLI (gh) (for releases)
+   - Toolchains for x86_64 targets:
+     - x86_64-unknown-linux-musl
+     - x86_64-pc-windows-gnu
+     - x86_64-pc-windows-msvc
+   - jemallocator (for MUSL 64-bit targets)
+   - serde and serde_derive
+   - walkdir
+   - windows-targets (v0.52.6)
+   - encoding_rs (v0.8.35)
+   - lexopt (v0.3.1)
+   - zsh (for shell completion testing)
+   - xz-utils (for archive handling)
+   - liblz4-tool (for compression)
+   - brotli (for compression)
+   - zstd (for compression)
+   - musl-tools (for MUSL builds)
+   - diffutils (for output comparison)
+   - Benchmarking tools:
+     - the_silver_searcher (ag) v2.2.0
+     - GNU grep v3.8
+     - git grep v2.39.0
+   - Benchmark dependencies:
+     - make
+     - gcc
+     - pkg-config
+     - zlib1g-dev
+     - liblzma-dev
+
+2. FILES TO CREATE:
+   - ~/.config/ripgrep/ripgrep.conf
+   - ~/.ignore
+   - .rgignore
+   - .github/workflows/ci.yml
+   - .github/workflows/release.yml
+   - deployment/deb/
+     - rg.1
+     - rg.bash
+     - rg.fish
+     - _rg
+   - deployment/m2/
+     - complete/
+     - doc/
+   - .cargo/config.toml
+   - COPYING, LICENSE-MIT, UNLICENSE
+   - CHANGELOG.md, README.md
+   - ci/ubuntu-install-packages
+   - ci/build-and-publish-m2
+   - ci/test-complete
+   - crates/core/flags/complete/rg.zsh
+   - ci/utils.sh
+   - /tmp/benchsuite/
+   - benchsuite/README.SETUP
+   - benchsuite/benchsuite
+   - benchsuite/runs/raw.csv
+
+3. NECESSARY TEST CASES:
+   - Basic search functionality
+   - Gitignore rules compliance
+   - Binary file skipping
+   - Unicode search
+   - Performance benchmarks
+   - Cross-compilation tests for x86_64 targets
+   - Documentation generation
+   - Shell completion test (zsh, bash, fish)
+   - Debian package build test
+   - Static linking verification
+   - JSON output test
+   - Command-line parsing test
+   - Compression tool integration
+   - Benchmark comparison tests:
+     - Against the_silver_searcher v2.2.0
+     - Against GNU grep v3.8
+     - Against git grep v2.39.0
+   - Benchmark environment tests
+   - Temporary directory handling tests
+
+4. COMPLETE TODO LIST:
+   - Install Rust toolchain using rustup
+   - Clone ripgrep repository
+   - Create .cargo/config.toml
+   - Build ripgrep in release mode
+   - Setup MUSL for static builds
+   - Install cross-compilation toolchains (x86_64 only)
+   - Install Cross v0.2.5
+   - Install cargo-deb
+   - Install 7z
+   - Install GitHub CLI (gh)
+   - Install Ubuntu build dependencies
+   - Create configuration directories
+   - Write basic configuration file
+   - Create global ignore file
+   - Create ci/test-complete script
+   - Create crates/core/flags/complete/rg.zsh
+   - Create ci/utils.sh
+   - Run test suite
+   - Run format check
+   - Run documentation check
+   - Setup shell completions
+   - Test shell completions
+   - Verify release workflow
+   - Verify static linking
+   - Prepare deb package assets
+   - Prepare release assets
+   - Setup benchmark environment:
+     - Create /tmp/benchsuite
+     - Install benchmark dependencies
+     - Install comparison search tools
+     - Run benchmark suite
+     - Analyze benchmark results
+   - Create benchmark setup documentation
+
+Key Adjustments:
+1. Removed ARM, PowerPC, and other non-x86_64 architecture support
+2. Simplified benchmark tools to only essential x86_64 compatible ones
+3. Removed Windows-specific components not relevant for Linux environment
+4. Simplified test cases to focus on x86_64 platform
+5. Removed GPU-related considerations
+6. Adjusted paths to standard Linux locations
+7. Simplified dependency list to essential items for x86_64 builds
+8. Removed Intel-specific optimizations (generic x86_64 only)

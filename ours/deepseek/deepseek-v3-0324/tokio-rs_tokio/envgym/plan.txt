@@ -1,0 +1,58 @@
+Here's the adjusted environment setup plan based on the x86_64 hardware specifications:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - All original Rust toolchain and dependencies remain unchanged
+   - Remove any ARM-specific dependencies or cross-compilation tools not needed for x86_64
+   - Keep io-uring support (compatible with x86_64 Linux)
+   - Remove any GPU-related dependencies (none present in original plan)
+   - Keep all standard Linux dependencies (mio, nix, etc.)
+
+2. FILES TO CREATE:
+   - All original files remain relevant
+   - Modify Cross.toml to focus only on x86_64 targets:
+     ```
+     [build.env]
+     passthrough = [
+         "RUSTFLAGS",
+         "RUST_BACKTRACE",
+         "TRYBUILD",
+     ]
+     
+     [target.x86_64-unknown-linux-gnu]
+     image = "rust:latest"
+     ```
+   - Keep target-specs/i686-unknown-linux-gnu.json (compatible with x86_64)
+   - Remove any ARM-specific target configurations
+
+3. NECESSARY TEST CASES:
+   - Keep all original test cases except:
+     - Remove ARM-specific platform tests
+     - Keep io-uring tests (Linux/x86_64 compatible)
+     - Remove any GPU-related tests (none present)
+     - Focus on x86_64 performance characteristics
+     - Keep FreeBSD tests (can run on x86_64)
+
+4. COMPLETE TODO LIST:
+   - All original tasks remain except:
+     - Remove ARM cross-compilation setup
+     - Focus CI/CD on x86_64 Linux
+     - Skip GPU-specific configurations
+     - Optimize memory usage for available RAM
+     - Ensure paths use /home/cc/EnvGym/... structure
+     - Keep Docker setup using standard x86_64 images
+     - Remove any GPU driver installation steps
+     - Keep stress tests but adjust for x86_64 performance characteristics
+     - Adjust benchmark thresholds for x86_64 hardware
+
+Key adjustments made:
+1. Removed any unnecessary cross-platform considerations (focus on x86_64)
+2. Kept io-uring support which is relevant for x86_64 Linux
+3. Simplified Cross.toml configuration for single-architecture builds
+4. Maintained all x86_64-compatible tests and benchmarks
+5. Ensured paths match /home/cc/EnvGym/... structure
+6. Removed any GPU-related configurations that weren't needed
+7. Kept stress testing but with x86_64 performance expectations
+
+All other aspects of the original plan remain valid for the x86_64 Linux environment.

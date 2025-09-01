@@ -1,0 +1,125 @@
+=== Docker Execution Log - 20250828_173832 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756402707
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 928B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/debian:12-slim
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 185B done
+#3 DONE 0.0s
+
+#4 [build 1/5] FROM docker.io/library/debian:12-slim@sha256:b1a741487078b369e78119849663d7f1a5341ef2768798f7b7406c4240f86aef
+#4 CACHED
+
+#5 [internal] load build context
+#5 transferring context: 33.70kB 0.0s done
+#5 DONE 0.0s
+
+#6 [build 2/5] RUN apt-get update && apt-get install -y     build-essential     cmake     ninja-build     clang     llvm     git     wget     python3     python3-pip     libatomic1     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [build 3/5] WORKDIR /workspace
+#7 CACHED
+
+#8 [build 4/5] COPY . .
+#8 CACHED
+
+#9 [build 5/5] RUN mkdir -p build &&     cd build &&     cmake -G Ninja           -DCMAKE_BUILD_TYPE=Release           -DSIMDJSON_BUILD_STATIC=ON           -DSIMDJSON_EXCEPTIONS=ON           -DSIMDJSON_SANITIZE=OFF           .. 2>&1 | tee cmake.log &&     ninja 2>&1 | tee build.log &&     ninja install 2>&1 | tee install.log
+#9 0.249 CMake Warning:
+#9 0.249   Ignoring extra path from command line:
+#9 0.249 
+#9 0.249    ".."
+#9 0.249 
+#9 0.249 
+#9 0.249 CMake Error: The source directory "/workspace" does not appear to contain CMakeLists.txt.
+#9 0.249 Specify --help for usage, or press the help button on the CMake GUI.
+#9 0.253 ninja: error: loading 'build.ninja': No such file or directory
+#9 0.256 ninja: error: loading 'build.ninja': No such file or directory
+#9 DONE 0.3s
+
+#10 [stage-1 2/4] RUN apt-get update && apt-get install -y     libatomic1     && rm -rf /var/lib/apt/lists/*
+#10 0.340 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+#10 0.356 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+#10 0.356 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+#10 0.462 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8793 kB]
+#10 1.029 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+#10 1.030 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [277 kB]
+#10 1.891 Fetched 9331 kB in 2s (5932 kB/s)
+#10 1.891 Reading package lists...
+#10 2.317 Reading package lists...
+#10 2.737 Building dependency tree...
+#10 2.824 Reading state information...
+#10 2.950 The following NEW packages will be installed:
+#10 2.950   libatomic1
+#10 2.981 0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+#10 2.981 Need to get 9376 B of archives.
+#10 2.981 After this operation, 46.1 kB of additional disk space will be used.
+#10 2.981 Get:1 http://deb.debian.org/debian bookworm/main amd64 libatomic1 amd64 12.2.0-14+deb12u1 [9376 B]
+#10 3.074 debconf: delaying package configuration, since apt-utils is not installed
+#10 3.100 Fetched 9376 B in 0s (373 kB/s)
+#10 3.115 Selecting previously unselected package libatomic1:amd64.
+#10 3.115 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 6089 files and directories currently installed.)
+#10 3.119 Preparing to unpack .../libatomic1_12.2.0-14+deb12u1_amd64.deb ...
+#10 3.120 Unpacking libatomic1:amd64 (12.2.0-14+deb12u1) ...
+#10 3.143 Setting up libatomic1:amd64 (12.2.0-14+deb12u1) ...
+#10 3.146 Processing triggers for libc-bin (2.36-9+deb12u10) ...
+#10 DONE 3.2s
+
+#11 [stage-1 3/4] WORKDIR /workspace
+#11 DONE 0.0s
+
+#12 [stage-1 4/4] COPY --from=build /workspace /workspace
+#12 DONE 0.4s
+
+#13 exporting to image
+#13 exporting layers
+#13 exporting layers 0.4s done
+#13 writing image sha256:0fd1ba4fc70dc3320448e3ce84aa415e187ddcb844522f3a43e25e724ca593c8 done
+#13 naming to docker.io/library/envgym_test_1756402707 done
+#13 DONE 0.4s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

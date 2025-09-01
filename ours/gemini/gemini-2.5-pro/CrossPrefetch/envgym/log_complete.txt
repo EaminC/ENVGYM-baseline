@@ -1,0 +1,67 @@
+=== Docker Execution Log - 20250827_230804 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756336074
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.50kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/11] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 5.82MB 1.8s done
+#5 DONE 1.9s
+
+#6 [ 2/11] RUN apt-get update && apt-get install -y --no-install-recommends     wget     git     cmake     build-essential     python3-pip     python3-dev     libffi-dev     libssl-dev     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [ 3/11] WORKDIR /app
+#7 CACHED
+
+#8 [ 4/11] COPY . /app
+#8 DONE 7.3s
+
+#9 [ 5/11] RUN pip3 install --no-cache-dir -r requirements.txt
+#9 0.867 ERROR: Could not open requirements file: [Errno 2] No such file or directory: 'requirements.txt'
+#9 ERROR: process "/bin/sh -c pip3 install --no-cache-dir -r requirements.txt" did not complete successfully: exit code: 1
+------
+ > [ 5/11] RUN pip3 install --no-cache-dir -r requirements.txt:
+0.867 ERROR: Could not open requirements file: [Errno 2] No such file or directory: 'requirements.txt'
+------
+envgym.dockerfile:27
+--------------------
+  25 |     
+  26 |     # Install Python packages from requirements.txt.
+  27 | >>> RUN pip3 install --no-cache-dir -r requirements.txt
+  28 |     
+  29 |     # Create and switch to a build directory for an out-of-source build.
+--------------------
+ERROR: failed to solve: process "/bin/sh -c pip3 install --no-cache-dir -r requirements.txt" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

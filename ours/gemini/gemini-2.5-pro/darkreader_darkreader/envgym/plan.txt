@@ -1,0 +1,182 @@
+Based on the provided hardware and environment information, here is the adjusted and optimized setup plan. The primary adjustments account for the headless `linux/amd64` environment, the absence of a GPU, the removal of incompatible software (Apple Safari), and the opportunity to leverage the high CPU core count for parallelization.
+
+***
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN (for Linux/amd64 Headless Environment) ===
+
+1.  DOWNLOADS AND SYSTEM PACKAGES NEEDED:
+    - **System Packages (for Ubuntu/Debian-based images)**: To run browsers in a headless environment, several system-level libraries are required.
+      - `git`, `curl`, `unzip`: Core development utilities.
+      - `xvfb`: A virtual framebuffer essential for running GUI applications like browsers in a headless environment without a physical display.
+      - **Browser Dependencies**: Libraries required by Chrome and Firefox (e.g., `libasound2`, `libatk1.0-0`, `libcairo2`, `libcups2`, `libdbus-1-3`, `libexpat1`, `libfontconfig1`, `libgbm1`, `libgcc1`, `libgconf-2-4`, `libgdk-pixbuf2.0-0`, `libglib2.0-0`, `libgtk-3-0`, `libnspr4`, `libpango-1.0-0`, `libpangocairo-1.0-0`, `libstdc++6`, `libx11-6`, `libx11-xcb1`, `libxcb1`, `libxcomposite1`, `libxcursor1`, `libxdamage1`, `libxext6`, `libxfixes3`, `libxi6`, `libxrandr2`, `libxrender1`, `libxss1`, `libxtst6`, `lsb-release`, `wget`).
+    - **Git**: For cloning the project repository. Version 2.x or newer is recommended.
+    - **Node.js**: JavaScript runtime. The CI environment uses version **18.x**, which is the recommended and validated version. A modern LTS version (18.x or 20.x) is required.
+    - **npm**: Node Package Manager. It is bundled with Node.js. Version 9.x or newer is recommended.
+    - **Deno**: A secure runtime for JavaScript and TypeScript. Used for the `deno:bootstrap` script. Version 1.x or newer is recommended.
+    - **Google Chrome**: Web browser required for testing. The `stable` channel is recommended to align with CI. Version **106.0** or newer is required for Manifest V3 compatibility.
+    - **Mozilla Firefox**: Web browser required for testing (`test:firefox`). The `latest` stable or `esr` version is recommended. Version **78.0** or newer is required.
+    - **Mozilla Thunderbird**: Email client required for testing the Thunderbird version of the add-on. Version **78.0** or newer is required.
+    - **Apple Safari**: **Incompatible.** Safari and its test launcher (`karma-safari-launcher`) are only available on macOS. This component will be skipped in the Linux environment.
+    - **Operating System**: The target environment is **Ubuntu Linux (`linux/amd64`)**, which perfectly aligns with the project's continuous integration (CI) environment, ensuring high compatibility.
+    - **Note on Headless Environment**: The absence of a GPU and physical display makes the virtual framebuffer (**Xvfb**) a mandatory component for running any browser-based tests.
+
+2.  FILES TO CREATE:
+    - **Note**: This section remains unchanged as it describes the file structure within the project repository, which is independent of the execution environment.
+    - **`.gitattributes`**: Located at the project root. Configures Git to enforce consistent line endings.
+    - **`src/manifest.json`**: Located in the `src` directory. The core Manifest V2 file.
+    - **`src/manifest-chrome-mv3.json`**: Located in the `src` directory. The Manifest V3 file for Chrome.
+    - **`src/manifest-firefox.json`**: Located in the `src` directory. The Manifest file for Firefox.
+    - **`src/manifest-thunderbird.json`**: Located in the `src` directory. The Manifest file for Mozilla Thunderbird.
+    - **`src/config/dark-sites.config`**: Located in the `src/config` directory. A configuration file listing websites with their own dark mode.
+    - **`src/config/dynamic-theme-fixes.config`**: Located in the `src/config` directory. A configuration file containing site-specific rules to improve dark mode rendering.
+    - **`src/config/inversion-fixes.config`**: Located in the `src/config` directory. A configuration file containing site-specific CSS selectors for elements that should be inverted.
+    - **`src/config/static-themes.config`**: Located in the `src/config` directory. A configuration file defining site-specific static themes.
+    - **`src/plus/` (directory)**: Optional directory that is **ignored by Git**.
+    - **`tasks/package.json`**: Located in the `tasks` directory. Contains `"type": "module"`.
+    - **`tasks/build.js`**: Located in the `tasks` directory. The main Node.js build script.
+    - **`.github/workflows/test-code.yml`**: Located in the `.github/workflows` directory. A GitHub Actions workflow for code quality.
+    - **`.github/workflows/test-browser.yml`**: Located in the `.github/workflows` directory. A GitHub Actions workflow for browser tests.
+    - **`.github/workflows/tagged-release.yml`**: Located in the `.github/workflows` directory. A GitHub Actions workflow for release automation.
+    - **`.github/dependabot.yml`**: Located in the `.github` directory. Configures Dependabot for dependency updates.
+    - **`.npmignore`**: Located at the project root. Configures files for the npm registry.
+    - **`eslint.config.js`**: Located at the project root. Defines the linting rules for ESLint (`v9.x`).
+    - **`eslint-plugin-local.js`**: A local, custom ESLint plugin.
+    - **`tsconfig.json`**: Located at the project root. Configures the TypeScript compiler.
+    - **`src/tsconfig.json`**: Located in the `src` directory. Configures TypeScript for **type-checking** the main extension source code.
+    - **`tests/package.json`**: Located in the `tests` directory. Contains `"type": "module"`.
+    - **`tests/dependencies.js`**: A custom Node.js script for checking NPM dependencies.
+    - **`tests/unit/jest.config.mjs`**: Jest configuration file for unit tests.
+    - **`tests/unit/tsconfig.json`**: Located in the `tests/unit` directory. Configures TypeScript for **type-checking** the unit tests.
+    - **`tests/browser/jest.config.mjs`**: Jest configuration for browser tests.
+    - **`tests/browser/environment.js`**: A custom Jest test environment for Puppeteer.
+    - **`tests/browser/tsconfig.json`**: Located in the `tests/browser` directory. Configures TypeScript for **type-checking** the browser tests.
+    - **`tests/inject/karma.conf.cjs`**: A CommonJS wrapper for the Karma configuration.
+    - **`tests/inject/karma.conf.js`**: The main Karma (`v6.4.x`) configuration file.
+    - **`tests/inject/tsconfig.json`**: Located in the `tests/inject` directory. Configures TypeScript for **type-checking** the injection tests.
+    - **`deno.json` / `deno.lock`**: **Generated files** located at the project root.
+    - **`darkreader.js` / `darkreader.mjs` / `index.d.ts`**: **Generated files** located at the project root.
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    - **Code Quality and Dependency Checks (`lint`, `lint:bundle`)**:
+      - Test code for style and consistency issues using ESLint (`npm run lint`).
+      - Check for browser API compatibility using `eslint-plugin-compat`.
+      - Enforce module boundaries using `eslint-plugin-import`.
+      - Check for compatibility issues within the final bundled code (`npm run lint:bundle`).
+      - Run a custom script to validate NPM dependencies (`node tests/dependencies.js`).
+      - Validate the npm package contents via `.npmignore`.
+    - **Unit Tests (`test:unit`)**:
+      - These tests use the **Jest** framework and are run in a Node.js environment, making them fully compatible.
+      - Test core theme generation logic, configuration parsers, utility functions, and state management.
+    - **Browser and Application Tests (`test:chrome`, `test:chrome-mv3`, `test:firefox`)**:
+      - These end-to-end tests are run using **Jest** and **Puppeteer**. They are compatible with the headless Linux environment but **require Xvfb** to function.
+      - Test the extension popup UI, background script/service worker functionality, and browser API integrations.
+      - Test functionality related to specific permissions and site-specific fixes from `.config` files.
+      - Test different build contexts and Thunderbird-specific functionality.
+    - **Injection Tests (`test:inject`)**:
+      - These tests are run by the **Karma** test runner using the **Jasmine** framework. They are compatible but also **require Xvfb** to launch browsers.
+      - Test the content script's ability to inject styles correctly on various web pages.
+      - Verify site-specific fixes, dynamic content styling, and performance.
+      - **Note**: Any configuration in `tests/inject/karma.conf.js` that specifies `Safari` as a browser target should be disabled or removed to prevent errors.
+
+4.  COMPLETE TODO LIST:
+    - **Step 1: Install Prerequisites**
+      - **System Packages**: On an Ubuntu/Debian-based system, install all necessary dependencies.
+        ```bash
+        # Update package lists
+        apt-get update
+        # Install core utilities, Xvfb, and browser dependencies
+        apt-get install -y git curl unzip xvfb wget \
+        libasound2 libatk1.0-0 libcairo2 libcups2 libdbus-1-3 \
+        libexpat1 libfontconfig1 libgbm1 libgcc1 libgconf-2-4 \
+        libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 \
+        libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 \
+        libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 \
+        libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 \
+        libxss1 libxtst6 lsb-release
+        ```
+      - **Browsers**: Install Google Chrome, Firefox, and Thunderbird.
+        ```bash
+        # Install Google Chrome (stable)
+        wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        dpkg -i google-chrome-stable_current_amd64.deb || apt-get install -fy
+        rm google-chrome-stable_current_amd64.deb
+        # Install Firefox (ESR) and Thunderbird from system repositories
+        apt-get install -y firefox-esr thunderbird
+        ```
+      - **Node.js, npm, Deno**: Install the required runtimes. Using a tool like `nvm` is recommended for managing Node versions.
+        ```bash
+        # Example using nvm for Node.js
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+        export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        nvm install 18 && nvm use 18 && nvm alias default 18
+        # Install Deno
+        curl -fsSL https://deno.land/x/install/install.sh | sh
+        export DENO_INSTALL="/root/.deno" && export PATH="$DENO_INSTALL/bin:$PATH"
+        ```
+      - **Verification**: Verify all installations: `git --version`, `node -v`, `npm -v`, `deno --version`, `google-chrome --version`, `firefox --version`.
+
+    - **Step 2: Clone the Project Repository**
+      - Navigate to your projects directory: `cd /home/cc/EnvGym/data`
+      - Run the command: `git clone https://github.com/darkreader/darkreader.git darkreader_darkreader`
+      - Navigate into the project working directory: `cd darkreader_darkreader`
+      - **Verification**: The directory `/home/cc/EnvGym/data/darkreader_darkreader` should now contain the project files.
+
+    - **Step 3: Install Project Dependencies**
+      - In the project root directory, run: `npm ci`
+      - **Note**: `npm ci` ensures a clean, reproducible install matching the CI environment.
+      - **Verification**: Command completes successfully and a `node_modules` directory is created.
+
+    - **Step 4: Run Bootstrap and Setup Scripts**
+      - Run the Deno bootstrap script: `npm run deno:bootstrap`
+      - **Note**: The `npm run plus-link` command is for macOS/Linux with a GUI and is likely not applicable in this automated environment unless the optional `src/plus` directory is manually placed.
+      - **Verification**: The `deno.json` and `deno.lock` files are created in the project root.
+
+    - **Step 5: Perform Code Quality and Dependency Checks**
+      - Run the linter: `npm run lint`
+      - Run the bundle compatibility check: `npm run lint:bundle`
+      - Run the dependency check script: `node tests/dependencies.js`
+      - **Verification**: All commands finish without reporting errors, confirming code quality and TypeScript configurations are correct.
+
+    - **Step 6: Run the Test Suite**
+      - Run unit tests (no browser needed): `npm run test:unit`
+      - **Run Browser/Injection Tests with Xvfb**: Prefix the commands with `xvfb-run` to provide a virtual display.
+        ```bash
+        xvfb-run --auto-servernum npm run test:inject
+        xvfb-run --auto-servernum npm run test:chrome-mv3
+        xvfb-run --auto-servernum npm run test:firefox
+        ```
+      - To run the complete suite, wrap the entire command: `xvfb-run --auto-servernum npm run test:all`
+      - **Optimization for High Core Count (96 cores)**: To maximize CPU usage, run independent test suites in parallel.
+        ```bash
+        # Run unit tests and browser tests concurrently
+        npm run test:unit &
+        xvfb-run --auto-servernum npm run test:chrome-mv3 &
+        xvfb-run --auto-servernum npm run test:firefox &
+        wait # Wait for all background jobs to finish
+        ```
+      - **Verification**: All test commands complete successfully. The use of `xvfb-run` allows browser tests to pass in the headless environment.
+
+    - **Step 7: Build the Extension**
+      - Create a debug build for all supported platforms: `npm run debug`
+      - **Optimization for High Core Count**: If builds for different platforms are independent, you can run them in parallel.
+        ```bash
+        npm run debug -- --chrome-mv3 &
+        npm run debug -- --firefox &
+        npm run debug -- --thunderbird &
+        wait
+        ```
+      - Create a release build (includes linting and zipping): `npm run release`
+      - **Verification**: Check for the creation of `build/debug` and `build/release` directories. Inspect the generated manifests (e.g., `build/debug/chrome-mv3/manifest.json`) to confirm they are correct for each platform. The API files (`darkreader.js`, `darkreader.mjs`, `index.d.ts`) should be present in the project root.
+
+    - **Step 8: Verify Build Artifacts (Headless Environment)**
+      - **Note**: Interactive loading of the extension into a browser GUI is not possible in this environment. Verification must be done by inspecting the build output and relying on the automated test results.
+      - **Inspect Directory Structure**:
+        - List the contents of the build directory to ensure all platform targets were created: `ls -l build/debug`
+        - Check that a release archive was created: `ls -l build/release`
+      - **Inspect Manifests**:
+        - Check the manifest version for the MV3 build: `grep '"manifest_version": 3' build/debug/chrome-mv3/manifest.json`
+        - Check for Thunderbird-specific settings: `grep '"gecko"' build/debug/thunderbird/manifest.json`
+      - **Check npm Package Contents**:
+        - Run `npm pack` to create a `darkreader-....tgz` archive.
+        - List the contents to verify that `.npmignore` is working correctly and only includes the intended API files: `tar -tzf darkreader-*.tgz`
+      - **Verification**: The build artifacts exist and appear correctly configured. The automated tests in Step 6 serve as the primary functional validation of these builds. The environment is now fully configured for automated builds and testing.

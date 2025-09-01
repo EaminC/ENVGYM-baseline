@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250828_033643",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756352200",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 4.14kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/continuumio/miniconda3:latest\n#2 DONE 0.1s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/20] FROM docker.io/continuumio/miniconda3:latest@sha256:4a2425c3ca891633e5a27280120f3fb6d5960a0f509b7594632cdd5bb8cbaea8\n#4 DONE 0.0s\n\n#5 [ 7/20] RUN conda run -n reltr conda install -y c-compiler cxx-compiler -c conda-forge\n#5 CACHED\n\n#6 [ 2/20] WORKDIR /home/cc/EnvGym/data\n#6 CACHED\n\n#7 [ 3/20] RUN apt-get update && apt-get install -y --no-install-recommends     git     procps     unzip     build-essential     && apt-get clean && rm -rf /var/lib/apt/lists/*\n#7 CACHED\n\n#8 [ 8/20] RUN conda run -n reltr conda install -y pytorch==1.6.0 torchvision==0.7.0 cpuonly -c pytorch\n#8 CACHED\n\n#9 [10/20] RUN conda run -n reltr pip install cython numpy\n#9 CACHED\n\n#10 [ 5/20] WORKDIR /home/cc/EnvGym/data/RelTR\n#10 CACHED\n\n#11 [12/20] RUN conda run -n reltr conda install -y git\n#11 CACHED\n\n#12 [ 9/20] RUN conda run -n reltr conda install -y matplotlib scipy=1.5.2 make\n#12 CACHED\n\n#13 [ 4/20] RUN git clone https://github.com/yrcong/RelTR.git\n#13 CACHED\n\n#14 [11/20] RUN conda run -n reltr pip install --upgrade setuptools\n#14 CACHED\n\n#15 [ 6/20] RUN conda create -n reltr python=3.6 -y\n#15 CACHED\n\n#16 [13/20] RUN conda run -n reltr conda install -y -c conda-forge pycocotools\n#16 CACHED\n\n#17 [14/20] RUN cd models/ops && make -j$(nproc)\n#17 2.110 /bin/bash: line 1: cd: models/ops: No such file or directory\n#17 2.110 \n#17 2.110 ERROR conda.cli.main_run:execute(125): `conda run /bin/bash -c cd models/ops && make -j$(nproc)` failed. (See above for error)\n#17 ERROR: process \"conda run -n reltr /bin/bash -c cd models/ops && make -j$(nproc)\" did not complete successfully: exit code: 1\n------\n > [14/20] RUN cd models/ops && make -j$(nproc):\n2.110 /bin/bash: line 1: cd: models/ops: No such file or directory\n2.110 \n2.110 ERROR conda.cli.main_run:execute(125): `conda run /bin/bash -c cd models/ops && make -j$(nproc)` failed. (See above for error)\n------\nenvgym.dockerfile:59\n--------------------\n  57 |     \n  58 |     # Compile the custom helper operations using the provided build script.\n  59 | >>> RUN cd models/ops && make -j$(nproc)\n  60 |     \n  61 |     # Install gdown, a utility for downloading large files from Google Drive.\n--------------------\nERROR: failed to solve: process \"conda run -n reltr /bin/bash -c cd models/ops && make -j$(nproc)\" did not complete successfully: exit code: 1\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

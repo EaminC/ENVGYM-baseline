@@ -1,0 +1,82 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.10.12
+   - pip package manager
+   - Git
+   - ["Nonhuman Primate Reaching with Multichannel Sensorimotor Cortex Electrophysiology" dataset](https://zenodo.org/records/583331)
+   - Specific stork commit (40c68fe)
+   - randman repository
+   - numpy
+   - torch (CPU version)
+   - scipy
+   - matplotlib
+   - seaborn
+   - h5py
+   - soundfile
+   - tables
+   - torchaudio (CPU version)
+   - torchvision (CPU version)
+   - tonic
+   - xlsxwriter
+   - hydra-core
+   - neurobench
+   - pandas
+   - snntorch (CPU version)
+   - omegaconf
+   - KDEpy
+
+2. FILES TO CREATE:
+   - /home/cc/EnvGym/data/RSNN/conf/data/data-default.yaml:
+     ```yaml
+     data_dir: "/home/cc/EnvGym/data/RSNN/dataset"
+     pretrain_filenames: "challenge-data"
+     ```
+   - /home/cc/EnvGym/data/RSNN/conf/config.yaml:
+     ```yaml
+     output_dir: "/home/cc/EnvGym/data/RSNN/outputs"
+     defaults:
+       - data: data-default
+     ```
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Data loading verification
+   - Model initialization tests for both tinyRSNN and bigRSNN (CPU versions)
+   - Forward pass validation (CPU)
+   - Training loop verification (CPU)
+   - Evaluation metrics calculation
+   - NeuroBench compatibility checks
+   - Half-precision conversion validation for tinyRSNN (CPU)
+   - Pruning strategy verification
+   - Activity regularization test
+   - randman integration test
+   - Tonic dataset handling verification
+   - Torchaudio compatibility test (CPU)
+   - XLSX output validation
+
+4. COMPLETE TODO LIST:
+   1. Install Python 3.10.12
+   2. Verify Python installation with `python --version`
+   3. Install pip and verify with `pip --version`
+   4. Clone repository and navigate to /home/cc/EnvGym/data/RSNN
+   5. Download dataset and update path in data-default.yaml
+   6. Create output directory structure at /home/cc/EnvGym/data/RSNN/outputs
+   7. Install dependencies: `pip install -r requirements.txt` (ensuring CPU versions of torch-related packages)
+   8. Verify stork installation matches exact commit (40c68fe)
+   9. Install randman from specified repository
+   10. Verify all package installations (torch-cpu, numpy, scipy, etc.)
+   11. Run data loading test cases
+   12. Initialize CPU models and run forward pass tests
+   13. Execute training verification on small subset (CPU)
+   14. Run full training for one seed to verify pipeline (CPU)
+   15. Execute evaluation script on pretrained models
+   16. Verify results against provided benchmarks
+   17. Check NeuroBench compatibility
+   18. Validate half-precision conversion for tinyRSNN (CPU)
+   19. Verify pruning and activity regularization effects
+   20. Test randman integration
+   21. Verify Tonic dataset handling
+   22. Check Torchaudio compatibility (CPU)
+   23. Validate XLSX output generation
+   24. Run complete test suite
+   25. Remove any GPU-specific code/configurations from the project

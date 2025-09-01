@@ -1,0 +1,51 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust toolchain (version 1.88.0)
+   - Verus (version 3b6b805ac86cd6640d59468341055c7fa14cff07)
+   - Kubernetes CLI (kubectl)
+   - Minikube or Docker Desktop for local Kubernetes cluster
+   - kind (version 0.23.0)
+   - Go (version ^1.20)
+   - kube-rs dependencies
+   - k8s-openapi crate
+   - Git (for cloning repository)
+   - Additional dependencies for deps_hack compilation
+   - OpenSSL (for certificate generation)
+   - base64 utility
+   - Docker (version 28.1.1)
+   - Python 3 (version 3.8+)
+   - Verus line counting tool (from VERUS_DIR/source/tools/line_count)
+   - jq (for processing JSON verification results)
+   - pkg-config (for builder image)
+   - libssl-dev (for builder image)
+   - python3-pip (for builder image)
+   - tabulate Python package (for builder image)
+   - Ubuntu 20.04 base image (amd64 compatible)
+   - ghcr.io/anvil-verifier/anvil/verus:latest image (amd64)
+   - wget
+   - unzip
+   - curl
+   - gcc
+   - tungstenite (version 0.20.1)
+   - rand (version 0.8)
+
+2. FILES TO CREATE:
+   [All files remain the same as original plan, but ensure all Dockerfiles specify amd64 architecture]
+   - In all Dockerfiles: FROM --platform=linux/amd64 <base_image>
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   [All test cases remain the same, but add:]
+   - Verify all Docker images are built for amd64 architecture
+   - Test compatibility with Ubuntu 20.04 base image
+   - Verify BuildKit functionality with Docker 28.1.1
+
+4. COMPLETE TODO LIST:
+   [All tasks remain the same, but adjust:]
+   - Change Ubuntu 22.04 references to Ubuntu 20.04 in Dockerfiles
+   - Ensure all container builds use --platform=linux/amd64 flag
+   - Verify Docker BuildKit compatibility with current version
+   - Confirm Python 3.8+ installation instead of unspecified version
+   - Skip any GPU-related checks since none are available
+
+Note: The working directory path (/home/cc/EnvGym/data/anvil) and x86_64 architecture are fully compatible with all components in the plan. No storage or memory adjustments needed as they weren't specified as constraints in the hardware information. All tool versions specified are compatible with amd64 architecture.

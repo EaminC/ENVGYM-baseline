@@ -1,0 +1,66 @@
+=== Docker Execution Log - 20250829_192702 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756495620
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 2.20kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.21-bullseye
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 111B done
+#3 DONE 0.0s
+
+#4 [ 1/11] FROM docker.io/library/golang:1.21-bullseye@sha256:40a67e6626bead90d5c7957bd0354cfeb8400e61acc3adc256e03252630014a6
+#4 DONE 0.0s
+
+#5 [ 2/11] WORKDIR /app
+#5 CACHED
+
+#6 [ 3/11] RUN apt-get update && apt-get install -y --no-install-recommends     bash     build-essential     git     make     protobuf-compiler     zip     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [internal] load build context
+#7 transferring context: 1.05MB 0.1s done
+#7 DONE 0.1s
+
+#8 [ 4/11] RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+#8 0.691 go: downloading google.golang.org/protobuf v1.36.8
+#8 1.029 go: google.golang.org/protobuf/cmd/protoc-gen-go@latest: google.golang.org/protobuf@v1.36.8 requires go >= 1.23 (running go 1.21.13; GOTOOLCHAIN=local)
+#8 ERROR: process "/bin/sh -c go install google.golang.org/protobuf/cmd/protoc-gen-go@latest" did not complete successfully: exit code: 1
+------
+ > [ 4/11] RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest:
+0.691 go: downloading google.golang.org/protobuf v1.36.8
+1.029 go: google.golang.org/protobuf/cmd/protoc-gen-go@latest: google.golang.org/protobuf@v1.36.8 requires go >= 1.23 (running go 1.21.13; GOTOOLCHAIN=local)
+------
+envgym.dockerfile:41
+--------------------
+  39 |     # This avoids dependency conflicts with the project's modules.
+  40 |     # These will be installed to $GOPATH/bin, which is already in the PATH.
+  41 | >>> RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+  42 |     RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+  43 |     RUN go install go.uber.org/mock/mockgen@latest
+--------------------
+ERROR: failed to solve: process "/bin/sh -c go install google.golang.org/protobuf/cmd/protoc-gen-go@latest" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

@@ -1,0 +1,185 @@
+Here is the adjusted environment setup plan, optimized for the specified `linux/amd64` containerized environment.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    *   **Source Code:**
+        *   The plan assumes the Zstandard source code is copied into the build environment (e.g., via Docker's `COPY` command). A Git client is needed if cloning from within the container.
+    *   **Containerization Tools:**
+        *   Docker: This plan is designed to be executed within a Docker container.
+    *   **Primary Build Toolchain:**
+        *   C Compiler: GCC (e.g., version 7.3.0 or newer) or Clang.
+        *   C++ Compiler: A C++11 compliant compiler (for `pzstd` support).
+        *   Make Utility: GNU Make.
+        *   `pkg-config`: For testing library installation and discovery.
+    *   **Alternative Build Systems & Tools:**
+        *   CMake: Cross-platform build generator (version 3.10 or newer **required**).
+        *   Meson: The Meson build system (version 0.50.0 or newer **required**).
+        *   Ninja: A small build system with a focus on speed, often used with CMake or Meson.
+        *   Intel oneAPI DPC++/C++ Compiler (ICX): For building with the Intel compiler (optional).
+    *   **Dependencies for Meson Build:**
+        *   Python: Required by Meson scripts.
+    *   **Core POSIX Utilities (Essential for Testing):**
+        *   `coreutils`: Provides `rm`, `wc`, `dd`, `cat`, `ln`, `mkdir`, `ls`, `split`, `touch`, `printf`.
+        *   `diffutils`: Provides the `diff` command.
+        *   `grep`: For searching test output and logs.
+        *   `tar`: Required for testing automatic decompression of `.tzst`, `.tgz`, etc.
+    *   **Optional Library Dependencies (for extended format support, recommended for full testing):**
+        *   Zlib (development headers, e.g., `zlib1g-dev`). For reproducible release builds, clone from source (e.g., version `v1.3.1`).
+        *   Liblzma (development headers, e.g., `liblzma-dev` from `xz-utils`).
+        *   Liblz4 (development headers, e.g., `liblz4-dev`). For reproducible release builds, clone from source (e.g., version `v1.10.0`).
+    *   **Optional CLI Tool Dependencies (for full `playTests.sh` compatibility suite):**
+        *   `gzip`: The command-line tool for testing `--format=gzip`.
+        *   `xz-utils`: Provides `xz` and `lzma` command-line tools for `--format=xz/lzma`.
+        *   `lz4`: The command-line tool for testing `--format=lz4`.
+    *   **Specialized Testing & Development Tools (Optional for `linux/amd64`):**
+        *   **32-bit Compatibility:**
+            *   `gcc-multilib`: For 32-bit builds on the 64-bit host.
+        *   **Static Linking:**
+            *   `musl-tools`: For building against the musl C library.
+        *   **Debugging and Analysis Tools:**
+            *   Valgrind: For memory debugging.
+            *   Clang Static Analyzer (`scan-build`): For static code analysis.
+            *   `shellcheck`: For linting shell scripts.
+            *   `llvm` toolchain (including `llvm-profdata`): For Clang PGO builds.
+            *   `binutils` (for `readelf`): Used to check for executable stack.
+            *   `util-linux` (for `losetup`): Required for block device tests (may require elevated privileges).
+        *   **Release & Packaging Tools:**
+            *   `p7zip`: For creating compressed archive artifacts.
+            *   GitHub CLI (`gh`): For managing releases and pull requests in a CI/CD context.
+        *   **Multiple Compiler Versions:** Specific versions of GCC or Clang for compatibility testing.
+
+2.  FILES TO CREATE:
+    *   **Note:** In a containerized build, environment variables are typically set using the `ENV` instruction in a `Dockerfile` rather than through manual scripts. The following script is provided as an example for interactive testing inside a running container.
+    *   **Environment Setup Script (for interactive testing inside the container):**
+        *   **File Path:** `/home/cc/EnvGym/data/facebook_zstd/setup_test_env.sh`
+        *   **Content Description:** A shell script to export environment variables required by the `playTests.sh` script.
+        *   **Example Content:**
+          ```bash
+          #!/bin/bash
+          # Set this to the root of the zstd source code
+          ZSTD_REPO_PATH="/home/cc/EnvGym/data/facebook_zstd"
+
+          # Set paths for a Meson build (adjust if using make or cmake)
+          export ZSTD_BIN="${ZSTD_REPO_PATH}/build-meson/programs/zstd"
+          export DATAGEN_BIN="${ZSTD_REPO_PATH}/build-meson/programs/datagen"
+
+          echo "Environment variables ZSTD_BIN and DATAGEN_BIN are set."
+          echo "You can now run tests using: ./tests/playTest.sh"
+          ```
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    *   **Basic Functionality Test (`make check`):** Executes the standard, fast test suite (`tests/playTest.sh`).
+    *   **Full Test Suite (`make test`):** Executes a more comprehensive and long-duration test suite. Includes large data tests when run as `./tests/playTests.sh --test-large-data`.
+    *   **CLI and Library Functionality:**
+        *   **Round Trip:** Compress and decompress data, verifying integrity.
+        *   **I/O Operations:** Test standard input/output, file I/O (`-o`), force overwrite (`-f`).
+        *   **File Handling:** Test multiple files, recursive mode (`-r`), file removal (`--rm`), and directory output.
+        *   **Metadata Preservation:** Verify file permissions and modification times.
+        *   **Symbolic Link Handling:** Ensure correct symlink behavior.
+        *   **Special Files:** Test handling of named pipes (FIFOs), `/dev/null`, and block devices.
+        *   **Error Handling:** Test behavior with missing files, read-only files, truncated input, etc.
+    *   **Compression Format and Parameter Tests:**
+        *   **Compression Levels:** Test a wide range of positive and negative (`--fast`) levels.
+        *   **Advanced Parameters:** Test custom compression parameters via `--zstd=...`.
+        *   **Long Distance Matching:** Test `--long` mode.
+        *   **Multi-threading:** Test `-T` and `--threads` options, leveraging high core counts.
+        *   **Adaptive Compression:** Test `--adapt` mode.
+        *   **Frame Options:** Test content size and checksum toggles.
+        *   **Frame Concatenation:** Test decompression of concatenated `.zst` files.
+        *   **Sparse File Support:** Test `--sparse` mode.
+    *   **Dictionary Compression Tests:**
+        *   **Dictionary Builders:** Test all dictionary builders (`--train`, `--train-legacy`, etc.).
+        *   **Dictionary Usage:** Test compression and decompression using dictionaries (`-D`).
+        *   **`--patch-from` Mode:** Test creating and applying diffs.
+    *   **Alternative Format Compatibility:**
+        *   **Gzip, xz, lzma, lz4:** If CLI tools are present, test round-trip compatibility using `--format=...` flags.
+        *   **Tarball Integration:** Test automatic decompression of `*.tzst`, `*.tgz`, etc.
+    *   **Informational and Diagnostic Modes:**
+        *   **Test/Integrity Check:** Test `-t` mode.
+        *   **List Mode:** Test `-l`/`--list` mode.
+        *   **Benchmark Mode:** Test `-b` mode.
+        *   **Verbose/Quiet Modes:** Test `-v` and `-q` flags.
+    *   **Build and System Integration Tests:**
+        *   **Strict Compilation:** Build with warnings as errors (`MOREFLAGS="-Werror"`).
+        *   **32-bit Build:** Compile and test in a 32-bit environment (`CFLAGS="-m32"`).
+        *   **Executable Stack Check:** Use `readelf` to ensure the `zstd` binary does not have an executable stack.
+        *   **`pkg-config` Integration:** After installation, verify `pkg-config --cflags --libs libzstd`.
+        *   **Docker Build:** Build the Docker image and run `zstd --test` inside the container (this is the primary validation path).
+    *   **CI/CD and Workflow Validation:**
+        *   **Dependabot Pull Request Validation:** Ensure that the full CI test suite passes on pull requests generated by Dependabot.
+
+4.  COMPLETE TODO LIST:
+    *   **1. Install Prerequisites:**
+        *   **Action (Linux - Debian/Ubuntu based Dockerfile):** Combine all installation steps into a single `RUN` command to optimize Docker layer caching.
+          ```dockerfile
+          RUN apt-get update && apt-get install -y --no-install-recommends \
+              # Core build tools
+              git build-essential pkg-config \
+              # Test dependencies
+              coreutils diffutils grep tar gzip xz-utils lz4 binutils util-linux \
+              # Alternative build systems
+              cmake ninja-build meson python3 \
+              # Optional for extended features
+              zlib1g-dev liblzma-dev liblz4-dev \
+              # Optional Advanced Testing Tools
+              gcc-multilib musl-tools valgrind clang llvm p7zip-full shellcheck \
+              && rm -rf /var/lib/apt/lists/*
+          ```
+        *   **Verification:** The successful completion of this Dockerfile instruction serves as verification.
+    *   **2. Copy the Source Code:**
+        *   **Action:** In the Dockerfile, use a `COPY` instruction to add the source code to the working directory.
+          ```dockerfile
+          WORKDIR /home/cc/EnvGym/data/facebook_zstd
+          COPY . .
+          ```
+        *   **Verification:** Subsequent build steps will fail if the source code is not present.
+    *   **3. Build the Project (Choose one or more methods):**
+        *   **Note:** Leverage the high core count by using `-j$(nproc)` for parallel execution.
+        *   **Method A: `make`**
+            *   **Action:** `make -j$(nproc) all`
+            *   **Verification:** Check for `zstd` in `programs/` and `libzstd.a`/`.so` in `lib/`.
+        *   **Method B: `cmake`**
+            *   **Action:**
+              ```bash
+              mkdir build-cmake && cd build-cmake
+              cmake ../build/cmake -DCMAKE_BUILD_TYPE=Release
+              cmake --build . --config Release -j $(nproc)
+              cd ..
+              ```
+            *   **Verification:** Check for binaries in `build-cmake/programs/`.
+        *   **Method C: `meson`**
+            *   **Action:**
+              ```bash
+              meson setup build-meson build/meson
+              ninja -C build-meson -j $(nproc)
+              ```
+            *   **Verification:** Check for `zstd` in `build-meson/programs/`.
+    *   **4. Run Tests to Validate the Build:**
+        *   **Action (Primary Test Suite):**
+            *   **make:** `make -j$(nproc) check`
+            *   **cmake:** `cd build-cmake && ctest -C Release -V -j $(nproc)`
+            *   **meson:** `meson test -C build-meson --num-processes $(nproc)`
+        *   **Action (Advanced/Specific Validation Tests - Optional):**
+            *   **Full suite:** `make -j$(nproc) test` (runs `playTests.sh` with the `--test-large-data` flag).
+            *   **32-bit build:** `make clean && CFLAGS="-m32" LDFLAGS="-m32" make -j$(nproc) check`
+            *   **Dictionary training:** `make -C programs/ zstd-train` then `./programs/zstd --train tests/*.c -o dictionary`
+            *   **Minimal decompressor:** `make check ZSTD_LIB_MINIFY=1 MOREFLAGS="-Werror"`
+        *   **Verification:** All test commands should complete without errors and report success.
+    *   **5. Install the Binaries (Optional, for final image stage):**
+        *   **Note:** `sudo` is not required when running as the root user in a Docker container.
+        *   **Action (if built with `make`):** `make install`
+        *   **Action (if built with `cmake`):** `cmake --install build-cmake`
+        *   **Action (if built with `meson`):** `meson install -C build-meson`
+        *   **Verification:** After installation, run `which zstd` to confirm it's in `/usr/local/bin`. Run `zstd --version`. Check `pkg-config --modversion libzstd`.
+    *   **6. Perform Final End-to-End Verification:**
+        *   **Action:**
+          ```bash
+          echo "test" > testfile.txt
+          zstd testfile.txt -o testfile.zst
+          zstd -d testfile.zst -o testfile.decompressed.txt
+          ```
+        *   **Verification:** The following command should produce no output, indicating success: `diff testfile.txt testfile.decompressed.txt`
+    *   **7. Manage Repository Maintenance (For Contributors):**
+        *   **Action:** Be aware that GitHub Dependabot is configured to automatically create pull requests for updating GitHub Actions dependencies. When these PRs appear, review them.
+        *   **Verification:** Ensure the CI checks on the pull request pass successfully before merging. This keeps the automated build and test environment secure and up-to-date.

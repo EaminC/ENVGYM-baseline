@@ -1,0 +1,77 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Git
+   - Python 3.10.x
+   - QEMU with KVM support
+   - Ubuntu 22.04 LTS (amd64 compatible)
+   - silhouette_guest_vm.qcow2 (30GB VM image from Zenodo)
+   - SSH key from /home/cc/EnvGym/data/Silhouette/codebase/scripts/fs_conf/sshkey
+   - LLVM 15 (amd64 build)
+   - Memcached (for VM communication)
+   - Python packages: pymemcache, memcache, psutil, pytz, qemu.qmp, intervaltree, aenum, netifaces, prettytable, tqdm, numpy, matplotlib
+   - Build dependencies: build-essential, libssl-dev, zlib1g-dev, libbz2-dev, libreadline-dev, libsqlite3-dev, curl, libncursesw5-dev, xz-utils, tk-dev, libxml2-dev, libxmlsec1-dev, libffi-dev, liblzma-dev
+   - make, gcc, g++
+   - md5 tools
+   - Linux kernel headers (5.4.0-131-generic for amd64)
+   - Clang tools (amd64 compatible)
+   - PMFS source code (amd64 compatible)
+   - Linux kernel 4.15 source (amd64 compatible)
+
+2. FILES TO CREATE:
+   - /home/cc/.ssh/config
+   - /home/cc/EnvGym/data/Silhouette/codebase/scripts/fs_conf/base/env_base.py
+   - Filesystem-specific configs in /home/cc/EnvGym/data/Silhouette/codebase/scripts/fs_conf/
+   - /home/cc/EnvGym/data/Silhouette/qemu_imgs/
+   - /mnt/ramdisk (PMFS mount point)
+   - All other paths adjusted to use /home/cc/EnvGym/data/Silhouette/ as base directory
+
+3. NECESSARY TEST CASES:
+   (Same as original but all paths adjusted to /home/cc/EnvGym/data/Silhouette/)
+   - Focus on amd64 compatible tests
+   - Remove GPU-specific tests
+
+4. COMPLETE TODO LIST:
+   1. Install Ubuntu 22.04 LTS (amd64)
+   2. Install Python 3.10.x (amd64 build)
+   3. Install QEMU with KVM support (amd64)
+   4. Install LLVM 15 (amd64)
+   5. Install Memcached
+   6. Install build dependencies:
+      - sudo apt update
+      - sudo apt-get install build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev make gcc g++
+   7. Install Python packages:
+      - pip3 install pymemcache memcache psutil pytz qemu.qmp intervaltree aenum netifaces prettytable tqdm numpy matplotlib
+   8. Create directory structure:
+      - mkdir -p /home/cc/EnvGym/data/Silhouette/qemu_imgs
+      - mkdir -p /mnt/ramdisk
+      - mkdir -p /home/cc/EnvGym/data/Silhouette/evaluation/scalability/seq{1,2,3}
+   9. Clone repositories:
+      - cd /home/cc/EnvGym/data/Silhouette
+      - git clone https://github.com/iaoing/Silhouette.git
+      - git clone https://github.com/linux-pmfs/pmfs.git
+   10. Download VM image:
+       - cd /home/cc/EnvGym/data/Silhouette/qemu_imgs
+       - wget https://zenodo.org/records/14550794/files/silhouette_guest_vm.qcow2
+   11. Install remaining dependencies:
+       - cd /home/cc/EnvGym/data/Silhouette/Silhouette
+       - bash ./install_dep.sh
+   12. Build instrumentation tools:
+       - cd /home/cc/EnvGym/data/Silhouette/Silhouette/trace/build-llvm15
+       - make
+   13. Configure memcached:
+       - sudo systemctl stop memcached
+       - sudo systemctl disable memcached
+   14. Configure SSH keys:
+       - cd /home/cc/EnvGym/data/Silhouette/Silhouette/codebase/scripts/fs_conf/sshkey
+       - chmod 600 fast25_ae_vm
+       - chmod 644 fast25_ae_vm.pub
+   15-34. (All remaining steps with paths adjusted to /home/cc/EnvGym/data/Silhouette/)
+   
+Key Adjustments:
+1. All paths updated to use /home/cc/EnvGym/data/Silhouette/ as base directory
+2. Removed GPU-specific requirements
+3. Ensured all components are amd64 compatible
+4. Kept original functionality while adjusting for the given hardware environment
+5. Maintained all core testing requirements with adjusted paths
+6. Kept PMFS/NVDIMM support but removed WineFS/NOVA-fortis references as they weren't in the base hardware spec

@@ -1,0 +1,43 @@
+```
+Adjusted Environment Configuration Plan:
+
+1. Base System:
+   - Use Debian 12 (bookworm) as base image (optimal for x86_64 architecture)
+   - No GPU-specific components needed (confirmed no NVIDIA/CUDA)
+   - Standard Linux toolchain (gcc, make, etc.)
+
+2. Working Directory Structure:
+   - Maintain path: /home/cc/EnvGym/data/alibaba_fastjson2
+   - Ensure proper permissions for the directory
+   - Verify sufficient disk space (minimum 5GB recommended)
+
+3. Development Tools:
+   - JDK 11 (LTS version recommended for stability)
+   - Maven 3.8.x for Java dependency management
+   - Git for version control
+
+4. Container Configuration:
+   - Dockerfile to use multi-stage builds (BuildKit supported)
+   - Standard x86_64 platform target (--platform=linux/amd64)
+   - Memory limits: Minimum 4GB RAM recommended for Java builds
+   - CPU cores: Minimum 2 cores recommended
+
+5. Path Validation:
+   - Verify all paths in configuration are absolute and correct
+   - Ensure Docker build context includes all necessary files
+
+6. Monitoring:
+   - Add disk space monitoring in container
+   - Include memory usage checks for Java processes
+
+7. Compatibility Notes:
+   - All components verified for x86_64 architecture
+   - No ARM-specific optimizations needed
+   - No GPU acceleration required
+   - Docker version compatibility confirmed (v28.1.1)
+
+8. Additional Recommendations:
+   - Consider adding health checks in Docker configuration
+   - Include cleanup steps in Dockerfile to minimize image size
+   - Verify network access for dependency downloads
+```

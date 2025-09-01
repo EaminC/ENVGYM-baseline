@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250828_121859",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756383538",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 1.52kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/debian:bookworm\n#2 DONE 0.1s\n\n#3 [internal] load .dockerignore\n#3 transferring context:\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/15] FROM docker.io/library/debian:bookworm@sha256:731dd1380d6a8d170a695dbeb17fe0eade0e1c29f654cf0a3a07f372191c3f4b\n#4 DONE 0.0s\n\n#5 [ 3/15] RUN wget https://sh.rustup.rs -O rustup-init.sh &&     chmod +x rustup-init.sh &&     ./rustup-init.sh -y --default-toolchain stable &&     rm rustup-init.sh &&     chmod -R a+w /usr/local/cargo\n#5 CACHED\n\n#6 [ 2/15] RUN apt-get update && apt-get install -y     wget     git     openssl     libssl-dev     perl     sqlite3     libsqlite3-dev     clang     dpkg     bash     coreutils     less     build-essential     pkg-config     cmake     && rm -rf /var/lib/apt/lists/*\n#6 CACHED\n\n#7 [ 4/15] RUN . /usr/local/cargo/env &&     rustc --version &&     cargo --version\n#7 CACHED\n\n#8 [internal] load build context\n#8 transferring context: 620.15kB 0.1s done\n#8 DONE 0.1s\n\n#9 [ 5/15] RUN . /usr/local/cargo/env &&     cargo install --version 0.106.2 nushell\n#9 0.292     Updating crates.io index\n#9 0.387 error: could not find `nushell` in registry `crates-io` with version `=0.106.2`\n#9 ERROR: process \"/bin/sh -c . $CARGO_HOME/env &&     cargo install --version 0.106.2 nushell\" did not complete successfully: exit code: 101\n------\n > [ 5/15] RUN . /usr/local/cargo/env &&     cargo install --version 0.106.2 nushell:\n0.292     Updating crates.io index\n0.387 error: could not find `nushell` in registry `crates-io` with version `=0.106.2`\n------\nenvgym.dockerfile:34\n--------------------\n  33 |     \n  34 | >>> RUN . $CARGO_HOME/env && \\\n  35 | >>>     cargo install --version 0.106.2 nushell\n  36 |     \n--------------------\nERROR: failed to solve: process \"/bin/sh -c . $CARGO_HOME/env &&     cargo install --version 0.106.2 nushell\" did not complete successfully: exit code: 101\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

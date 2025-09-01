@@ -1,0 +1,680 @@
+=== Iteration 1 - [2025-08-27 22:51:58] ===
+PLAN:
+  === ADJUSTED ENVIRONMENT SETUP PLAN ===
+  1. DOWNLOADS NEEDED:
+     - Python 3.7.x
+     - pip3 package manager
+     - PyTorch 1.2.0 (CPU-only version)
+     - torchvision 0.4.0 (CPU-only version)
+     - matplotlib 3.1.1
+     - numpy 1.17.2
+     - pandas 0.25.1
+     - Pillow 6.2.0
+     - scipy 1.3.1
+     - seaborn 0.9.0
+     - tensorboardX 1.8
+     - tqdm 4.36.1
+     - git (for repository cloning)
+  2. FILES TO CREATE:
+     - requirements.txt (verified with provided content)
+     - config.yaml (for storing default hyperparameters)
+       - Contents should mirror command line args from README
+     - test_config.py (for environment verification)
+       - Should verify Python version, PyTorch availability (CPU-only)
+       - Add checks for pandas, seaborn, and tensorboardX
+  3. NECESSARY TEST CASES IN THE CODEBASE:
+     - Test model initialization for all architecture types (CPU-only)
+     - Test data loading for all dataset options
+     - Test pruning functionality (lt and reinit types) with CPU
+     - Test training loop execution (CPU)
+     - Test validation frequency handling
+     - Test plot generation functionality
+     - Test custom model/dataset integration
+     - Test tensorboardX logging
+     - Test pandas data handling
+     - Test seaborn visualization integration
+  4. COMPLETE TODO LIST:
+     1. Install Python 3.7.x
+        - Verify with: python --version
+     2. Install pip3
+        - Verify with: pip3 --version
+     3. Clone repository
+        - git clone <repo_url>
+     4. Navigate to project directory
+        - cd Lottery-Ticket-Hypothesis-in-Pytorch
+     5. Install requirements with CPU-only flags
+        - pip3 install -r requirements.txt --no-cache-dir
+        - For PyTorch: pip3 install torch==1.2.0+cpu torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+        - Verify with: pip3 list
+     6. Remove GPU verification steps (no CUDA needed)
+     7. Verify PyTorch CPU installation
+        - Run: python -c "import torch; print(torch.device('cpu'))"
+     8. Verify additional package installations
+        - Run: python -c "import pandas, seaborn, tensorboardX; print('All imports successful')"
+     9. Run basic test case with CPU
+        - python3 main.py --prune_type=lt --arch_type=fc1 --dataset=mnist --no-cuda
+     10. Verify output files created
+         - Check /saves and /plots directories
+         - Verify tensorboard logs generation
+     11. Add custom models/datasets (if needed)
+         - Follow README instructions for new architectures
+         - Verify integration with test runs
+     12. Set up test suite
+         - Create test files for core functionality
+         - Add tests for CPU-specific operations
+         - Run with: python -m pytest
+  Key Adjustments Made:
+  - Removed all CUDA/cuDNN related components
+  - Specified CPU-only versions for PyTorch/torchvision
+  - Added --no-cuda flag for test runs
+  - Updated verification steps for CPU-only environment
+  - Added --no-cache-dir flag for pip install to reduce disk usage
+  - Adjusted PyTorch installation command for CPU-only version
+  - Removed GPU-specific test cases
+  - Updated path references to match /home/cc/EnvGym/data/Lottory
+NEXT:
+  current progress
+  - Dockerfile created with Python 3.7 base image
+  - Git installed and repository cloned
+  - Requirements installed including CPU-only PyTorch
+  - Directories /saves and /plots created
+  - Build failed due to missing test_config.py file during COPY operation
+  next step
+  - Ensure test_config.py exists in build context before COPY operation
+  - Verify file paths in COPY commands
+  - Add file existence checks before COPY operations
+  - Consider using ADD instead of COPY for local files
+  - Rebuild with corrected file references
+LOG:
+  === Docker Execution Log - 20250827_225155 ===
+  Dockerfile: envgym/envgym.dockerfile
+  Image Name: envgym_test_1756335114
+  === Build Log ===
+  Build Status: Failed
+  Build Output:
+  Build Error:
+  #0 building with "default" instance using docker driver
+  #1 [internal] load build definition from envgym.dockerfile
+  #1 transferring dockerfile: 737B done
+  #1 DONE 0.0s
+  #2 [internal] load metadata for docker.io/library/python:3.7-slim
+  #2 DONE 0.2s
+  #3 [internal] load .dockerignore
+  #3 transferring context: 2B done
+  #3 DONE 0.0s
+  #4 [ 1/10] FROM docker.io/library/python:3.7-slim@sha256:b53f496ca43e5af6994f8e316cf03af31050bf7944e0e4a308ad86c001cf028b
+  #4 CACHED
+  #5 [internal] load build context
+  #5 transferring context: 311B done
+  #5 DONE 0.0s
+  #6 [ 3/10] WORKDIR /Lottery-Ticket-Hypothesis-in-Pytorch
+  #6 CACHED
+  #7 [ 6/10] RUN pip install --no-cache-dir -r requirements.txt &&     pip install --no-cache-dir torch==1.2.0+cpu torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+  #7 CACHED
+  #8 [ 7/10] RUN mkdir -p /saves /plots
+  #8 CACHED
+  #9 [ 4/10] RUN git clone https://github.com/rahulvigneswaran/Lottery-Ticket-Hypothesis-in-Pytorch.git ./
+  #9 CACHED
+  #10 [ 5/10] COPY requirements.txt ./
+  #10 CACHED
+  #11 [ 8/10] COPY config.yaml ./
+  #11 ERROR: failed to calculate checksum of ref c15302f4-694d-41bc-81e2-a6ac2297ecef::q1tyiu6osutqy4onlbamcz9sp: "/config.yaml": not found
+  #12 [ 9/10] COPY test_config.py ./
+  #12 ERROR: failed to calculate checksum of ref c15302f4-694d-41bc-81e2-a6ac2297ecef::q1tyiu6osutqy4onlbamcz9sp: "/test_config.py": not found
+  #13 [ 2/10] RUN apt-get update && apt-get install -y git &&     rm -rf /var/lib/apt/lists/*
+  #13 0.348 runc run failed: container process is already dead
+  #13 CANCELED
+  ------
+   > [ 8/10] COPY config.yaml ./:
+  ------
+  ------
+   > [ 9/10] COPY test_config.py ./:
+  ------
+  envgym.dockerfile:16
+  --------------------
+    14 |     
+    15 |     COPY config.yaml ./
+    16 | >>> COPY test_config.py ./
+    17 |     
+    18 |     RUN python -c "import torch; print(torch.device('cpu'))" && \
+  --------------------
+  ERROR: failed to solve: failed to compute cache key: failed to calculate checksum of ref c15302f4-694d-41bc-81e2-a6ac2297ecef::q1tyiu6osutqy4onlbamcz9sp: "/test_config.py": not found
+  === Runtime Log ===  
+  Runtime Status: Failed
+  Runtime Output:
+  Runtime Error:
+  === Execution End ===
+DOCKERFILE:
+  FROM python:3.7-slim
+  RUN apt-get update && apt-get install -y git && \
+      rm -rf /var/lib/apt/lists/*
+  WORKDIR /Lottery-Ticket-Hypothesis-in-Pytorch
+  RUN git clone https://github.com/rahulvigneswaran/Lottery-Ticket-Hypothesis-in-Pytorch.git ./
+  COPY requirements.txt ./
+  RUN pip install --no-cache-dir -r requirements.txt && \
+      pip install --no-cache-dir torch==1.2.0+cpu torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+  RUN mkdir -p /saves /plots
+  COPY config.yaml ./
+  COPY test_config.py ./
+  RUN python -c "import torch; print(torch.device('cpu'))" && \
+      python -c "import pandas, seaborn, tensorboardX; print('All imports successful')"
+  CMD ["/bin/bash"]
+--- End of Iteration 1 ---
+
+=== Iteration 2 - [2025-08-27 22:54:16] ===
+PLAN:
+  === ADJUSTED ENVIRONMENT SETUP PLAN ===
+  1. DOWNLOADS NEEDED:
+     - Python 3.7.x
+     - pip3 package manager
+     - PyTorch 1.2.0 (CPU-only version)
+     - torchvision 0.4.0 (CPU-only version)
+     - matplotlib 3.1.1
+     - numpy 1.17.2
+     - pandas 0.25.1
+     - Pillow 6.2.0
+     - scipy 1.3.1
+     - seaborn 0.9.0
+     - tensorboardX 1.8
+     - tqdm 4.36.1
+     - git (for repository cloning)
+  2. FILES TO CREATE:
+     - requirements.txt (verified with provided content)
+     - config.yaml (for storing default hyperparameters)
+       - Contents should mirror command line args from README
+     - test_config.py (for environment verification)
+       - Should verify Python version, PyTorch availability (CPU-only)
+       - Add checks for pandas, seaborn, and tensorboardX
+  3. NECESSARY TEST CASES IN THE CODEBASE:
+     - Test model initialization for all architecture types (CPU-only)
+     - Test data loading for all dataset options
+     - Test pruning functionality (lt and reinit types) with CPU
+     - Test training loop execution (CPU)
+     - Test validation frequency handling
+     - Test plot generation functionality
+     - Test custom model/dataset integration
+     - Test tensorboardX logging
+     - Test pandas data handling
+     - Test seaborn visualization integration
+  4. COMPLETE TODO LIST:
+     1. Install Python 3.7.x
+        - Verify with: python --version
+     2. Install pip3
+        - Verify with: pip3 --version
+     3. Clone repository
+        - git clone <repo_url>
+     4. Navigate to project directory
+        - cd Lottery-Ticket-Hypothesis-in-Pytorch
+     5. Install requirements with CPU-only flags
+        - pip3 install -r requirements.txt --no-cache-dir
+        - For PyTorch: pip3 install torch==1.2.0+cpu torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+        - Verify with: pip3 list
+     6. Remove GPU verification steps (no CUDA needed)
+     7. Verify PyTorch CPU installation
+        - Run: python -c "import torch; print(torch.device('cpu'))"
+     8. Verify additional package installations
+        - Run: python -c "import pandas, seaborn, tensorboardX; print('All imports successful')"
+     9. Run basic test case with CPU
+        - python3 main.py --prune_type=lt --arch_type=fc1 --dataset=mnist --no-cuda
+     10. Verify output files created
+         - Check /saves and /plots directories
+         - Verify tensorboard logs generation
+     11. Add custom models/datasets (if needed)
+         - Follow README instructions for new architectures
+         - Verify integration with test runs
+     12. Set up test suite
+         - Create test files for core functionality
+         - Add tests for CPU-specific operations
+         - Run with: python -m pytest
+  Key Adjustments Made:
+  - Removed all CUDA/cuDNN related components
+  - Specified CPU-only versions for PyTorch/torchvision
+  - Added --no-cuda flag for test runs
+  - Updated verification steps for CPU-only environment
+  - Added --no-cache-dir flag for pip install to reduce disk usage
+  - Adjusted PyTorch installation command for CPU-only version
+  - Removed GPU-specific test cases
+  - Updated path references to match /home/cc/EnvGym/data/Lottory
+NEXT:
+  current progress
+  - Docker image built successfully with Python 3.7-slim base
+  - Required packages installed including CPU-only PyTorch
+  - Repository cloned and directory structure set up
+  - Basic import verifications (PyTorch, pandas, seaborn, tensorboardX) completed
+  - Directories for saves and plots created
+  next step
+  - Add config.yaml creation step
+  - Implement test_config.py for environment verification
+  - Add test suite setup commands
+  - Include test execution commands in CMD
+  - Verify file structure matches adjusted plan
+  - Add cleanup steps for build optimization
+STATUS:
+  SUCCESS
+LOG:
+  === Docker Execution Log - 20250827_225412 ===
+  Dockerfile: envgym/envgym.dockerfile
+  Image Name: envgym_test_1756335126
+  === Build Log ===
+  Build Status: Success
+  Build Output:
+  Build Error:
+  #0 building with "default" instance using docker driver
+  #1 [internal] load build definition from envgym.dockerfile
+  #1 transferring dockerfile: 789B done
+  #1 DONE 0.0s
+  #2 [internal] load metadata for docker.io/library/python:3.7-slim
+  #2 DONE 0.1s
+  #3 [internal] load .dockerignore
+  #3 transferring context: 2B done
+  #3 DONE 0.0s
+  #4 [ 1/13] FROM docker.io/library/python:3.7-slim@sha256:b53f496ca43e5af6994f8e316cf03af31050bf7944e0e4a308ad86c001cf028b
+  #4 CACHED
+  #5 [internal] load build context
+  #5 transferring context: 92.89kB done
+  #5 DONE 0.0s
+  #6 [ 2/13] RUN apt-get update && apt-get install -y git &&     rm -rf /var/lib/apt/lists/*
+  #6 0.259 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+  #6 0.276 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+  #6 0.276 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+  #6 0.375 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8793 kB]
+  #6 0.457 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+  #6 0.544 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [277 kB]
+  #6 1.310 Fetched 9331 kB in 1s (8764 kB/s)
+  #6 1.310 Reading package lists...
+  #6 1.729 Reading package lists...
+  #6 2.131 Building dependency tree...
+  #6 2.209 Reading state information...
+  #6 2.307 The following additional packages will be installed:
+  #6 2.307   git-man less libbrotli1 libbsd0 libcbor0.8 libcurl3-gnutls libedit2
+  #6 2.307   liberror-perl libfido2-1 libgdbm-compat4 libldap-2.5-0 libldap-common
+  #6 2.307   libnghttp2-14 libperl5.36 libpsl5 librtmp1 libsasl2-2 libsasl2-modules
+  #6 2.307   libsasl2-modules-db libssh2-1 libssl3 libx11-6 libx11-data libxau6 libxcb1
+  #6 2.307   libxdmcp6 libxext6 libxmuu1 openssh-client openssl patch perl perl-base
+  #6 2.307   perl-modules-5.36 publicsuffix xauth
+  #6 2.308 Suggested packages:
+  #6 2.308   gettext-base git-daemon-run | git-daemon-sysvinit git-doc git-email git-gui
+  #6 2.308   gitk gitweb git-cvs git-mediawiki git-svn sensible-utils
+  #6 2.308   libsasl2-modules-gssapi-mit | libsasl2-modules-gssapi-heimdal
+  #6 2.308   libsasl2-modules-ldap libsasl2-modules-otp libsasl2-modules-sql keychain
+  #6 2.308   libpam-ssh monkeysphere ssh-askpass ed diffutils-doc perl-doc
+  #6 2.308   libterm-readline-gnu-perl | libterm-readline-perl-perl make
+  #6 2.308   libtap-harness-archive-perl
+  #6 2.501 The following NEW packages will be installed:
+  #6 2.501   git git-man less libbrotli1 libbsd0 libcbor0.8 libcurl3-gnutls libedit2
+  #6 2.501   liberror-perl libfido2-1 libgdbm-compat4 libldap-2.5-0 libldap-common
+  #6 2.501   libnghttp2-14 libperl5.36 libpsl5 librtmp1 libsasl2-2 libsasl2-modules
+  #6 2.501   libsasl2-modules-db libssh2-1 libx11-6 libx11-data libxau6 libxcb1 libxdmcp6
+  #6 2.501   libxext6 libxmuu1 openssh-client patch perl perl-modules-5.36 publicsuffix
+  #6 2.501   xauth
+  #6 2.502 The following packages will be upgraded:
+  #6 2.502   libssl3 openssl perl-base
+  #6 2.553 3 upgraded, 34 newly installed, 0 to remove and 40 not upgraded.
+  #6 2.553 Need to get 26.2 MB of archives.
+  #6 2.553 After this operation, 112 MB of additional disk space will be used.
+  #6 2.553 Get:1 http://deb.debian.org/debian bookworm/main amd64 perl-base amd64 5.36.0-7+deb12u2 [1609 kB]
+  #6 2.582 Get:2 http://deb.debian.org/debian bookworm/main amd64 perl-modules-5.36 all 5.36.0-7+deb12u2 [2815 kB]
+  #6 2.658 Get:3 http://deb.debian.org/debian bookworm/main amd64 libgdbm-compat4 amd64 1.23-3 [48.2 kB]
+  #6 2.660 Get:4 http://deb.debian.org/debian bookworm/main amd64 libperl5.36 amd64 5.36.0-7+deb12u2 [4207 kB]
+  #6 2.978 Get:5 http://deb.debian.org/debian bookworm/main amd64 perl amd64 5.36.0-7+deb12u2 [239 kB]
+  #6 2.992 Get:6 http://deb.debian.org/debian bookworm/main amd64 less amd64 590-2.1~deb12u2 [132 kB]
+  #6 3.001 Get:7 http://deb.debian.org/debian bookworm/main amd64 libbsd0 amd64 0.11.7-2 [117 kB]
+  #6 3.009 Get:8 http://deb.debian.org/debian bookworm/main amd64 libedit2 amd64 3.1-20221030-2 [93.0 kB]
+  #6 3.014 Get:9 http://deb.debian.org/debian bookworm/main amd64 libcbor0.8 amd64 0.8.0-2+b1 [27.4 kB]
+  #6 3.015 Get:10 http://deb.debian.org/debian bookworm-updates/main amd64 libssl3 amd64 3.0.17-1~deb12u2 [2027 kB]
+  #6 3.160 Get:11 http://deb.debian.org/debian bookworm/main amd64 libfido2-1 amd64 1.12.0-2+b1 [77.2 kB]
+  #6 3.168 Get:12 http://deb.debian.org/debian bookworm-updates/main amd64 openssh-client amd64 1:9.2p1-2+deb12u7 [992 kB]
+  #6 3.286 Get:13 http://deb.debian.org/debian bookworm/main amd64 libbrotli1 amd64 1.0.9-2+b6 [275 kB]
+  #6 3.308 Get:14 http://deb.debian.org/debian bookworm/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg-10 [20.3 kB]
+  #6 3.308 Get:15 http://deb.debian.org/debian bookworm/main amd64 libsasl2-2 amd64 2.1.28+dfsg-10 [59.7 kB]
+  #6 3.313 Get:16 http://deb.debian.org/debian bookworm/main amd64 libldap-2.5-0 amd64 2.5.13+dfsg-5 [183 kB]
+  #6 3.327 Get:17 http://deb.debian.org/debian bookworm/main amd64 libnghttp2-14 amd64 1.52.0-1+deb12u2 [73.0 kB]
+  #6 3.333 Get:18 http://deb.debian.org/debian bookworm/main amd64 libpsl5 amd64 0.21.2-1 [58.7 kB]
+  #6 3.336 Get:19 http://deb.debian.org/debian bookworm/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2+b2 [60.8 kB]
+  #6 3.339 Get:20 http://deb.debian.org/debian bookworm/main amd64 libssh2-1 amd64 1.10.0-3+b1 [179 kB]
+  #6 3.350 Get:21 http://deb.debian.org/debian bookworm/main amd64 libcurl3-gnutls amd64 7.88.1-10+deb12u12 [386 kB]
+  #6 3.373 Get:22 http://deb.debian.org/debian bookworm/main amd64 liberror-perl all 0.17029-2 [29.0 kB]
+  #6 3.375 Get:23 http://deb.debian.org/debian bookworm/main amd64 git-man all 1:2.39.5-0+deb12u2 [2053 kB]
+  #6 3.490 Get:24 http://deb.debian.org/debian bookworm/main amd64 git amd64 1:2.39.5-0+deb12u2 [7260 kB]
+  #6 4.026 Get:25 http://deb.debian.org/debian bookworm/main amd64 libldap-common all 2.5.13+dfsg-5 [29.3 kB]
+  #6 4.027 Get:26 http://deb.debian.org/debian bookworm/main amd64 libsasl2-modules amd64 2.1.28+dfsg-10 [66.6 kB]
+  #6 4.030 Get:27 http://deb.debian.org/debian bookworm/main amd64 libxau6 amd64 1:1.0.9-1 [19.7 kB]
+  #6 4.031 Get:28 http://deb.debian.org/debian bookworm/main amd64 libxdmcp6 amd64 1:1.1.2-3 [26.3 kB]
+  #6 4.033 Get:29 http://deb.debian.org/debian bookworm/main amd64 libxcb1 amd64 1.15-1 [144 kB]
+  #6 4.040 Get:30 http://deb.debian.org/debian bookworm/main amd64 libx11-data all 2:1.8.4-2+deb12u2 [292 kB]
+  #6 4.055 Get:31 http://deb.debian.org/debian bookworm/main amd64 libx11-6 amd64 2:1.8.4-2+deb12u2 [760 kB]
+  #6 4.098 Get:32 http://deb.debian.org/debian bookworm/main amd64 libxext6 amd64 2:1.3.4-1+b1 [52.9 kB]
+  #6 4.101 Get:33 http://deb.debian.org/debian bookworm/main amd64 libxmuu1 amd64 2:1.1.3-3 [23.9 kB]
+  #6 4.101 Get:34 http://deb.debian.org/debian bookworm-updates/main amd64 openssl amd64 3.0.17-1~deb12u2 [1430 kB]
+  #6 4.183 Get:35 http://deb.debian.org/debian bookworm/main amd64 patch amd64 2.7.6-7 [128 kB]
+  #6 4.191 Get:36 http://deb.debian.org/debian bookworm/main amd64 publicsuffix all 20230209.2326-1 [126 kB]
+  #6 4.201 Get:37 http://deb.debian.org/debian bookworm/main amd64 xauth amd64 1:1.1.2-1 [36.0 kB]
+  #6 4.303 debconf: delaying package configuration, since apt-utils is not installed
+  #6 4.331 Fetched 26.2 MB in 2s (15.4 MB/s)
+  #6 4.356 (Reading database ... 
+  (Reading database ... 5%
+  (Reading database ... 10%
+  (Reading database ... 15%
+  (Reading database ... 20%
+  (Reading database ... 25%
+  (Reading database ... 30%
+  (Reading database ... 35%
+  (Reading database ... 40%
+  (Reading database ... 45%
+  (Reading database ... 50%
+  (Reading database ... 55%
+  (Reading database ... 60%
+  (Reading database ... 65%
+  (Reading database ... 70%
+  (Reading database ... 75%
+  (Reading database ... 80%
+  (Reading database ... 85%
+  (Reading database ... 90%
+  (Reading database ... 95%
+  (Reading database ... 100%
+  (Reading database ... 6705 files and directories currently installed.)
+  #6 4.361 Preparing to unpack .../perl-base_5.36.0-7+deb12u2_amd64.deb ...
+  #6 4.382 Unpacking perl-base (5.36.0-7+deb12u2) over (5.36.0-7) ...
+  #6 4.818 Setting up perl-base (5.36.0-7+deb12u2) ...
+  #6 4.857 Selecting previously unselected package perl-modules-5.36.
+  #6 4.857 (Reading database ... 
+  (Reading database ... 5%
+  (Reading database ... 10%
+  (Reading database ... 15%
+  (Reading database ... 20%
+  (Reading database ... 25%
+  (Reading database ... 30%
+  (Reading database ... 35%
+  (Reading database ... 40%
+  (Reading database ... 45%
+  (Reading database ... 50%
+  (Reading database ... 55%
+  (Reading database ... 60%
+  (Reading database ... 65%
+  (Reading database ... 70%
+  (Reading database ... 75%
+  (Reading database ... 80%
+  (Reading database ... 85%
+  (Reading database ... 90%
+  (Reading database ... 95%
+  (Reading database ... 100%
+  (Reading database ... 6706 files and directories currently installed.)
+  #6 4.863 Preparing to unpack .../00-perl-modules-5.36_5.36.0-7+deb12u2_all.deb ...
+  #6 4.864 Unpacking perl-modules-5.36 (5.36.0-7+deb12u2) ...
+  #6 5.108 Selecting previously unselected package libgdbm-compat4:amd64.
+  #6 5.109 Preparing to unpack .../01-libgdbm-compat4_1.23-3_amd64.deb ...
+  #6 5.111 Unpacking libgdbm-compat4:amd64 (1.23-3) ...
+  #6 5.146 Selecting previously unselected package libperl5.36:amd64.
+  #6 5.148 Preparing to unpack .../02-libperl5.36_5.36.0-7+deb12u2_amd64.deb ...
+  #6 5.149 Unpacking libperl5.36:amd64 (5.36.0-7+deb12u2) ...
+  #6 5.446 Selecting previously unselected package perl.
+  #6 5.448 Preparing to unpack .../03-perl_5.36.0-7+deb12u2_amd64.deb ...
+  #6 5.457 Unpacking perl (5.36.0-7+deb12u2) ...
+  #6 5.503 Selecting previously unselected package less.
+  #6 5.504 Preparing to unpack .../04-less_590-2.1~deb12u2_amd64.deb ...
+  #6 5.507 Unpacking less (590-2.1~deb12u2) ...
+  #6 5.549 Selecting previously unselected package libbsd0:amd64.
+  #6 5.550 Preparing to unpack .../05-libbsd0_0.11.7-2_amd64.deb ...
+  #6 5.550 Unpacking libbsd0:amd64 (0.11.7-2) ...
+  #6 5.588 Selecting previously unselected package libedit2:amd64.
+  #6 5.590 Preparing to unpack .../06-libedit2_3.1-20221030-2_amd64.deb ...
+  #6 5.590 Unpacking libedit2:amd64 (3.1-20221030-2) ...
+  #6 5.628 Selecting previously unselected package libcbor0.8:amd64.
+  #6 5.628 Preparing to unpack .../07-libcbor0.8_0.8.0-2+b1_amd64.deb ...
+  #6 5.629 Unpacking libcbor0.8:amd64 (0.8.0-2+b1) ...
+  #6 5.662 Preparing to unpack .../08-libssl3_3.0.17-1~deb12u2_amd64.deb ...
+  #6 5.665 Unpacking libssl3:amd64 (3.0.17-1~deb12u2) over (3.0.9-1) ...
+  #6 5.824 Selecting previously unselected package libfido2-1:amd64.
+  #6 5.824 Preparing to unpack .../09-libfido2-1_1.12.0-2+b1_amd64.deb ...
+  #6 5.825 Unpacking libfido2-1:amd64 (1.12.0-2+b1) ...
+  #6 5.861 Selecting previously unselected package openssh-client.
+  #6 5.863 Preparing to unpack .../10-openssh-client_1%3a9.2p1-2+deb12u7_amd64.deb ...
+  #6 5.873 Unpacking openssh-client (1:9.2p1-2+deb12u7) ...
+  #6 5.969 Selecting previously unselected package libbrotli1:amd64.
+  #6 5.970 Preparing to unpack .../11-libbrotli1_1.0.9-2+b6_amd64.deb ...
+  #6 5.971 Unpacking libbrotli1:amd64 (1.0.9-2+b6) ...
+  #6 6.019 Selecting previously unselected package libsasl2-modules-db:amd64.
+  #6 6.021 Preparing to unpack .../12-libsasl2-modules-db_2.1.28+dfsg-10_amd64.deb ...
+  #6 6.022 Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg-10) ...
+  #6 6.046 Selecting previously unselected package libsasl2-2:amd64.
+  #6 6.047 Preparing to unpack .../13-libsasl2-2_2.1.28+dfsg-10_amd64.deb ...
+  #6 6.048 Unpacking libsasl2-2:amd64 (2.1.28+dfsg-10) ...
+  #6 6.080 Selecting previously unselected package libldap-2.5-0:amd64.
+  #6 6.081 Preparing to unpack .../14-libldap-2.5-0_2.5.13+dfsg-5_amd64.deb ...
+  #6 6.081 Unpacking libldap-2.5-0:amd64 (2.5.13+dfsg-5) ...
+  #6 6.124 Selecting previously unselected package libnghttp2-14:amd64.
+  #6 6.125 Preparing to unpack .../15-libnghttp2-14_1.52.0-1+deb12u2_amd64.deb ...
+  #6 6.126 Unpacking libnghttp2-14:amd64 (1.52.0-1+deb12u2) ...
+  #6 6.157 Selecting previously unselected package libpsl5:amd64.
+  #6 6.159 Preparing to unpack .../16-libpsl5_0.21.2-1_amd64.deb ...
+  #6 6.159 Unpacking libpsl5:amd64 (0.21.2-1) ...
+  #6 6.192 Selecting previously unselected package librtmp1:amd64.
+  #6 6.193 Preparing to unpack .../17-librtmp1_2.4+20151223.gitfa8646d.1-2+b2_amd64.deb ...
+  #6 6.194 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+  #6 6.225 Selecting previously unselected package libssh2-1:amd64.
+  #6 6.227 Preparing to unpack .../18-libssh2-1_1.10.0-3+b1_amd64.deb ...
+  #6 6.227 Unpacking libssh2-1:amd64 (1.10.0-3+b1) ...
+  #6 6.265 Selecting previously unselected package libcurl3-gnutls:amd64.
+  #6 6.267 Preparing to unpack .../19-libcurl3-gnutls_7.88.1-10+deb12u12_amd64.deb ...
+  #6 6.268 Unpacking libcurl3-gnutls:amd64 (7.88.1-10+deb12u12) ...
+  #6 6.317 Selecting previously unselected package liberror-perl.
+  #6 6.318 Preparing to unpack .../20-liberror-perl_0.17029-2_all.deb ...
+  #6 6.319 Unpacking liberror-perl (0.17029-2) ...
+  #6 6.344 Selecting previously unselected package git-man.
+  #6 6.345 Preparing to unpack .../21-git-man_1%3a2.39.5-0+deb12u2_all.deb ...
+  #6 6.346 Unpacking git-man (1:2.39.5-0+deb12u2) ...
+  #6 6.452 Selecting previously unselected package git.
+  #6 6.454 Preparing to unpack .../22-git_1%3a2.39.5-0+deb12u2_amd64.deb ...
+  #6 6.464 Unpacking git (1:2.39.5-0+deb12u2) ...
+  #6 6.761 Selecting previously unselected package libldap-common.
+  #6 6.762 Preparing to unpack .../23-libldap-common_2.5.13+dfsg-5_all.deb ...
+  #6 6.763 Unpacking libldap-common (2.5.13+dfsg-5) ...
+  #6 6.791 Selecting previously unselected package libsasl2-modules:amd64.
+  #6 6.793 Preparing to unpack .../24-libsasl2-modules_2.1.28+dfsg-10_amd64.deb ...
+  #6 6.803 Unpacking libsasl2-modules:amd64 (2.1.28+dfsg-10) ...
+  #6 6.836 Selecting previously unselected package libxau6:amd64.
+  #6 6.838 Preparing to unpack .../25-libxau6_1%3a1.0.9-1_amd64.deb ...
+  #6 6.839 Unpacking libxau6:amd64 (1:1.0.9-1) ...
+  #6 6.865 Selecting previously unselected package libxdmcp6:amd64.
+  #6 6.866 Preparing to unpack .../26-libxdmcp6_1%3a1.1.2-3_amd64.deb ...
+  #6 6.866 Unpacking libxdmcp6:amd64 (1:1.1.2-3) ...
+  #6 6.891 Selecting previously unselected package libxcb1:amd64.
+  #6 6.892 Preparing to unpack .../27-libxcb1_1.15-1_amd64.deb ...
+  #6 6.893 Unpacking libxcb1:amd64 (1.15-1) ...
+  #6 6.929 Selecting previously unselected package libx11-data.
+  #6 6.931 Preparing to unpack .../28-libx11-data_2%3a1.8.4-2+deb12u2_all.deb ...
+  #6 6.932 Unpacking libx11-data (2:1.8.4-2+deb12u2) ...
+  #6 6.981 Selecting previously unselected package libx11-6:amd64.
+  #6 6.982 Preparing to unpack .../29-libx11-6_2%3a1.8.4-2+deb12u2_amd64.deb ...
+  #6 6.982 Unpacking libx11-6:amd64 (2:1.8.4-2+deb12u2) ...
+  #6 7.055 Selecting previously unselected package libxext6:amd64.
+  #6 7.057 Preparing to unpack .../30-libxext6_2%3a1.3.4-1+b1_amd64.deb ...
+  #6 7.057 Unpacking libxext6:amd64 (2:1.3.4-1+b1) ...
+  #6 7.090 Selecting previously unselected package libxmuu1:amd64.
+  #6 7.091 Preparing to unpack .../31-libxmuu1_2%3a1.1.3-3_amd64.deb ...
+  #6 7.092 Unpacking libxmuu1:amd64 (2:1.1.3-3) ...
+  #6 7.120 Preparing to unpack .../32-openssl_3.0.17-1~deb12u2_amd64.deb ...
+  #6 7.123 Unpacking openssl (3.0.17-1~deb12u2) over (3.0.9-1) ...
+  #6 7.238 Selecting previously unselected package patch.
+  #6 7.239 Preparing to unpack .../33-patch_2.7.6-7_amd64.deb ...
+  #6 7.240 Unpacking patch (2.7.6-7) ...
+  #6 7.277 Selecting previously unselected package publicsuffix.
+  #6 7.279 Preparing to unpack .../34-publicsuffix_20230209.2326-1_all.deb ...
+  #6 7.279 Unpacking publicsuffix (20230209.2326-1) ...
+  #6 7.310 Selecting previously unselected package xauth.
+  #6 7.312 Preparing to unpack .../35-xauth_1%3a1.1.2-1_amd64.deb ...
+  #6 7.312 Unpacking xauth (1:1.1.2-1) ...
+  #6 7.351 Setting up libxau6:amd64 (1:1.0.9-1) ...
+  #6 7.353 Setting up libpsl5:amd64 (0.21.2-1) ...
+  #6 7.355 Setting up libcbor0.8:amd64 (0.8.0-2+b1) ...
+  #6 7.358 Setting up libbrotli1:amd64 (1.0.9-2+b6) ...
+  #6 7.360 Setting up libssl3:amd64 (3.0.17-1~deb12u2) ...
+  #6 7.363 Setting up libnghttp2-14:amd64 (1.52.0-1+deb12u2) ...
+  #6 7.364 Setting up less (590-2.1~deb12u2) ...
+  #6 7.372 Setting up libldap-common (2.5.13+dfsg-5) ...
+  #6 7.375 Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg-10) ...
+  #6 7.377 Setting up perl-modules-5.36 (5.36.0-7+deb12u2) ...
+  #6 7.378 Setting up libx11-data (2:1.8.4-2+deb12u2) ...
+  #6 7.380 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+  #6 7.382 Setting up patch (2.7.6-7) ...
+  #6 7.384 Setting up libgdbm-compat4:amd64 (1.23-3) ...
+  #6 7.386 Setting up libsasl2-2:amd64 (2.1.28+dfsg-10) ...
+  #6 7.387 Setting up git-man (1:2.39.5-0+deb12u2) ...
+  #6 7.389 Setting up libssh2-1:amd64 (1.10.0-3+b1) ...
+  #6 7.391 Setting up libfido2-1:amd64 (1.12.0-2+b1) ...
+  #6 7.392 Setting up openssl (3.0.17-1~deb12u2) ...
+  #6 7.396 Setting up libbsd0:amd64 (0.11.7-2) ...
+  #6 7.398 Setting up publicsuffix (20230209.2326-1) ...
+  #6 7.400 Setting up libperl5.36:amd64 (5.36.0-7+deb12u2) ...
+  #6 7.401 Setting up libxdmcp6:amd64 (1:1.1.2-3) ...
+  #6 7.403 Setting up libxcb1:amd64 (1.15-1) ...
+  #6 7.405 Setting up libedit2:amd64 (3.1-20221030-2) ...
+  #6 7.408 Setting up libsasl2-modules:amd64 (2.1.28+dfsg-10) ...
+  #6 7.419 Setting up libldap-2.5-0:amd64 (2.5.13+dfsg-5) ...
+  #6 7.422 Setting up perl (5.36.0-7+deb12u2) ...
+  #6 7.438 Setting up libx11-6:amd64 (2:1.8.4-2+deb12u2) ...
+  #6 7.440 Setting up libxmuu1:amd64 (2:1.1.3-3) ...
+  #6 7.442 Setting up openssh-client (1:9.2p1-2+deb12u7) ...
+  #6 7.510 Setting up libxext6:amd64 (2:1.3.4-1+b1) ...
+  #6 7.513 Setting up libcurl3-gnutls:amd64 (7.88.1-10+deb12u12) ...
+  #6 7.515 Setting up liberror-perl (0.17029-2) ...
+  #6 7.518 Setting up git (1:2.39.5-0+deb12u2) ...
+  #6 7.529 Setting up xauth (1:1.1.2-1) ...
+  #6 7.532 Processing triggers for libc-bin (2.36-9+deb12u1) ...
+  #6 DONE 7.9s
+  #7 [ 3/13] WORKDIR /Lottery-Ticket-Hypothesis-in-Pytorch
+  #7 DONE 0.0s
+  #8 [ 4/13] RUN git clone https://github.com/rahulvigneswaran/Lottery-Ticket-Hypothesis-in-Pytorch.git ./
+  #8 0.221 Cloning into '.'...
+  #8 DONE 0.6s
+  #9 [ 5/13] COPY requirements.txt ./
+  #9 DONE 0.0s
+  #10 [ 6/13] RUN pip install --no-cache-dir -r requirements.txt &&     pip install --no-cache-dir torch==1.2.0+cpu torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+  #10 1.478 Collecting cycler==0.10.0
+  #10 1.549   Downloading cycler-0.10.0-py2.py3-none-any.whl (6.5 kB)
+  #10 1.713 Collecting kiwisolver==1.1.0
+  #10 1.718   Downloading kiwisolver-1.1.0-cp37-cp37m-manylinux1_x86_64.whl (90 kB)
+  #10 1.732      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 90.7/90.7 kB 7.3 MB/s eta 0:00:00
+  #10 2.054 Collecting matplotlib==3.1.1
+  #10 2.061   Downloading matplotlib-3.1.1-cp37-cp37m-manylinux1_x86_64.whl (13.1 MB)
+  #10 3.116      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.1/13.1 MB 12.0 MB/s eta 0:00:00
+  #10 3.615 Collecting numpy==1.17.2
+  #10 3.621   Downloading numpy-1.17.2-cp37-cp37m-manylinux1_x86_64.whl (20.3 MB)
+  #10 5.869      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 20.3/20.3 MB 9.4 MB/s eta 0:00:00
+  #10 6.207 Collecting pandas==0.25.1
+  #10 6.214   Downloading pandas-0.25.1-cp37-cp37m-manylinux1_x86_64.whl (10.4 MB)
+  #10 7.222      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.4/10.4 MB 10.3 MB/s eta 0:00:00
+  #10 7.682 Collecting Pillow==6.2.0
+  #10 7.692   Downloading Pillow-6.2.0-cp37-cp37m-manylinux1_x86_64.whl (2.1 MB)
+  #10 7.855      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 13.3 MB/s eta 0:00:00
+  #10 8.308 Collecting protobuf==3.9.2
+  #10 8.316   Downloading protobuf-3.9.2-cp37-cp37m-manylinux1_x86_64.whl (1.2 MB)
+  #10 8.407      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 14.2 MB/s eta 0:00:00
+  #10 8.465 Collecting pyparsing==2.4.2
+  #10 8.471   Downloading pyparsing-2.4.2-py2.py3-none-any.whl (65 kB)
+  #10 8.475      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 65.5/65.5 kB 37.6 MB/s eta 0:00:00
+  #10 8.501 Collecting python-dateutil==2.8.0
+  #10 8.508   Downloading python_dateutil-2.8.0-py2.py3-none-any.whl (226 kB)
+  #10 8.523      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 226.8/226.8 kB 19.4 MB/s eta 0:00:00
+  #10 8.602 Collecting pytz==2019.2
+  #10 8.609   Downloading pytz-2019.2-py2.py3-none-any.whl (508 kB)
+  #10 8.641      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 508.9/508.9 kB 18.5 MB/s eta 0:00:00
+  #10 8.959 Collecting scipy==1.3.1
+  #10 8.967   Downloading scipy-1.3.1-cp37-cp37m-manylinux1_x86_64.whl (25.2 MB)
+  #10 11.61      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 25.2/25.2 MB 10.6 MB/s eta 0:00:00
+  #10 11.70 Collecting seaborn==0.9.0
+  #10 11.71   Downloading seaborn-0.9.0-py3-none-any.whl (208 kB)
+  #10 11.73      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 208.1/208.1 kB 10.1 MB/s eta 0:00:00
+  #10 11.76 Collecting six==1.12.0
+  #10 11.76   Downloading six-1.12.0-py2.py3-none-any.whl (10 kB)
+  #10 11.79 Collecting tensorboardX==1.8
+  #10 11.80   Downloading tensorboardX-1.8-py2.py3-none-any.whl (216 kB)
+  #10 11.83      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 216.3/216.3 kB 7.0 MB/s eta 0:00:00
+  #10 11.97 Collecting torch==1.2.0
+  #10 11.98   Downloading torch-1.2.0-cp37-cp37m-manylinux1_x86_64.whl (748.9 MB)
+  #10 82.99      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 748.9/748.9 MB 10.9 MB/s eta 0:00:00
+  #10 84.80 Collecting torchvision==0.4.0
+  #10 84.81   Downloading torchvision-0.4.0-cp37-cp37m-manylinux1_x86_64.whl (8.8 MB)
+  #10 85.82      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.8/8.8 MB 8.8 MB/s eta 0:00:00
+  #10 85.93 Collecting tqdm==4.36.1
+  #10 85.94   Downloading tqdm-4.36.1-py2.py3-none-any.whl (52 kB)
+  #10 85.94      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 52.8/52.8 kB 14.6 MB/s eta 0:00:00
+  #10 85.95 Requirement already satisfied: setuptools in /usr/local/lib/python3.7/site-packages (from kiwisolver==1.1.0->-r requirements.txt (line 2)) (57.5.0)
+  #10 86.25 Installing collected packages: pytz, tqdm, six, pyparsing, Pillow, numpy, kiwisolver, torch, scipy, python-dateutil, protobuf, cycler, torchvision, tensorboardX, pandas, matplotlib, seaborn
+  #10 101.7 Successfully installed Pillow-6.2.0 cycler-0.10.0 kiwisolver-1.1.0 matplotlib-3.1.1 numpy-1.17.2 pandas-0.25.1 protobuf-3.9.2 pyparsing-2.4.2 python-dateutil-2.8.0 pytz-2019.2 scipy-1.3.1 seaborn-0.9.0 six-1.12.0 tensorboardX-1.8 torch-1.2.0 torchvision-0.4.0 tqdm-4.36.1
+  #10 101.7 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+  #10 101.8 
+  #10 101.8 [notice] A new release of pip is available: 23.0.1 -> 24.0
+  #10 101.8 [notice] To update, run: pip install --upgrade pip
+  #10 102.3 Looking in links: https://download.pytorch.org/whl/torch_stable.html
+  #10 103.3 Collecting torch==1.2.0+cpu
+  #10 103.5   Downloading https://download.pytorch.org/whl/cpu/torch-1.2.0%2Bcpu-cp37-cp37m-manylinux1_x86_64.whl (103.9 MB)
+  #10 104.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 103.9/103.9 MB 145.9 MB/s eta 0:00:00
+  #10 105.2 Collecting torchvision==0.4.0+cpu
+  #10 105.3   Downloading https://download.pytorch.org/whl/cpu/torchvision-0.4.0%2Bcpu-cp37-cp37m-manylinux1_x86_64.whl (12.2 MB)
+  #10 105.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.2/12.2 MB 237.3 MB/s eta 0:00:00
+  #10 105.5 Requirement already satisfied: numpy in /usr/local/lib/python3.7/site-packages (from torch==1.2.0+cpu) (1.17.2)
+  #10 105.5 Requirement already satisfied: six in /usr/local/lib/python3.7/site-packages (from torchvision==0.4.0+cpu) (1.12.0)
+  #10 105.5 Requirement already satisfied: pillow>=4.1.1 in /usr/local/lib/python3.7/site-packages (from torchvision==0.4.0+cpu) (6.2.0)
+  #10 105.6 Installing collected packages: torch, torchvision
+  #10 105.6   Attempting uninstall: torch
+  #10 105.6     Found existing installation: torch 1.2.0
+  #10 105.9     Uninstalling torch-1.2.0:
+  #10 105.9       Successfully uninstalled torch-1.2.0
+  #10 108.8   Attempting uninstall: torchvision
+  #10 108.8     Found existing installation: torchvision 0.4.0
+  #10 108.8     Uninstalling torchvision-0.4.0:
+  #10 108.8       Successfully uninstalled torchvision-0.4.0
+  #10 109.1 Successfully installed torch-1.2.0+cpu torchvision-0.4.0+cpu
+  #10 109.1 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+  #10 109.6 
+  #10 109.6 [notice] A new release of pip is available: 23.0.1 -> 24.0
+  #10 109.6 [notice] To update, run: pip install --upgrade pip
+  #10 DONE 111.2s
+  #11 [ 7/13] RUN mkdir -p /saves /plots
+  #11 DONE 0.3s
+  #12 [ 8/13] COPY main.py ./
+  #12 DONE 0.0s
+  #13 [ 9/13] COPY utils.py ./
+  #13 DONE 0.0s
+  #14 [10/13] COPY combine_plots.py ./
+  #14 DONE 0.0s
+  #15 [11/13] COPY README.md ./
+  #15 DONE 0.0s
+  #16 [12/13] COPY archs ./archs
+  #16 DONE 0.0s
+  #17 [13/13] RUN python -c "import torch; print(torch.device('cpu'))" &&     python -c "import pandas, seaborn, tensorboardX; print('All imports successful')"
+  #17 0.637 cpu
+  #17 1.540 All imports successful
+  #17 DONE 1.7s
+  #18 exporting to image
+  #18 exporting layers
+  #18 exporting layers 3.9s done
+  #18 writing image sha256:e55117f20209b6ddd447b8ac79c134d016ba6dbc90727a933b29f61cff530f54 done
+  #18 naming to docker.io/library/envgym_test_1756335126 done
+  #18 DONE 3.9s
+  === Runtime Log ===  
+  Runtime Status: Success
+  Runtime Output:
+  Runtime Error:
+  === Execution End ===
+DOCKERFILE:
+  FROM python:3.7-slim
+  RUN apt-get update && apt-get install -y git && \
+      rm -rf /var/lib/apt/lists/*
+  WORKDIR /Lottery-Ticket-Hypothesis-in-Pytorch
+  RUN git clone https://github.com/rahulvigneswaran/Lottery-Ticket-Hypothesis-in-Pytorch.git ./
+  COPY requirements.txt ./
+  RUN pip install --no-cache-dir -r requirements.txt && \
+      pip install --no-cache-dir torch==1.2.0+cpu torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+  RUN mkdir -p /saves /plots
+  COPY main.py ./
+  COPY utils.py ./
+  COPY combine_plots.py ./
+  COPY README.md ./
+  COPY archs ./archs
+  RUN python -c "import torch; print(torch.device('cpu'))" && \
+      python -c "import pandas, seaborn, tensorboardX; print('All imports successful')"
+  CMD ["/bin/bash"]
+--- End of Iteration 2 ---
+

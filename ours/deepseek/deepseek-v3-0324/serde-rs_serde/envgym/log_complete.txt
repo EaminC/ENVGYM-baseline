@@ -1,0 +1,116 @@
+=== Docker Execution Log - 20250828_154242 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756395761
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 726B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/rust:1.61.0
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/15] FROM docker.io/library/rust:1.61.0@sha256:e9a087a78f4b632ee8977f70a3a6fb3b6c7746c392e63afc98cab7b6afdc37d7
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 23.20kB 0.0s done
+#5 DONE 0.0s
+
+#6 [ 3/15] WORKDIR /serde-rs_serde
+#6 CACHED
+
+#7 [ 2/15] RUN rustup install 1.56.0 &&     rustup install 1.60.0 &&     rustup install stable &&     rustup install beta &&     rustup install nightly-2025-05-16 &&     rustup component add rust-src &&     rustup component add clippy &&     rustup component add miri --toolchain nightly-2025-05-16
+#7 CACHED
+
+#8 [ 4/15] COPY Cargo.toml .
+#8 CACHED
+
+#9 [ 5/15] COPY serde serde
+#9 DONE 0.0s
+
+#10 [ 6/15] COPY serde_derive serde_derive
+#10 DONE 0.0s
+
+#11 [ 7/15] COPY serde_derive_internals serde_derive_internals
+#11 DONE 0.0s
+
+#12 [ 8/15] COPY test_suite test_suite
+#12 DONE 0.0s
+
+#13 [ 9/15] COPY CONTRIBUTING.md .
+#13 DONE 0.0s
+
+#14 [10/15] COPY crates-io.md .
+#14 DONE 0.0s
+
+#15 [11/15] COPY LICENSE-APACHE .
+#15 DONE 0.0s
+
+#16 [12/15] COPY LICENSE-MIT .
+#16 DONE 0.0s
+
+#17 [13/15] COPY README.md .
+#17 DONE 0.0s
+
+#18 [14/15] RUN cargo fetch
+#18 0.277 error: failed to load manifest for workspace member `/serde-rs_serde/serde`
+#18 0.277 
+#18 0.277 Caused by:
+#18 0.277   failed to load manifest for dependency `serde_derive`
+#18 0.277 
+#18 0.277 Caused by:
+#18 0.277   failed to parse manifest at `/serde-rs_serde/serde_derive/Cargo.toml`
+#18 0.277 
+#18 0.277 Caused by:
+#18 0.277   feature `workspace-inheritance` is required
+#18 0.277 
+#18 0.277   The package requires the Cargo feature called `workspace-inheritance`, but that feature is not stabilized in this version of Cargo (1.61.0 (a028ae4 2022-04-29)).
+#18 0.277   Consider trying a newer version of Cargo (this may require the nightly release).
+#18 0.277   See https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#workspace-inheritance for more information about the status of this feature.
+#18 ERROR: process "/bin/sh -c cargo fetch" did not complete successfully: exit code: 101
+------
+ > [14/15] RUN cargo fetch:
+0.277 
+0.277 Caused by:
+0.277   failed to parse manifest at `/serde-rs_serde/serde_derive/Cargo.toml`
+0.277 
+0.277 Caused by:
+0.277   feature `workspace-inheritance` is required
+0.277 
+0.277   The package requires the Cargo feature called `workspace-inheritance`, but that feature is not stabilized in this version of Cargo (1.61.0 (a028ae4 2022-04-29)).
+0.277   Consider trying a newer version of Cargo (this may require the nightly release).
+0.277   See https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#workspace-inheritance for more information about the status of this feature.
+------
+envgym.dockerfile:25
+--------------------
+  23 |     COPY README.md .
+  24 |     
+  25 | >>> RUN cargo fetch
+  26 |     
+  27 |     RUN cargo build --workspace --all-features --verbose
+--------------------
+ERROR: failed to solve: process "/bin/sh -c cargo fetch" did not complete successfully: exit code: 101
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

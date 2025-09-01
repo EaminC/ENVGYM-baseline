@@ -1,0 +1,42 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.7.x (x86_64 compatible)
+   - git (x86_64 version)
+   - pip (latest version)
+   - virtualenv package
+   - z3-solver (CPU-only version)
+   - tensorflow==2.5.0 (CPU-only version)
+   - aif360 (CPU-compatible version)
+   - bash shell (standard Linux version)
+   - Adult Census Income dataset (adult.data, adult.test, adult.names)
+   - Bank Marketing dataset (bank-additional-full.csv, bank-additional-names.txt)
+   - German Credit dataset (german.data, german.doc)
+   - pandas (for additional data processing)
+
+2. FILES TO CREATE:
+   - /home/cc/EnvGym/data/Fairify/fenv/ (virtual environment directory)
+   - ~/.bashrc (for environment variable setup)
+   - INSTALL.md (updated with CPU-only instructions)
+   - All res/ directories and readme.md files as originally specified
+   - data/adult/ directory with dataset files
+   - data/bank/ directory with dataset files
+   - data/german/ directory with dataset files
+   - All specified results directories and documentation files
+
+3. NECESSARY TEST CASES:
+   - All original test cases remain valid
+   - Added CPU-specific test for tensorflow: verify no GPU dependencies
+   - Added test for x86_64 architecture compatibility
+   - Added test for sufficient disk space (>2GB available)
+   - Added test for memory requirements (>4GB RAM available)
+
+4. COMPLETE TODO LIST:
+   1-54: All original steps remain with following adjustments:
+   - Modified step 8: pip install tensorflow-cpu==2.5.0 (instead of tensorflow)
+   - Added step 55: Verify CPU-only installation: python3 -c "import tensorflow as tf; print(tf.test.is_gpu_available())" (should return False)
+   - Added step 56: Verify system architecture: uname -m (should return x86_64)
+   - Added step 57: Verify disk space: df -h /home/cc/EnvGym/data/Fairify
+   - Added step 58: Verify available memory: free -h
+   - All paths updated to use /home/cc/EnvGym/data/Fairify/ as base directory
+   - Added warning in documentation about CPU-only execution limitations

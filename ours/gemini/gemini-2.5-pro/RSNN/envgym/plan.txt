@@ -1,0 +1,242 @@
+Based on the provided hardware information, here is the adjusted environment setup plan. The primary modifications account for the absence of a GPU, which involves removing all CUDA-related steps, ensuring a CPU-only version of PyTorch is installed, and configuring the project to run on the CPU.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN (CPU-ONLY) ===
+
+1.  **DOWNLOADS NEEDED:**
+    *   **Python:** Version 3.10.12.
+    *   **Git:** Required for cloning the project repository and for installing specific Python packages (`stork`, `randman`) from their Git repositories.
+    *   **Project Code:** The source code from the repository, including all configuration files (`.yaml`).
+    *   **Dataset:** "Nonhuman Primate Reaching with Multichannel Sensorimotor Cortex Electrophysiology" dataset from Zenodo (https://zenodo.org/records/583331).
+    *   **(Optional) Pre-trained Base Models:** If you intend to skip the `pretraining` step and directly fine-tune, you may need to download pre-trained model states for each monkey (`loco`, `indy`).
+    *   **(Optional) Jupyter Notebook/Lab:** Useful for data exploration and analysis. The project is configured to ignore files in a `notebooks/` directory.
+
+2.  **FILES TO CREATE:**
+    *   **Note:** The following files are not created from scratch but must be understood and modified. All paths are relative to the project root: `/home/cc/EnvGym/data/RSNN`.
+    *   **File Path:** `.gitignore`
+        *   **Description:** This file specifies which files and directories are intentionally untracked by Git. This is important to understand because it explains why directories for data (`data/`), outputs (`output/`), and user notebooks (`notebooks/`) are not included in the repository and must be created or are generated locally.
+        *   **Modification:** Typically not modified.
+    *   **File Path:** `/conf/data/data-default.yaml`
+        *   **Description:** This file defines the path to the dataset and parameters for data loading, preprocessing, and augmentation. The primary modification required is setting the `data_dir` to the correct location.
+        *   **Modification:** Change the `data_dir` parameter to the absolute path where the dataset is stored.
+            ```yaml
+            # Example modification
+            defaults:
+              - filenames: filenames
+              - pretrain_filenames: all-data
+            
+            data_dir: /home/cc/EnvGym/data/RSNN/data # CHANGE THIS LINE
+            
+            dt: 4e-3  # Time step (seconds)
+            nb_outputs: 2  # Number of outputs
+            
+            # ... other parameters like ratio_val, sample_duration, p_drop etc.
+            ```
+    *   **File Path:** `/conf/training/training-default.yaml`
+        *   **Description:** This new file centralizes default training parameters like the optimizer, batch size, and loss function settings. It is included by the main training configuration files.
+        *   **Modification:** You can change the default `optimizer` (e.g., from `'SMORMS3'` to `'adam'`), adjust the `batchsize`, or modify loss calculation parameters like `mask_early_timesteps`. These settings serve as the baseline for all training runs unless overridden.
+            ```yaml
+            # Example contents
+            # Defaults for training
+            SG_beta: 20    # beta for SG
+            
+            # Training
+            batchsize: 250
+            
+            # Loss
+            loss: "RMSE"     
+            mask_early_timesteps: False
+            nb_masked_timesteps: 20
+            
+            # Optimizer
+            optimizer: "SMORMS3"    # 'SMORMS3' or 'adam'
+            
+            # Output
+            verbose: True
+            ```
+    *   **File Path:** `/conf/hydra/default.yaml`
+        *   **Description:** This file configures Hydra's output directory structure. It defines how output paths are generated for single runs (timestamped) and multi-runs (organized by job name and seed).
+        *   **Modification:** Typically not modified, but useful to understand where to find logs and model outputs. The `output_dir` variable used here is set in `/conf/defaults.yaml`.
+            ```yaml
+            # Example contents
+            run:
+              dir: ${output_dir}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+            
+            sweep:
+              dir: ${output_dir}/multirun/${hydra.job.name}
+              subdir: ${seed}
+            
+            job:
+              chdir: True
+            ```
+    *   **File Path:** `/conf/defaults.yaml`
+        *   **Description:** This is the main configuration file. It can be edited to change the default output directory, processing device (CPU/GPU), and other global settings.
+        *   **Modification:** **Crucially, you must change `device` to `"cpu"` since no GPU is available.** You can also change the `output_dir` parameter to set a custom location for logs, models, and results.
+            ```yaml
+            # Example modification
+            defaults:
+              - hydra: default
+              # ...
+            
+            device: "cpu" # MUST be set to "cpu"
+            
+            output_dir : ./output # Default is /home/cc/EnvGym/data/RSNN/output
+            # To change, modify the line above, for example:
+            # output_dir: /path/to/custom/outputs
+            
+            seed: False
+            ```
+    *   **File Path:** `/conf/train-bigRSNN.yaml`
+        *   **Description:** This file controls the training workflow for the `bigRSNN` model, managing pre-training and fine-tuning stages. It now composes its settings from `conf/training/training-default.yaml`.
+        *   **Modification:** You can disable pre-training (`pretraining: False`) and instead provide paths to pre-trained models for fine-tuning.
+            ```yaml
+            # Set pretraining to True to pre-train a model on all sessions from each monkey before training on each session separately
+            pretraining: True
+            
+            # If pretraining is False, you can set the load_state to a path to load a pre-trained model for each monkey
+            # If state is not found, a model will be trained from scratch on each session
+            load_state: 
+              loco: /path/to/pretrained_loco.pth  # Set to a valid path if pretraining is False
+              indy: /path/to/pretrained_indy.pth  # Set to a valid path if pretraining is False
+            
+            train_monkeys:
+              - loco
+              - indy
+            ```
+    *   **File Path:** `/conf/train-tinyRSNN.yaml`
+        *   **Description:** This file controls the training workflow for the `tinyRSNN` model, managing its pre-training and fine-tuning stages. It also composes its settings from `conf/training/training-default.yaml`.
+        *   **Modification:** You can disable pre-training (`pretraining: False`) and instead provide paths to pre-trained models for fine-tuning.
+            ```yaml
+            # Set pretraining to True to pre-train a model on all sessions from each monkey before training on each session separately
+            pretraining: True
+
+            # If pretraining is False, you can set the load_state to a path to load a pre-trained model for each monkey
+            # If state is not found, a model will be trained from scratch on each session
+            load_state: 
+              loco: False # Set to a valid path if pretraining is False, e.g., /path/to/pretrained_loco.pth
+              indy: False # Set to a valid path if pretraining is False, e.g., /path/to/pretrained_indy.pth
+
+            train_monkeys:
+              - loco
+              - indy
+            ```
+    *   **File Path:** `/conf/evaluation/eval-default.yaml`
+        *   **Description:** This is the main configuration file for the evaluation script. It composes settings from other files (`baselines.yaml`, `metrics.yaml`) and controls high-level evaluation behavior.
+        *   **Modification:** The `half` parameter must be kept as `False`. Half-precision (FP16) inference is a GPU-specific feature and is not supported for CPU execution.
+            ```yaml
+            # Example contents of eval-default.yaml
+            defaults:
+              - baselines
+              - metrics
+            
+            half: False # MUST be False for CPU-only execution
+            ```
+    *   **File Path:** `/conf/evaluation/baselines.yaml` (Inferred)
+        *   **Description:** This file, included by `eval-default.yaml`, likely controls which models are evaluated.
+        *   **Modification:** (Optional) You can change `modelname` to `'tinyRSNN'` or `'bigRSNN'` to evaluate only one model instead of `'all'`. You can set `use_snnTorch_model: True` to test the alternative model implementation.
+            ```yaml
+            # Example inferred contents
+            model_dir: ./models
+            
+            modelname: 'all'    # 'tinyRSNN' or 'bigRSNN' or 'all'
+            
+            use_snnTorch_model: False   # Set to True to use the equivalent snnTorch model
+            ```
+    *   **File Path:** `/conf/evaluation/metrics.yaml` (Inferred)
+        *   **Description:** This file, included by `eval-default.yaml`, likely specifies which metrics to compute during evaluation.
+        *   **Modification:** Advanced users could potentially add or remove metrics from this file.
+
+3.  **NECESSARY TEST CASES IN THE CODEBASE:**
+    *   **Data Loader Verification:**
+        *   Write a test to instantiate the data loader from `/challenge/data`.
+        *   Key functionality: Verify it can find and load data files from the configured `data_dir`. Check that a single batch of data has the correct shape, type, and structure. Ensure that data splitting logic respects `ratio_val` and that preprocessing parameters like `sample_duration` are correctly applied.
+    *   **Model Instantiation Test:**
+        *   Write a test to create instances of `bigRSNN` and `tinyRSNN` from `/challenge/models`.
+        *   Key functionality: Ensure models can be initialized without errors. Check that the model architecture (layer sizes) matches the description in the README.
+    *   **Configuration Loading Test:**
+        *   Write a test to initialize `hydra` and load the configuration for a training run (e.g., using `train-bigRSNN.py`) and an evaluation run (using `evaluate.py`).
+        *   Key functionality: Verify that `hydra` correctly composes the configuration from all YAML files and that parameters are accessible.
+    *   **Pre-training Execution Test:**
+        *   Write a test that runs a single iteration of the pre-training phase by executing `train-bigRSNN.py` and `train-tinyRSNN.py` with `pretraining=True`.
+        *   Key functionality: Ensure the pre-training loop runs without errors for both models and that pre-trained model artifacts are saved to the output directory. Note that this will be significantly slower on a CPU.
+    *   **Load State Fine-tuning Test:**
+        *   Write a test that runs a single fine-tuning iteration using a pre-existing model state for both `bigRSNN` and `tinyRSNN`. This involves setting `pretraining=False` and providing a valid path in the respective `load_state` config.
+        *   Key functionality: Verify that the model's weights are correctly loaded from the specified path before the training step begins.
+    *   **Pre-trained Model Evaluation:**
+        *   Write a test that loads the final pre-trained models and runs the `evaluate.py` script.
+        *   Key functionality: Confirm that models load correctly and the script runs to completion. Verify that a `results_summary_*.json` file is generated and contains all required metrics.
+    *   **Alternative Implementation Evaluation Test:**
+        *   Write a test that runs `evaluate.py` with the `use_snnTorch_model=True` override.
+        *   Key functionality: Confirm that the `snnTorch`-based model implementation loads and runs successfully, producing a valid results file.
+    *   **Single-Step Training Test:**
+        *   Write a test to run a single training iteration (forward pass, loss calculation, backward pass, optimizer step) for both `tinyRSNN` and `bigRSNN` during the final session-specific phase.
+        *   Key functionality: Ensure there are no runtime errors during training. Check that the model's weights are updated after one step.
+    *   **Training Configuration Variants Test:**
+        *   Write a test to run a single training step with command-line overrides for parameters defined in `training-default.yaml`.
+        *   Key functionality: Execute a training step with `optimizer=adam` to ensure the alternative optimizer works. Run another step with `mask_early_timesteps=True` to verify this loss configuration is valid.
+    *   **Output Directory Structure Test:**
+        *   Write a test that runs a single training job and a multi-run training job.
+        *   Key functionality: Verify that the output directories are created according to the structure defined in `/conf/hydra/default.yaml`.
+    *   **Plot Generation Test:**
+        *   Write a test that runs the plotting script after a successful evaluation.
+        *   Key functionality: Verify that the script executes without errors and that plot files are generated.
+
+4.  **COMPLETE TODO LIST:**
+    *   **Step 1: Install System Prerequisites**
+        *   Install Python 3.10.12.
+        *   Verify installation: `python --version` should output `Python 3.10.12`.
+        *   Install Git.
+        *   Verify installation: `git --version` should show the Git version.
+
+    *   **Step 2: Acquire Project Code and Data**
+        *   Clone the project repository: `git clone <repository_url>`
+        *   Navigate into the project directory: `cd /home/cc/EnvGym/data/RSNN`
+        *   Note: The `.gitignore` file prevents the data and output directories from being version controlled. You must create them manually.
+        *   Create a data directory: `mkdir data`
+        *   Download the dataset from https://zenodo.org/records/583331.
+        *   Unzip the dataset into the newly created `data` directory. The absolute path to your data should be `/home/cc/EnvGym/data/RSNN/data/`.
+
+    *   **Step 3: Set Up Python Environment**
+        *   Create a Python virtual environment: `python -m venv venv`
+        *   Activate the environment: `source venv/bin/activate`
+        *   Upgrade pip: `pip install --upgrade pip`
+        *   Install all required Python packages from `requirements.txt`. **Note:** Ensure your `requirements.txt` specifies a CPU-only version of PyTorch, or install it manually first to avoid errors. For example, modify the `torch` line in `requirements.txt` to be generic (e.g., `torch>=1.12.0`) rather than a CUDA-specific version.
+            ```bash
+            pip install -r requirements.txt
+            ```
+        *   (Optional) Install Jupyter for notebooks: `pip install jupyterlab`
+        *   Verification: Run `pip list` and ensure packages like `torch`, `snntorch`, `hydra-core`, `stork`, and `randman` are listed. Check that PyTorch is installed for the CPU by running `python -c "import torch; print(torch.cuda.is_available())"`. This must return `False`.
+
+    *   **Step 4: Configure Project Paths and Training Strategy**
+        *   Open `/conf/data/data-default.yaml` and set `data_dir:` to `/home/cc/EnvGym/data/RSNN/data`.
+        *   Open `/conf/defaults.yaml` and **ensure `device:` is set to `"cpu"`. This is mandatory.**
+        *   (Optional) In `/conf/defaults.yaml`, modify `output_dir` if you want to store outputs in a non-default location (default is `/home/cc/EnvGym/data/RSNN/output`).
+        *   (Optional) Inspect `/conf/training/training-default.yaml` to change default training parameters like `optimizer` or `batchsize`.
+        *   Open `/conf/train-bigRSNN.yaml` and `/conf/train-tinyRSNN.yaml` to configure the training workflows. To run the full workflow, ensure `pretraining: True`. To skip pre-training, set `pretraining: False` and provide paths in `load_state`.
+
+    *   **Step 5: Verify Setup by Running Evaluation**
+        *   This step uses the pre-trained models provided in the repository to ensure the full inference pipeline is working.
+        *   Run evaluation for all models: `python evaluate.py`
+        *   (Optional) To test the `snnTorch` implementation: `python evaluate.py use_snnTorch_model=True`
+        *   **Note:** Half-precision evaluation (`half=True`) is not supported on CPU and should not be tested.
+        *   Verification: Check for the creation of `results_summary_bigRSNN.json` and `results_summary_tinyRSNN.json` in the root directory. Inspect these files to confirm they contain keys for all workload metrics (`r2`, `activation_sparsity`, `synaptic_operations`).
+
+    *   **Step 6: Reproduce Training Results (CPU-only)**
+        *   **Warning:** This step is computationally expensive and will be **extremely time-consuming** on a CPU. It will create an `output` directory to store logs and models.
+        *   To train the `bigRSNN` model across all 5 random seeds:
+            ```bash
+            python train-bigRSNN.py --multirun seed=1,2,3,4,5
+            ```
+        *   To train the `tinyRSNN` model across all 5 random seeds:
+            ```bash
+            python train-tinyRSNN.py --multirun seed=1,2,3,4,5
+            ```
+        *   (Optional) To run a single training job for debugging:
+            ```bash
+            python train-bigRSNN.py seed=1
+            ```
+        *   Verification: Monitor the console for progress. After completion, check the Hydra output directory (`./output` by default). For a multi-run, results will be in `output/multirun/train-bigRSNN/1/`, etc. Each directory will contain logs and newly trained model state dictionaries (`.pth` files).
+
+    *   **Step 7: Final Results Check**
+        *   After your custom training completes, re-run the evaluation script from Step 5 to generate summary JSON files based on your newly trained models.
+        *   `python evaluate.py`
+        *   Verification: Compare the contents of the generated `results_summary_*.json` files with the performance tables in the `README.md`. The R2 scores and other metrics should be closely reproducible.

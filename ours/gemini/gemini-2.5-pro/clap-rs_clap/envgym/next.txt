@@ -1,0 +1,5 @@
+current progress
+The Dockerfile successfully implements the environment setup plan up to Step 4. It correctly installs all specified system dependencies (`git`, `make`, `python3`, shells), the complete Rust toolchain ecosystem (pinned, stable, beta, nightly), all required developer tools (`cargo-deny`, `pre-commit`, `bencher`, etc.), clones the source code, installs pre-commit hooks, and pre-builds the workspace to cache dependencies. The previous `apt-get` build failure has been addressed by including all required packages in a single, comprehensive command.
+
+next step
+Add a final validation layer to the Dockerfile. After the `RUN make build-default` command, add a new `RUN make test-full` command. This will execute the core test suite within the image build process, verifying that the environment is fully functional and correctly configured before the image is finalized.

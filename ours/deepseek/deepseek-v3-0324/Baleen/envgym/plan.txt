@@ -1,0 +1,119 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Git (latest version)
+   - Python 3.11 (PyPy 3.8 removed as optional since no performance optimization needed)
+   - Micromamba 1.4.1 (lightweight alternative to Conda recommended for Debian/Ubuntu)
+   - Jupyter Notebook
+   - Trace files from https://ftp.pdl.cmu.edu/pub/datasets/Baleen24/
+     - storage_0.1.tar.gz
+     - results_release.csv.gz
+     - breakdowns.tar.gz
+   - pip (for alternative installation method)
+   - wget (for downloading trace files)
+   - Additional tectonic trace files for 20230325 and 202110 datasets
+
+2. FILES TO CREATE:
+   - ~/.condarc (conda configuration file)
+   - environment.yml (local Python environment specification)
+   - config.json (simulator configuration files in runs/example/)
+   - .gitignore (with content: tmp/, .ipynb_checkpoints, notebooks/paper-figs/figs)
+   - .gitmodules (already present, verify configuration)
+   - getting-started.sh (executable setup script)
+   - data/clean.sh (executable cleanup script)
+   - data/get-tectonic.sh (already exists, verify content matches)
+   - notebooks/reproduce/reproduce_commands.sh (new reproduction script)
+   - Additional config files for Region4-Region7 experiments
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Simulator execution test (RejectX baseline)
+   - Baleen ML model training test
+   - Baleen simulator execution test
+   - Jupyter notebook execution test
+   - Trace file validation test
+   - Result plotting test
+   - Git ignore pattern validation test
+   - Submodule initialization test
+   - Repository update test
+   - Alternative pip installation test
+   - Data cleanup script test
+   - Trace file removal validation test
+   - Trace file download validation test
+   - Breakdown stats extraction test
+   - Results file validation test
+   - Region-specific experiment validation (Regions 4-7)
+   - CoinFlip policy validation test
+   - RejectX policy validation test
+   - Prefetch configuration tests
+   - Model threshold validation tests
+
+4. COMPLETE TODO LIST:
+   1. Clone repository: git clone --recurse-submodules https://github.com/wonglkd/Baleen-FAST24.git
+      - Verify: Check /home/cc/EnvGym/data/Baleen/Baleen-FAST24 directory exists with all submodules initialized
+   2. Change directory: cd /home/cc/EnvGym/data/Baleen/Baleen-FAST24
+      - Verify: Current directory is correct and BCacheSim submodule exists
+   3. Update repository and submodules:
+      - git pull --recurse-submodules
+      - Verify: Repository is up-to-date and submodules are current
+   4. Initialize and update submodules if needed:
+      - git submodule update --init --recursive
+      - Verify: BCacheSim directory contains files
+   5. Set up Python environment (Micromamba recommended):
+      - micromamba env create -f BCacheSim/install/env_cachelib-py-3.11.yaml
+      - micromamba activate cachelib-py-3.11
+      - Verify: micromamba env list shows active environment
+   6. Download trace files:
+      - cd /home/cc/EnvGym/data/Baleen/Baleen-FAST24/data
+      - chmod +x get-tectonic.sh
+      - ./get-tectonic.sh
+      - Verify: Check data directory contains:
+        - tectonic/ directory with 202110 and 20230325 data
+        - results_release.csv.gz
+        - breakdown-stats/ directory
+   7. Setup cleanup script:
+      - chmod +x data/clean.sh
+      - Verify: data/clean.sh is executable
+   8. Setup reproduce script:
+      - chmod +x notebooks/reproduce/reproduce_commands.sh
+      - Verify: script is executable
+   9. Run baseline simulation:
+      - ./BCacheSim/run_py.sh py -B -m BCacheSim.cachesim.simulate_ap --config runs/example/rejectx/config.json
+      - Verify: Check runs/example/rejectx for output files
+   10. Train Baleen models:
+       - ./BCacheSim/run_py.sh py -B -m BCacheSim.episodic_analysis.train --exp example --policy PolicyUtilityServiceTimeSize2 --region Region1 --sample-ratio 0.1 --sample-start 0 --trace-group 201910 --supplied-ea physical --target-wrs 34 50 100 75 20 10 60 90 30 --target-csizes 366.475 --output-base-dir runs/example/baleen --eviction-age 5892.856 --rl-init-kwargs filter_=prefetch --train-target-wr 35.599 --train-models admit prefetch --train-split-secs-start 0 --train-split-secs-end 86400 --ap-acc-cutoff 15 --ap-feat-subset meta+block+chunk
+       - Verify: Check runs/example/baleen for model files
+   11. Run Baleen simulation:
+       - ./BCacheSim/run_py.sh py -B -m BCacheSim.cachesim.simulate_ap --config runs/example/baleen/prefetch_ml-on-partial-hit/config.json
+       - Verify: Check runs/example/baleen for output files
+   12. Execute reproduction commands:
+       - cd notebooks/reproduce && ./reproduce_commands.sh
+       - Verify: Check output in runs/exp_reproduce_spring23/ directories
+   13. Launch Jupyter notebook:
+       - jupyter notebook notebooks/example/example.ipynb
+       - Verify: Notebook executes without errors and produces plots
+   14. Verify git ignore patterns:
+       - Check that tmp/, .ipynb_checkpoints, and notebooks/paper-figs/figs are properly ignored
+       - Verify: git status doesn't show ignored files
+   15. Verify submodule configuration:
+       - Check .gitmodules file content matches expected configuration
+       - Verify: git submodule status shows correct commit hashes
+   16. Create and test getting-started.sh:
+       - Make script executable: chmod +x getting-started.sh
+       - Verify: Script runs without errors and completes setup tasks
+   17. Test cleanup script:
+       - cd data && ./clean.sh
+       - Verify: Temporary files and directories are properly removed
+   18. Verify trace file integrity:
+       - Check tectonic/ directory contains expected files for all regions
+       - Verify results_release.csv.gz exists and is valid
+       - Check breakdown-stats/ directory contains extracted files
+       - Verify: All downloaded files are accessible and complete
+
+Key adjustments made:
+1. Removed GPU-related components (CUDA, Chameleon setup)
+2. Recommended Micromamba over Conda for Debian/Ubuntu systems
+3. Removed PyPy setup as non-essential
+4. Updated all paths to use /home/cc/EnvGym/data/Baleen base directory
+5. Simplified environment setup by removing redundant options
+6. Removed cloud-specific setup instructions
+7. Maintained all core functionality while optimizing for x86_64 architecture

@@ -1,0 +1,134 @@
+Based on the provided hardware and environment information, here is the adjusted and optimized environment setup plan.
+
+***
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+**Environment Context:** This plan is tailored for a Linux `x86_64` (`linux/amd64`) architecture with 96 CPU cores, operating within the working directory `/home/cc/EnvGym/data/sharkdp_fd`.
+
+1.  DOWNLOADS NEEDED:
+    *   **Rust Toolchain**: The Minimum Supported Rust Version (MSRV) is defined in `Cargo.toml` (e.g., 1.64). The latest stable version installed via `rustup` is recommended for the `x86_64-unknown-linux-gnu` target. The toolchain must include:
+        *   `rustc`: The compiler.
+        *   `cargo`: The package manager. It will automatically leverage the available 96 CPU cores for parallel compilation.
+        *   `rustup`: The toolchain manager.
+        *   `rustfmt`: For code formatting (`rustup component add rustfmt`).
+        *   `clippy`: For linting and static analysis (`rustup component add clippy`).
+    *   **C Compiler and Build Tools**: A C compiler and standard build utilities are required.
+        *   On Debian/Ubuntu (recommended for the base image): `build-essential` and `make`.
+        *   On Fedora/CentOS: `Development Tools` group.
+        *   For cross-compiling to non-native targets (e.g., ARM): `gcc-aarch64-linux-gnu`, `gcc-arm-linux-gnueabihf`, etc.
+    *   **Git**: Required for cloning the project repository.
+    *   **cross (Optional)**: A tool for seamless cross-compilation to non-native architectures. Essential if building for targets like ARM64 Linux from this `x86_64` host, as it uses the specific environment settings in `Cross.toml`. Install with `cargo install cross`.
+    *   **Project Dependencies (crates)**: All Rust dependencies are specified in `Cargo.toml` and locked in `Cargo.lock`. They are downloaded automatically by `cargo`.
+    *   **Packaging Tools (Optional)**: For creating release packages.
+        *   `tar`, `gzip` for creating `.tar.gz` archives.
+        *   `zip` or `7z` for creating `.zip` archives.
+        *   Debian packaging tools (e.g., `dpkg`) for creating `.deb` files via provided scripts.
+
+2.  FILES TO CREATE:
+    *   No files need to be manually created. The project is fully configured upon cloning the source repository into the working directory.
+    *   The repository includes important scripts and metadata:
+        *   `Makefile`: Used for common tasks like generating shell completion files (`make completions`) and system-wide installation (`make install`).
+        *   `scripts/create-deb.sh`: A script for building Debian packages.
+        *   `.github/workflows/CICD.yml`: Defines the CI/CD process, serving as a reference for build targets and quality checks.
+        *   `.github/dependabot.yml`: Configures automated dependency updates.
+        *   `Cross.toml`: Defines configurations for the `cross` tool, ensuring successful cross-compilation for non-native targets.
+        *   `rustfmt.toml`: Defines project-specific code formatting rules.
+        *   `.gitignore`: Specifies files to be excluded from version control, such as the `target/` build directory and the `/autocomplete/` generated completions directory.
+        *   `doc/fd.1`: The man page source file.
+        *   `contrib/completion/_fd`: The source file for Zsh completions.
+    *   Optional user-level configuration files may be created by the application at runtime (e.g., in `~/.config/fd/`).
+    *   Internal tool configuration files like `.git/config` are generated automatically by `git`.
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    *   **Core Search Functionality**:
+        *   Test searching for files and directories by exact name and patterns (regex, globs).
+    *   **Command-Line Interface (CLI) Arguments**:
+        *   Test flags for search behavior: case sensitivity, hidden files, symlinks (`--case-sensitive`, `--hidden`, `--follow`).
+    *   **Filesystem Interaction and Edge Cases**:
+        *   Verify that ignore files (`.gitignore`, `.fdignore`) are respected and can be disabled.
+        *   Test behavior with restricted permissions and symbolic links on the Linux filesystem.
+    *   **Output and Formatting**:
+        *   Verify correct output to stdout, including colorization and path separators.
+    *   **Build System and Environment Checks**:
+        *   Verify the build fails if the Rust compiler is below the MSRV.
+        *   Ensure the project compiles and passes tests on the exact MSRV.
+        *   Ensure the project builds successfully using the `--locked` flag.
+    *   **Code Quality and Style**:
+        *   Verify code formatting passes `cargo fmt -- --check`.
+        *   Ensure the codebase is free of warnings when running `cargo clippy --all-targets --all-features -- -Dwarnings`.
+    *   **Dependency Management and CI**:
+        *   The full test suite must pass on pull requests with updated dependencies.
+    *   **Platform-Specific and Cross-Compilation**:
+        *   The primary focus for this environment is testing Unix-style paths and permissions on `x86_64` Linux.
+        *   Verify successful cross-compilation for other key targets (e.g., `aarch64-unknown-linux-gnu`) using the `cross` tool.
+    *   **Packaging and Artifacts**:
+        *   Verify that shell completion files can be generated successfully via `make completions`.
+        *   Verify that `make install` successfully installs the binary, man page, and shell completion scripts.
+    *   **Build Artifacts and Source Control**:
+        *   Verify that generated directories (`target/`, `/autocomplete/`) are correctly ignored by Git.
+
+4.  COMPLETE TODO LIST:
+    *   **1. Install System Prerequisites**:
+        *   **Action**: Install a C compiler, `make`, and essential build tools suitable for a Debian/Ubuntu-based image.
+        *   **Command**: `apt-get update && apt-get install -y build-essential`
+        *   **Verification**: `gcc --version` and `make --version` commands succeed.
+
+    *   **2. Install Rust Toolchain and Components**:
+        *   **Action**: Install Rust via `rustup` and add the `fmt` and `clippy` components.
+        *   **Command**: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && . "$HOME/.cargo/env" && rustup component add rustfmt clippy`
+        *   **Verification**: `rustc --version` shows a version meeting or exceeding the MSRV.
+
+    *   **3. Prepare Project Source Code**:
+        *   **Action**: Ensure the project source code is available in the specified working directory. If it's not already present, clone it from GitHub.
+        *   **Command (if needed)**: `git clone https://github.com/sharkdp/fd.git /home/cc/EnvGym/data/sharkdp_fd`
+        *   **Verification**: The directory `/home/cc/EnvGym/data/sharkdp_fd` contains project files like `Cargo.toml`.
+
+    *   **4. Navigate to Project Directory**:
+        *   **Action**: Change your current directory to the project's root. All subsequent commands assume they are run from this location.
+        *   **Command**: `cd /home/cc/EnvGym/data/sharkdp_fd`
+        *   **Verification**: `pwd` outputs `/home/cc/EnvGym/data/sharkdp_fd`.
+
+    *   **5. Run Code Quality Checks**:
+        *   **Action**: Run the formatter and linter to ensure code quality.
+        *   **Command (Format Check)**: `cargo fmt -- --check`
+        *   **Command (Lint Check)**: `cargo clippy --all-targets --all-features -- -Dwarnings`
+        *   **Verification**: Both commands complete without errors.
+
+    *   **6. Fetch Dependencies and Run Tests**:
+        *   **Action**: Use `cargo` to download dependencies and run the entire test suite. `cargo` will automatically utilize the 96 available CPU cores to parallelize compilation.
+        *   **Command**: `cargo test --locked`
+        *   **Verification**: The command completes successfully, with all tests passing.
+
+    *   **7. Build the Executable (Native Release Version)**:
+        *   **Action**: Compile the project in release mode for the native `x86_64` architecture. This build will be highly parallelized across the 96 CPU cores.
+        *   **Command**: `cargo build --release --locked`
+        *   **Verification**: An executable file `fd` is created in `target/release/`. `git status` confirms the `target/` directory is ignored.
+
+    *   **8. Cross-Compile for Other Architectures (Optional)**:
+        *   **Action**: Use the `cross` tool to build for a different target platform, like ARM64 Linux.
+        *   **Prerequisite**: `cargo install cross` and ensure a container runtime like Docker is active.
+        *   **Command**: `cross build --target aarch64-unknown-linux-gnu --release --locked`
+        *   **Verification**: An executable `fd` is created in `target/aarch64-unknown-linux-gnu/release/`.
+
+    *   **9. Generate Supporting Files (Optional)**:
+        *   **Action**: Generate man pages and shell completion files using the Makefile.
+        *   **Command**: `make completions`
+        *   **Note**: While `make` supports parallel execution with `make -j96`, the specific `completions` target in this project may not benefit significantly as it runs sequential commands.
+        *   **Verification**: The `autocomplete` directory is created and populated. `git status` confirms this directory is ignored.
+
+    *   **10. Run the Natively Compiled Executable**:
+        *   **Action**: Execute the binary compiled for the local `x86_64` machine.
+        *   **Command**: `./target/release/fd --version`
+        *   **Verification**: The command prints the application name and version number.
+
+    *   **11. Install the Executable**:
+        *   **Action**: Install the binary, man page, and shell completion files to standard system locations. This may require elevated privileges.
+        *   **Command (Recommended)**: `make install` (run with `sudo` if you are not the root user).
+        *   **Command (Alternative - binary only)**: `cp target/release/fd /usr/local/bin/` or `cargo install --path .` (installs to `~/.cargo/bin`).
+        *   **Verification**: `which fd` shows the installation path. `man fd` opens the man page.
+
+    *   **12. Final Verification**:
+        *   **Action**: Run the installed `fd` command from any directory to confirm it is in the system's `PATH`.
+        *   **Command**: `fd README.md`
+        *   **Verification**: The command finds and prints `README.md`, confirming the application is globally available and functional.

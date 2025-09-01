@@ -1,0 +1,208 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust toolchain (version 1.57 or higher)
+   - Cargo package manager (bundled with Rust)
+   - Nightly Rust toolchain (nightly-2024-09-15 or compatible)
+   - serde (v1.0.60 or compatible if Serde support is needed)
+   - portable-atomic (v1.3 or compatible if extra-platforms feature is needed)
+   - loom (v0.7 for loom-specific testing)
+   - cargo-hack (for feature-powerset testing)
+   - Rust src component (for sanitizer tests)
+   - Miri (for Miri tests)
+   - x86_64-unknown-linux-gnu target (for sanitizer tests)
+   - Clippy (for linting)
+
+2. FILES TO CREATE:
+   - /home/cc/EnvGym/data/tokio-rs_bytes/Cargo.toml with content:
+     ```toml
+     [package]
+     name = "my_project"
+     version = "0.1.0"
+     edition = "2021"
+     rust-version = "1.57"
+
+     [dependencies]
+     bytes = { version = "1.10.1", default-features = false }
+     serde = { version = "1.0.60", optional = true, default-features = false, features = ["alloc"] }
+     portable-atomic = { version = "1.3", optional = true, default-features = false, features = ["require-cas"] }
+
+     [dev-dependencies]
+     serde_test = "1.0"
+
+     [package.metadata.docs.rs]
+     rustdoc-args = ["--cfg", "docsrs"]
+     ```
+   - lib.rs or main.rs with content:
+     ```rust
+     use bytes::{Bytes, BytesMut, Buf, BufMut};
+     ```
+   - .github/workflows/ci.yml with GitHub Actions configuration
+   - ci/test-stable.sh with content:
+     ```bash
+     #!/bin/bash
+
+     set -ex
+
+     cmd="${1:-test}"
+
+     # Run with each feature
+     # * --each-feature includes both default/no-default features
+     # * --optional-deps is needed for serde feature
+     cargo hack "${cmd}" --each-feature --optional-deps
+     # Run with all features
+     cargo "${cmd}" --all-features
+
+     if [[ "${RUST_VERSION}" == "nightly"* ]]; then
+         # Check benchmarks
+         cargo check --benches
+
+         # Check minimal versions
+         # Remove dev-dependencies from Cargo.toml to prevent the next `cargo update`
+         # from determining minimal versions based on dev-dependencies.
+         cargo hack --remove-dev-deps --workspace
+         # Update Cargo.lock to minimal version dependencies.
+         cargo update -Z minimal-versions
+         cargo check --all-features
+     fi
+     ```
+   - ci/panic-abort.sh with content:
+     ```bash
+     #!/bin/bash
+     set -ex
+     RUSTFLAGS="$RUSTFLAGS -Cpanic=abort -Zpanic-abort-tests" cargo test --all-features --test '*'
+     ```
+   - ci/tsan.sh with content:
+     ```bash
+     #!/bin/bash
+
+     set -ex
+
+     export ASAN_OPTIONS="detect_odr_violation=0 detect_leaks=0"
+
+     # Run address sanitizer
+     RUSTFLAGS="-Z sanitizer=address" \
+     cargo test --target x86_64-unknown-linux-gnu --test test_bytes --test test_buf --test test_buf_mut
+
+     # Run thread sanitizer
+     RUSTFLAGS="-Z sanitizer=thread" \
+     cargo -Zbuild-std test --target x86_64-unknown-linux-gnu --test test_bytes --test test_buf --test test_buf_mut
+     ```
+   - ci/miri.sh with content:
+     ```bash
+     #!/bin/bash
+     set -e
+
+     rustup component add miri
+     cargo miri setup
+
+     export MIRIFLAGS="-Zmiri-strict-provenance"
+
+     cargo miri test
+     ```
+   - clippy.toml with content:
+     ```toml
+     msrv = "1.57"
+     ```
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Basic Bytes/BytesMut functionality tests
+   - Buf/BufMut trait implementation tests
+   - no_std environment compatibility tests
+   - Serde serialization/deserialization tests (if enabled)
+   - Atomic operation tests for extra-platforms feature
+   - Loom concurrency model tests (for loom-specific builds)
+   - Documentation tests (with docsrs configuration)
+   - Minimum Rust version compatibility tests
+   - Thread sanitizer tests
+   - Address sanitizer tests
+   - Miri tests for undefined behavior
+   - Panic=abort compatibility tests with all features
+   - Feature-powerset combination tests
+   - Formatting checks via rustfmt
+   - Benchmark compilation checks
+   - Minimal version dependency checks
+   - Nightly-specific feature tests
+   - Sanitizer tests with build-std support
+   - Clippy lint checks with MSRV 1.57
+
+4. COMPLETE TODO LIST:
+   1. Install Rust and Cargo using rustup
+      - Run: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
+      - Verify: `rustc --version` (must be ≥1.57) and `cargo --version`
+
+   2. Create new Rust project
+      - Run: `cd /home/cc/EnvGym/data && cargo new tokio-rs_bytes --edition 2021`
+      - Verify: Check directory structure and Cargo.toml exists
+
+   3. Configure project metadata and dependencies
+      - Edit Cargo.toml with above configuration
+      - Verify: `cargo build` completes successfully
+
+   4. Setup no_std environment
+      - Ensure default features are disabled in Cargo.toml
+      - Add extra-platforms feature if needed
+      - Verify: Build with `cargo build --no-default-features`
+
+   5. Add Serde support
+      - Enable serde feature in Cargo.toml
+      - Verify: `cargo build --features serde` and serde_test integration
+
+   6. Setup documentation building
+      - Install nightly toolchain: `rustup install nightly-2024-09-15`
+      - Verify: `cargo +nightly-2024-09-15 --version`
+      - Build docs: `RUSTDOCFLAGS="--cfg docsrs" cargo +nightly-2024-09-15 doc --open`
+      - Verify: Documentation builds and opens in browser
+
+   7. Setup loom testing environment
+      - Add loom to dev-dependencies for specific targets
+      - Verify: `cargo test --features loom` runs successfully
+
+   8. Configure CI workflow
+      - Create .github/workflows directory
+      - Add ci.yml with GitHub Actions configuration
+      - Create necessary test scripts in ci/ directory
+      - Verify: GitHub Actions runs successfully on push/pull requests
+
+   9. Install additional testing tools
+      - Install cargo-hack: `cargo install cargo-hack`
+      - Install rust-src: `rustup component add rust-src`
+      - Install Miri: `rustup +nightly-2024-09-15 component add miri`
+      - Install Clippy: `rustup component add clippy`
+      - Add target: `rustup target add x86_64-unknown-linux-gnu`
+
+   10. Setup sanitizer tests
+       - Create tsan.sh script with above content
+       - Verify: `ci/tsan.sh` runs successfully for both address and thread sanitizers
+       - Verify tests pass with build-std support
+
+   11. Setup Miri tests
+       - Create miri.sh script with above content (removed mips64 target)
+       - Ensure MIRIFLAGS is set with strict provenance
+       - Verify: `ci/miri.sh` runs successfully
+
+   12. Setup panic=abort tests
+       - Create panic-abort.sh script with above content
+       - Verify: `ci/panic-abort.sh` runs successfully with all features
+       - Verify tests pass with panic=abort configuration
+
+   13. Configure stable test script
+       - Create test-stable.sh script with above content
+       - Verify: `ci/test-stable.sh` runs successfully for all feature combinations
+       - Verify minimal version checks pass on nightly
+       - Verify benchmark compilation checks pass on nightly
+
+   14. Configure lint settings
+       - Ensure unexpected_cfgs lint is properly configured
+       - Create clippy.toml with MSRV configuration
+       - Verify: `cargo check` shows no warnings for cfg(loom)
+       - Verify: `cargo fmt --all --check` passes
+       - Verify: `cargo clippy --all-targets --all-features -- -D warnings` passes
+
+Key adjustments made:
+1. Removed mips64 target from Miri tests since we're focusing on x86_64 architecture
+2. Updated all paths to use /home/cc/EnvGym/data/tokio-rs_bytes as working directory
+3. Simplified cross-platform targets to only include x86_64-unknown-linux-gnu
+4. Removed unnecessary cross-compilation targets (ARM, WASM, etc.) from installation steps
+5. Kept only x86_64-specific sanitizer tests
+6. Updated project creation command to use correct path

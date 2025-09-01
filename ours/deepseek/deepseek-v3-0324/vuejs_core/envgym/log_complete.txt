@@ -1,0 +1,719 @@
+=== Docker Execution Log - 20250828_210802 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756415253
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 855B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:18-bullseye
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [builder 1/7] FROM docker.io/library/node:18-bullseye@sha256:0d9e9a8dcd5a83ea737ed92227a6591a31ad70c8bb722b0c51aff7ae23a88b6a
+#4 DONE 0.0s
+
+#5 [builder 2/7] WORKDIR /app
+#5 CACHED
+
+#6 [internal] load build context
+#6 transferring context: 257.35kB 0.0s done
+#6 DONE 0.0s
+
+#7 [builder 3/7] COPY package.json pnpm-lock.yaml ./
+#7 CACHED
+
+#8 [builder 4/7] RUN apt-get update && apt-get install -y git curl
+#8 CACHED
+
+#9 [builder 5/7] RUN corepack enable &&     corepack prepare pnpm@7 --activate &&     pnpm install --frozen-lockfile ||     { echo "pnpm installation failed"; exit 1; }
+#9 CACHED
+
+#10 [builder 6/7] COPY . .
+#10 DONE 0.2s
+
+#11 [builder 7/7] RUN pnpm run build &&     mkdir -p /app/dist &&     ls -la /app
+#11 0.576 
+#11 0.576 > @3.5.20 build /app
+#11 0.576 > node scripts/build.js
+#11 0.576 
+#11 1.057 [36m
+#11 1.057 [1m/app/packages/compiler-ssr/src/index.ts[22m → [1mpackages/compiler-ssr/dist/compiler-ssr.cjs.js[22m...[39m
+#11 1.079 [36m
+#11 1.079 [1m/app/packages/compiler-core/src/index.ts[22m → [1mpackages/compiler-core/dist/compiler-core.esm-bundler.js[22m...[39m
+#11 1.087 [36m
+#11 1.087 [1m/app/packages/runtime-core/src/index.ts[22m → [1mpackages/runtime-core/dist/runtime-core.esm-bundler.js[22m...[39m
+#11 1.111 [36m
+#11 1.111 [1m/app/packages/server-renderer/src/index.ts[22m → [1mpackages/server-renderer/dist/server-renderer.esm-bundler.js[22m...[39m
+#11 1.117 [36m
+#11 1.117 [1m/app/packages/reactivity/src/index.ts[22m → [1mpackages/reactivity/dist/reactivity.esm-bundler.js[22m...[39m
+#11 1.139 [36m
+#11 1.139 [1m/app/packages/shared/src/index.ts[22m → [1mpackages/shared/dist/shared.esm-bundler.js[22m...[39m
+#11 1.140 [36m
+#11 1.140 [1m/app/packages/compiler-sfc/src/index.ts[22m → [1mpackages/compiler-sfc/dist/compiler-sfc.cjs.js[22m...[39m
+#11 1.178 [36m
+#11 1.178 [1m/app/packages/vue/src/index.ts[22m → [1mpackages/vue/dist/vue.esm-bundler.js[22m...[39m
+#11 1.179 [36m
+#11 1.179 [1m/app/packages/vue-compat/src/esm-index.ts[22m → [1mpackages/vue-compat/dist/vue.esm-bundler.js[22m...[39m
+#11 1.184 [36m
+#11 1.184 [1m/app/packages/compiler-dom/src/index.ts[22m → [1mpackages/compiler-dom/dist/compiler-dom.esm-bundler.js[22m...[39m
+#11 1.197 [36m
+#11 1.197 [1m/app/packages/runtime-dom/src/index.ts[22m → [1mpackages/runtime-dom/dist/runtime-dom.esm-bundler.js[22m...[39m
+#11 1.271 [32mcreated [1mpackages/vue/dist/vue.esm-bundler.js[22m in [1m93ms[22m[39m
+#11 1.271 [36m
+#11 1.271 [1m/app/packages/vue/src/runtime.ts[22m → [1mpackages/vue/dist/vue.runtime.esm-bundler.js[22m...[39m
+#11 1.288 [32mcreated [1mpackages/vue/dist/vue.runtime.esm-bundler.js[22m in [1m17ms[22m[39m
+#11 1.288 [36m
+#11 1.288 [1m/app/packages/vue/src/index.ts[22m → [1mpackages/vue/dist/vue.cjs.js[22m...[39m
+#11 1.315 [32mcreated [1mpackages/vue/dist/vue.cjs.js[22m in [1m26ms[22m[39m
+#11 1.315 [36m
+#11 1.315 [1m/app/packages/vue/src/index.ts[22m → [1mpackages/vue/dist/vue.global.js[22m...[39m
+#11 1.342 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 1.342 
+#11 1.342 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 1.342 
+#11 1.342 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 1.342 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 1.342 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 1.342 [90m32:   unref,
+#11 1.342 33:   warn,
+#11 1.342 34: } from '@vue/runtime-core'
+#11 1.342     ^
+#11 1.342 35: import {
+#11 1.342 36:   camelize,[39m
+#11 1.348 [32mcreated [1mpackages/shared/dist/shared.esm-bundler.js[22m in [1m209ms[22m[39m
+#11 1.348 [36m
+#11 1.348 [1m/app/packages/shared/src/index.ts[22m → [1mpackages/shared/dist/shared.cjs.js[22m...[39m
+#11 1.371 [32mcreated [1mpackages/compiler-ssr/dist/compiler-ssr.cjs.js[22m in [1m315ms[22m[39m
+#11 1.398 [32mcreated [1mpackages/compiler-dom/dist/compiler-dom.esm-bundler.js[22m in [1m214ms[22m[39m
+#11 1.398 [36m
+#11 1.398 [1m/app/packages/compiler-dom/src/index.ts[22m → [1mpackages/compiler-dom/dist/compiler-dom.esm-browser.js[22m...[39m
+#11 1.411 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 1.411 
+#11 1.411 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 1.411 
+#11 1.411 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 1.411 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 1.411 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 1.411 [90m32:   unref,
+#11 1.411 33:   warn,
+#11 1.411 34: } from '@vue/runtime-core'
+#11 1.411     ^
+#11 1.411 35: import {
+#11 1.411 36:   camelize,[39m
+#11 1.416 [32mcreated [1mpackages/shared/dist/shared.cjs.js[22m in [1m68ms[22m[39m
+#11 1.417 [36m
+#11 1.417 [1m/app/packages/shared/src/index.ts[22m → [1mpackages/shared/dist/shared.cjs.prod.js[22m...[39m
+#11 1.472 [32mcreated [1mpackages/shared/dist/shared.cjs.prod.js[22m in [1m56ms[22m[39m
+#11 1.505 [32mcreated [1mpackages/reactivity/dist/reactivity.esm-bundler.js[22m in [1m389ms[22m[39m
+#11 1.506 [36m
+#11 1.506 [1m/app/packages/reactivity/src/index.ts[22m → [1mpackages/reactivity/dist/reactivity.esm-browser.js[22m...[39m
+#11 1.603 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 1.603 
+#11 1.603 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 1.603 
+#11 1.603 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 1.603 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 1.603 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 1.603 [90m32:   unref,
+#11 1.603 33:   warn,
+#11 1.603 34: } from '@vue/runtime-core'
+#11 1.603     ^
+#11 1.603 35: import {
+#11 1.603 36:   camelize,[39m
+#11 1.607 [32mcreated [1mpackages/runtime-dom/dist/runtime-dom.esm-bundler.js[22m in [1m410ms[22m[39m
+#11 1.607 [36m
+#11 1.607 [1m/app/packages/runtime-dom/src/index.ts[22m → [1mpackages/runtime-dom/dist/runtime-dom.esm-browser.js[22m...[39m
+#11 1.664 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 1.664 
+#11 1.664 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 1.664 
+#11 1.664 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 1.664 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 1.664 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 1.664 [90m32:   unref,
+#11 1.664 33:   warn,
+#11 1.664 34: } from '@vue/runtime-core'
+#11 1.664     ^
+#11 1.664 35: import {
+#11 1.664 36:   camelize,[39m
+#11 1.694 [32mcreated [1mpackages/reactivity/dist/reactivity.esm-browser.js[22m in [1m188ms[22m[39m
+#11 1.694 [36m
+#11 1.694 [1m/app/packages/reactivity/src/index.ts[22m → [1mpackages/reactivity/dist/reactivity.cjs.js[22m...[39m
+#11 1.731 [32mcreated [1mpackages/compiler-core/dist/compiler-core.esm-bundler.js[22m in [1m652ms[22m[39m
+#11 1.731 [36m
+#11 1.731 [1m/app/packages/compiler-core/src/index.ts[22m → [1mpackages/compiler-core/dist/compiler-core.cjs.js[22m...[39m
+#11 1.819 [32mcreated [1mpackages/reactivity/dist/reactivity.cjs.js[22m in [1m125ms[22m[39m
+#11 1.819 [36m
+#11 1.819 [1m/app/packages/reactivity/src/index.ts[22m → [1mpackages/reactivity/dist/reactivity.global.js[22m...[39m
+#11 1.844 [32mcreated [1mpackages/server-renderer/dist/server-renderer.esm-bundler.js[22m in [1m733ms[22m[39m
+#11 1.844 [36m
+#11 1.844 [1m/app/packages/server-renderer/src/index.ts[22m → [1mpackages/server-renderer/dist/server-renderer.esm-browser.js[22m...[39m
+#11 1.857 [1m[33m(!) Unresolved dependencies[39m[22m
+#11 1.857 [90mhttps://rollupjs.org/troubleshooting/#warning-treating-module-as-external-dependency[39m
+#11 1.857 [1mpostcss-modules[22m (imported by "packages/compiler-sfc/src/compileStyle.ts")
+#11 1.857 [1mminimatch[22m (imported by "packages/compiler-sfc/src/script/resolveType.ts")
+#11 1.857 [1mlru-cache[22m (imported by "packages/compiler-sfc/src/cache.ts")
+#11 1.857 [1mhash-sum[22m (imported by "packages/compiler-sfc/src/style/cssVars.ts")
+#11 1.857 [1mpostcss-selector-parser[22m (imported by "packages/compiler-sfc/src/style/pluginScoped.ts")
+#11 1.857 [1mmerge-source-map[22m (imported by "packages/compiler-sfc/src/style/preprocessors.ts")
+#11 1.858 [32mcreated [1mpackages/compiler-sfc/dist/compiler-sfc.cjs.js[22m in [1m718ms[22m[39m
+#11 1.858 [36m
+#11 1.858 [1m/app/packages/compiler-sfc/src/index.ts[22m → [1mpackages/compiler-sfc/dist/compiler-sfc.esm-browser.js[22m...[39m
+#11 1.961 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 1.961 
+#11 1.961 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 1.961 
+#11 1.961 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 1.961 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 1.961 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 1.961 [90m32:   unref,
+#11 1.961 33:   warn,
+#11 1.961 34: } from '@vue/runtime-core'
+#11 1.961     ^
+#11 1.961 35: import {
+#11 1.961 36:   camelize,[39m
+#11 1.974 [32mcreated [1mpackages/reactivity/dist/reactivity.global.js[22m in [1m155ms[22m[39m
+#11 1.974 [36m
+#11 1.974 [1m/app/packages/reactivity/src/index.ts[22m → [1mpackages/reactivity/dist/reactivity.esm-browser.prod.js[22m...[39m
+#11 1.976 [32mcreated [1mpackages/compiler-dom/dist/compiler-dom.esm-browser.js[22m in [1m577ms[22m[39m
+#11 1.976 [36m
+#11 1.976 [1m/app/packages/compiler-dom/src/index.ts[22m → [1mpackages/compiler-dom/dist/compiler-dom.cjs.js[22m...[39m
+#11 2.044 [32mcreated [1mpackages/compiler-dom/dist/compiler-dom.cjs.js[22m in [1m69ms[22m[39m
+#11 2.044 [36m
+#11 2.044 [1m/app/packages/compiler-dom/src/index.ts[22m → [1mpackages/compiler-dom/dist/compiler-dom.global.js[22m...[39m
+#11 2.050 [32mcreated [1mpackages/runtime-core/dist/runtime-core.esm-bundler.js[22m in [1m964ms[22m[39m
+#11 2.051 [36m
+#11 2.051 [1m/app/packages/runtime-core/src/index.ts[22m → [1mpackages/runtime-core/dist/runtime-core.cjs.js[22m...[39m
+#11 2.162 [32mcreated [1mpackages/compiler-core/dist/compiler-core.cjs.js[22m in [1m430ms[22m[39m
+#11 2.162 [36m
+#11 2.162 [1m/app/packages/compiler-core/src/index.ts[22m → [1mpackages/compiler-core/dist/compiler-core.cjs.prod.js[22m...[39m
+#11 2.174 [32mcreated [1mpackages/reactivity/dist/reactivity.esm-browser.prod.js[22m in [1m199ms[22m[39m
+#11 2.174 [36m
+#11 2.174 [1m/app/packages/reactivity/src/index.ts[22m → [1mpackages/reactivity/dist/reactivity.cjs.prod.js[22m...[39m
+#11 2.285 [32mcreated [1mpackages/reactivity/dist/reactivity.cjs.prod.js[22m in [1m111ms[22m[39m
+#11 2.285 [36m
+#11 2.285 [1m/app/packages/reactivity/src/index.ts[22m → [1mpackages/reactivity/dist/reactivity.global.prod.js[22m...[39m
+#11 2.476 [32mcreated [1mpackages/compiler-dom/dist/compiler-dom.global.js[22m in [1m432ms[22m[39m
+#11 2.476 [36m
+#11 2.476 [1m/app/packages/compiler-dom/src/index.ts[22m → [1mpackages/compiler-dom/dist/compiler-dom.esm-browser.prod.js[22m...[39m
+#11 2.477 [32mcreated [1mpackages/reactivity/dist/reactivity.global.prod.js[22m in [1m192ms[22m[39m
+#11 2.515 [32mcreated [1mpackages/compiler-core/dist/compiler-core.cjs.prod.js[22m in [1m354ms[22m[39m
+#11 2.571 [32mcreated [1mpackages/runtime-dom/dist/runtime-dom.esm-browser.js[22m in [1m964ms[22m[39m
+#11 2.571 [36m
+#11 2.571 [1m/app/packages/runtime-dom/src/index.ts[22m → [1mpackages/runtime-dom/dist/runtime-dom.cjs.js[22m...[39m
+#11 2.576 [32mcreated [1mpackages/runtime-core/dist/runtime-core.cjs.js[22m in [1m526ms[22m[39m
+#11 2.576 [36m
+#11 2.576 [1m/app/packages/runtime-core/src/index.ts[22m → [1mpackages/runtime-core/dist/runtime-core.cjs.prod.js[22m...[39m
+#11 2.626 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 2.626 
+#11 2.626 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 2.626 
+#11 2.626 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 2.626 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 2.626 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 2.626 [90m32:   unref,
+#11 2.626 33:   warn,
+#11 2.626 34: } from '@vue/runtime-core'
+#11 2.626     ^
+#11 2.626 35: import {
+#11 2.626 36:   camelize,[39m
+#11 2.686 [32mcreated [1mpackages/runtime-dom/dist/runtime-dom.cjs.js[22m in [1m114ms[22m[39m
+#11 2.686 [36m
+#11 2.686 [1m/app/packages/runtime-dom/src/index.ts[22m → [1mpackages/runtime-dom/dist/runtime-dom.global.js[22m...[39m
+#11 2.745 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 2.745 
+#11 2.745 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 2.745 
+#11 2.745 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 2.745 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 2.745 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 2.745 [90m32:   unref,
+#11 2.745 33:   warn,
+#11 2.745 34: } from '@vue/runtime-core'
+#11 2.745     ^
+#11 2.745 35: import {
+#11 2.745 36:   camelize,[39m
+#11 2.773 [32mcreated [1mpackages/vue/dist/vue.global.js[22m in [1m1.4s[22m[39m
+#11 2.773 [36m
+#11 2.773 [1m/app/packages/vue/src/runtime.ts[22m → [1mpackages/vue/dist/vue.runtime.global.js[22m...[39m
+#11 2.833 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 2.833 
+#11 2.833 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 2.833 
+#11 2.833 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 2.833 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 2.833 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 2.833 [90m32:   unref,
+#11 2.833 33:   warn,
+#11 2.833 34: } from '@vue/runtime-core'
+#11 2.833     ^
+#11 2.833 35: import {
+#11 2.833 36:   camelize,[39m
+#11 2.853 [32mcreated [1mpackages/vue-compat/dist/vue.esm-bundler.js[22m in [1m1.6s[22m[39m
+#11 2.853 [36m
+#11 2.853 [1m/app/packages/vue-compat/src/esm-runtime.ts[22m → [1mpackages/vue-compat/dist/vue.runtime.esm-bundler.js[22m...[39m
+#11 2.914 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 2.914 
+#11 2.914 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 2.914 
+#11 2.914 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 2.914 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 2.914 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 2.914 [90m32:   unref,
+#11 2.914 33:   warn,
+#11 2.914 34: } from '@vue/runtime-core'
+#11 2.914     ^
+#11 2.914 35: import {
+#11 2.914 36:   camelize,[39m
+#11 2.976 [32mcreated [1mpackages/compiler-dom/dist/compiler-dom.esm-browser.prod.js[22m in [1m500ms[22m[39m
+#11 2.977 [36m
+#11 2.977 [1m/app/packages/compiler-dom/src/index.ts[22m → [1mpackages/compiler-dom/dist/compiler-dom.cjs.prod.js[22m...[39m
+#11 2.986 [32mcreated [1mpackages/runtime-core/dist/runtime-core.cjs.prod.js[22m in [1m410ms[22m[39m
+#11 3.018 [32mcreated [1mpackages/server-renderer/dist/server-renderer.esm-browser.js[22m in [1m1.1s[22m[39m
+#11 3.018 [36m
+#11 3.018 [1m/app/packages/server-renderer/src/index.ts[22m → [1mpackages/server-renderer/dist/server-renderer.cjs.js[22m...[39m
+#11 3.026 [32mcreated [1mpackages/compiler-dom/dist/compiler-dom.cjs.prod.js[22m in [1m50ms[22m[39m
+#11 3.026 [36m
+#11 3.026 [1m/app/packages/compiler-dom/src/index.ts[22m → [1mpackages/compiler-dom/dist/compiler-dom.global.prod.js[22m...[39m
+#11 3.443 [32mcreated [1mpackages/compiler-dom/dist/compiler-dom.global.prod.js[22m in [1m416ms[22m[39m
+#11 3.447 [32mcreated [1mpackages/server-renderer/dist/server-renderer.cjs.js[22m in [1m429ms[22m[39m
+#11 3.447 [36m
+#11 3.447 [1m/app/packages/server-renderer/src/index.ts[22m → [1mpackages/server-renderer/dist/server-renderer.esm-browser.prod.js[22m...[39m
+#11 3.527 [32mcreated [1mpackages/runtime-dom/dist/runtime-dom.global.js[22m in [1m841ms[22m[39m
+#11 3.527 [36m
+#11 3.527 [1m/app/packages/runtime-dom/src/index.ts[22m → [1mpackages/runtime-dom/dist/runtime-dom.esm-browser.prod.js[22m...[39m
+#11 3.568 [32mcreated [1mpackages/vue/dist/vue.runtime.global.js[22m in [1m795ms[22m[39m
+#11 3.568 [36m
+#11 3.568 [1m/app/packages/vue/src/index.ts[22m → [1mpackages/vue/dist/vue.esm-browser.js[22m...[39m
+#11 3.603 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 3.603 
+#11 3.603 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 3.603 
+#11 3.603 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 3.603 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 3.603 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 3.603 [90m31:   nextTick,
+#11 3.603 32:   unref,
+#11 3.603 33:   warn,
+#11 3.603     ^
+#11 3.603 34: } from '@vue/runtime-core'
+#11 3.603 35: import {[39m
+#11 3.656 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 3.656 
+#11 3.656 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 3.656 
+#11 3.656 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 3.656 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 3.656 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 3.656 [90m32:   unref,
+#11 3.656 33:   warn,
+#11 3.656 34: } from '@vue/runtime-core'
+#11 3.656     ^
+#11 3.656 35: import {
+#11 3.656 36:   camelize,[39m
+#11 3.674 [32mcreated [1mpackages/vue-compat/dist/vue.runtime.esm-bundler.js[22m in [1m820ms[22m[39m
+#11 3.674 [36m
+#11 3.674 [1m/app/packages/vue-compat/src/index.ts[22m → [1mpackages/vue-compat/dist/vue.cjs.js[22m...[39m
+#11 3.751 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 3.751 
+#11 3.751 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 3.751 
+#11 3.751 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 3.751 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 3.751 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 3.751 [90m31:   nextTick,
+#11 3.751 32:   unref,
+#11 3.751 33:   warn,
+#11 3.751     ^
+#11 3.751 34: } from '@vue/runtime-core'
+#11 3.751 35: import {[39m
+#11 3.767 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 3.767 
+#11 3.767 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 3.767 
+#11 3.767 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 3.767 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 3.767 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 3.767 [90m32:   unref,
+#11 3.767 33:   warn,
+#11 3.767 34: } from '@vue/runtime-core'
+#11 3.767     ^
+#11 3.767 35: import {
+#11 3.767 36:   camelize,[39m
+#11 4.173 [1m[33m(!) Unresolved dependencies[39m[22m
+#11 4.173 [90mhttps://rollupjs.org/troubleshooting/#warning-treating-module-as-external-dependency[39m
+#11 4.173 [1mpostcss[22m (imported by "packages/compiler-sfc/src/compileStyle.ts" and "packages/compiler-sfc/src/style/pluginScoped.ts")
+#11 4.173 [1mpostcss-modules[22m (imported by "packages/compiler-sfc/src/compileStyle.ts")
+#11 4.173 [1msource-map-js[22m (imported by "packages/compiler-sfc/src/compileScript.ts", "packages/compiler-sfc/src/compileTemplate.ts", "packages/compiler-sfc/src/parse.ts" and "packages/compiler-core/src/codegen.ts")
+#11 4.173 [1mminimatch[22m (imported by "packages/compiler-sfc/src/script/resolveType.ts")
+#11 4.173 [1mlru-cache[22m (imported by "packages/compiler-sfc/src/cache.ts")
+#11 4.173 [1mhash-sum[22m (imported by "packages/compiler-sfc/src/style/cssVars.ts")
+#11 4.173 [1mentities/lib/decode.js[22m (imported by "packages/compiler-core/src/parser.ts" and "packages/compiler-core/src/tokenizer.ts")
+#11 4.173 [1mmerge-source-map[22m (imported by "packages/compiler-sfc/src/style/preprocessors.ts")
+#11 4.173 [1mpostcss-selector-parser[22m (imported by "packages/compiler-sfc/src/style/pluginScoped.ts")
+#11 4.173 [32mcreated [1mpackages/compiler-sfc/dist/compiler-sfc.esm-browser.js[22m in [1m2.3s[22m[39m
+#11 4.390 [32mcreated [1mpackages/runtime-dom/dist/runtime-dom.esm-browser.prod.js[22m in [1m864ms[22m[39m
+#11 4.390 [36m
+#11 4.390 [1m/app/packages/runtime-dom/src/index.ts[22m → [1mpackages/runtime-dom/dist/runtime-dom.cjs.prod.js[22m...[39m
+#11 4.433 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 4.433 
+#11 4.433 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 4.433 
+#11 4.433 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 4.433 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 4.433 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 4.433 [90m31:   nextTick,
+#11 4.433 32:   unref,
+#11 4.433 33:   warn,
+#11 4.433     ^
+#11 4.433 34: } from '@vue/runtime-core'
+#11 4.433 35: import {[39m
+#11 4.488 [32mcreated [1mpackages/server-renderer/dist/server-renderer.esm-browser.prod.js[22m in [1m1s[22m[39m
+#11 4.488 [36m
+#11 4.488 [1m/app/packages/server-renderer/src/index.ts[22m → [1mpackages/server-renderer/dist/server-renderer.cjs.prod.js[22m...[39m
+#11 4.488 [32mcreated [1mpackages/runtime-dom/dist/runtime-dom.cjs.prod.js[22m in [1m97ms[22m[39m
+#11 4.488 [36m
+#11 4.488 [1m/app/packages/runtime-dom/src/index.ts[22m → [1mpackages/runtime-dom/dist/runtime-dom.global.prod.js[22m...[39m
+#11 4.536 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 4.536 
+#11 4.536 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 4.536 
+#11 4.536 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 4.536 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 4.536 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 4.536 [90m31:   nextTick,
+#11 4.536 32:   unref,
+#11 4.536 33:   warn,
+#11 4.536     ^
+#11 4.536 34: } from '@vue/runtime-core'
+#11 4.536 35: import {[39m
+#11 4.650 [32mcreated [1mpackages/vue/dist/vue.esm-browser.js[22m in [1m1s[22m[39m
+#11 4.650 [36m
+#11 4.650 [1m/app/packages/vue/src/runtime.ts[22m → [1mpackages/vue/dist/vue.runtime.esm-browser.js[22m...[39m
+#11 4.699 [32mcreated [1mpackages/vue-compat/dist/vue.cjs.js[22m in [1m1s[22m[39m
+#11 4.699 [36m
+#11 4.699 [1m/app/packages/vue-compat/src/index.ts[22m → [1mpackages/vue-compat/dist/vue.global.js[22m...[39m
+#11 4.721 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 4.721 
+#11 4.721 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 4.721 
+#11 4.721 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 4.721 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 4.721 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 4.721 [90m32:   unref,
+#11 4.721 33:   warn,
+#11 4.721 34: } from '@vue/runtime-core'
+#11 4.721     ^
+#11 4.721 35: import {
+#11 4.721 36:   camelize,[39m
+#11 4.786 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 4.786 
+#11 4.786 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 4.786 
+#11 4.786 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 4.786 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 4.786 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 4.786 [90m32:   unref,
+#11 4.786 33:   warn,
+#11 4.786 34: } from '@vue/runtime-core'
+#11 4.786     ^
+#11 4.786 35: import {
+#11 4.786 36:   camelize,[39m
+#11 4.888 [32mcreated [1mpackages/server-renderer/dist/server-renderer.cjs.prod.js[22m in [1m400ms[22m[39m
+#11 5.211 [32mcreated [1mpackages/runtime-dom/dist/runtime-dom.global.prod.js[22m in [1m723ms[22m[39m
+#11 5.301 [32mcreated [1mpackages/vue/dist/vue.runtime.esm-browser.js[22m in [1m650ms[22m[39m
+#11 5.301 [36m
+#11 5.301 [1m/app/packages/vue/src/index.ts[22m → [1mpackages/vue/dist/vue.cjs.prod.js[22m...[39m
+#11 5.314 [32mcreated [1mpackages/vue/dist/vue.cjs.prod.js[22m in [1m14ms[22m[39m
+#11 5.314 [36m
+#11 5.314 [1m/app/packages/vue/src/index.ts[22m → [1mpackages/vue/dist/vue.global.prod.js[22m...[39m
+#11 5.389 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 5.389 
+#11 5.389 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 5.389 
+#11 5.389 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 5.389 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 5.389 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 5.389 [90m31:   nextTick,
+#11 5.389 32:   unref,
+#11 5.389 33:   warn,
+#11 5.389     ^
+#11 5.389 34: } from '@vue/runtime-core'
+#11 5.389 35: import {[39m
+#11 5.659 [32mcreated [1mpackages/vue-compat/dist/vue.global.js[22m in [1m959ms[22m[39m
+#11 5.659 [36m
+#11 5.659 [1m/app/packages/vue-compat/src/runtime.ts[22m → [1mpackages/vue-compat/dist/vue.runtime.global.js[22m...[39m
+#11 5.883 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 5.883 
+#11 5.883 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 5.883 
+#11 5.883 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 5.883 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 5.883 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 5.883 [90m32:   unref,
+#11 5.883 33:   warn,
+#11 5.883 34: } from '@vue/runtime-core'
+#11 5.883     ^
+#11 5.883 35: import {
+#11 5.883 36:   camelize,[39m
+#11 6.277 [32mcreated [1mpackages/vue-compat/dist/vue.runtime.global.js[22m in [1m618ms[22m[39m
+#11 6.277 [36m
+#11 6.277 [1m/app/packages/vue-compat/src/esm-index.ts[22m → [1mpackages/vue-compat/dist/vue.esm-browser.js[22m...[39m
+#11 6.365 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 6.365 
+#11 6.365 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 6.365 
+#11 6.365 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 6.365 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 6.365 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 6.365 [90m32:   unref,
+#11 6.365 33:   warn,
+#11 6.365 34: } from '@vue/runtime-core'
+#11 6.365     ^
+#11 6.365 35: import {
+#11 6.365 36:   camelize,[39m
+#11 6.382 [32mcreated [1mpackages/vue/dist/vue.global.prod.js[22m in [1m1s[22m[39m
+#11 6.382 [36m
+#11 6.382 [1m/app/packages/vue/src/runtime.ts[22m → [1mpackages/vue/dist/vue.runtime.global.prod.js[22m...[39m
+#11 6.440 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 6.440 
+#11 6.440 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 6.440 
+#11 6.440 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 6.440 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 6.440 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 6.440 [90m31:   nextTick,
+#11 6.440 32:   unref,
+#11 6.440 33:   warn,
+#11 6.440     ^
+#11 6.440 34: } from '@vue/runtime-core'
+#11 6.440 35: import {[39m
+#11 6.964 [32mcreated [1mpackages/vue/dist/vue.runtime.global.prod.js[22m in [1m582ms[22m[39m
+#11 6.964 [36m
+#11 6.964 [1m/app/packages/vue/src/index.ts[22m → [1mpackages/vue/dist/vue.esm-browser.prod.js[22m...[39m
+#11 7.037 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 7.037 
+#11 7.037 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 7.037 
+#11 7.037 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 7.037 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 7.037 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 7.037 [90m31:   nextTick,
+#11 7.037 32:   unref,
+#11 7.037 33:   warn,
+#11 7.037     ^
+#11 7.037 34: } from '@vue/runtime-core'
+#11 7.037 35: import {[39m
+#11 7.255 [32mcreated [1mpackages/vue-compat/dist/vue.esm-browser.js[22m in [1m978ms[22m[39m
+#11 7.255 [36m
+#11 7.255 [1m/app/packages/vue-compat/src/esm-runtime.ts[22m → [1mpackages/vue-compat/dist/vue.runtime.esm-browser.js[22m...[39m
+#11 7.382 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (34:0): A comment
+#11 7.382 
+#11 7.382 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 7.382 
+#11 7.382 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 7.382 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 7.382 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:34:0[22m
+#11 7.382 [90m32:   unref,
+#11 7.382 33:   warn,
+#11 7.382 34: } from '@vue/runtime-core'
+#11 7.382     ^
+#11 7.382 35: import {
+#11 7.382 36:   camelize,[39m
+#11 7.832 [32mcreated [1mpackages/vue-compat/dist/vue.runtime.esm-browser.js[22m in [1m577ms[22m[39m
+#11 7.832 [36m
+#11 7.832 [1m/app/packages/vue-compat/src/index.ts[22m → [1mpackages/vue-compat/dist/vue.cjs.prod.js[22m...[39m
+#11 7.893 [32mcreated [1mpackages/vue/dist/vue.esm-browser.prod.js[22m in [1m929ms[22m[39m
+#11 7.893 [36m
+#11 7.893 [1m/app/packages/vue/src/runtime.ts[22m → [1mpackages/vue/dist/vue.runtime.esm-browser.prod.js[22m...[39m
+#11 7.925 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 7.925 
+#11 7.925 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 7.925 
+#11 7.925 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 7.925 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 7.925 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 7.925 [90m31:   nextTick,
+#11 7.925 32:   unref,
+#11 7.925 33:   warn,
+#11 7.925     ^
+#11 7.925 34: } from '@vue/runtime-core'
+#11 7.925 35: import {[39m
+#11 7.936 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 7.936 
+#11 7.936 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 7.936 
+#11 7.936 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 7.936 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 7.936 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 7.936 [90m31:   nextTick,
+#11 7.936 32:   unref,
+#11 7.936 33:   warn,
+#11 7.936     ^
+#11 7.936 34: } from '@vue/runtime-core'
+#11 7.936 35: import {[39m
+#11 8.458 [32mcreated [1mpackages/vue/dist/vue.runtime.esm-browser.prod.js[22m in [1m565ms[22m[39m
+#11 8.655 [32mcreated [1mpackages/vue-compat/dist/vue.cjs.prod.js[22m in [1m822ms[22m[39m
+#11 8.655 [36m
+#11 8.655 [1m/app/packages/vue-compat/src/index.ts[22m → [1mpackages/vue-compat/dist/vue.global.prod.js[22m...[39m
+#11 8.738 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 8.738 
+#11 8.738 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 8.738 
+#11 8.738 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 8.738 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 8.738 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 8.738 [90m31:   nextTick,
+#11 8.738 32:   unref,
+#11 8.738 33:   warn,
+#11 8.738     ^
+#11 8.738 34: } from '@vue/runtime-core'
+#11 8.738 35: import {[39m
+#11 9.702 [32mcreated [1mpackages/vue-compat/dist/vue.global.prod.js[22m in [1m1s[22m[39m
+#11 9.702 [36m
+#11 9.702 [1m/app/packages/vue-compat/src/runtime.ts[22m → [1mpackages/vue-compat/dist/vue.runtime.global.prod.js[22m...[39m
+#11 9.915 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 9.915 
+#11 9.915 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 9.915 
+#11 9.915 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 9.915 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 9.915 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 9.915 [90m31:   nextTick,
+#11 9.915 32:   unref,
+#11 9.915 33:   warn,
+#11 9.915     ^
+#11 9.915 34: } from '@vue/runtime-core'
+#11 9.915 35: import {[39m
+#11 10.32 [32mcreated [1mpackages/vue-compat/dist/vue.runtime.global.prod.js[22m in [1m620ms[22m[39m
+#11 10.32 [36m
+#11 10.32 [1m/app/packages/vue-compat/src/esm-index.ts[22m → [1mpackages/vue-compat/dist/vue.esm-browser.prod.js[22m...[39m
+#11 10.37 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 10.37 
+#11 10.37 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 10.37 
+#11 10.37 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 10.37 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 10.37 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 10.37 [90m31:   nextTick,
+#11 10.37 32:   unref,
+#11 10.37 33:   warn,
+#11 10.37     ^
+#11 10.37 34: } from '@vue/runtime-core'
+#11 10.37 35: import {[39m
+#11 11.32 [32mcreated [1mpackages/vue-compat/dist/vue.esm-browser.prod.js[22m in [1m996ms[22m[39m
+#11 11.32 [36m
+#11 11.32 [1m/app/packages/vue-compat/src/esm-runtime.ts[22m → [1mpackages/vue-compat/dist/vue.runtime.esm-browser.prod.js[22m...[39m
+#11 11.43 [1m[33m(!) packages/runtime-dom/src/apiCustomElement.ts (33:0): A comment
+#11 11.43 
+#11 11.43 "/*! #__NO_SIDE_EFFECTS__ */"
+#11 11.43 
+#11 11.43 in "packages/runtime-dom/src/apiCustomElement.ts" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.[39m[22m
+#11 11.43 [90mhttps://rollupjs.org/configuration-options/#no-side-effects[39m
+#11 11.43 [1m/app/packages/runtime-dom/src/apiCustomElement.ts:33:0[22m
+#11 11.43 [90m31:   nextTick,
+#11 11.43 32:   unref,
+#11 11.43 33:   warn,
+#11 11.43     ^
+#11 11.43 34: } from '@vue/runtime-core'
+#11 11.43 35: import {[39m
+#11 11.90 [32mcreated [1mpackages/vue-compat/dist/vue.runtime.esm-browser.prod.js[22m in [1m583ms[22m[39m
+#11 11.94 
+#11 12.07 compiler-dom.global.prod.js min:81 kB / gzip:28.7 kB / brotli:25.4 kB
+#11 12.10 reactivity.global.prod.js min:18.6 kB / gzip:6.79 kB / brotli:6.25 kB
+#11 12.25 runtime-dom.global.prod.js min:101 kB / gzip:38.4 kB / brotli:34.6 kB
+#11 12.52 vue.global.prod.js min:159 kB / gzip:58.5 kB / brotli:52.2 kB
+#11 12.67 vue.runtime.global.prod.js min:101 kB / gzip:38.4 kB / brotli:34.6 kB
+#11 12.67 
+#11 12.70 total 464
+#11 12.70 drwxr-xr-x  1 root root   4096 Aug 28 21:07 .
+#11 12.70 drwxr-xr-x  1 root root   4096 Aug 28 21:07 ..
+#11 12.70 drwxrwxr-x  8 root root   4096 Aug 27 21:29 .git
+#11 12.70 -rw-rw-r--  1 root root     83 Aug 27 21:29 .git-blame-ignore-revs
+#11 12.70 drwxrwxr-x  4 root root   4096 Aug 27 21:29 .github
+#11 12.70 -rw-rw-r--  1 root root    128 Aug 27 21:29 .gitignore
+#11 12.70 -rw-rw-r--  1 root root      8 Aug 27 21:29 .node-version
+#11 12.70 -rw-rw-r--  1 root root     34 Aug 27 21:29 .prettierignore
+#11 12.70 -rw-rw-r--  1 root root     69 Aug 27 21:29 .prettierrc
+#11 12.70 drwxrwxr-x  2 root root   4096 Aug 27 21:29 .vscode
+#11 12.70 drwxrwxr-x  2 root root   4096 Aug 27 21:29 .well-known
+#11 12.70 -rw-rw-r--  1 root root    496 Aug 27 21:29 BACKERS.md
+#11 12.70 -rw-rw-r--  1 root root  85703 Aug 27 21:29 CHANGELOG.md
+#11 12.70 -rw-rw-r--  1 root root    107 Aug 27 21:29 FUNDING.json
+#11 12.70 -rw-rw-r--  1 root root   1112 Aug 27 21:29 LICENSE
+#11 12.70 -rw-rw-r--  1 root root   2503 Aug 27 21:29 README.md
+#11 12.70 -rw-rw-r--  1 root root   1159 Aug 27 21:29 SECURITY.md
+#11 12.70 drwxrwxr-x  2 root root   4096 Aug 27 21:29 changelogs
+#11 12.70 drwxr-xr-x  2 root root   4096 Aug 28 21:07 dist
+#11 12.70 drwxrwxr-x  2 root root   4096 Aug 28 21:07 envgym
+#11 12.70 -rw-rw-r--  1 root root   5036 Aug 27 21:29 eslint.config.js
+#11 12.70 -rw-rw-r--  1 root root     98 Aug 27 21:29 netlify.toml
+#11 12.70 drwxr-xr-x 10 root root   4096 Aug 28 21:07 node_modules
+#11 12.70 -rw-rw-r--  1 root root   5041 Aug 27 21:29 package.json
+#11 12.70 drwxrwxr-x  1 root root   4096 Aug 27 21:29 packages
+#11 12.70 drwxrwxr-x  7 root root   4096 Aug 27 21:29 packages-private
+#11 12.70 -rw-rw-r--  1 root root 212140 Aug 27 21:29 pnpm-lock.yaml
+#11 12.70 -rw-rw-r--  1 root root    644 Aug 27 21:29 pnpm-workspace.yaml
+#11 12.70 -rw-rw-r--  1 root root  11945 Aug 27 21:29 rollup.config.js
+#11 12.70 -rw-rw-r--  1 root root   6829 Aug 27 21:29 rollup.dts.config.js
+#11 12.70 drwxrwxr-x  2 root root   4096 Aug 27 21:29 scripts
+#11 12.70 drwxr-xr-x  2 root root   4096 Aug 28 21:07 temp
+#11 12.70 -rw-rw-r--  1 root root    588 Aug 27 21:29 tsconfig.build.json
+#11 12.70 -rw-rw-r--  1 root root   1091 Aug 27 21:29 tsconfig.json
+#11 12.70 -rw-rw-r--  1 root root   1491 Aug 27 21:29 vitest.config.ts
+#11 12.70 -rw-rw-r--  1 root root    301 Aug 27 21:29 vitest.e2e.config.ts
+#11 12.70 -rw-rw-r--  1 root root    226 Aug 27 21:29 vitest.unit.config.ts
+#11 12.70 -rw-rw-r--  1 root root    142 Aug 27 21:29 vitest.workspace.ts
+#11 DONE 12.7s
+
+#12 [stage-1 3/9] COPY --from=builder /app/node_modules ./node_modules
+#12 DONE 2.0s
+
+#13 [stage-1 4/9] COPY --from=builder /app/package*.json ./
+#13 DONE 0.2s
+
+#14 [stage-1 5/9] COPY --from=builder /app/scripts ./scripts
+#14 DONE 0.0s
+
+#15 [stage-1 6/9] COPY --from=builder /app/packages ./packages
+#15 DONE 0.1s
+
+#16 [stage-1 7/9] COPY --from=builder /app/README.md ./
+#16 DONE 0.0s
+
+#17 [stage-1 8/9] RUN chmod -R 755 /app/scripts &&     chown -R node:node /app
+#17 DONE 7.3s
+
+#18 [stage-1 9/9] WORKDIR /app
+#18 DONE 0.0s
+
+#19 exporting to image
+#19 exporting layers
+#19 exporting layers 3.1s done
+#19 writing image sha256:3e6ed5b2a632f5ae77809a03edbc7d58e67ea021b5ef28df4115360bae5d7f60 done
+#19 naming to docker.io/library/envgym_test_1756415253 done
+#19 DONE 3.1s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

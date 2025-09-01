@@ -1,0 +1,130 @@
+Based on the provided hardware information, here is the adjusted and verified environment setup plan. The plan has been updated to reflect the specific working directory, the `x86_64` architecture, and the absence of a GPU, ensuring all steps are compatible and feasible.
+
+***
+
+### **ADJUSTED ENVIRONMENT SETUP PLAN**
+
+This plan has been revised for an `x86_64` architecture within a Docker container environment (e.g., `ubuntu:20.04`) with no NVIDIA GPU access. All paths and actions assume the working directory is `/home/cc/EnvGym/data/flex`.
+
+---
+
+#### **1. DOWNLOADS NEEDED:**
+
+*   **Conda:** Anaconda or Miniconda for environment management.
+*   **Git:** For cloning the project repository (if not already present).
+*   **System-Level Dependencies (Debian/Ubuntu-based):** A number of system libraries are required by the target ML projects. These should be installed via `apt-get` and may require `sudo` permissions.
+    *   Key packages include: `build-essential`, `cmake`, `clang`, `swig`, `ffmpeg`, `libsdl2-dev`, `libboost-all-dev`, `libgmp3-dev`, `libopenmpi-dev`, `libpq-dev`, `libgdal-dev`, `mysql-server`.
+*   **Python:**
+    *   **For FLEX tool environment (`flex-env`):** Version 3.6, 3.7, or 3.8. Version 3.8 is recommended.
+    *   **For target project environments:** The setup script defaults to Python 3.6.
+*   **R Language and Packages:** `r-base` and `r-eva` are required for the main FLEX environment. They will be installed via Conda.
+*   **Python Packages (for FLEX):** All packages listed in the `requirements.txt` file, installed via pip into the main FLEX environment. Key packages include `arviz==0.6.1`, `astunparse`, `rpy2==3.2.0`, `scipy==1.5.4`, `numpy`, and `pandas`. The `astunparse` package is critical for parsing target project dependencies.
+*   **Target ML Projects:** Specific machine learning projects (e.g., `coax`). These will be downloaded and configured automatically by the `general_setup.sh` script.
+    *   **Note on GPU:** Given the absence of a GPU, the setup script must install **CPU-only** versions of any deep learning libraries (e.g., PyTorch, TensorFlow). This may require manual intervention if a project's default setup assumes a CUDA environment.
+
+---
+
+#### **2. FILES TO CREATE:**
+
+*   **Manually Created Directories:**
+    *   **Path:** `./projects` (relative to `/home/cc/EnvGym/data/flex`)
+    *   **Description:** A directory named `projects` must be created in the root of the FLEX repository. The `general_setup.sh` script will clone target ML projects into this directory. This directory is ignored by version control.
+*   **Optional Directories:**
+    *   **Path:** `tool/scripts/extra_deps/`
+    *   **Description:** This directory can hold project-specific `.txt` files with additional dependencies if needed by the setup script.
+*   **Key Configuration Files (Existing):**
+    *   **Path:** `tool/src/Config.py`
+    *   **Description:** This file contains the main configuration class for the FLEX tool. It is part of the repository and can be modified to tune analysis parameters.
+*   **Script-Generated Files & Directories:** The setup and analysis scripts will automatically create several files and directories. These include:
+    *   **Within `./projects/[project_name]/`:** `[project_name]_install_log.txt`, `commit.txt`, `evalreqs.txt`, `printExtra.py`.
+    *   **In the repository root (`/home/cc/EnvGym/data/flex`):** `logs/`, `build_logs/`, `projects/`.
+    *   **Within the `tool/` directory:** `tool/scripts/data`, `tool/scripts/azure/results/`.
+
+---
+
+#### **3. NECESSARY TEST CASES IN THE CODEBASE:**
+
+*   No new test cases need to be written for the FLEX tool itself. The primary test is to verify the complete environment setup by running FLEX on a known flaky test case.
+*   **Verification Test Case:** Run FLEX on the `coax` project example.
+    *   **Objective:** To confirm that all dependencies for both the FLEX tool and the target project are correctly installed for a **CPU-only** environment and that the tool can execute its analysis pipeline successfully.
+    *   **Expected Outcome:** The tool should run without GPU-related errors (e.g., "CUDA not available") and produce output indicating a new bound has been calculated and a patch file has been generated. Successful execution confirms that FLEX can correctly manage, interact with, and install all necessary CPU-based dependencies for the separate project-specific conda environment.
+
+---
+
+#### **4. COMPLETE TODO LIST:**
+
+**Initial Setup: Set Working Directory**
+*   **Action:** All subsequent commands assume you are operating from the project's root directory. Navigate to it first.
+    ```bash
+    cd /home/cc/EnvGym/data/flex
+    ```
+*   **Verification:** Run `ls` to confirm you see the project's contents (e.g., `tool/`, `requirements.txt`).
+
+**Step 1: Install Prerequisites**
+*   **Action:** Install Conda (Miniconda recommended) and Git.
+*   **Action (Debian/Ubuntu):** Install system-level dependencies. This is safe for the x86_64 architecture and does not install GPU-specific libraries.
+    ```bash
+    sudo apt-get update
+    sudo apt-get install -y build-essential git cmake clang curl swig subversion portaudio19-dev pkg-config ffmpeg xvfb x11vnc mesa-utils libgl1-mesa-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev libsdl1.2-dev libsmpeg-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev libfreetype6-dev libasound2-dev libjack-dev libsndfile1-dev libgmp3-dev libopenmpi-dev libeigen3-dev libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-gfx-dev libboost-all-dev libdirectfb-dev libst-dev libsdl-sge-dev libmysqlclient-dev libmariadbclient-dev libpq-dev gdal-bin libgdal-dev mysql-server
+    ```
+*   **Action:** Create necessary symbolic links for library compatibility.
+    ```bash
+    if [[ -e /usr/include/locale.h && ! -e /usr/include/xlocale.h ]]; then sudo ln -s /usr/include/locale.h /usr/include/xlocale.h; fi
+    if [[ -e /usr/include/eigen3/Eigen && ! -e /usr/include/Eigen ]]; then sudo ln -s /usr/include/eigen3/Eigen /usr/include/Eigen; fi
+    ```
+*   **Verification:** Run `conda --version` and `git --version`.
+
+**Step 2: Create and Configure Main FLEX Conda Environment**
+*   **Action:** Create a Conda environment for the FLEX tool.
+    ```bash
+    conda create -n flex-env python=3.8
+    ```
+*   **Action:** Activate the environment.
+    ```bash
+    conda activate flex-env
+    ```
+*   **Verification:** `python --version` should show `Python 3.8.x`.
+
+**Step 3: Install R Dependencies into FLEX Environment**
+*   **Action:** Within the activated `flex-env`, install R.
+    ```bash
+    conda install -c conda-forge r-base r-eva
+    ```
+*   **Verification:** Command completes successfully.
+
+**Step 4: Install Python Dependencies into FLEX Environment**
+*   **Action:** Install FLEX's Python requirements.
+    ```bash
+    pip install -r requirements.txt
+    ```
+*   **Verification:** `pip check` reports "No broken requirements found."
+
+**Step 5: Create Project Directory**
+*   **Action:** In the project root (`/home/cc/EnvGym/data/flex`), run `mkdir projects`.
+*   **Verification:** `ls -d projects` lists the directory.
+
+**Step 6: Set Up a Target ML Project**
+*   **Action:** Navigate to the scripts directory: `cd tool/scripts`.
+*   **Action:** Run the setup script.
+    *   **Important:** Since no GPU is available, monitor the installation log (`build_logs/coax_install_log.txt`) for any attempts to install GPU-specific packages. If errors occur, you may need to modify the target project's dependency files to explicitly request CPU-only versions (e.g., for PyTorch: `pip install torch --index-url https://download.pytorch.org/whl/cpu`).
+    ```bash
+    bash general_setup.sh ../../projects coax-dev/coax local d169c93
+    ```
+*   **Verification:** Check the `projects` directory for a new `coax` subdirectory. Check for installation logs in `build_logs/`. Run `conda env list` to see the new `coax` environment.
+
+**Step 7: Run FLEX to Verify the Setup**
+*   **Action:** Navigate to the `tool` directory: `cd ..`.
+*   **Action:** Execute the `boundschecker.py` script. The `-conda` flag must point to the project-specific environment (`coax`).
+    ```bash
+    python boundschecker.py -r coax -test test_update -file coax/coax/experience_replay/_prioritized_test.py -line 137 -conda coax -deps "numpy" -bc
+    ```
+*   **Verification:** The script should execute successfully without any CUDA or GPU-related errors. The output should show bound calculation and patch generation messages (e.g., "Bound:", "Patch: Generating looser patch").
+
+**Step 8: (Optional) Customize FLEX Analysis Parameters**
+*   **Action:** Tune the analysis by editing `tool/src/Config.py`.
+*   **Key Parameters to Modify:**
+    *   `THREAD_COUNT`: Set the number of parallel threads. To optimize for your CPU, you can set this to the number of available cores. Find this number by running `nproc` in your terminal. Default is 1.
+    *   `DEFAULT_ITERATIONS`, `SUBSEQUENT_ITERATIONS`: Control the number of samples taken. Default is 50.
+    *   `PROBABILITY_OF_FAILURE`: The target probability of failure. Default is 0.01.
+    *   `USE_BOXCOX`: Set to `True` to enable Box-Cox transformation for data normalization. Default is `False`.
+*   **Verification:** After modifying `tool/src/Config.py`, rerun the command from Step 7 and observe changes in performance or output.

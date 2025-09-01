@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250828_153639",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756395396",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 1.72kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/rust:1.61.0\n#2 DONE 0.3s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [1/9] FROM docker.io/library/rust:1.61.0@sha256:e9a087a78f4b632ee8977f70a3a6fb3b6c7746c392e63afc98cab7b6afdc37d7\n#4 DONE 0.0s\n\n#5 [2/9] RUN rustup install 1.56.0 &&     rustup install 1.60.0 &&     rustup install stable &&     rustup install beta &&     rustup install nightly-2025-05-16 &&     rustup component add rust-src &&     rustup component add clippy &&     rustup component add miri --toolchain nightly-2025-05-16\n#5 CACHED\n\n#6 [internal] preparing inline document\n#6 CACHED\n\n#7 [internal] preparing inline document\n#7 CACHED\n\n#8 [3/9] RUN mkdir -p /home/cc/EnvGym/data/serde-rs_serde\n#8 DONE 0.3s\n\n#9 [4/9] WORKDIR /home/cc/EnvGym/data/serde-rs_serde\n#9 DONE 0.0s\n\n#10 [5/9] RUN cargo init &&     mkdir -p serde &&     mkdir -p serde_derive &&     mkdir -p serde_derive_internals &&     mkdir -p test_suite/no_std &&     mkdir -p .github/workflows\n#10 1.159      Created binary (application) package\n#10 DONE 1.2s\n\n#11 [6/9] COPY <<EOF Cargo.toml\n#11 DONE 0.0s\n\n#12 [7/9] RUN touch serde/Cargo.toml serde_derive/Cargo.toml serde_derive_internals/Cargo.toml     test_suite/Cargo.toml test_suite/no_std/Cargo.toml\n#12 DONE 0.4s\n\n#13 [8/9] COPY <<EOF src/main.rs\n#13 DONE 0.0s\n\n#14 [9/9] RUN cargo build --workspace --all-features\n#14 0.448 error: failed to load manifest for workspace member `/home/cc/EnvGym/data/serde-rs_serde/serde`\n#14 0.448 \n#14 0.448 Caused by:\n#14 0.448   failed to parse manifest at `/home/cc/EnvGym/data/serde-rs_serde/serde/Cargo.toml`\n#14 0.448 \n#14 0.448 Caused by:\n#14 0.448   virtual manifests must be configured with [workspace]\n#14 ERROR: process \"/bin/sh -c cargo build --workspace --all-features\" did not complete successfully: exit code: 101\n------\n > [9/9] RUN cargo build --workspace --all-features:\n0.448 error: failed to load manifest for workspace member `/home/cc/EnvGym/data/serde-rs_serde/serde`\n0.448 \n0.448 Caused by:\n0.448   failed to parse manifest at `/home/cc/EnvGym/data/serde-rs_serde/serde/Cargo.toml`\n0.448 \n0.448 Caused by:\n0.448   virtual manifests must be configured with [workspace]\n------\nenvgym.dockerfile:65\n--------------------\n  63 |     \n  64 |     # Build workspace\n  65 | >>> RUN cargo build --workspace --all-features\n  66 |     \n  67 |     CMD [\"/bin/bash\"]\n--------------------\nERROR: failed to solve: process \"/bin/sh -c cargo build --workspace --all-features\" did not complete successfully: exit code: 101\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

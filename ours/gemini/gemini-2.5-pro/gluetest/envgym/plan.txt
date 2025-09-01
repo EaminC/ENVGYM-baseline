@@ -1,0 +1,126 @@
+Based on the provided hardware and environment information, here is the complete, adjusted environment setup plan. The original plan has been adapted to be fully compatible with a containerized `x86_64` Linux environment (e.g., `ubuntu:20.04`) and converted into a non-interactive, scriptable format suitable for automation.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    *   **System Utilities**: `git`, `subversion`, `curl`, `wget`, `unzip`, and `software-properties-common` are required and will be installed via the system's package manager (`apt-get`).
+    *   **GraalVM Community Edition**: A direct download of the tarball for Linux `x86_64`/`amd64`. Specifically, `graalvm-community-jdk-17.0.8+9.1_linux-x64_bin.tar.gz` is recommended, which provides Java 17 and corresponds to the required Graal SDK `23.0.1`.
+    *   **GraalPython**: This component is bundled with the recommended GraalVM distribution.
+    *   **Apache Maven**: A Java project management tool, to be installed via the system's package manager.
+    *   **CPython**: Version `3.11`, which satisfies the `>= 3.10` requirement. It will be installed from the `deadsnakes` PPA, as the default system Python on `ubuntu:20.04` is older.
+    *   **pytest**: A Python testing framework, to be installed via `pip`.
+    *   **`org.skife.kasparov:csv:1.0` JAR**: (Optional) A specific Java library JAR file required only for performance benchmarks. This file must be manually provided in the build context.
+
+2.  FILES TO CREATE:
+    *   Most necessary project files are expected to be present in the build context (`/home/cc/EnvGym/data/gluetest`) and will be copied into the environment at `/app`.
+    *   **`csv-1.0.jar`**: (Conditional) If running the `commons-csv` performance benchmarks, this file must be placed in the build context to be copied into the environment.
+    *   **`clean.csv` (or similar)**: (Conditional) An input file required by the `scripts/clients/bash_script_version.sh` script. If this script is to be run, the file must be created in the build context (e.g., at `/home/cc/EnvGym/data/gluetest/scripts/clients/clean.csv`) to be copied into the environment. The `REPO_LIST` variable inside the script must be updated to point to the file's location within the environment (e.g., `/app/scripts/clients/clean.csv`).
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    *   No changes are needed for this section. The existing test suites for Java (JUnit), Python (`pytest`), performance (JMH), and GraalVM interoperability are sufficient and will be used for verification. The `scripts/generate_glue.py` and `run.sh` scripts remain the primary tools for building and testing the project.
+
+4.  COMPLETE TODO LIST:
+    This plan is designed for a non-interactive setup within a container based on an `x86_64`/`amd64` image like `ubuntu:20.04`. All paths are relative to the container's filesystem.
+
+    *   **Step 1: Configure Environment and Install System Dependencies**
+        *   **Action:** Set the environment to non-interactive mode. Update the package list and install essential tools like Git, Subversion (for optional Maven profiles), curl/wget for downloads, and `software-properties-common` to manage repositories for Python.
+          ```bash
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update
+          apt-get install -y git subversion curl wget unzip software-properties-common
+          ```
+        *   **Verification:** The installation commands should complete without errors.
+
+    *   **Step 2: Install CPython 3.11 and pytest**
+        *   **Action:** Add the `deadsnakes` PPA to access newer Python versions. Install Python 3.11 and its package installer (`pip`). Then, install `pytest`.
+          ```bash
+          add-apt-repository ppa:deadsnakes/ppa
+          apt-get update
+          apt-get install -y python3.11 python3-pip
+          python3.11 -m pip install --upgrade pip
+          python3.11 -m pip install pytest
+          # Make python3.11 the default python3
+          update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+          ```
+        *   **Verification:** Check the installed versions.
+          ```bash
+          python3 --version  # Should show Python 3.11.x
+          python3 -m pytest --version
+          ```
+
+    *   **Step 3: Install GraalVM**
+        *   **Action:** Download the specified GraalVM Community Edition tarball for Linux `x86_64`, extract it to `/opt/graalvm`, and set the `JAVA_HOME` and `PATH` environment variables accordingly.
+          ```bash
+          curl -L -o graalvm.tar.gz "https://github.com/graalvm/graalvm-ce-builds/releases/download/jdk-17.0.8/graalvm-community-jdk-17.0.8+9.1_linux-x64_bin.tar.gz"
+          mkdir -p /opt/graalvm
+          tar -xzf graalvm.tar.gz -C /opt/graalvm --strip-components=1
+          rm graalvm.tar.gz
+          # These should be set as permanent environment variables (e.g., using ENV in a Dockerfile)
+          export JAVA_HOME=/opt/graalvm
+          export PATH=$JAVA_HOME/bin:$PATH
+          ```
+        *   **Verification:** Check the Java and GraalPy versions.
+          ```bash
+          java -version     # Output should mention "GraalVM CE" and "17.0.8"
+          graalpy --version # Output should show the GraalPy version
+          ```
+
+    *   **Step 4: Install Apache Maven**
+        *   **Action:** Install Maven using the system package manager. It will automatically detect and use the `JAVA_HOME` we just configured.
+          ```bash
+          apt-get install -y maven
+          ```
+        *   **Verification:** Check the Maven version and confirm it's using GraalVM.
+          ```bash
+          mvn -v
+          ```
+
+    *   **Step 5: Copy Project Files**
+        *   **Action:** The project source code from the host working directory (`/home/cc/EnvGym/data/gluetest`) should be copied into the environment's working directory, `/app`. In a Dockerfile, this is done with:
+          ```dockerfile
+          WORKDIR /app
+          COPY . /app
+          ```
+
+    *   **Step 6: Install Local Benchmark Dependency for commons-csv (Optional)**
+        *   **Action:** This step is only required for running performance benchmarks. First, copy the `csv-1.0.jar` from the build context into the container. Then, use Maven to install it to the local repository.
+          ```bash
+          # In a Dockerfile, you would first do: COPY csv-1.0.jar /app/
+          mvn install:install-file -Dfile=./csv-1.0.jar -DgroupId=org.skife.kasparov -DartifactId=csv -Dversion=1.0 -Dpackaging=jar
+          ```
+        *   **Verification:** Check for the artifact's presence in the local Maven repository inside the environment (`/root/.m2/repository/org/skife/kasparov/csv/1.0/`).
+
+    *   **Step 7: Generate GraalVM Interoperability Glue Code**
+        *   **Action:** From the `/app` directory, run the Python script that generates the necessary glue code.
+          ```bash
+          python3 scripts/generate_glue.py
+          ```
+        *   **Verification:** The script should execute and complete without errors.
+
+    *   **Step 8: Run the Verification Script**
+        *   **Action:** Make the main execution script executable and run it to build the project and run all primary test suites.
+          ```bash
+          chmod +x run.sh
+          ./run.sh
+          ```
+        *   **Verification:** The script must complete successfully, with the final output being:
+          ```
+          All tests passed!
+          ```
+
+    *   **Step 9: Run Performance Benchmarks for commons-csv (Optional)**
+        *   **Action:** If Step 6 was completed, run the JMH benchmarks by navigating to the `commons-csv` directory and activating the `benchmark` profile.
+          ```bash
+          cd /app/commons-csv
+          mvn test -Pbenchmark
+          ```
+        *   **Verification:** The build should complete, and benchmark results will be available at `/app/commons-csv/target/jmh-result.json`.
+
+    *   **Step 10: Run Dependency Analysis Script (Optional)**
+        *   **Action:** Ensure your input file (e.g., `clean.csv`) has been copied into the environment. Configure the script variables and execute it.
+          ```bash
+          # First, ensure the file is copied in (e.g., COPY scripts/clients/clean.csv /app/scripts/clients/)
+          # Then, edit scripts/clients/bash_script_version.sh to set REPO_LIST and OUTPUT_CSV
+          bash scripts/clients/bash_script_version.sh
+          ```
+        *   **Verification:** Inspect the generated output CSV file. It should contain the analysis results for the repositories listed in your input file.

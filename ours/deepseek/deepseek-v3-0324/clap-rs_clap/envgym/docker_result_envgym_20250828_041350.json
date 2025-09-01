@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250828_041350",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756354429",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 1.29kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/rust:1.74-slim-bullseye\n#2 DONE 0.1s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/12] FROM docker.io/library/rust:1.74-slim-bullseye@sha256:94a9c74bd893356500a12cfc022fe8574fdbb9f980dbe7c546be5f51abc10fec\n#4 DONE 0.0s\n\n#5 [ 2/12] RUN apt-get update && apt-get install -y     git     build-essential     curl     pkg-config     libssl-dev     && rm -rf /var/lib/apt/lists/*\n#5 CACHED\n\n#6 [ 3/12] RUN rustup toolchain install stable-x86_64-unknown-linux-gnu &&     rustup default stable-x86_64-unknown-linux-gnu &&     rustup target add wasm32-unknown-unknown --toolchain stable-x86_64-unknown-linux-gnu\n#6 CACHED\n\n#7 [internal] load build context\n#7 transferring context: 189.19kB 0.1s done\n#7 DONE 0.1s\n\n#8 [ 4/12] RUN cargo install cargo-deny --locked &&     cargo install cargo-release --locked &&     cargo install cargo-typos --locked &&     cargo install pre-commit --locked &&     cargo install renovate --locked\n#8 0.303 error: could not parse `$(nproc)`. Number of parallel jobs should be `default` or a number.\n#8 ERROR: process \"/bin/sh -c cargo install cargo-deny --locked &&     cargo install cargo-release --locked &&     cargo install cargo-typos --locked &&     cargo install pre-commit --locked &&     cargo install renovate --locked\" did not complete successfully: exit code: 101\n------\n > [ 4/12] RUN cargo install cargo-deny --locked &&     cargo install cargo-release --locked &&     cargo install cargo-typos --locked &&     cargo install pre-commit --locked &&     cargo install renovate --locked:\n0.303 error: could not parse `$(nproc)`. Number of parallel jobs should be `default` or a number.\n------\nenvgym.dockerfile:22\n--------------------\n  21 |     \n  22 | >>> RUN cargo install cargo-deny --locked && \\\n  23 | >>>     cargo install cargo-release --locked && \\\n  24 | >>>     cargo install cargo-typos --locked && \\\n  25 | >>>     cargo install pre-commit --locked && \\\n  26 | >>>     cargo install renovate --locked\n  27 |     \n--------------------\nERROR: failed to solve: process \"/bin/sh -c cargo install cargo-deny --locked &&     cargo install cargo-release --locked &&     cargo install cargo-typos --locked &&     cargo install pre-commit --locked &&     cargo install renovate --locked\" did not complete successfully: exit code: 101\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

@@ -1,0 +1,5 @@
+current progress
+The Dockerfile successfully creates a complete and correct build environment according to the plan. It installs all specified versions of the JDK (8, 11, 17), Go, the Android SDK Command-Line Tools, and GraalVM. All required environment variables (`JAVA_HOME`, `ANDROID_HOME`, `PATH`) are properly configured. The project source code is copied into the container, and the Maven and Gradle wrappers are made executable. The environment setup phase is complete.
+
+next step
+Add a multi-stage `RUN` instruction to the Dockerfile to execute the project's build and test commands, thereby validating the environment and the project code. This step should execute the main Maven build (`./mvnw clean install`) and the Android Gradle build (`cd android-test && ./gradlew build`). Given the multiple JDK requirements, this command should switch the `JAVA_HOME` environment variable as needed for different build profiles or modules.

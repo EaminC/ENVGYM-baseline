@@ -1,0 +1,5 @@
+current progress
+A Dockerfile has been created to automate the environment setup, including installing system dependencies and using a `NODE_AUTH_TOKEN` to run `npm ci` for private packages. The previous build failed because the required `NODE_AUTH_TOKEN` was not passed as a build argument during execution, not due to a flaw in the Dockerfile's logic. The current file combines dependency installation and the `inso` artifact build into a single stage.
+
+next step
+Modify the Dockerfile to improve build performance by leveraging Docker's layer caching. First, copy only the `package.json`, `package-lock.json`, and other necessary package manifest files, then run `npm ci`. After the dependencies are installed, copy the rest of the source code. This change will prevent the time-consuming `npm ci` command from re-running on every source code change.

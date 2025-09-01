@@ -1,0 +1,5 @@
+current progress
+The Dockerfile successfully prepares the base Ubuntu 20.04 environment, installing all specified system and Python packages. The primary source code repositories (Metis, RefFS, IOCov) have been cloned, and a workaround for Git SSH URLs has been implemented. The build process is currently paused, with the dependency installation script (`setup-deps.sh`) and the main project compilation steps commented out, indicating that the `setup-deps.sh` script was the point of a previous failure.
+
+next step
+Uncomment the `RUN /home/cc/EnvGym/data/Metis/scripts/setup-deps.sh` command to proceed with building the project's dependencies. Subsequently, uncomment the `RUN make && make install` command for Metis and the `RUN make` command for RefFS to compile the main applications. For optimization, chain the clone and build commands into a single `RUN` layer. Keep the custom kernel module build step commented out, as it should be executed at runtime due to its dependency on the host's specific kernel version.

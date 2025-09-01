@@ -1,0 +1,94 @@
+Based on the provided hardware information, here is the adjusted environment setup plan. The modifications focus on configuring a CPU-only environment, removing all GPU-related steps, and ensuring all instructions are compatible with the specified setup.
+
+***
+
+### **ADJUSTED ENVIRONMENT SETUP PLAN**
+
+This plan has been adapted for a CPU-only `x86_64` architecture. All GPU-specific requirements and tests have been removed to ensure compatibility and feasibility.
+
+**1. DOWNLOADS NEEDED:**
+*   **Git**: For cloning the source code repository.
+*   **Python**: Version 3.7 is required as specified in the README.
+*   **pip3**: Python package installer, used to install dependencies from `requirements.txt`.
+*   **Python Packages**: All packages listed in the `requirements.txt` file with their specific versions. This environment will use the CPU-only versions of the deep learning packages. Key dependencies include:
+    *   `torch==1.2.0`: The core deep learning framework (CPU version).
+    *   `torchvision==0.4.0`: For datasets and model architectures (CPU version).
+    *   `matplotlib==3.1.1`: For plotting results.
+    *   `numpy==1.17.2`: For numerical operations.
+    *   `seaborn==0.9.0`: For statistical data visualization.
+    *   `tensorboardX==1.8`: For logging to TensorBoard.
+    *   Other dependencies as listed with exact versions in `requirements.txt`.
+*   **Datasets**: The code will automatically download the required datasets (`mnist`, `fashionmnist`, `cifar10`, `cifar100`) into a `../data` directory upon the first run for each dataset. An active internet connection is needed for this initial download.
+
+**2. FILES TO CREATE:**
+*   None. All necessary files and directories are either included in the repository or will be generated automatically by the scripts. These auto-generated directories, which are ignored by Git as specified in `.gitignore`, include: `data/`, `dumps/`, `plots/`, `runs/`, and `saves/`.
+
+**3. NECESSARY TEST CASES IN THE CODEBASE:**
+*   **Basic Execution Test**: Run the primary script with default or example parameters to ensure the environment is set up correctly and training can start.
+    *   Command: `python3 main.py --prune_type=lt --arch_type=fc1 --dataset=mnist --prune_percent=10 --prune_iterations=3` (using fewer iterations for a quick test).
+    *   Success criteria: The script starts training without any import or setup errors, and console output shows training progress.
+*   **Dataset and Architecture Compatibility Test**: Verify that different combinations of tested datasets and architectures work as expected.
+    *   Command: `python3 main.py --arch_type=lenet5 --dataset=cifar10 --end_iter=2`
+    *   Success criteria: The CIFAR-10 dataset is downloaded, and training begins with the LeNet-5 architecture.
+*   **Alternative Pruning Method Test**: Test the `reinit` pruning type.
+    *   Command: `python3 main.py --prune_type=reinit --arch_type=fc1 --dataset=mnist --end_iter=2`
+    *   Success criteria: The script runs successfully using the random reinitialization pruning method.
+*   **Plot Generation Test**: After running at least two experiments, test the plot combination script.
+    *   Command: `python3 combine_plots.py`
+    *   Success criteria: The script executes without errors and generates combined plot images in the `plots/lt/combined_plots/` directory.
+*   **TensorBoard Logging Test**: Verify that training metrics are logged correctly.
+    *   Command: Use any of the training commands, e.g., `python3 main.py --dataset=mnist --arch_type=fc1 --end_iter=2`.
+    *   Success criteria: A new subdirectory containing TensorBoard log files is created within the `runs/` directory. The logs can be viewed by running `tensorboard --logdir runs`.
+
+**4. COMPLETE TODO LIST:**
+
+*   **Step 1: Install Prerequisites**
+    *   Install Git from the [official website](https://git-scm.com/downloads).
+    *   Install Python 3.7. You can download it from the [official Python website](https://www.python.org/downloads/release/python-370/).
+    *   During installation, ensure that Python and pip are added to your system's PATH.
+    *   **Verification**: Open a new terminal or command prompt and run `python3 --version` and `pip3 --version`. The output should show versions corresponding to Python 3.7.
+
+*   **Step 2: Clone the Project Repository**
+    *   Open your terminal or command prompt.
+    *   Navigate to the directory where you want to store the project (e.g., `/home/cc/EnvGym/data`).
+    *   Run the command: `git clone https://github.com/rahulvigneswaran/Lottery-Ticket-Hypothesis-in-Pytorch.git`
+    *   Change into the newly created project directory. This will be your working directory: `cd Lottery-Ticket-Hypothesis-in-Pytorch` (e.g., `/home/cc/EnvGym/data/Lottery-Ticket-Hypothesis-in-Pytorch`).
+
+*   **Step 3: Create and Activate a Virtual Environment (Recommended)**
+    *   Create a virtual environment to isolate project dependencies: `python3 -m venv venv`
+    *   Activate the environment:
+        *   On macOS/Linux: `source venv/bin/activate`
+        *   On Windows: `.\venv\Scripts\activate`
+    *   **Verification**: Your command prompt should now be prefixed with `(venv)`.
+
+*   **Step 4: Install Python Dependencies**
+    *   **Note on PyTorch**: Since no GPU is available, the standard CPU-only version of PyTorch is required. The `requirements.txt` file is configured to install this version by default.
+    *   Install all required packages using the provided file: `pip3 install -r requirements.txt`
+    *   **Verification**:
+        *   Run `pip3 list` to see a list of installed packages. Verify that `torch` is `1.2.0` and `tensorboardX` is `1.8`.
+        *   To confirm PyTorch is installed for CPU-only execution, run `python3 -c "import torch; print(torch.cuda.is_available())"`. The output must be `False`.
+
+*   **Step 5: Run an Initial Test**
+    *   Execute a short training process to confirm the setup and trigger the dataset download.
+    *   Command: `python3 main.py --prune_type=lt --arch_type=fc1 --dataset=mnist --prune_percent=10 --prune_iterations=3`
+    *   **Verification**:
+        *   Observe the console output. You should see messages indicating the MNIST dataset is being downloaded (if it's the first time).
+        *   The script should start printing training progress (e.g., epoch number, loss, accuracy) without any errors.
+        *   Check that a `data` directory has been created in the parent folder of your project directory, containing the MNIST dataset files.
+
+*   **Step 6: Verify Output Generation**
+    *   After the test run from Step 5 completes, check the project's subdirectories.
+    *   **Verification**: Check the `saves/`, `plots/`, and `runs/` directories. They should contain files and subdirectories related to the model weights, plots, and logs from your test run. The `dumps/` directory may also be created.
+
+*   **Step 7: Run the Plot Combination Script**
+    *   To test the plotting utility, you need results from at least two runs. Execute another short run with different parameters: `python3 main.py --prune_type=reinit --arch_type=fc1 --dataset=mnist --end_iter=2`
+    *   Run the combination script: `python3 combine_plots.py`
+    *   **Verification**: Check the `plots/lt/combined_plots/` directory. A new plot image file comparing the runs should have been created.
+
+*   **Step 8: Verify TensorBoard Logging**
+    *   After running any training command, log files will be generated in the `runs/` directory.
+    *   Launch the TensorBoard server from your terminal: `tensorboard --logdir runs`
+    *   **Verification**:
+        *   Open the URL provided by TensorBoard (usually `http://localhost:6006/`) in a web browser.
+        *   You should be able to see the metrics from your test runs, such as loss and accuracy, visualized in the dashboard.
+        *   The environment is now fully configured and verified for CPU-only operation.

@@ -1,0 +1,308 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    -   **Go Programming Language**: Version 1.25 is recommended for development, as it is the primary version used in CI. The project maintains compatibility with Go 1.24 (as enforced by `go mod tidy -compat=1.24` and `test/tools/go.mod`). Download from the official Go website: https://golang.org/dl/.
+    -   **Git**: Required for cloning the source code repository. Download from https://git-scm.com/downloads.
+    -   **Docker**: Required for building and running containerized examples, such as the CSM observability and interop test images. Download from https://www.docker.com/products/docker-desktop.
+    -   **gRPC-Go Source Code**: The project source code itself, which will be cloned from its official repository.
+    -   **Project Dependencies**: This is a multi-module repository. All required Go modules for the main library are listed in the root `go.mod` file. Sub-modules, such as `cmd/protoc-gen-go-grpc`, `examples`, `gcp/observability`, `interop/observability`, `interop/xds`, `security/advancedtls`, and `stats/opencensus`, have their own `go.mod` files to manage their specific dependencies. These will be downloaded automatically by Go tools.
+    -   **Go-based Linter and Proto-Verification Tools**: The project uses a suite of linters and proto validators. Their versions are pinned in `test/tools/go.mod` to ensure reproducible builds and are installed via a `make` command or by running scripts with an `-install` flag. The specific linters include:
+        -   `goimports` (from `golang.org/x/tools`)
+        -   `staticcheck` (from `honnef.co/go/tools`)
+        -   `misspell` (from `github.com/client9/misspell`)
+        -   `revive` (from `github.com/mgechev/revive`)
+    -   **(Optional) Protocol Buffers Toolchain and Sources**: Required for regenerating Go code from `.proto` files. The project provides a comprehensive script (`scripts/regenerate.sh`) that automates the download and installation of all necessary components:
+        -   **Protocol Buffers Compiler (`protoc`)**: Version 27.1 is installed by the script.
+        -   **Go plugins for `protoc`**: `protoc-gen-go` and `protoc-gen-go-grpc` are installed from source by the script.
+        -   **gRPC-Proto Source Code**: Cloned from `https://github.com/grpc/grpc-proto` by the script.
+        -   **Protocol Buffers Source Code**: Cloned from `https://github.com/protocolbuffers/protobuf` by the script for well-known types.
+        -   **Google APIs Source Code (`code.proto`)**: Downloaded via `curl` by the script.
+    -   **(Optional) bash, curl & unzip**: Required by various project scripts (`install-protoc.sh`, `vet.sh`, etc.). These tools are typically pre-installed on Linux and macOS.
+    -   **(Optional) GitHub CLI (`gh`)**: Required for maintainers to manage GitHub Releases, such as uploading release assets. Download from https://cli.github.com/.
+    -   **(Optional) CodeQL CLI**: Required for running static security analysis scans locally. This is primarily a CI-driven check, but local execution can prevent CI failures. Download from https://github.com/github/codeql-cli-binaries/releases.
+
+2.  FILES TO CREATE:
+    -   No new files need to be created for the initial setup. The environment will be configured to work with the existing source code and its configuration files, including `LICENSE`, `Makefile`, `go.mod`, `cmd/protoc-gen-go-grpc/go.mod`, `examples/go.mod`, `gcp/observability/go.mod`, `interop/observability/go.mod`, `interop/xds/go.mod`, `security/advancedtls/go.mod`, `stats/opencensus/go.mod`, `scripts/common.sh`, `scripts/vet.sh`, `scripts/revive.toml`, `test/tools/go.mod`, `test/kokoro/xds.cfg`, `test/kokoro/xds.sh`, `test/kokoro/psm-light.cfg`, `Dockerfile`, `.github/workflows/release.yml`, `.github/workflows/pr-validation.yml`, `.github/workflows/codeql-analysis.yml`, `.github/workflows/coverage.yml`, `.github/codecov.yml`, `.github/workflows/lock.yml`, and `.github/workflows/stale.yml`.
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    -   **Dependency Resolution and Compilation**:
+        -   All modules (including the root module, `cmd/protoc-gen-go-grpc`, `examples`, `gcp/observability`, `interop/observability`, `interop/xds`, `security/advancedtls`, and `stats/opencensus`) and their packages within the `grpc-go` repository should compile successfully. This can be verified by running `make build`.
+    -   **Static Analysis, Linting, and Code Style Checks**:
+        -   The codebase should pass all static analysis checks defined in the `scripts/vet.sh` script, which enforces Google's Go style guide. This is verified by running `make vet`. The versions of the linting tools are pinned in `test/tools/go.mod` to ensure consistent checks. All verification scripts (`.sh` files) must be executed in a `bash` shell environment. These checks include:
+            -   **Automated Formatting**: Code must be correctly formatted according to `gofmt` and `goimports`.
+            -   **Static Analysis**: Code must pass `go vet`, `staticcheck`, and `revive`. The `revive` linter is configured via `scripts/revive.toml` to enforce numerous style and correctness rules, including:
+                -   Proper error handling and naming (`error-return`, `error-strings`, `error-naming`).
+                -   Correct `context` usage (`context-as-argument`).
+                -   Consistent naming conventions for receivers and variables (`receiver-naming`, `var-naming`, `time-naming`).
+                -   Prohibition of dot imports, blank imports unless necessary, and package comment requirements.
+                -   Modern Go practices, such as `any` instead of `interface{}` (`use-any`).
+                -   Control flow improvements (`superfluous-else`, `unreachable-code`).
+            -   **Spell Checking**: Code must pass checks from `misspell`.
+            -   **Copyright and License Headers**: All `.go` source files must contain a copyright message and a license header compliant with the Apache License, Version 2.0, as specified in the root `LICENSE` file.
+            -   **Best Practices**:
+                -   All tests must use `leakcheck` via a `Teardown` function.
+                -   `time.After` should not be used outside of test files.
+                -   `any` must be used instead of `interface{}`.
+                -   `grpclog.Component` must be used instead of direct calls to `grpclog.I/W/E/F/V`.
+                -   `context.Background()` and `context.TODO()` must be wrapped with `context.WithTimeout` or `context.WithCancel` in tests.
+                -   `netip.ParseAddr` should be used instead of `net.ParseIP`.
+            -   **Dependency Constraints**:
+                -   The deprecated `github.com/golang/protobuf` package must not be used.
+                -   The `google.golang.org/grpc/interop/grpc_testing` package must be imported with a rename.
+                -   Any new dependencies introduced must be discussed with and approved by project maintainers.
+            -   **Code Style**:
+                -   Test function names must follow the `Test...`, `Benchmark...`, or `Example...` conventions.
+                -   No trailing spaces are allowed in any files.
+                -   All files must have a terminating newline.
+                -   No tabs are allowed in Markdown (`.md`) files.
+    -   **Static Security Analysis (CodeQL)**:
+        -   The codebase should pass static security analysis scans performed by CodeQL. This is verified automatically in CI via the `codeql-analysis.yml` workflow and can be optionally run locally.
+    -   **Protocol Buffer Source Validation**:
+        -   The generated Protocol Buffer files must be up-to-date with their `.proto` sources. This is verified by running `./scripts/vet-proto.sh`. Note for contributors: this check may fail if upstream proto files have been updated, but this will not block your PR and will be addressed by the maintenance team.
+    -   **Dependency Graph Integrity**:
+        -   The project's full dependency graph is tracked. Any changes to `go.mod` must result in a predictable and acceptable change to the dependency graph. This is verified by running `scripts/gen-deps.sh` and comparing its output against the base branch. Note for contributors: this check may fail if you have intentionally added a dependency; this is acceptable but will require discussion.
+    -   **Library Test Suite Execution**:
+        -   The comprehensive test suite should pass. Running `make test` or `go test -cpu 1,4 -timeout 7m ./...` will execute these tests. Note that as this is a multi-module repository, tests may need to be run from the root of each module to ensure full coverage.
+    -   **Race Condition Detection**:
+        -   The test suite should be run with the Go race detector enabled to identify potential concurrency issues. This is verified by running `make testrace` or `go test -race -cpu 1,4 -timeout 7m ./...`.
+    -   **Code Coverage Generation**:
+        -   The environment should be able to generate test coverage reports. This is verified by running `go test -coverprofile=...` for all packages. It should also be tested with specific feature flags toggled, such as `GRPC_EXPERIMENTAL_ENABLE_NEW_PICK_FIRST=false`, to ensure coverage under different configurations. This is checked automatically in CI via the `coverage.yml` workflow.
+        -   **Note on Coverage Scope**: As defined in `.github/codecov.yml`, code coverage metrics intentionally ignore certain files and directories, including:
+            -   Generated protocol buffer files (`**/*.pb.go`)
+            -   Test-only packages (`**/test`, `**/testutils`, `**/testdata`)
+            -   Non-library modules and packages (`benchmark`, `interop`, `interop/observability`, `cmd`, `examples`, `gcp`, `security`, `stats/opencensus`)
+    -   **Feature Flag Testing**:
+        -   Specific tests can be run with environment variables to toggle experimental features. For example, running tests with `GRPC_EXPERIMENTAL_ENABLE_NEW_PICK_FIRST=false`.
+    -   **Multi-Architecture Compatibility**:
+        -   The codebase is tested on multiple architectures. The release process for tools like `protoc-gen-go-grpc` specifically targets `amd64`, `386`, and `arm64` across `linux`, `darwin`, and `windows`. As the target environment is `linux/amd64`, all native tests are directly compatible.
+    -   **Integration and Example Tests**:
+        -   A suite of end-to-end and example tests should pass. This is verified by running scripts like `examples/examples_test.sh`, `security/advancedtls/examples/examples_test.sh`, `interop/interop_test.sh`, `internal/xds/test/e2e/run.sh`, `cmd/protoc-gen-go-grpc/protoc-gen-go-grpc_test.sh`, `test/kokoro/xds.sh`, and `test/kokoro/psm-interop-test-go.sh`.
+    -   **Proxyless Service Mesh (PSM) Interop Test Execution**:
+        -   The environment should be capable of running the PSM interop test suite. This is verified by executing `test/kokoro/psm-interop-test-go.sh` with the `PSM_TEST_SUITE` environment variable set (e.g., to `light`).
+    -   **Containerized Example Execution (CSM Observability)**:
+        -   The environment should be capable of building Docker images for containerized examples. This is verified by successfully building the CSM observability client and server images.
+    -   **Containerized Interop and xDS Test Execution**:
+        -   The environment should be capable of building Docker images for interop tests, including `interop/observability`, `interop/xds/client`, and `interop/xds/server`.
+    -   **Runtime Logging Configuration**:
+        -   Set the `GRPC_GO_LOG_VERBOSITY_LEVEL`, `GRPC_GO_LOG_SEVERITY_LEVEL`, and `GRPC_GO_LOG_FORMATTER` environment variables. Running an example application should produce detailed, JSON-formatted logs.
+    -   **Protocol Buffer Code Generation**:
+        -   The environment should be capable of regenerating Go code from `.proto` files. This is verified by running `scripts/regenerate.sh`. This script automates the installation of `protoc`, Go plugins, and downloads dependent proto sources from external repositories before regenerating files.
+    -   **`protoc-gen-go-grpc` Cross-Compilation and Packaging**:
+        -   The environment should support cross-compiling the `protoc-gen-go-grpc` tool for various target platforms (e.g., `linux/amd64`, `windows/arm64`). This verifies the release build process locally.
+    -   **Pull Request and Repository Policy Validation (CI Checks)**:
+        -   **Contributor License Agreement (CLA)**: All contributors must sign the CNCF Contributor License Agreement. This is checked automatically on the first PR submission.
+        -   **PR Title Format**: The PR title should begin with the name of the component being changed (e.g., `transport`, `client`, `xds`, `cleanup`).
+        -   **PR Labeling**: A pull request must have at least one label prefixed with `Type:` (e.g., `Type: Bug`, `Type: Feature`). This is checked by the `pr-validation.yml` workflow.
+        -   **PR Description Format**:
+            -   The description should reference a related issue using `Fixes #<issue>` or `Updates #<issue>`.
+            -   The description must end with a `RELEASE NOTES:` section. For user-visible changes, it must be a bulleted list where each item follows the format `* <component>: <summary>`. For internal changes, it should be `RELEASE NOTES: n/a`.
+        -   **PR Milestone Association**: The pull request must be associated with a milestone whose title ends in `Release`. This is checked by the `pr-validation.yml` workflow.
+        -   **Automated Inactivity Locking**: Issues and Pull Requests that have been inactive for 180 days are automatically locked. This is a repository maintenance policy enforced by the `lock.yml` workflow.
+        -   **Automated Stale Item Management**: Issues and Pull Requests labeled with `Status: Requires Reporter Clarification` will be marked as `stale` after 6 days of inactivity. If no further updates are provided, they will be automatically closed 7 days later. This is enforced by the `stale.yml` workflow.
+
+4.  COMPLETE TODO LIST:
+    -   **Step 1: Install Prerequisites**
+        -   Action: Download and install the Go programming language (version 1.25 recommended, 1.24 compatible) from https://golang.org/dl/.
+        -   Action: Download and install Git from https://git-scm.com/downloads.
+        -   Action: Download and install Docker from https://www.docker.com/products/docker-desktop.
+        -   Action: (Optional, for maintainers) Download and install the GitHub CLI (`gh`) from https://cli.github.com/.
+        -   Action: (Optional) Ensure `bash`, `curl`, and `unzip` are installed, as they are required for project scripts. They are typically pre-installed on Linux and macOS.
+        -   Verification: Open a terminal and run `go version`, `git --version`, `docker --version`, and optionally `gh --version`, `bash --version`, `curl --version`, and `unzip`. The commands should output the installed versions.
+
+    -   **Step 2: Obtain the gRPC-Go Source Code**
+        -   Action: Navigate to your projects directory and clone the repository if you have not done so already.
+            ```sh
+            # Example:
+            # cd /home/cc/EnvGym/data
+            # git clone https://github.com/grpc/grpc-go.git grpc_grpc-go
+            ```
+        -   Action: Change into the project's working directory. All subsequent commands should be run from this location.
+            ```sh
+            cd /home/cc/EnvGym/data/grpc_grpc-go
+            ```
+        -   Verification: The current directory should contain the `LICENSE`, `Makefile`, `go.mod`, and other project source files.
+
+    -   **Step 3: Download Dependencies**
+        -   Action: Use Go's module tools to download all the dependencies specified in the `go.mod` files across the repository.
+            ```sh
+            go mod download
+            ```
+        -   Verification: The command should complete without errors. This command, when run from the root, will download dependencies for all modules defined within the repository, including those in `cmd/protoc-gen-go-grpc/`, `examples/`, `gcp/observability/`, `interop/observability/`, `interop/xds/`, `security/advancedtls/`, and `stats/opencensus/`. The Go toolchain will use the `go.sum` files to verify the integrity of the downloaded dependencies.
+
+    -   **Step 4: Install Development and Verification Tools**
+        -   Action: The project uses scripts to manage and install necessary static analysis and proto validation tools. This command uses the `test/tools/go.mod` file to install version-pinned linters, ensuring consistency. Run the following commands from the project root:
+            ```sh
+            # Install linters (goimports, staticcheck, revive, misspell)
+            make vetdeps
+
+            # Install proto validation tools
+            ./scripts/vet-proto.sh -install
+            ```
+        -   Verification: The commands should complete without errors, installing several Go-based tools into your `$(go env GOPATH)/bin` directory.
+
+    -   **Step 5: Run Core Build and Test Suite**
+        -   Action: Run the full suite of builds, static analysis checks, and tests. To leverage multiple CPU cores for faster execution, use the `-j` flag with `make`.
+            ```sh
+            # Determine the number of available CPU cores
+            NPROC=$(nproc)
+
+            # Run static analysis, linting, and style checks in parallel
+            make -j$NPROC vet
+
+            # Verify proto definitions are up-to-date
+            # Note: This check may fail for contributors and is not a blocker.
+            ./scripts/vet-proto.sh
+
+            # Run the standard test suite in parallel
+            make -j$NPROC test
+
+            # Run the test suite with the race detector in parallel
+            make -j$NPROC testrace
+            ```
+        -   Verification: The `vet`, `test`, and `testrace` commands should complete successfully without reporting any errors. This confirms the core development environment is correctly configured and the code, including all sub-modules, adheres to project quality standards.
+
+    -   **Step 6: Run Integration and Example Tests ("Extras")**
+        -   Action: Execute the suite of scripts that cover examples, interop, and other end-to-end tests.
+            ```sh
+            # Run main examples test
+            examples/examples_test.sh
+
+            # Run AdvancedTLS examples test
+            security/advancedtls/examples/examples_test.sh
+
+            # Run interop test
+            interop/interop_test.sh
+
+            # Run xDS end-to-end test
+            internal/xds/test/e2e/run.sh
+
+            # Run internal CI xDS test
+            # Note: This may have dependencies specific to the CI environment.
+            test/kokoro/xds.sh
+
+            # Run internal CI PSM interop test
+            # Note: This may have dependencies specific to the CI environment.
+            PSM_TEST_SUITE=light test/kokoro/psm-interop-test-go.sh
+
+            # Run protoc-gen-go-grpc plugin test
+            cmd/protoc-gen-go-grpc/protoc-gen-go-grpc_test.sh
+            ```
+        -   Verification: All scripts should complete successfully, indicating that more complex, multi-component features are working correctly.
+
+    -   **Step 7: (Optional) Run Code Coverage Analysis**
+        -   **Context**: The project tracks code coverage using Codecov, as defined in `.github/workflows/coverage.yml` and configured by `.github/codecov.yml`. You can run these checks locally to generate coverage reports before pushing code.
+        -   **Action**: Run the Go test command with coverage enabled for all packages. Two runs are performed to cover different feature flag configurations.
+            ```sh
+            # Generate default coverage report
+            go test -coverprofile=coverage.out -coverpkg=./... ./...
+
+            # Generate coverage report with the old pick-first behavior
+            GRPC_EXPERIMENTAL_ENABLE_NEW_PICK_FIRST=false go test -coverprofile=coverage_old_pickfirst.out -coverpkg=./... ./...
+            ```
+        -   **Verification**: The commands should complete without test failures. The `coverage.out` and `coverage_old_pickfirst.out` files will be created in the project root. You can inspect these files using `go tool cover -html=coverage.out`. Note that the report will not include coverage for intentionally ignored paths like `examples/`, `interop/`, `cmd/`, `gcp/`, `stats/opencensus`, or generated `.pb.go` files.
+
+    -   **Step 8: Verify Runtime Logging with an Example**
+        -   Action: Set the logging environment variables.
+            ```sh
+            export GRPC_GO_LOG_VERBOSITY_LEVEL=99
+            export GRPC_GO_LOG_SEVERITY_LEVEL=info
+            export GRPC_GO_LOG_FORMATTER=json
+            ```
+        -   Action: In a separate terminal, navigate to the `helloworld` example directory and run the server.
+            ```sh
+            cd examples/helloworld/greeter_server
+            go run .
+            ```
+        -   Action: In your original terminal (where env vars are set), run the client.
+            ```sh
+            cd examples/helloworld/greeter_client
+            go run .
+            ```
+        -   Verification: Check the console output in the client's terminal. You should see verbose, JSON-formatted gRPC logs in addition to the application's standard output.
+
+    -   **Step 9: (Optional) Build Containerized Examples and Tests**
+        -   Action: Verify your Docker setup by building the various test and example images. Run the following commands from the project root directory.
+            ```sh
+            docker build -t grpc-csm-example-client -f examples/features/csm_observability/client/Dockerfile .
+            docker build -t grpc-csm-example-server -f examples/features/csm_observability/server/Dockerfile .
+            docker build -t grpc-interop-observability -f interop/observability/Dockerfile .
+            docker build -t grpc-xds-interop-client -f interop/xds/client/Dockerfile .
+            docker build -t grpc-xds-interop-server -f interop/xds/server/Dockerfile .
+            ```
+        -   Verification: The `docker build` commands should complete successfully. You can confirm the images were created by running `docker images | grep grpc-`.
+
+    -   **Step 10: (Optional) Regenerate Protocol Buffer Code**
+        -   **Context**: If you modify `.proto` files, you must regenerate the corresponding Go code. The project provides an all-in-one script that handles the entire toolchain setup and code generation process.
+        -   **Action**: Run the `regenerate.sh` script from the project root. This script will:
+            1.  Automatically download and install the correct version of `protoc`.
+            2.  Install the `protoc-gen-go` and `protoc-gen-go-grpc` Go plugins.
+            3.  Clone or update external proto source repositories (`grpc-proto`, `protobuf`).
+            4.  Regenerate all `*.pb.go` files in the repository.
+            ```sh
+            ./scripts/regenerate.sh
+            ```
+        -   **Verification**: The script should complete without any errors. After it finishes, run `git status`. If you did not make any changes to the `.proto` files, there should be no changes to any `*.pb.go` files. If you did make changes, the `git status` output will show the updated `*.pb.go` files, which you should review and commit.
+
+    -   **Step 11: (Optional) Verify Dependency Changes Locally**
+        -   **Context**: The project uses a CI check to ensure that changes to `go.mod` do not introduce unintended modifications to the dependency graph. You can run this check locally before pushing to avoid CI failures. This step is only necessary if you have modified a `go.mod` file.
+        -   **Action**: Run the following commands from your feature branch to compare its dependencies against the `master` branch.
+            ```sh
+            git stash
+            TEMP_DIR=$(mktemp -d)
+            scripts/gen-deps.sh "${TEMP_DIR}/after"
+            git checkout master
+            scripts/gen-deps.sh "${TEMP_DIR}/before"
+            git checkout -
+            diff -ur "${TEMP_DIR}/before" "${TEMP_DIR}/after"
+            rm -rf "${TEMP_DIR}"
+            git stash pop
+            echo "Local dependency check complete."
+            ```
+        -   **Verification**: If you did not intend to change dependencies, the `diff` command should produce no output. If you did change dependencies, review the `diff` output to ensure it reflects only your intended changes. Note that the CI check may fail, but this is acceptable if the dependency change is approved.
+
+    -   **Step 12: (Optional) Verify Release Build Process Locally**
+        -   **Context**: For maintainers, it can be useful to locally replicate the multi-platform build process for tools like `protoc-gen-go-grpc`, as defined in `.github/workflows/release.yml`. The `linux/amd64` target is native to this environment.
+        -   **Action**: Run the following commands from the project root to cross-compile the tool for a few different target platforms.
+            ```sh
+            # Build for Linux AMD64 (native)
+            GOOS=linux GOARCH=amd64 go build -trimpath -o ./protoc-gen-go-grpc.linux-amd64 ./cmd/protoc-gen-go-grpc
+
+            # Build for Windows AMD64
+            GOOS=windows GOARCH=amd64 go build -trimpath -o ./protoc-gen-go-grpc.windows-amd64.exe ./cmd/protoc-gen-go-grpc
+
+            # Build for macOS ARM64
+            GOOS=darwin GOARCH=arm64 go build -trimpath -o ./protoc-gen-go-grpc.darwin-arm64 ./cmd/protoc-gen-go-grpc
+            ```
+        -   **Verification**: The commands should complete without errors, and the corresponding binaries should be created in the project's root directory. You can execute the native binary (`./protoc-gen-go-grpc.linux-amd64 --version`) to confirm it was built correctly.
+
+    -   **Step 13: (Optional) Run Static Security Analysis Locally with CodeQL**
+        -   **Context**: The project uses CodeQL for static security analysis in CI. You can run this locally to find potential vulnerabilities before committing code.
+        -   **Action**: Download the CodeQL CLI from https://github.com/github/codeql-cli-binaries/releases. Extract it and add the directory containing the `codeql` executable to your shell's `PATH`.
+        -   **Action**: From the project root, create a CodeQL database from the source code.
+            ```sh
+            codeql database create grpc-go-db --language=go
+            ```
+        -   **Action**: Run the standard Go analysis suite against the database.
+            ```sh
+            codeql database analyze grpc-go-db --format=sarif-latest --output=go-results.sarif go-code-scanning.qls
+            ```
+        -   **Verification**: The `analyze` command should complete successfully. Open the `go-results.sarif` file with a compatible viewer (like the SARIF viewer extension in VS Code) or inspect the command-line output to check for any reported security issues. A clean run should report no results.
+
+    -   **Step 14: (Optional) Prepare a Pull Request for Submission**
+        -   **Context**: The project uses automated CI workflows to enforce contribution guidelines. To ensure your PR passes these checks, you must correctly format its metadata and follow project conventions.
+        -   **Action**: Before submitting your pull request, ensure the following requirements are met:
+            -   **CLA**: Sign the Contributor License Agreement. A bot will provide a link and instructions in a comment on your first PR.
+            -   **Commit History**: Maintain a clean commit history with meaningful commit messages. Rebase on top of the latest `master` before submitting.
+            -   **Title**: The PR title must start with the component name. Examples: `transport:`, `xds:`, `cleanup:`.
+            -   **Label**: The PR must have at least one label starting with `Type:`. For example: `Type: Bug` or `Type: Feature`.
+            -   **Description**:
+                -   Link to the relevant issue using `Fixes #<issue number>` or `Updates #<issue number>`.
+                -   The description must conclude with a `RELEASE NOTES:` section. For user-facing changes, the format is a bulleted list:
+                    ```
+                    RELEASE NOTES:
+                    * <component>: <A summary of the change that users will understand.>
+                    ```
+                -   For non-user-facing changes (e.g., tests, cleanup), use `RELEASE NOTES: n/a`.
+            -   **Milestone**: The PR must be associated with a milestone whose title ends with `Release`.
+            -   **Respond to Feedback**: If your PR or issue is labeled with `Status: Requires Reporter Clarification`, ensure you provide an update within 6 days to prevent it from being marked stale and subsequently closed.
+        -   **Verification**: After you open the pull request, the `Validate PR` check in the GitHub Actions UI should complete successfully with a green checkmark. The Codecov status check is informational, meaning it reports coverage changes but will not block your PR from being merged. If other checks fail, review the error messages and update your PR's metadata or code accordingly.

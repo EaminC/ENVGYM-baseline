@@ -1,0 +1,165 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1.  **ENVIRONMENT REQUIREMENTS & TOOLS:**
+    *   **Node.js & npm**: Provided by the `node:<version>-alpine` base image. The project supports versions 16-24. A recent LTS version (e.g., 18, 20, 22) is recommended. The codebase requires Node.js 16+ for ES2022 features.
+    *   **Core Build Tools**: A minimal set of tools required for installing dependencies and running scripts. Install with `apk add --no-cache git python3 make g++`.
+    *   **Redis Server (Optional)**: A key-value store needed for the `online` user tracking example. This should be run as a separate Docker container, not installed within the application image.
+    *   **`wrk` (Optional)**: An HTTP benchmarking tool required for the performance suite. It must be compiled from source in an Alpine environment. Requires `build-base`, `openssl-dev`, and `zlib-dev`.
+    *   **`lcov` (Optional)**: A tool for manipulating LCOV coverage files, used to replicate the CI coverage-merging process. Install with `apk add --no-cache lcov`.
+    *   **CodeQL CLI & OpenSSF Scorecard CLI (Optional, Advanced)**: Static and supply-chain analysis tools. These are typically executed within the CI/CD pipeline (e.g., GitHub Actions) and do not need to be installed in the local development container unless specifically replicating those workflows.
+    *   **Project Dependencies (to be installed via npm)**:
+        *   **Runtime Dependencies**: Core framework components like `accepts`, `cookie`, `debug`, `qs`, `router`, etc., as defined in `package.json`.
+        *   **Development Dependencies**: Essential development tools like `mocha`, `supertest`, `eslint`, and `nyc`, as defined in `package.json`.
+
+2.  **FILES TO CREATE:**
+    *   **`.npmrc`**:
+        *   **Path**: `/home/cc/EnvGym/data/expressjs_express/.npmrc`
+        *   **Content**: `package-lock=false`
+        *   **Description**: An npm configuration file to prevent the creation of a `package-lock.json` file, enforcing the project's policy of not committing lock files.
+    *   **Key Project Structure (after setup):**
+        *   **`package.json`**:
+            *   **Path**: Project root directory.
+            *   **Description**: The provided file that defines project metadata, dependencies, and scripts for testing, linting, and coverage.
+        *   **`History.md`**:
+            *   **Path**: Project root directory.
+            *   **Description**: A detailed changelog file that provides historical context on new features, breaking changes, and dependency updates across different versions of Express.js.
+        *   **`.editorconfig`**:
+            *   **Path**: Project root directory.
+            *   **Description**: A configuration file to ensure consistent coding styles (such as indentation, whitespace, and character set) across different editors and IDEs. It complements `.eslintrc.yml` by providing editor-level enforcement.
+        *   **`.eslintrc.yml`**:
+            *   **Path**: Project root directory.
+            *   **Description**: The ESLint configuration file. It defines the project's code style rules, such as 2-space indentation and no trailing spaces, which are consistent with the `.editorconfig` settings. It also enforces strict equality checks and modern JavaScript standards for an ES2022 Node.js environment, including requiring explicit imports for globals like `Buffer`.
+        *   **`.github/`**:
+            *   **Path**: Project root directory.
+            *   **Description**: Contains GitHub-specific configurations, including Actions workflows (`codeql.yml`, `legacy.yml`, `scorecard.yml`) for CI/CD and Dependabot configuration (`dependabot.yml`) for automated dependency updates.
+        *   **`.npmrc`**:
+            *   **Path**: Project root directory.
+            *   **Description**: The configuration file that instructs npm not to generate a `package-lock.json` file.
+        *   **`index.js`**:
+            *   **Path**: Project root directory.
+            *   **Description**: The main entry point that exports the Express.js functionality.
+        *   **`lib/`**:
+            *   **Path**: Project root directory.
+            *   **Description**: A directory containing the core source code of the Express framework (e.g., `application.js`, `request.js`, `response.js`, `router/`).
+        *   **`.gitignore`**:
+            *   **Path**: Project root directory.
+            *   **Description**: An existing file that specifies intentionally untracked files to be ignored by Git. This includes dependency folders (`node_modules`), package manager lock files (`package-lock.json`, `yarn.lock`), coverage reports (`coverage/`, `.nyc_output`), log files, and benchmark outputs (`benchmarks/graphs`).
+        *   **`test/` and `test/acceptance/`**:
+            *   **Path**: Project root directory.
+            *   **Description**: Directories containing the comprehensive Mocha test suite for the framework.
+        *   **`examples/`**:
+            *   **Path**: Project root directory.
+            *   **Description**: Contains various example applications demonstrating framework usage, with descriptions in `examples/README.md`.
+        *   **`coverage/` and `.nyc_output/`**:
+            *   **Path**: Project root directory.
+            *   **Description**: Directories generated after running the test coverage script. They contain coverage reports like `lcov.info` and detailed HTML reports. These are temporary build artifacts and are ignored by Git.
+        *   **`benchmarks/`**:
+            *   **Path**: Project root directory.
+            *   **Description**: Contains performance benchmark scripts and a `Makefile` for execution. Requires `make` and `wrk`.
+
+3.  **NECESSARY TEST CASES IN THE CODEBASE:**
+    *   **Run the CI Test and Coverage Suite**: The primary goal is to run the comprehensive test suite using `npm run test-ci`. This command is used across all CI environments to ensure consistency and generates coverage reports.
+    *   **Multi-Platform and Multi-Version Testing**: The CI pipeline validates the codebase on both Linux (Ubuntu) and Windows across a wide range of Node.js versions (16 through 24), ensuring broad compatibility.
+    *   **New Feature Tests (v5.1.0+)**:
+        *   `res.send()`: Verify `Uint8Array` support.
+        *   `res.sendFile()`: Verify ETag generation option.
+        *   `res.links()`: Verify multiple links with the same `rel` attribute.
+    *   **Breaking Change Verification (v5.0.0+)**:
+        *   `res.status()`: Test `RangeError` for invalid codes and `TypeError` for non-integers.
+        *   `res.redirect()`: Verify removal of the `'back'` magic string.
+        *   `res.clearCookie()`: Verify that `maxAge` and `expires` options are ignored.
+        *   `req.body`: Verify it is no longer initialized to `{}`.
+    *   **Legacy API Removal**: Ensure tests do not rely on removed APIs like `app.del()` or `req.param()`.
+    *   **Code Linting**: Run `npm run lint` to enforce code style and quality rules from `.eslintrc.yml`.
+    *   **Performance Benchmarking**: Run the benchmark suite in `benchmarks/` using `make`. This requires `make` and `wrk` to be installed in the environment.
+    *   **Example Application Execution**: Verify that example applications run correctly. This includes testing the `online` example, which requires a running Redis container accessible from the application container.
+    *   **Static Code Analysis (CodeQL)**: This automated check for security vulnerabilities runs in the CI pipeline on pull requests.
+    *   **Supply-Chain Security Analysis (OpenSSF Scorecard)**: This automated check for security health runs in the CI pipeline.
+    *   **Automated Dependency Updates (Dependabot)**: The project uses Dependabot for automated dependency management.
+    *   **Coverage Report Merging**: The CI process merges multiple coverage reports using the `lcov` tool.
+
+4.  **COMPLETE TODO LIST:**
+    *   **Preamble**: The following steps assume you are executing commands within a shell inside a Docker container based on a `node:<version>-alpine` image, with the project source code available at the working directory `/home/cc/EnvGym/data/expressjs_express`.
+
+    *   **Step 1: Install System Prerequisites**
+        *   Update the package index and install the necessary tools for building, testing, and benchmarking.
+        *   Run the following command:
+            ```bash
+            apk update && apk add --no-cache \
+              git \
+              python3 \
+              make \
+              g++ \
+              lcov \
+              build-base \
+              openssl-dev \
+              zlib-dev
+            ```
+        *   (Optional) If you need to run the `online` example, start a Redis container. It's recommended to use a Docker network to facilitate communication.
+            ```bash
+            # Create a network (if you don't have one)
+            docker network create express-dev-net
+            # Run Redis on this network
+            docker run --rm -d --name express-redis --network express-dev-net redis:alpine
+            # When running your application container, add it to the same network
+            # Example: docker run ... --network express-dev-net ...
+            ```
+        *   (Optional) To run performance benchmarks, compile and install `wrk`:
+            ```bash
+            git clone https://github.com/wg/wrk.git /tmp/wrk && \
+              cd /tmp/wrk && \
+              make && \
+              mv wrk /usr/local/bin/ && \
+              cd - && \
+              rm -rf /tmp/wrk
+            ```
+        *   **Verification**: Run `git --version`, `make --version`, `lcov --version`, and `wrk --version` to confirm installations.
+
+    *   **Step 2: Set Up Project Workspace**
+        *   Navigate to the project's root directory: `cd /home/cc/EnvGym/data/expressjs_express`
+
+    *   **Step 3: Create npm Configuration File**
+        *   In the project root, create a new file named `.npmrc` to disable lock file generation.
+        *   `echo "package-lock=false" > .npmrc`
+        *   **Verification**: The file `.npmrc` exists in the project root and contains the specified content.
+
+    *   **Step 4: Install Project Dependencies**
+        *   From the project root, run: `npm install`
+        *   **Verification**: A `node_modules` directory is created. No `package-lock.json` file should be present.
+
+    *   **Step 5: Run the CI Test and Coverage Suite**
+        *   Run the main CI test script: `npm run test-ci`
+        *   **Verification**: The Mocha test suite executes and passes. A coverage summary is displayed in the console, and detailed reports are generated in the `coverage/` and `.nyc_output/` directories.
+
+    *   **Step 6: Run the Linter**
+        *   Check for code style and quality issues: `npm run lint`
+        *   **Verification**: The command completes without reporting any linting errors.
+
+    *   **Step 7: Understand Static Analysis (CodeQL)**
+        *   This is an automated quality gate in the GitHub Actions CI pipeline. No local action is required. Observe the "CodeQL" check on pull requests in the repository.
+
+    *   **Step 8: Understand Supply-Chain Security Analysis (OpenSSF Scorecard)**
+        *   This is an automated security health check in the GitHub Actions CI pipeline. No local action is required. Observe the "Scorecard analysis" check on pushes to `master`.
+
+    *   **Step 9: Understand Automated Dependency Updates (Dependabot)**
+        *   This is an automated service that creates pull requests for dependency updates. No local action is required.
+
+    *   **Step 10 (Optional): Explore and Run Example Applications**
+        *   **To run a simple example (`hello-world`):**
+            *   `cd examples/hello-world`
+            *   `npm install`
+            *   `node index.js`
+            *   **Verification**: The app listens on port 3000.
+        *   **To run the `online` example with Redis:**
+            *   Ensure the Redis container from Step 1 is running. The example should connect to it via its container name (`redis://express-redis:6379`) if both containers are on the same Docker network.
+            *   `cd ../online` (from `hello-world`)
+            *   `npm install`
+            *   `node index.js`
+            *   **Verification**: The app listens on port 3000 and tracks users via Redis.
+        *   Return to the project root before proceeding: `cd ../..`
+
+    *   **Step 11 (Optional): Run Performance Benchmarks**
+        *   Ensure `make` and `wrk` are installed (Step 1).
+        *   Navigate to the benchmarks directory: `cd benchmarks`
+        *   Run the suite: `make`
+        *   **Verification**: A series of benchmark tests run, outputting performance metrics to the console. Output files may be generated in `benchmarks/graphs/`, which is ignored by Git.

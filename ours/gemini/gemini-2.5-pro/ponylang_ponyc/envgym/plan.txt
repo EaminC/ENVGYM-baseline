@@ -1,0 +1,393 @@
+Based on the provided hardware information, here is the adjusted environment setup plan. The instructions have been tailored for a `linux/amd64` environment, such as a Docker container based on Debian/Ubuntu, and optimized to leverage the high core count available for parallel processing. Sections irrelevant to this architecture (e.g., cross-compilation, non-Linux operating systems) have been removed for clarity.
+
+***
+
+### **Adjusted Environment Setup Plan for `linux/amd64`**
+
+This plan is optimized for an `x86_64` Linux system with a high core count (96 cores) and is suitable for containerized environments using Docker. The working directory is assumed to be `/home/cc/EnvGym/data/ponylang_ponyc`.
+
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - **For Using Pony (via Pre-built Binaries):**
+     - **Pony Toolchain**: Can be acquired in two ways:
+       - **`ponyup` (Recommended)**: The official Pony toolchain installer. It manages installations of `ponyc`, `corral`, `changelog-tool`, etc.
+       - **Direct Download (Manual)**: Pre-built `.tar.gz` archives for `ponyc`, `corral`, etc., can be downloaded directly from the official release distribution service (e.g., Cloudsmith).
+     - **Platform Dependencies**: A C/C++ compiler, linker, and basic utilities are required.
+       - **Debian/Ubuntu**: `clang`, `build-essential` (provides `g++`, `make`, etc.), `git`, `curl`, `lsb-release`, `ca-certificates`, `zlib1g`
+       - **Alpine**: `clang`, `curl`, `build-base`, `binutils-gold`, `git`
+
+   ---
+   - **For Building Ponyc from Source (in addition to the above):**
+     - **Git**: Version control system, used to clone the repository and manage submodules.
+     - **CMake**: Build system generator (**version 3.21 or newer is required**).
+     - **C++ Compiler**: A modern **C++17** (or newer) compatible compiler.
+       - **Recommended**: Clang/Clang++ (version 8 or newer). Required for certain features like `PONY_RUNTIME_BITCODE`.
+       - **Alternative**: GCC/G++ (version 8 or newer).
+     - **Make or Ninja**: The build tool used by CMake to perform the actual compilation.
+     - **Java Development Kit (JDK)**: Version 8 or newer. Required to run the ANTLR parser generator.
+     - **ANTLR v3**: The ANTLR v3 parser generator tool (e.g., `antlr-3.5.2-complete.jar`). Required to generate the Pony parser.
+     - **LLVM Build Tools**: The build process compiles a local version of LLVM from a submodule, generating necessary tools like `llc` and `llvm-link`. No separate installation is needed.
+     - **Internet Connection**: Required during the library build step (`make libs`) to download dependencies like Google Test and Google Benchmark.
+     - **Docker and Docker Buildx**: Required for building CI images and replicating certain CI tasks.
+     - **Platform-Specific Dependencies (based on CI environments for `linux/amd64`):**
+       - **Debian/Ubuntu (24.04 is used for CI)**: `apt-transport-https`, `build-essential`, `ca-certificates`, `clang`, `cmake`, `curl`, `git`, `libclang-rt-dev`, `lldb`, `lsb-release`, `make`, `openjdk-11-jdk-headless`, `python3-pip`, `systemtap-sdt-dev`, `wget`, `xz-utils`, `zlib1g-dev`, and a static C++ standard library (e.g., `libstdc++-13-dev`).
+       - **Alpine (v3.20 and v3.21 are used for CI)**: `alpine-sdk`, `binutils-gold`, `clang`, `clang-dev`, `coreutils`, `linux-headers`, `cmake`, `git`, `zlib-dev`, `bash`, `curl`, `gdb`, `lldb`, `openjdk11`, `py3-pip`, `py3-lldb`, `libstdc++-static`.
+     - **Optional Debugging Tools**:
+       - `dtrace` / `systemtap-sdt-dev` (Debian/Ubuntu): Required only if building with the `use=dtrace` option.
+       - `gdb`, `gdb-multiarch`: Debuggers useful for development on Linux.
+     - **Optional Developer Productivity Tools**:
+       - **`clangd`**: A language server for C/C++/Objective-C.
+       - **IDE/Text Editor**: Visual Studio Code, Sublime Text, or Vim with appropriate extensions.
+       - **Node.js and npm**: Required for `markdownlint-cli`.
+       - **`markdownlint-cli`**: A command-line interface for Markdown linting.
+       - **`yamllint`**: A command-line interface for YAML linting.
+     - **Optional CI/Release Tools**:
+       - `actionlint`: A linter for GitHub Actions workflow files.
+       - `cloudsmith-cli`: Command-line client for Cloudsmith, used for uploading release assets.
+       - Various Docker-based tools and GitHub Actions as detailed in the original plan, which are largely platform-independent.
+
+   ---
+   - **For Building Documentation (in addition to basic tools like `git`):**
+     - **Python**: Python 3 and its package manager, `pip`.
+     - **Python Packages**: `mkdocs`, `mkdocs-material`.
+     - **Platform Dependencies**:
+       - **Debian/Ubuntu**: `python3`, `python3-dev`, `python3-pip`, `libffi-dev`, `libssl-dev`
+       - **Alpine**: `python3`, `python3-dev`, `py3-pip`, `libffi-dev`, `libressl-dev`, `bash`, `tar`
+
+2. KEY CONFIGURATION FILES:
+   - This section remains unchanged as it describes the project's file structure, which is not hardware-dependent. It provides essential context for understanding the build process.
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - **For validating a pre-built installation:**
+     - **`ponyc --version`**: Verifies that the `ponyc` executable is in the PATH and can run.
+     - **`corral --version`**: Verifies the dependency manager is installed.
+     - **`changelog-tool --version`**: Verifies the changelog tool is installed.
+     - **"Hello, World!" compilation**: Creating a simple `main.pony` file and compiling it with `ponyc` confirms that the compiler and the necessary C/C++ toolchain are correctly installed.
+
+   - **For validating a build from source:**
+     - **Submodule checkout and integrity**: The `lib/llvm/src` directory should be populated.
+     - **Library build (`make libs`)**: Successful completion confirms internet access, correct submodule state, and successful compilation of LLVM and its tools.
+     - **Parser generation**: Successful generation of parser source files from the ANTLR grammar.
+     - **Runtime and compiler library creation**: `libponyrt.a` and `libponyc-standalone.a` should exist in the build output directory.
+     - **Bootstrap compilation of test runner**: The `full-program-runner` executable should exist in the build output directory.
+     - **FFI Test Library Generation**: A `test_lib` directory should exist in the build output containing shared libraries (`.so`).
+     - **Static linking validation (Linux)**: Run `ldd <path-to-ponyc>`. The output should not list `libstdc++.so.6` or `libc++.so.1`.
+     - **Benchmark executables build and run**: The `libponyc.benchmarks` and `libponyrt.benchmarks` executables should build and run successfully.
+     - The existing test suite is the primary validation method. The main CI test command is **`make test-ci`**.
+     - Key test targets include: `libponyrt.tests`, `libponyc.tests`, `full-program-tests`, `test-stdlib-release`, and various TCP/UBench stress tests.
+     - **Special Build Configurations**: The test suite should be run for different build configurations used in CI:
+       - **Sanitizers**: Build with `use=address_sanitizer,undefined_behavior_sanitizer`.
+       - **Directives**: Build with `use=dtrace`, `use=pool_memalign`, etc.
+       - **Bitcode Runtime**: Build with `PONY_RUNTIME_BITCODE=true` (requires Clang).
+       - **Debugger Integration**: Run tests with `usedebugger=lldb`.
+
+   - **For validating the documentation build environment:**
+     - **`python3 --version`**, **`pip3 --version`**, **`mkdocs --version`**: Verify tools are installed.
+     - **`mkdocs build`**: Successfully generates the documentation site.
+
+   - **For validating the CI environment:**
+     - This section remains largely unchanged as it details the validation of CI workflows and tools, which are critical for maintainers and are not hardware-specific.
+
+4. COMPLETE TODO LIST:
+
+   ---
+   ### **Method A: Install Pre-built Binaries (Recommended for Users)**
+
+   *This method installs the Pony compiler and tools, making it easy to start writing Pony code.*
+
+   1.  **Install Runtime Dependencies**: Open a terminal and install the necessary compiler toolchain, `git`, `curl`, and basic build utilities.
+       - **On Debian/Ubuntu**:
+         ```bash
+         export DEBIAN_FRONTEND=noninteractive
+         sudo apt-get update
+         sudo apt-get install -y --no-install-recommends clang build-essential git curl lsb-release ca-certificates zlib1g
+         ```
+       - **On Alpine Linux**:
+         ```bash
+         apk add --update --no-cache clang curl build-base binutils-gold git
+         ```
+
+   2.  **Install ponyup**: `ponyup` is the Pony toolchain manager.
+       ```bash
+       sh -c "$(curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ponylang/ponyup/latest-release/ponyup-init.sh)"
+       ```
+       - Follow the on-screen instructions to add `ponyup` to your PATH (typically `$HOME/.local/share/ponyup/bin`). You may need to restart your shell or source your profile file (e.g., `source ~/.bashrc`).
+
+   3.  **Install Ponyc and Other Tools**: Use `ponyup` to install the latest stable releases.
+       ```bash
+       ponyup update ponyc release
+       ponyup update corral release
+       ponyup update changelog-tool release
+       ```
+
+   4.  **Verify Installation**: Check the versions of the installed tools.
+       ```bash
+       ponyc --version
+       corral --version
+       changelog-tool --version
+       ```
+       - **Verification**: This should print the versions of the installed Pony tools.
+
+   ---
+   ### **Method B: Build from Source (for Contributors)**
+
+   *This method is for those who want to contribute to the Pony compiler itself.*
+
+   1.  **Install Build Prerequisites**: Open a terminal and install the necessary development tools.
+       - **On Debian/Ubuntu (24.04+)**:
+         ```bash
+         export DEBIAN_FRONTEND=noninteractive
+         sudo apt-get update
+         sudo apt-get install -y --no-install-recommends \
+           apt-transport-https \
+           build-essential \
+           ca-certificates \
+           clang \
+           cmake \
+           curl \
+           git \
+           libclang-rt-dev \
+           libstdc++-13-dev \
+           lldb \
+           lsb-release \
+           make \
+           openjdk-11-jdk-headless \
+           python3-pip \
+           systemtap-sdt-dev \
+           wget \
+           xz-utils \
+           zlib1g-dev
+         ```
+       - **On Alpine Linux (v3.20+)**:
+         ```bash
+         apk add --update --no-cache \
+           alpine-sdk \
+           binutils-gold \
+           clang \
+           clang-dev \
+           coreutils \
+           linux-headers \
+           cmake \
+           git \
+           zlib-dev \
+           bash \
+           curl \
+           gdb \
+           lldb \
+           openjdk11 \
+           py3-pip \
+           py3-lldb \
+           libstdc++-static
+         ```
+       - **Note**: Ensure your `cmake` version is **3.21** or newer by running `cmake --version`.
+
+   2.  **Acquire Source Code**: Clone the project repository and its submodules into your working directory.
+       ```bash
+       # This command clones the repository and initializes the LLVM submodule.
+       # The target directory will be /home/cc/EnvGym/data/ponylang_ponyc.
+       git clone --recurse-submodules <repository_url> /home/cc/EnvGym/data/ponylang_ponyc
+       cd /home/cc/EnvGym/data/ponylang_ponyc
+       ```
+       - **Verification**: Check that the `lib/llvm/src` directory is not empty.
+
+   3.  **Install ANTLR v3**: The build process requires ANTLR v3 to generate the parser.
+       - Download the ANTLR v3 complete JAR file (e.g., `antlr-3.5.2-complete.jar`) from the official ANTLR website.
+       - The build system expects this file to be placed in a specific location. Check the project's build scripts or documentation for the exact path.
+       - **Verification**: Ensure Java is installed and can execute the JAR file. `java -jar /path/to/your/antlr-3.5.2-complete.jar --help`
+
+   4.  **Create Version File**: Check if a `VERSION` file exists. If not, create one.
+       ```bash
+       if [ ! -f VERSION ]; then echo "0.59.0" > VERSION; fi
+       ```
+       - **Verification**: Run `cat VERSION`. It should display the version string.
+
+   5.  **Build Core Dependencies**: Compile LLVM and other libraries. This command is optimized to use all available CPU cores (96 in this case).
+       ```bash
+       make libs build_flags="-j$(nproc)"
+       ```
+       - **Verification**: The `build/libs` directory should be populated.
+
+   6.  **Configure and Build (Debug)**:
+       ```bash
+       make configure arch=x86-64 config=debug
+       make build config=debug build_flags="-j$(nproc)"
+       ```
+       - **Optional (for IDEs)**: To generate `compile_commands.json` for tools like `clangd`, add the `cmake_flags` argument:
+         ```bash
+         make configure arch=x86-64 config=debug cmake_flags=-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+         ```
+       - **Verification**: `ponyc` should exist in `build/debug/ponyc`. Verify static linking with `ldd build/debug/ponyc`.
+
+   7.  **Run Tests (Debug)**:
+       ```bash
+       make test-ci config=debug
+       ```
+       - **Verification**: All tests should pass.
+
+   8.  **Configure and Build (Release)**:
+       ```bash
+       make configure arch=x86-64 config=release
+       make build config=release build_flags="-j$(nproc)"
+       ```
+       - **Verification**: `ponyc` should exist in `build/release/ponyc`. Verify static linking with `ldd build/release/ponyc`.
+
+   9.  **Run Tests (Release)**:
+       ```bash
+       make test-ci config=release
+       ```
+       - **Verification**: All tests should pass.
+
+   10. **(Optional) Build and Run Benchmarks**:
+       ```bash
+       make libponyc.benchmarks config=release build_flags="-j$(nproc)"
+       ./build/release/benchmark/libponyc/libponyc.benchmarks
+
+       make libponyrt.benchmarks config=release build_flags="-j$(nproc)"
+       ./build/release/benchmark/libponyrt/libponyrt.benchmarks
+       ```
+       - **Verification**: The benchmark executables run and print performance measurement results.
+
+   ---
+   #### **Path B.2: Building CI Docker Images (Advanced)**
+
+   *This method is for replicating the CI process of building and publishing release or specialized images.*
+
+   1.  **Install Docker**: Install Docker Engine and the Buildx plugin.
+       ```bash
+       sudo apt-get update
+       sudo apt-get install -y docker.io
+       ```
+
+   2.  **Log in to Container Registry**: Authenticate with the registry where you intend to push the image (e.g., GitHub Container Registry).
+       ```bash
+       export CR_PAT=YOUR_GITHUB_PAT
+       echo $CR_PAT | docker login ghcr.io -u YOUR_USERNAME --password-stdin
+       ```
+
+   **Example 1: Building a "latest" Image on Linux (e.g., `x86_64-musl`)**
+
+   3.  **Execute the Build Script**: Run the specific build-and-push script for the target image.
+       ```bash
+       bash .dockerfiles/latest/x86-64-unknown-linux-musl/build-and-push.bash
+       ```
+
+   4.  **Verify the Push**: Check the container registry (e.g., `ghcr.io`) to confirm that the new image tag has been pushed successfully.
+
+   **Example 2: Building the `stdlib-builder` Image**
+
+   3.  **Provide Access Token**: The `stdlib-builder` image requires access to a private repository.
+       ```bash
+       export MATERIAL_INSIDERS_ACCESS="<your_token_here>"
+       ```
+
+   4.  **Execute the Build Script**: Run the build-and-push script for the `stdlib-builder` image.
+       ```bash
+       bash .ci-dockerfiles/stdlib-builder/build-and-push.bash
+       ```
+
+   5.  **Verify the Push**: Check the container registry to confirm that the `ghcr.io/ponylang/ponyc-ci-stdlib-builder` image has been pushed.
+
+   ---
+   #### **Path B.3: Building and Publishing a Nightly/Official Release (CI Replication)**
+
+   *This advanced method replicates the CI task of building, packaging, and publishing a release of the compiler.*
+
+   1.  **Install Prerequisites**: Follow the steps in **Method B, step 1**.
+
+   2.  **Install Cloudsmith CLI**:
+       ```bash
+       python3 -m venv .venv
+       source .venv/bin/activate
+       pip3 install cloudsmith-cli
+       ```
+
+   3.  **Set Environment Variables**:
+       ```bash
+       export CLOUDSMITH_API_KEY="YOUR_API_KEY_HERE"
+       export TRIPLE_VENDOR="unknown"
+       export TRIPLE_OS="linux-gnu"
+       ```
+
+   4.  **Execute the Script**: Run the appropriate script for your target architecture.
+       - **For a Nightly Release**:
+         ```bash
+         bash .ci-scripts/x86-64-nightly.bash
+         ```
+       - **For an Official Release** (ensure `VERSION` file is correct):
+         ```bash
+         bash .ci-scripts/x86-64-release.bash
+         ```
+
+   5.  **Verify the Upload**: Check the script output and the Cloudsmith repository to confirm the package was uploaded.
+
+   ---
+   #### **Further Maintainer/CI Workflow Paths (B.4 - B.16)**
+
+   The remaining advanced paths from the original plan (**Initiating a Release, Validating Bots, Stress Tests, Cache Workflows**, etc.) are primarily concerned with GitHub Actions automation and are not hardware-dependent. They remain valid as-is for maintainers looking to understand or validate the full CI/CD pipeline.
+
+   ---
+   ### **Method C: Build the Project Documentation (for Contributors)**
+
+   1.  **Install Documentation Prerequisites**:
+       - **On Debian/Ubuntu**:
+         ```bash
+         sudo apt-get update
+         sudo apt-get install -y --no-install-recommends python3 python3-dev python3-pip libffi-dev libssl-dev
+         ```
+
+   2.  **Acquire Source Code**: If you haven't already, clone the project repository.
+
+   3.  **Install Python Packages**:
+       ```bash
+       python3 -m venv .venv
+       source .venv/bin/activate
+       pip3 install mkdocs mkdocs-material
+       ```
+
+   4.  **Build the Documentation**: `mkdocs build`
+
+   5.  **Verify the Build**: Open `site/index.html` in a web browser.
+
+   ---
+   ### **Method D: Validate CI Workflows (for Contributors)**
+
+   1.  **Install `actionlint`**: Download the pre-built binary for Linux from the official GitHub releases.
+
+   2.  **Run `actionlint`**: From the project root, run `actionlint`.
+
+   3.  **Verify the Result**: The command should produce no output if workflows are valid.
+
+   ---
+   ### **Method E: Validate Code and Documentation Style (for Contributors)**
+
+   #### **Path E.1: Using `super-linter` (Comprehensive Check)**
+
+   1.  **Install Docker**: Ensure Docker is installed and running.
+
+   2.  **Run `super-linter`**: From the project root:
+       ```bash
+       docker run --rm -e RUN_LOCAL=true -v $(pwd):/tmp/lint github/super-linter:v6
+       ```
+
+   3.  **Verify the Result**: The command should report no errors.
+
+   ---
+   ### **Method F: Build the Standard Library Documentation (for Contributors)**
+
+   1.  **Install Docker**: Ensure Docker is installed and running.
+
+   2.  **Acquire Source Code**: Clone the project repository.
+
+   3.  **Pull the `stdlib-builder` Image**:
+       ```bash
+       docker pull ghcr.io/ponylang/ponyc-ci-stdlib-builder:latest
+       ```
+
+   4.  **Run the Build Script**:
+       ```bash
+       docker run --rm -v $(pwd):/src ghcr.io/ponylang/ponyc-ci-stdlib-builder:latest \
+         bash .ci-scripts/build-stdlib-documentation.bash
+       ```
+
+   5.  **Verify the Build**: Open `stdlib-docs/site/index.html` in a web browser.

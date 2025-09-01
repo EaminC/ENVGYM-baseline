@@ -1,0 +1,108 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - fd-find package (version 10.3.0 or later)
+   - Rust compiler (version 1.64 or later)
+   - make utility
+   - Git (for source installation)
+   - LS_COLORS database (for color output)
+   - version_check crate (for Rust version verification)
+   - Additional Rust crates:
+     - aho-corasick (1.1.3), ignore, regex, lscolors, anstream (0.6.19), anstyle (1.0.11)
+     - clap (4.5.42), clap_complete (4.5.55), crossbeam-channel (0.5.15)
+     - jemalloc (Linux x86_64 systems only)
+     - nu-ansi-term (0.50.1) for color output
+     - tempfile (3.20.0) for temporary file handling
+   - bash-completion (for bash completions)
+   - fish shell (for fish completions)
+   - PowerShell (for powershell completions)
+   - zsh (for zsh completions)
+
+2. FILES TO CREATE:
+   - ~/.fdignore (for custom ignore patterns)
+   - ~/.config/fd/ignore (for global ignore patterns)
+   - Shell aliases file (e.g., ~/.bash_aliases or ~/.zshrc)
+   - FZF configuration file (if using fzf integration)
+   - autocomplete/fd.bash
+   - autocomplete/fd.fish
+   - autocomplete/fd.ps1
+   - autocomplete/_fd
+   - build.rs (with Rust version check)
+   - Cargo.lock (managed by Cargo)
+   - Configuration for anstyle terminal styling
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Basic file search functionality
+   - Regular expression pattern matching
+   - Hidden file detection
+   - File type filtering
+   - Command execution tests
+   - Multi-threaded search verification
+   - Shell completion generation
+   - Cross-platform compatibility tests (x86_64 Linux focus)
+   - Memory allocation tests (jemalloc on Linux)
+   - Color output verification with nu-ansi-term and anstyle
+   - Signal handling tests (Linux systems)
+   - Completion script generation tests
+   - Installation path verification
+   - Man page installation test
+   - Rust version compatibility verification
+   - Build script execution tests
+   - Terminal styling verification
+   - Temporary file handling tests
+
+4. COMPLETE TODO LIST:
+   - Verify Rust version meets minimum requirement (1.64 or later)
+   - Install fd using preferred method:
+     - Linux: apt/dnf/pacman install fd-find (version ≥10.3.0)
+     - Source: cargo install fd-find --version 10.3.0 OR make
+   - Verify installation by running `fd --version`
+   - Create ~/.fdignore with custom patterns if needed
+   - Create ~/.config/fd/ignore for global ignores
+   - Set up LS_COLORS environment variable using lscolors crate
+   - Configure terminal styling using anstyle
+   - Add fd aliases to shell configuration:
+     - alias fd='fdfind' (if on Debian/Ubuntu)
+   - Configure FZF integration if needed:
+     - export FZF_DEFAULT_COMMAND='fd --type file'
+     - export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+   - Generate shell completions:
+     - Run `make completions` to generate all completion files
+     - OR manually generate using `fd --generate-completion <shell>`
+   - Install completions:
+     - Run `make install` to install binaries and completions
+     - OR manually install to appropriate paths
+   - Test basic functionality:
+     - fd test_pattern
+     - fd -e md
+     - fd -H
+   - Verify color output works with nu-ansi-term
+   - Test ignore patterns in .fdignore
+   - Test command execution with -x/-X options
+   - Verify multi-threaded performance
+   - Check man page accessibility (man fd)
+   - Test signal handling (Ctrl-C behavior)
+   - Verify memory allocation on Linux (jemalloc)
+   - Verify completion scripts:
+     - Test bash completion
+     - Test fish completion
+     - Test zsh completion
+     - Test PowerShell completion
+   - Verify installation paths:
+     - Check binary installation
+     - Check completion file locations
+     - Check man page installation
+   - Verify build script executes correctly
+   - Test Rust version compatibility enforcement
+   - Verify terminal styling behavior
+   - Test temporary file handling functionality
+
+Changes made:
+1. Removed aarch64/cross-compilation specific items (Cross.toml, aarch64 tests)
+2. Removed jiff crate and timezone-related items (not needed for x86_64 Linux)
+3. Kept jemalloc only for Linux (removed non-Windows, non-macOS note)
+4. Simplified platform-specific notes to focus on x86_64 Linux
+5. Removed redundant GPU-related notes
+6. Maintained all core functionality for x86_64 architecture
+7. Kept all shell completion options since they're architecture-independent
+8. Simplified test cases to focus on x86_64 Linux environment

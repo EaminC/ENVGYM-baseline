@@ -1,0 +1,952 @@
+This is the adjusted plan based on the provided hardware information.
+
+=== ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    *   **Go**: Version 1.21 or later. Both the project's main `go.mod` and the vendored `goctl` tool specify Go 1.21 as the minimum required version. Go 1.18+ is required for Go Workspace support.
+    *   **Git**: For version control and interacting with the GitHub repository.
+    *   **Protocol Buffers Compiler (`protoc`)**: Version 3.x or later. Required for code generation from `.proto` files. **Note**: This is required for local development on the host. An alternative is to use the `goctl` Docker image, which bundles `protoc`.
+    *   **Go Development Tools**:
+        *   `goctl`: The go-zero framework's command-line tool. **Note**: This project maintains a specific version in the `tools/goctl` directory. It can be built from source, downloaded, or run via a dedicated Docker image.
+        *   `protoc-gen-go`: Protoc plugin for Go. (`go install google.golang.org/protobuf/cmd/protoc-gen-go@latest`)
+        *   `protoc-gen-go-grpc`: Protoc plugin for gRPC. (`go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest`)
+        *   `mockgen`: Tool for generating mock objects. (`go install go.uber.org/mock/mockgen@latest`)
+        *   **`golangci-lint`**: A fast, comprehensive Go linter aggregator. (`go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest`)
+        *   **`zip`**: A command-line tool for creating zip archives. Required by the `goctl` cross-compilation build script.
+    *   **gRPC Command-line Tool**:
+        *   `grpcurl`: For interacting with and testing gRPC services.
+    *   **Containerization & Orchestration**:
+        *   **Docker**: For running dependency services and the application itself in isolated containers for local development. Also used for building and running the `goctl` tool image.
+        *   **Docker Compose**: For defining and running multi-container Docker applications locally.
+        *   **Kubernetes (Optional/Advanced)**: A local cluster (Minikube, Kind, Docker Desktop Kubernetes) for testing deployments.
+        *   **`kubectl`**: The command-line tool for interacting with a Kubernetes cluster.
+    *   **External Services (to be run via Docker or Kubernetes)**:
+        *   **Databases**:
+            *   MySQL (Version 8.0+)
+            *   PostgreSQL (Version 14+)
+            *   MongoDB (Version 6.0+)
+            *   Redis (Version 7.0+)
+        *   **Service Discovery**:
+            *   **etcd (Version 3.5+)**: A single-node instance for local development (via Docker Compose) or a clustered setup for advanced/staging environments (via Kubernetes).
+        *   **Observability Stack**:
+            *   Prometheus (for metrics)
+            *   Jaeger, Zipkin, or OpenTelemetry Collector (for tracing)
+            *   Pyroscope (for continuous profiling)
+            *   **Codecov**: For tracking code coverage reports generated during CI.
+    *   **GitHub CLI (`gh`) (Optional)**:
+        *   For easier interaction with GitHub, such as downloading release assets.
+
+2.  FILES TO CREATE:
+    *   **`.gitignore`**: To specify intentionally untracked files to ignore.
+        *   **Path**: Project root directory.
+        *   **Description**: Prevents committing generated files, logs, IDE settings, and local configuration.
+        *   **Content**:
+            ```gitignore
+            # Ignore all
+            *
+
+            # Unignore all with extensions
+            !*.*
+            !**/Dockerfile
+            !**/Makefile
+
+            # Unignore all dirs
+            !*/
+            !api
+
+            # ignore
+            **/.idea
+            **/.vscode
+            **/.DS_Store
+            **/logs
+            **/adhoc
+            **/coverage.txt
+            **/dist/
+
+            # for test purpose
+            go.work
+            go.work.sum
+
+            # gitlab ci
+            .cache
+            .golangci.yml
+
+            # vim auto backup file
+            *~
+            !OWNERS
+            ```
+    *   **`docker-compose.yml`**: To manage local development dependencies.
+        *   **Path**: Project root directory.
+        *   **Description**: Defines services for MySQL, PostgreSQL, MongoDB, Redis, a single-node etcd, Jaeger, and Zipkin. This allows all external dependencies for a simple local setup to be started with a single command.
+        *   **Example Snippet**:
+            ```yaml
+            version: '3.8'
+            services:
+              mysql:
+                image: mysql:8.0
+                platform: linux/amd64
+                ports: ["3306:3306"]
+                environment:
+                  MYSQL_ROOT_PASSWORD: "yourpassword"
+              postgres:
+                image: postgres:14
+                platform: linux/amd64
+                ports: ["5432:5432"]
+                environment:
+                  POSTGRES_PASSWORD: "yourpassword"
+                  POSTGRES_USER: "user"
+                  POSTGRES_DB: "yourdb"
+              redis:
+                image: redis:7.0
+                platform: linux/amd64
+                ports: ["6379:6379"]
+              etcd:
+                image: bitnami/etcd:3.5
+                platform: linux/amd64
+                ports: ["2379:2379"]
+                environment:
+                  ALLOW_NONE_AUTHENTICATION: "yes"
+                  ETCD_ADVERTISE_CLIENT_URLS: "http://etcd:2379"
+              jaeger:
+                image: jaegertracing/all-in-one:latest
+                platform: linux/amd64
+                ports: ["16686:16686", "14268:14268"]
+              zipkin:
+                image: openzipkin/zipkin
+                platform: linux/amd64
+                ports: ["9411:9411"]
+            ```
+    *   **`Dockerfile`**: To build the application into a container image.
+        *   **Path**: Project root directory.
+        *   **Description**: Defines a multi-stage build to create a minimal, production-ready Docker image for the service.
+        *   **Example Content**:
+            ```dockerfile
+            # Stage 1: Build the application
+            FROM --platform=linux/amd64 golang:1.21-alpine AS builder
+
+            WORKDIR /app
+
+            # Set necessary environment variables for cross-compilation
+            ENV GO111MODULE=on
+            ENV CGO_ENABLED=0
+            ENV GOOS=linux
+            ENV GOARCH=amd64
+            ENV GOPROXY=https://goproxy.cn,direct
+
+            COPY go.mod go.sum ./
+            # If using Go workspaces, copy go.work and go.work.sum as well
+            # COPY go.work go.work.sum ./
+            RUN go mod download
+
+            COPY . .
+
+            # Build the application binary (replace 'main.go' with your entrypoint)
+            RUN go build -o myapp main.go
+
+            # Stage 2: Create the final, minimal image
+            FROM --platform=linux/amd64 alpine:latest
+
+            WORKDIR /app
+
+            # Copy the binary and configuration from the builder stage
+            COPY --from=builder /app/myapp .
+            COPY --from=builder /app/etc ./etc
+
+            EXPOSE 8888
+
+            CMD ["./myapp", "-f", "etc/service-api.yaml"]
+            ```
+    *   **`.dockerignore`**: To exclude files from the Docker build context.
+        *   **Path**: Project root directory.
+        *   **Description**: Prevents unnecessary or sensitive files from being copied into the Docker image, keeping it small and secure.
+        *   **Content**:
+            ```
+            .git
+            .github
+            .idea
+            .vscode
+            .DS_Store
+            .dockerignore
+            .gitignore
+            .golangci.yml
+            Dockerfile
+            Makefile
+            go.work
+            go.work.sum
+            goctl
+            logs/
+            coverage.txt
+            readme.md
+            readme-cn.md
+            ```
+    *   **`etc/service-api.yaml`**: Configuration file for a go-zero API service.
+        *   **Path**: `etc/` directory within your service.
+        *   **Description**: Contains settings for the server, authentication, database connections, Redis, etcd, and telemetry endpoints. It's important to have configurations for both local (Docker Compose) and Kubernetes environments.
+        *   **Example Snippet (for local Docker Compose)**:
+            ```yaml
+            Name: user-api
+            Host: 0.0.0.0
+            Port: 8888
+            Log:
+              Mode: console
+              Level: info
+            Redis:
+              Host: 127.0.0.1:6379
+              Type: node
+            Etcd:
+              Hosts:
+                - 127.0.0.1:2379
+              Key: user.rpc
+            Telemetry:
+              Name: user-api
+              Endpoint: http://127.0.0.1:14268/api/traces # Jaeger Endpoint
+            ```
+        *   **Example Snippet (for Kubernetes)**:
+            ```yaml
+            # etc/service-api.k8s.yaml
+            Name: user-api
+            Host: 0.0.0.0
+            Port: 8888
+            Log:
+              Mode: console
+              Level: info
+            Redis:
+              Host: redis.default.svc.cluster.local:6379 # Example K8s service DNS
+              Type: node
+            Etcd:
+              Hosts:
+                - etcd0.discov.svc.cluster.local:2379 # Example K8s service DNS for new Pod-based deployment
+                - etcd1.discov.svc.cluster.local:2379
+                - etcd2.discov.svc.cluster.local:2379
+                - etcd3.discov.svc.cluster.local:2379
+                - etcd4.discov.svc.cluster.local:2379
+              Key: user.rpc
+            Telemetry:
+              Name: user-api
+              Endpoint: http://jaeger.observability.svc.cluster.local:14268/api/traces
+            ```
+    *   **Kubernetes Manifests (Optional/Advanced)**:
+        *   **Path**: `core/discov/kubernetes/`
+        *   **Description**: A set of YAML files to deploy a clustered `etcd` for service discovery in Kubernetes.
+        *   **`discov-namespace.yaml`**:
+            ```yaml
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: discov
+            ```
+        *   **`etcd.yaml`**:
+            ```yaml
+            apiVersion: v1
+            kind: Service
+            metadata:
+              name: etcd
+              namespace: discov
+            spec:
+              ports:
+                - name: etcd-port
+                  port: 2379
+                  protocol: TCP
+                  targetPort: 2379
+              selector:
+                app: etcd
+            
+            ---
+            
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              labels:
+                app: etcd
+                etcd_node: etcd0
+              name: etcd0
+              namespace: discov
+            spec:
+              containers:
+                - command:
+                    - /usr/local/bin/etcd
+                    - --name
+                    - etcd0
+                    - --initial-advertise-peer-urls
+                    - http://etcd0:2380
+                    - --listen-peer-urls
+                    - http://0.0.0.0:2380
+                    - --listen-client-urls
+                    - http://0.0.0.0:2379
+                    - --advertise-client-urls
+                    - http://etcd0.discov:2379
+                    - --initial-cluster
+                    - etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380,etcd4=http://etcd4:2380
+                    - --initial-cluster-state
+                    - new
+                    - --auto-compaction-retention=1
+                  image: quay.io/coreos/etcd:latest
+                  name: etcd0
+                  ports:
+                    - containerPort: 2379
+                      name: client
+                      protocol: TCP
+                    - containerPort: 2380
+                      name: server
+                      protocol: TCP
+              affinity:
+                podAntiAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    - labelSelector:
+                        matchExpressions:
+                          - key: app
+                            operator: In
+                            values:
+                              - etcd
+                      topologyKey: "kubernetes.io/hostname"
+              restartPolicy: Always
+            
+            ---
+            
+            apiVersion: v1
+            kind: Service
+            metadata:
+              labels:
+                etcd_node: etcd0
+              name: etcd0
+              namespace: discov
+            spec:
+              ports:
+                - name: client
+                  port: 2379
+                  protocol: TCP
+                  targetPort: 2379
+                - name: server
+                  port: 2380
+                  protocol: TCP
+                  targetPort: 2380
+              selector:
+                etcd_node: etcd0
+            
+            ---
+            
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              labels:
+                app: etcd
+                etcd_node: etcd1
+              name: etcd1
+              namespace: discov
+            spec:
+              containers:
+                - command:
+                    - /usr/local/bin/etcd
+                    - --name
+                    - etcd1
+                    - --initial-advertise-peer-urls
+                    - http://etcd1:2380
+                    - --listen-peer-urls
+                    - http://0.0.0.0:2380
+                    - --listen-client-urls
+                    - http://0.0.0.0:2379
+                    - --advertise-client-urls
+                    - http://etcd1.discov:2379
+                    - --initial-cluster
+                    - etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380,etcd4=http://etcd4:2380
+                    - --initial-cluster-state
+                    - new
+                    - --auto-compaction-retention=1
+                  image: quay.io/coreos/etcd:latest
+                  name: etcd1
+                  ports:
+                    - containerPort: 2379
+                      name: client
+                      protocol: TCP
+                    - containerPort: 2380
+                      name: server
+                      protocol: TCP
+              affinity:
+                podAntiAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    - labelSelector:
+                        matchExpressions:
+                          - key: app
+                            operator: In
+                            values:
+                              - etcd
+                      topologyKey: "kubernetes.io/hostname"
+              restartPolicy: Always
+            
+            ---
+            
+            apiVersion: v1
+            kind: Service
+            metadata:
+              labels:
+                etcd_node: etcd1
+              name: etcd1
+              namespace: discov
+            spec:
+              ports:
+                - name: client
+                  port: 2379
+                  protocol: TCP
+                  targetPort: 2379
+                - name: server
+                  port: 2380
+                  protocol: TCP
+                  targetPort: 2380
+              selector:
+                etcd_node: etcd1
+            
+            ---
+            
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              labels:
+                app: etcd
+                etcd_node: etcd2
+              name: etcd2
+              namespace: discov
+            spec:
+              containers:
+                - command:
+                    - /usr/local/bin/etcd
+                    - --name
+                    - etcd2
+                    - --initial-advertise-peer-urls
+                    - http://etcd2:2380
+                    - --listen-peer-urls
+                    - http://0.0.0.0:2380
+                    - --listen-client-urls
+                    - http://0.0.0.0:2379
+                    - --advertise-client-urls
+                    - http://etcd2.discov:2379
+                    - --initial-cluster
+                    - etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380,etcd4=http://etcd4:2380
+                    - --initial-cluster-state
+                    - new
+                    - --auto-compaction-retention=1
+                  image: quay.io/coreos/etcd:latest
+                  name: etcd2
+                  ports:
+                    - containerPort: 2379
+                      name: client
+                      protocol: TCP
+                    - containerPort: 2380
+                      name: server
+                      protocol: TCP
+              affinity:
+                podAntiAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    - labelSelector:
+                        matchExpressions:
+                          - key: app
+                            operator: In
+                            values:
+                              - etcd
+                      topologyKey: "kubernetes.io/hostname"
+              restartPolicy: Always
+            
+            ---
+            
+            apiVersion: v1
+            kind: Service
+            metadata:
+              labels:
+                etcd_node: etcd2
+              name: etcd2
+              namespace: discov
+            spec:
+              ports:
+                - name: client
+                  port: 2379
+                  protocol: TCP
+                  targetPort: 2379
+                - name: server
+                  port: 2380
+                  protocol: TCP
+                  targetPort: 2380
+              selector:
+                etcd_node: etcd2
+            
+            ---
+            
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              labels:
+                app: etcd
+                etcd_node: etcd3
+              name: etcd3
+              namespace: discov
+            spec:
+              containers:
+                - command:
+                    - /usr/local/bin/etcd
+                    - --name
+                    - etcd3
+                    - --initial-advertise-peer-urls
+                    - http://etcd3:2380
+                    - --listen-peer-urls
+                    - http://0.0.0.0:2380
+                    - --listen-client-urls
+                    - http://0.0.0.0:2379
+                    - --advertise-client-urls
+                    - http://etcd3.discov:2379
+                    - --initial-cluster
+                    - etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380,etcd4=http://etcd4:2380
+                    - --initial-cluster-state
+                    - new
+                    - --auto-compaction-retention=1
+                  image: quay.io/coreos/etcd:latest
+                  name: etcd3
+                  ports:
+                    - containerPort: 2379
+                      name: client
+                      protocol: TCP
+                    - containerPort: 2380
+                      name: server
+                      protocol: TCP
+              affinity:
+                podAntiAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    - labelSelector:
+                        matchExpressions:
+                          - key: app
+                            operator: In
+                            values:
+                              - etcd
+                      topologyKey: "kubernetes.io/hostname"
+              restartPolicy: Always
+            
+            ---
+            
+            apiVersion: v1
+            kind: Service
+            metadata:
+              labels:
+                etcd_node: etcd3
+              name: etcd3
+              namespace: discov
+            spec:
+              ports:
+                - name: client
+                  port: 2379
+                  protocol: TCP
+                  targetPort: 2379
+                - name: server
+                  port: 2380
+                  protocol: TCP
+                  targetPort: 2380
+              selector:
+                etcd_node: etcd3
+            
+            ---
+            
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              labels:
+                app: etcd
+                etcd_node: etcd4
+              name: etcd4
+              namespace: discov
+            spec:
+              containers:
+                - command:
+                    - /usr/local/bin/etcd
+                    - --name
+                    - etcd4
+                    - --initial-advertise-peer-urls
+                    - http://etcd4:2380
+                    - --listen-peer-urls
+                    - http://0.0.0.0:2380
+                    - --listen-client-urls
+                    - http://0.0.0.0:2379
+                    - --advertise-client-urls
+                    - http://etcd4.discov:2379
+                    - --initial-cluster
+                    - etcd0=http://etcd0:2380,etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380,etcd4=http://etcd4:2380
+                    - --initial-cluster-state
+                    - new
+                    - --auto-compaction-retention=1
+                  image: quay.io/coreos/etcd:latest
+                  name: etcd4
+                  ports:
+                    - containerPort: 2379
+                      name: client
+                      protocol: TCP
+                    - containerPort: 2380
+                      name: server
+                      protocol: TCP
+              affinity:
+                podAntiAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    - labelSelector:
+                        matchExpressions:
+                          - key: app
+                            operator: In
+                            values:
+                              - etcd
+                      topologyKey: "kubernetes.io/hostname"
+              restartPolicy: Always
+            
+            ---
+            
+            apiVersion: v1
+            kind: Service
+            metadata:
+              labels:
+                etcd_node: etcd4
+              name: etcd4
+              namespace: discov
+            spec:
+              ports:
+                - name: client
+                  port: 2379
+                  protocol: TCP
+                  targetPort: 2379
+                - name: server
+                  port: 2380
+                  protocol: TCP
+                  targetPort: 2380
+              selector:
+                etcd_node: etcd4
+            ```
+    *   **`.env`**: For storing environment-specific and sensitive variables.
+        *   **Path**: Project root directory.
+        *   **Description**: Stores secrets like database passwords, API keys, and JWT secrets. This file should be added to `.gitignore`.
+        *   **Example Content**:
+            ```
+            DB_PASSWORD="your_secret_password"
+            JWT_SECRET="your_jwt_secret"
+            ```
+    *   **`Makefile`**: To automate common development workflows.
+        *   **Path**: Project root directory.
+        *   **Description**: Defines commands for code generation (local and Docker-based), building, linting, testing, and running services.
+        *   **Example Snippet**:
+            ```makefile
+            GOCTL_IMAGE ?= my-goctl:latest
+            .PHONY: gen gen-docker build test lint tidy run docker-build docker-run k8s-apply-etcd
+
+            # Generate code using local goctl binary
+            gen:
+            	./tools/goctl/goctl api go -api user.api -dir .
+            	./tools/goctl/goctl rpc protoc user.proto --go_out=. --go-grpc_out=. --zrpc_out=.
+
+            # Generate code using goctl Docker image (requires building the image first)
+            gen-docker:
+            	docker run --rm -v $(CURDIR):/app $(GOCTL_IMAGE) api go -api user.api -dir .
+            	docker run --rm -v $(CURDIR):/app $(GOCTL_IMAGE) rpc protoc user.proto --go_out=. --go-grpc_out=. --zrpc_out=.
+
+            build:
+            	go build -o myapp main.go
+
+            lint:
+            	golangci-lint run ./...
+
+            tidy:
+            	go mod tidy
+            	@if ! test -z "$$(git status --porcelain)"; then \
+            	  echo "Please run 'go mod tidy' and commit the changes"; \
+            	  exit 1; \
+            	fi
+
+            test:
+            	go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+
+            run:
+            	go run main.go -f etc/service-api.yaml
+
+            docker-build:
+            	docker build --platform linux/amd64 -t myapp:latest .
+
+            docker-run:
+            	# Using --network host allows the container to connect to services on localhost (e.g., from docker-compose)
+            	docker run --rm -p 8888:8888 --network host myapp:latest
+            
+            k8s-apply-etcd:
+            	kubectl apply -f core/discov/kubernetes/discov-namespace.yaml
+            	kubectl apply -f core/discov/kubernetes/etcd.yaml
+            ```
+    *   **`tools/goctl/Makefile`**: To automate common build tasks for the `goctl` tool.
+        *   **Path**: `tools/goctl/`
+        *   **Description**: Defines targets for building a local `goctl` binary (`build`), running the cross-platform release build script (`release`), and building/pushing a Docker image for the tool (`image`).
+        *   **Content**:
+            ```makefile
+            .PHONY: build release image
+
+            build:
+            	go build -ldflags="-s -w" goctl.go
+
+            release:
+            	bash build.sh
+
+            image:
+            	docker build --rm --platform linux/amd64 -t kevinwan/goctl:$(version) .
+            	docker tag kevinwan/goctl:$(version) kevinwan/goctl:latest
+            	docker push kevinwan/goctl:$(version)
+            	docker push kevinwan/goctl:latest
+            	docker build --rm --platform linux/arm64 -t kevinwan/goctl:$(version)-arm64 .
+            	docker tag kevinwan/goctl:$(version)-arm64 kevinwan/goctl:latest-arm64
+            	docker push kevinwan/goctl:$(version)-arm64
+            	docker push kevinwan/goctl:latest-arm64
+            ```
+    *   **`tools/goctl/build.sh`**: A script to cross-compile `goctl` for multiple platforms.
+        *   **Path**: `tools/goctl/`
+        *   **Description**: Automates the process of building `goctl` binaries for Linux, macOS, and Windows on both amd64 and arm64 architectures, and packages them into zip files.
+        *   **Content**:
+            ```bash
+            #!/bin/bash
+
+            source build.env
+            APP_NAME=$APP_NAME
+            VERSION=$APP_VERSION
+            BUILD_DIR="dist"
+            ZIP_DIR="${BUILD_DIR}/zips"
+
+            PLATFORMS=(
+                "linux/amd64"
+                "linux/arm64"
+                "darwin/amd64"
+                "darwin/arm64"
+                "windows/amd64"
+                "windows/arm64"
+            )
+
+            rm -rf "${BUILD_DIR}"
+            mkdir -p "${ZIP_DIR}"
+
+            for PLATFORM in "${PLATFORMS[@]}"; do
+                GOOS=${PLATFORM%/*}
+                GOARCH=${PLATFORM#*/}
+
+                OUTPUT="${BUILD_DIR}/${APP_NAME}-${VERSION}-${GOOS}-${GOARCH}"
+
+                if [ "${GOOS}" = "windows" ]; then
+                    OUTPUT="${OUTPUT}.exe"
+                fi
+
+                echo "Building for ${GOOS}/${GOARCH}..."
+
+                env GOOS="${GOOS}" GOARCH="${GOARCH}" go build -o "${OUTPUT}" goctl.go
+
+                if [ $? -ne 0 ]; then
+                    echo "Error building for ${GOOS}/${GOARCH}"
+                    exit 1
+                fi
+
+                ZIP_OUTPUT="${ZIP_DIR}/$(basename "${OUTPUT}")"
+                if [ "${GOOS}" = "windows" ]; then
+                    zip -j "${ZIP_OUTPUT%.exe}.zip" "${OUTPUT}"
+                else
+                    zip -j "${ZIP_OUTPUT}.zip" "${OUTPUT}"
+                fi
+
+                echo "Created zip: ${ZIP_OUTPUT}.zip"
+            done
+
+            echo "All builds completed successfully. Zip files are in ${ZIP_DIR}/"
+            ```
+    *   **`tools/goctl/build.env`**: Environment variables for the `goctl` build script.
+        *   **Path**: `tools/goctl/`
+        *   **Description**: Defines the application name and version used by `build.sh` to name the output binaries and archives.
+        *   **Content**:
+            ```
+            APP_NAME=goctl
+            APP_VERSION=1.8.4-beta
+            ```
+    *   **`tools/goctl/Dockerfile`**: To build a container image for the `goctl` tool.
+        *   **Path**: `tools/goctl/`
+        *   **Description**: Creates a self-contained Docker image for `goctl` that includes `protoc` and necessary Go plugins. This allows for consistent code generation without installing dependencies on the host machine.
+        *   **Content**:
+            ```dockerfile
+            FROM --platform=linux/amd64 golang:alpine AS builder
+
+            LABEL stage=gobuilder
+
+            ENV CGO_ENABLED=0
+            # if you are in China, you can use the following command to speed up the download
+            # ENV GOPROXY=https://goproxy.cn,direct
+
+            RUN apk update --no-cache && apk add --no-cache tzdata
+            RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+            RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+            RUN addgroup -g 1000 -S app && adduser -u 1000 -S app -G app
+
+            WORKDIR /build
+
+            COPY . .
+            RUN go mod download
+            RUN go build -ldflags="-s -w" -o /app/goctl ./goctl.go
+
+
+            FROM --platform=linux/amd64 golang:alpine
+
+            RUN apk update --no-cache && apk add --no-cache protoc
+
+            COPY --from=builder /etc/passwd /etc/group /etc/
+            COPY --from=builder /usr/share/zoneinfo/ /usr/share/zoneinfo/
+            COPY --from=builder --chown=1000:1000 /go/bin/protoc-gen-go* /app/goctl /usr/local/bin/
+            ENV TZ=Asia/Shanghai
+
+            WORKDIR /app
+            USER app
+
+            LABEL org.opencontainers.image.authors="Kevin Wan"
+            LABEL org.opencontainers.image.base.name="docker.io/library/golang:alpine"
+            LABEL org.opencontainers.image.description="A cloud-native Go microservices framework with cli tool for productivity."
+            LABEL org.opencontainers.image.licenses="MIT"
+            LABEL org.opencontainers.image.source="https://github.com/zeromicro/go-zero"
+            LABEL org.opencontainers.image.title="goctl (cli)"
+
+            ENTRYPOINT ["/usr/local/bin/goctl"]
+            ```
+    *   **`.golangci.yml`**: Configuration for the `golangci-lint` tool.
+        *   **Path**: Project root directory.
+        *   **Description**: Defines which linters to enable/disable and sets rules for static analysis.
+        *   **Content**:
+            ```yaml
+            run:
+              timeout: 5m
+            linters:
+              enable:
+                - govet
+                - errcheck
+                - staticcheck
+                - unused
+                - goimports
+                - revive
+                - ineffassign
+                - gofmt
+                - typecheck
+            ```
+    *   **`.github/dependabot.yml`**: To configure automated dependency updates.
+        *   **Path**: `.github/dependabot.yml`
+        *   **Description**: Defines schedules and configurations for Dependabot to check for updates.
+        *   **Content**:
+            ```yaml
+            version: 2
+            updates:
+              - package-ecosystem: "docker"
+                directory: "/"
+                schedule:
+                  interval: "weekly"
+              - package-ecosystem: "github-actions"
+                directory: "/"
+                schedule:
+                  interval: "weekly"
+              - package-ecosystem: "gomod"
+                directory: "/"
+                schedule:
+                  interval: "daily"
+            ```
+    *   **`.github/workflows/go.yml`**: To define the Continuous Integration (CI) pipeline.
+        *   **Path**: `.github/workflows/go.yml`
+        *   **Description**: Automates linting, dependency checks, testing (on Linux and Windows), and code coverage reporting on every push and pull request.
+        *   **Content**: (Content unchanged from original plan)
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    *   **Static Analysis / Linting**:
+        *   Run `golangci-lint` to perform a comprehensive static analysis of the code.
+    *   **Logic Unit Tests**:
+        *   Test business logic functions in isolation using mocks (`mockgen`) and assertions (`testify/assert`).
+    *   **Race Condition Detection**:
+        *   Run tests with the `-race` flag to automatically detect data race conditions.
+    *   **Database Interaction Tests**:
+        *   Use `github.com/DATA-DOG/go-sqlmock` to test SQL interactions without a live database.
+    *   **Redis Interaction Tests**:
+        *   Use `github.com/alicebob/miniredis/v2` to test Redis logic with an in-memory Redis server.
+    *   **API Handler Tests**:
+        *   Write tests for each API endpoint handler using `net/http/httptest`.
+    *   **gRPC Service Tests**:
+        *   Test gRPC service methods using a test client and an in-process server.
+    *   **Configuration Loading Tests**:
+        *   Ensure the application correctly parses various configuration files (e.g., for local and Kubernetes environments).
+    *   **Build & Release Process Tests**:
+        *   **Cross-Compilation Build Script Test**: Verify that the `tools/goctl/build.sh` script executes successfully and creates zipped binaries for all specified platforms in the `tools/goctl/dist/zips` directory.
+        *   **Tooling Containerization Tests**: Verify that the `goctl` Docker image can be built and can execute commands (e.g., `goctl --version`) successfully.
+    *   **Local Integration Tests**:
+        *   Write end-to-end tests that interact with live dependencies spun up via Docker Compose.
+    *   **Kubernetes Integration Tests (Advanced)**:
+        *   Test service discovery and registration against a multi-node `etcd` cluster running in a local Kubernetes environment.
+        *   Test the application's ability to connect to dependencies using Kubernetes service DNS names.
+        *   Test resilience by simulating the failure of an `etcd` node and verifying the application remains functional.
+    *   **Code Coverage Reporting**:
+        *   Generate a code coverage profile (`coverage.txt`) during testing and upload it to a service like Codecov.
+    *   **CI/CD Pipeline Validation**:
+        *   Ensure the full test suite runs automatically in the GitHub Actions CI environment on every push and pull request.
+
+4.  COMPLETE TODO LIST:
+    1.  **Install Go**:
+        *   Download and install Go 1.21 or a later compatible version from the official website.
+        *   **Verification**: Run `go version`.
+    2.  **Configure Go Environment**:
+        *   Set up your `GOPATH` and ensure `$GOPATH/bin` is in your system's `PATH`.
+        *   **Verification**: Run `echo $GOPATH` and `echo $PATH`.
+    3.  **Install Prerequisite Tools**:
+        *   Install host-level dependencies using your system's package manager. For Debian/Ubuntu-based systems:
+          ```bash
+          sudo apt-get update && sudo apt-get install -y protobuf-compiler git zip
+          ```
+        *   Install Go generator and linter tools:
+          ```bash
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+          go install go.uber.org/mock/mockgen@latest
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          ```
+        *   **Verification**: Run `protoc --version`, `git --version`, `zip --version`, `mockgen --version`, and `golangci-lint --version`.
+    4.  **Install Containerization & Orchestration Tools**:
+        *   Install Docker Engine and Docker Compose by following the official Docker installation guides for your Linux distribution.
+        *   Optionally, install `kubectl` and a local Kubernetes cluster like Minikube or Kind.
+        *   **Verification**: Run `docker --version`, `docker-compose --version`, and `kubectl version --client`.
+    5.  **Clone Project Repository**:
+        *   Clone the repository into the specified working directory: `git clone <repository-url> /home/cc/EnvGym/data/zeromicro_go-zero`
+        *   `cd /home/cc/EnvGym/data/zeromicro_go-zero`
+    6.  **Create Project Configuration Files**:
+        *   Create all necessary files as described in section 2: `.gitignore`, `docker-compose.yml`, `etc/service-api.yaml`, `.env`, `Dockerfile`, `.dockerignore`, `Makefile`, `tools/goctl/Makefile`, `tools/goctl/build.sh`, `tools/goctl/build.env`, `tools/goctl/Dockerfile`, `.golangci.yml`, Kubernetes manifests (`discov-namespace.yaml`, `etcd.yaml`), and the `.github` directory with its workflows.
+        *   **Verification**: All listed files exist in their correct locations.
+    7.  **Set Up Development Environment (Choose one)**:
+        *   **Option A: Local Docker Compose (Recommended for most development)**
+            1.  Run `docker-compose up -d`.
+            2.  **Verification**: Run `docker-compose ps` to see all containers running.
+        *   **Option B: Kubernetes Cluster (Advanced development/testing)**
+            1.  Start your local Kubernetes cluster.
+            2.  Run `make k8s-apply-etcd` to deploy the clustered etcd.
+            3.  **Verification**: Run `kubectl get pods -n discov` and wait for all `etcd` pods (`etcd0`, `etcd1`, etc.) to be in the `Running` state.
+    8.  **Install Go Dependencies**:
+        *   Run `go mod tidy && go mod verify`.
+        *   **Verification**: The commands complete without errors.
+    9.  **Acquire Project-Specific Tools (`goctl`)**:
+        *   **Option A (Recommended for Local Use)**: Download a pre-compiled `linux/amd64` binary from the project's GitHub Releases and place it in `tools/goctl`.
+        *   **Option B (For Modifying `goctl`)**: Build from source locally.
+            *   For a simple build for your current OS: `cd tools/goctl && make build && cd ../..`.
+            *   For a full release build for all platforms: `cd tools/goctl && make release && cd ../..`.
+        *   **Option C (Containerized Use)**: Build the `goctl` Docker image: `docker build -t my-goctl:latest ./tools/goctl`.
+        *   **Verification**: An executable `goctl` exists in `tools/goctl` (for simple build), the `tools/goctl/dist/zips` directory contains archives (for release build), or `docker images` shows `my-goctl:latest` (for C).
+    10. **Generate Code**:
+        *   **Option A (Local)**: Run `make gen`.
+        *   **Option B (Docker)**: Run `make gen-docker` (after building the image in step 9C).
+        *   **Verification**: Check for newly generated Go files in the project.
+    11. **Run Linter and Local Checks**:
+        *   Run `make lint` and `make tidy`.
+        *   **Verification**: Both commands pass without errors.
+    12. **Run Tests**:
+        *   Run `make test`.
+        *   **Verification**: All tests pass. A `coverage.txt` file is created.
+    13. **Build the Project**:
+        *   **Option A (Local Binary)**: `make build`.
+        *   **Option B (Application Docker Image)**: `make docker-build`.
+        *   **Verification**: An executable `myapp` appears, or `docker images` shows the `myapp` image.
+    14. **Run the Application**:
+        *   **Option A (Locally, connected to Docker Compose)**: `make run`.
+        *   **Option B (In Docker, connected to Docker Compose)**: `make docker-run`.
+        *   **Option C (Locally, connected to Kubernetes)**: `go run main.go -f etc/service-api.k8s.yaml`.
+        *   **Verification**: The console shows logs indicating the service is listening on its port.
+    15. **Verify Service Health**:
+        *   Send a request to a health check endpoint (e.g., `curl http://localhost:8888/health`).
+        *   **Verification**: You receive a successful response (e.g., HTTP 200 OK).
+    16. **Configure GitHub Repository**:
+        *   Push your local repository, including the `.github` workflow files, to GitHub.
+        *   In repository settings, add secrets (e.g., `CODECOV_TOKEN`) if required by CI integrations.
+        *   Ensure Dependabot is enabled under "Security & analysis".
+        *   **Verification**: The "Go" workflow runs on pushes and pull requests.

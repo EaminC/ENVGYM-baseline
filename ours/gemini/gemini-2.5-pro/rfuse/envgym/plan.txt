@@ -1,0 +1,71 @@
+```dockerfile
+# Stage 1: Build fuse-t from source
+# Adjusted to use a CPU-only base image (ubuntu:20.04) compatible with the x86_64 architecture.
+# BuildKit best practices are applied, such as cleaning apt caches.
+FROM ubuntu:20.04 AS builder
+
+# Set non-interactive frontend for package installation to prevent prompts.
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install build dependencies in a single layer and clean up to reduce layer size.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    git \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libfuse-dev \
+    pkg-config \
+    uuid-dev \
+    libgtest-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Clone the source code into a build directory.
+WORKDIR /build
+RUN git clone https://github.com/s3fs-fuse/fuse-t.git
+
+# Set the working directory to the cloned repository.
+WORKDIR /build/fuse-t
+
+# Check out a specific, stable version of the software.
+RUN git checkout tags/v2022.04.02
+
+# Create a dedicated build directory.
+RUN mkdir build
+WORKDIR /build/fuse-t/build
+
+# Configure, build, and install the application.
+# Adjusted 'make' to use -j$(nproc) to leverage the high core count of the
+# host machine for a more efficient parallel build, as per hardware information.
+RUN cmake .. && \
+    make -j$(nproc) && \
+    make install
+
+# Stage 2: Create the final, lean runtime image
+# Using the same base image for consistency and compatibility.
+FROM ubuntu:20.04
+
+# Set non-interactive frontend.
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install only the necessary runtime dependencies and clean up apt cache.
+# This ensures the final image is as small as possible and free of build tools.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libcurl4 \
+    libssl1.1 \
+    libfuse2 \
+    ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy the compiled binary from the builder stage. This multi-stage build pattern
+# is fully compatible with the specified Docker version and BuildKit.
+# The source path is absolute within the builder stage's container filesystem.
+COPY --from=builder /usr/local/bin/fuse-t /usr/local/bin/fuse-t
+
+# Set the entrypoint for the container to execute the fuse-t binary.
+ENTRYPOINT ["/usr/local/bin/fuse-t"]
+```

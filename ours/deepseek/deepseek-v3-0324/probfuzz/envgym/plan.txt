@@ -1,0 +1,55 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED (ADJUSTMENTS):
+   - Python 2.7 (x86_64 compatible version)
+   - Python 3.7 (x86_64 compatible version)
+   - Stan (PyStan package - CPU-only version)
+   - Edward (TensorFlow backend 1.5.0 - CPU-only version)
+   - Pyro 0.2.1 (with PyTorch 0.4.0 CPU-only version)
+   - pip package manager (for x86_64 architecture)
+   - bc utility (standard Linux x86_64 package)
+   - virtualenv (x86_64 compatible)
+   - ANTLR 4.7.1 (antlr4-python2-runtime for x86_64)
+   - antlr-4.7.1-complete.jar (standard Java version)
+   - OpenJDK 8 (instead of Oracle Java, better for Docker/headless environments)
+   - Remove all GPU-specific dependencies/requirements
+
+2. FILES TO CREATE (NO CHANGES NEEDED):
+   [Same as original plan, all paths are compatible with Linux x86_64]
+
+3. NECESSARY TEST CASES (ADJUSTMENTS):
+   - Remove any GPU-specific verification tests
+   - Add CPU-only backend verification tests
+   - Verify OpenJDK 8 instead of Oracle Java 8
+   - Add test for headless environment compatibility
+   - Verify all components work without CUDA support
+   - Add memory usage monitoring during tests (important for containerized environment)
+   - Verify Docker container compatibility tests
+
+4. COMPLETE TODO LIST (ADJUSTMENTS):
+   - Install OpenJDK 8 instead of Oracle Java: `apt-get install openjdk-8-jdk`
+   - Use CPU-only versions for all ML frameworks:
+     - `pip install tensorflow==1.5.0 --no-cache-dir`
+     - `pip install torch==0.4.0 -f https://download.pytorch.org/whl/cpu/torch_stable.html`
+   - Add memory monitoring step during test execution
+   - Verify container-compatible paths in all scripts
+   - Add cleanup step for Docker container resources
+   - Update installation checks for CPU-only versions:
+     - `pip show tensorflow | grep -i gpu` should return empty
+     - `python -c "import torch; print(torch.cuda.is_available())"` should return False
+   - Add Docker-specific verification:
+     - `docker info` to verify Docker daemon running
+     - `docker build` test for containerization
+   - Update path checks for Linux x86_64 environment
+   - Verify all file operations work within container constraints
+
+NOTES:
+- All adjustments maintain original functionality while ensuring compatibility with:
+  - x86_64 architecture
+  - Linux environment (Debian/Ubuntu base)
+  - Headless/containerized operation
+  - CPU-only computation
+  - Docker environment constraints
+- Removed all GPU-specific requirements and tests
+- Added verification steps for container compatibility
+- Switched to OpenJDK for better container support

@@ -1,0 +1,394 @@
+Based on the provided hardware and environment information, here is the complete, adjusted environment setup plan. The primary adjustments account for the specific working directory (`/home/cc/EnvGym/data/Metis`) and the context of a containerized environment (e.g., Docker), which impacts system-level operations like `sudo`, kernel module loading, and service management.
+
+***
+
+### **ENVIRONMENT SETUP PLAN (ADJUSTED)**
+
+1.  **DOWNLOADS NEEDED:**
+    *   **Operating System:** Ubuntu 22.04 or Ubuntu 20.04. For containerized builds, use a base image like `ubuntu:20.04` with the `--platform linux/amd64` flag.
+    *   **Kernel Version:** The project is tested on specific Linux kernel versions (e.g., 5.15.0 for Ubuntu 22.04, 5.4.0 for Ubuntu 20.04). Adherence to tested versions is recommended. For JFFS2 bug analysis, kernel versions < 6.3 and >= 6.3 are needed to observe the bug and its fix. The environment relies on specific kernel modules (`brd`, `mtdram`, `mtdblock`) for creating RAM-based test devices.
+        *   The standard `brd` module (`modprobe brd rd_size=SIZE`) creates all RAM disks with the same size, which is a limitation.
+        *   For newer kernels (e.g., 6.6.1+) or for testing filesystems with different size requirements simultaneously (e.g., ext4 at 256KB, XFS at 16MB), a custom-built `brd` kernel module is provided in `/home/cc/EnvGym/data/Metis/kernel/brd-for-6.6.1/`. This custom module supports the `rd_sizes` parameter (e.g., `insmod brd.ko rd_sizes=256,16384`) to specify individual sizes for each RAM disk.
+        *   The `driver-fs-state/loadmods.sh` script handles loading these modules, typically configuring 32 RAM disks of 256KB each (`brd rd_nr=32 rd_size=256`) and a 256KB MTD RAM device (`mtdram total_size=256 erase_size=16`).
+    *   **Source Code Repositories (Manually Cloned via Git):**
+        *   Metis: `git@github.com:sbu-fsl/Metis.git` (Contains custom kernel module source at `kernel/brd-for-6.6.1/`)
+        *   RefFS: `git@github.com:sbu-fsl/RefFS.git`
+        *   IOCov: `git@github.com:sbu-fsl/IOCov.git` (Contains analysis scripts like `MCFS/parser-mcfs-log-input.py`)
+    *   **Source Code Repositories (Handled by `setup-deps.sh` script):**
+        *   fsl-spin: `git@github.com:sbu-fsl/fsl-spin.git` (A modified version of Spin with required event hooks for state capture/restoration; checks out `c-track-hooks` branch)
+        *   swarm-mcfs: `git@github.com:sbu-fsl/swarm-mcfs.git` (A custom version of the Swarm verifier; checks out `swarm-v2` or `for-mcfs` branch)
+        *   nfs-ganesha: `git@github.com:nfs-ganesha/nfs-ganesha.git`
+        *   xxHash: `git@github.com:Cyan4973/xxHash.git` (checks out `v0.8.0` tag)
+        *   zlib: `git@github.com:madler/zlib.git`
+    *   **System Packages (via apt, handled by `setup-deps.sh` script unless noted):**
+        *   **Build Tools:** `gcc`, `g++`, `build-essential`, `m4`, `autoconf`, `bison`, `flex`, `cmake`, `make`, `spin` (from `fsl-spin`), `linux-headers-generic` (for building kernel modules), `gprof` (part of `binutils` for profiling), `gcov` (part of `gcc` for coverage).
+        *   **Core Tools:** `git`, `vim`, `rename`, `mtd-utils` (for JFFS2), `rpcbind`, `dbus`, `util-linux`, `lsof` (for debugging open files).
+        *   **Filesystem Tools:** `btrfs-progs`, `f2fs-tools`, `jfsutils`, `nilfs-tools`, `xfsprogs`
+        *   **NFS Tools:** `nfs-common`, `nfs-kernel-server` (for kernel NFS tests, install manually)
+        *   **MCFS Dependencies:** `libssl-dev` (for MD5 hashes), `libfuse-dev`, `google-perftools`, `libgoogle-perftools-dev`, `zlib1g-dev`
+        *   **NFS-Ganesha Dependencies:** `libnfsidmap-dev`, `libtirpc-dev`, `libkrb5-3`, `libkrb5-dev`, `libk5crypto3`, `libgssapi-krb5-2`, `libgssglue1`, `libdbus-1-3`, `libattr1-dev`, `libacl1-dev`, `libdbus-1-dev`, `libcap-dev`, `libjemalloc-dev`, `uuid-dev`, `libblkid-dev`, `xfslibs-dev`, `libwbclient-dev`, `rpm2cpio`, `libaio-dev`, `libibverbs-dev`, `librdmacm-dev`, `libboost-all-dev`, `liburcu-dev`, `libxxhash-dev`
+    *   **Python Packages (via pip3):**
+        *   `numpy`
+        *   `scipy`
+        *   `matplotlib`
+
+2.  **FILES TO CREATE:**
+    *   **`/home/cc/EnvGym/data/Metis/fs-state/replay.c`**:
+        *   **Path:** `/home/cc/EnvGym/data/Metis/fs-state/replay.c`
+        *   **Description:** This file must be manually edited before using the Metis replayer. The user needs to update the log file names on lines 40 and 46 to match the specific `sequence-pan-*.log` (sometimes referred to as `sequence.log`) file they wish to replay.
+    *   **`/home/cc/EnvGym/data/Metis/driver-fs-state/config.h`**:
+        *   **Path:** `/home/cc/EnvGym/data/Metis/driver-fs-state/config.h`
+        *   **Description:** A C header defining compile-time constants. For custom tests, this file must be edited before compilation.
+            *   **General Parameters:** Controls file/directory pool sizes (`FILE_COUNT=3`, `DIR_COUNT=2`), `MAX_OPENED_FILES=192`, log prefixes (`SEQ_PREFIX`, `ERROR_PREFIX`), performance logging interval (`PERF_INTERVAL=5`), and operation probabilities (`UNLINK_FILE_PROB=0.95`). `ABORT_ON_FAIL=1` stops the checker on the first error.
+            *   **Filesystem Configuration:** Contains C arrays `fslist[]` and `devlist[]` that must be updated with the names of the filesystems to be tested and their corresponding device paths (e.g., `/dev/ram0`). These must match the configuration in `setup.sh`.
+    *   **`/home/cc/EnvGym/data/Metis/driver-fs-state/Makefile`**:
+        *   **Path:** `/home/cc/EnvGym/data/Metis/driver-fs-state/Makefile`
+        *   **Description:** The Makefile for the C driver component. It can be configured at compile time by passing variables. For example, the `figure-3-exp.sh` script uses this to control the input generation strategy for `open` flags: `make MY_OPEN_FLAG_PATTERN=0` (Uniform), `make MY_OPEN_FLAG_PATTERN=4` (RSD), or `make MY_OPEN_FLAG_PATTERN=5` (IRSD).
+    *   **`/home/cc/EnvGym/data/Metis/fs-state/setup.sh`**:
+        *   **Path:** `/home/cc/EnvGym/data/Metis/fs-state/setup.sh`
+        *   **Description:** The main test orchestration script. For testing custom filesystem combinations, this script must be edited. The user needs to modify the shell arrays `FSLIST` and `DEVLIST` to match the desired filesystems and devices. If a filesystem not already defined in the script is used, new `setup_$fs()` and `unset_$fs()` shell functions must be added to handle its creation and cleanup. Test runs started with this script should be terminated using `/home/cc/EnvGym/data/Metis/driver-fs-state/stop.sh`.
+    *   **`/home/cc/EnvGym/data/Metis/fs-state/mcfs_scripts/only_one_fs.sh`**:
+        *   **Path:** `/home/cc/EnvGym/data/Metis/fs-state/mcfs_scripts/only_one_fs.sh`
+        *   **Description:** A specialized test runner to run Metis (MCFS) against a single filesystem, rather than comparing two. This is useful for fuzzing a filesystem in isolation to find crashes or hangs. It uses the standard `brd` kernel module to create a single RAM disk of a specified size, runs the test for a given duration, and then cleans up.
+    *   **`/home/cc/EnvGym/data/Metis/fs-state/mcfs-main.pml`**:
+        *   **Path:** `/home/cc/EnvGym/data/Metis/fs-state/mcfs-main.pml`
+        *   **Description:** This Promela model file defines which parts of the system state are tracked. The `setup.sh` script automatically injects `c_track` statements between the comment markers `/* The persistent content of the file systems */` and `/* Abstract state signatures of the file systems */` for known filesystems. To add a new filesystem, the user must ensure a corresponding `c_track "fsimgs[INDEX]" "SIZE_IN_BYTES" "UnMatched";` statement is correctly generated.
+    *   **`/home/cc/EnvGym/data/Metis/fs-state/swarm.lib`**:
+        *   **Path:** `/home/cc/EnvGym/data/Metis/fs-state/swarm.lib`
+        *   **Description:** Configuration file for Swarm Verification. For single-machine tests, it can be replaced by copying `swarm-single-node.lib`. For distributed, multi-machine tests, it should be copied from a template like `swarm-fast24ae.lib` and then edited. The `cpus` field (e.g., line 20) must be updated to specify the hostname and number of parallel instances (VTs) for the master and each client machine (e.g., `cpus 6 yifeilatest4:6 yifeilatest5:6`). Hostnames must match the client's `hostname` and be resolvable (e.g., via `~/.ssh/config` or `/etc/hosts`).
+    *   **`/home/cc/EnvGym/data/Metis/fs-state/parameters.py`**:
+        *   **Path:** `/home/cc/EnvGym/data/Metis/fs-state/parameters.py`
+        *   **Description:** This Python script generates `parameters.pml`, defining the parameter space for system calls. For reproducing the JFFS2 bug, this file must be edited to remove the `0o40101` (`O_DIRECT`) flag from the `create_open_flag` variable, as JFFS2 does not support it.
+    *   **`/home/cc/EnvGym/data/Metis/fs-state/parameters.pml`**:
+        *   **Path:** `/home/cc/EnvGym/data/Metis/fs-state/parameters.pml`
+        *   **Description:** Automatically generated by `parameters.py` via `setup.sh`. It contains the specific parameter values (flags, modes, sizes) for the `pan` model checker. Not for manual editing.
+    *   **`/home/cc/EnvGym/data/Metis/fs-state/ganesha.conf`**:
+        *   **Path:** `/home/cc/EnvGym/data/Metis/fs-state/ganesha.conf`
+        *   **Description:** A template configuration file for NFS-Ganesha. Copy to `/etc/ganesha/ganesha.conf` to set up the user-space NFS server, which pre-configures an export path at `/mnt/test-nfs-ganesha-export`.
+    *   **`/home/cc/EnvGym/data/Metis/fs-state/ganesha.conf.example`**:
+        *   **Path:** `/home/cc/EnvGym/data/Metis/fs-state/ganesha.conf.example`
+        *   **Description:** A generic, commented example configuration for NFS-Ganesha, serving as a reference.
+    *   **`/etc/exports`**:
+        *   **Path:** `/etc/exports`
+        *   **Description:** System file for the Linux Kernel NFS server. Must be edited to export a directory (e.g., `/tmp/knfs_export`) backed by a test filesystem.
+    *   **`/etc/ganesha/ganesha.conf`**:
+        *   **Path:** `/etc/ganesha/ganesha.conf`
+        *   **Description:** The active configuration file for NFS-Ganesha, created by copying the template from `/home/cc/EnvGym/data/Metis/fs-state/ganesha.conf`.
+    *   **Generated Files and Outputs**:
+        *   **Path:** Varies
+        *   **Description:** The build and test process generates numerous output files.
+            *   **Key Scripts (Provided by Repositories):**
+                *   `/home/cc/EnvGym/data/Metis/driver-fs-state/stop.sh`: Stops ongoing Metis test runs.
+                *   `/home/cc/EnvGym/data/Metis/driver-fs-state/driver_scripts/only_one_ext4.sh`: A specialized script to run a single ext4 test, used by experiment scripts.
+                *   `/home/cc/EnvGym/data/IOCov/MCFS/parser-mcfs-log-input.py`: A Python script to parse `sequence-pan-*.log` files and analyze input coverage.
+            *   **Executables (`/home/cc/EnvGym/data/Metis/fs-state/` and `/home/cc/EnvGym/data/Metis/driver-fs-state/`):** `pan`, `replay`, `replay_dump`, `min_repro`, `absfs`, `absfs_test`, `crmfs`, `driver`, `reproducer`. The `swarm-mcfs` tool will generate multiple `pan` executables (e.g., `pan1`, `pan2`).
+            *   **Kernel Modules (`/home/cc/EnvGym/data/Metis/kernel/brd-for-6.6.1/`):** `brd.ko` (custom RAM disk module), and other build artifacts (`*.mod`, `modules.order`, etc.).
+            *   **Intermediate Files (`/home/cc/EnvGym/data/Metis/fs-state/`):** `pan.c`, `*.o`, `*.a` (`common-libs.a`, `libsmcfs.a`), `*.so` (`libmcfs.so`), `.pml_tmp`.
+            *   **Logs and Outputs (`/home/cc/EnvGym/data/Metis/fs-state/` or `/home/cc/EnvGym/data/Metis/driver-fs-state/`):** `output.log`, `error.log`, `replay.log`, `sequence-pan-*.log`, `*.trail`, `lsof-pan*.txt`.
+            *   **Data and Reports:**
+                *   `perf.csv`: Performance metrics logged by the checker. Columns include: `epoch`, `fsops_rate`, `proc_state`, `minor_flt`, `major_flt`, `utime`, `ktime`, `num_threads`, `vmem_sz`, `pmem_sz`, `swap_bytes_used`, and filesystem-specific stats like `$fs_capacity`, `$fs_free`.
+                *   Other data files: `*.json`, `*.pdf`, `*.img` (file-based disk images).
+            *   **Profiling & Coverage Outputs:** `gmon.out`, `gmon*.txt`, `gcov_results/`, `*.gcno`, `*.gcda`, `*.gcov`, `*.info`.
+            *   **Swarm Verification Outputs:** `script*`, `script*.err`, `script*.out`, `mcfs-main.pml.swarm` (a shell script generated by Swarm that may require manual editing for distributed runs), `swarm_done_s*`.
+
+3.  **NECESSARY TEST CASES IN THE CODEBASE:**
+    *   The project provides a suite of scripts to execute test runs and reproduce paper experiments.
+    *   **Running Metis Tests (`setup.sh`):**
+        *   `/home/cc/EnvGym/data/Metis/fs-state/setup.sh`: The main script for orchestrating tests on filesystems created on RAM-based devices.
+        *   **Syntax:**
+            *   **Two Filesystems (Comparison):** `./setup.sh [options] -f "fs1:size1:fs2:size2:..."`
+            *   **Single Filesystem (Fuzzing):** `./setup.sh [options] -f "fs:size"`
+        *   **Example (Ext2 vs. Ext4):** `./setup.sh -f "ext4:256:ext2:256"`
+        *   **Supported filesystems:** `btrfs`, `ext2`, `ext4`, `f2fs`, `jfs`, `jffs2`, `nilfs2`, `xfs`, `verifs1`, `verifs2`. Minimum size requirements vary (e.g., ext4: 256KB, xfs: 16MB, btrfs: 110MB).
+        *   **Key Options:**
+            *   `-v, --verbose`: Enable verbose output.
+            *   `-s, --setup-only`: Sets up and formats filesystems but does not start the `pan` checker.
+            *   `-r, --replay`: Runs the replayer using a previous log.
+            *   `-c, --clean-after-exp`: Cleans up filesystems after the test.
+            *   `-k, --keep-fs`: Prevents filesystem cleanup (default).
+            *   `-a, --abort-on-discrepancy`: Aborts on the first discrepancy.
+            *   `-m, --mount-all`: Mounts all tested filesystems listed in the script's `FSLIST`.
+    *   **Specialized Test Runners:**
+        *   `/home/cc/EnvGym/data/Metis/driver-fs-state/driver_scripts/only_one_ext4.sh`: A script used by the paper reproduction experiments to run a test on a single ext4 filesystem.
+        *   `/home/cc/EnvGym/data/Metis/fs-state/mcfs_scripts/only_one_fs.sh`: A generic script to run Metis against a single specified filesystem for a set duration.
+            *   **Purpose:** Fuzz a single filesystem to find internal bugs (e.g., kernel panics) rather than consistency issues between two filesystems.
+            *   **Syntax:** `cd /home/cc/EnvGym/data/Metis/fs-state/mcfs_scripts/ && ./only_one_fs.sh <fs_name> <duration>`
+            *   **Example:** `./only_one_fs.sh xfs 30m`
+    *   **Running Swarm Verification:**
+        *   Swarm runs multiple `pan` instances in parallel to explore the state space faster.
+        *   **Single-Machine Swarm Test:**
+            *   **Prerequisites:** Ensure `brd` kernel module is loaded with at least 8 RAM disks of sufficient size (e.g., 256KB for Ext4 vs Ext2).
+            *   **Command:** `cd /home/cc/EnvGym/data/Metis/fs-state/ && swarm-mcfs -c4 -f mcfs-main.pml`
+            *   The `-c4` argument specifies using 4 CPU cores.
+        *   **Distributed (Multi-Machine) Swarm Test:**
+            *   **Concept:** A master machine orchestrates tests on multiple client machines. The master compiles and distributes test scripts via `ssh`/`scp`.
+            *   **Prerequisites (All Machines):**
+                1.  Master must have passwordless SSH access to all clients (`ssh-copy-id`).
+                2.  All client machines must have correct hostnames configured (`/etc/hostname`, `/etc/hosts`).
+                3.  The `Metis` repository must be cloned on all machines.
+                4.  MCFS libraries must be built and installed on all machines (`cd /home/cc/EnvGym/data/Metis && make && make install`).
+                5.  Kernel modules (`brd`, etc.) must be loaded manually on all machines before starting the test.
+            *   **Execution Flow:**
+                1.  On the master, edit `/home/cc/EnvGym/data/Metis/fs-state/swarm.lib` to define client hostnames and core counts.
+                2.  Run an experiment script (e.g., `/home/cc/EnvGym/data/Metis/ae-experiments/figure-6-exp.sh`) which uses Swarm.
+                3.  For custom tests, you may need to use scripts like `setup_swarm.sh`, which generates `mcfs-main.pml.swarm`. This generated script may need manual editing to correct remote paths and commands.
+                4.  Finally, execute the generated `mcfs-main.pml.swarm` script on the master node to begin the distributed test.
+        *   **Swarm Troubleshooting:**
+            *   **`swarm: no pan.c; cannot proceed`:** Ensure remote commands are run in the correct directory (e.g., `ssh remote "cd /path/to/metis && sh script"`).
+            *   **Stuck `cc1` compiler processes:** Kill the main Swarm script process with `pkill -f "mcfs-main.pml.swarm"`.
+            *   **`pan` executables not found on clients:** Double-check all prerequisites, especially correct hostnames and that MCFS libraries are installed on clients.
+            *   **`Ext4 vs. Ext2 discrepancy (less data written)`:** The RAM disks are too small. Use larger devices (e.g., 512KB instead of 256KB).
+    *   **Testing Custom Filesystems:**
+        *   To test a new combination of filesystems, a multi-step configuration is required:
+            1.  **Edit `setup.sh`:** Modify the `FSLIST` and `DEVLIST` shell arrays in `/home/cc/EnvGym/data/Metis/fs-state/setup.sh`. If using a new filesystem type, add `setup_$fs()` and `unset_$fs()` shell functions for it.
+            2.  **Edit `config.h`:** Modify the `fslist[]` and `devlist[]` C arrays in `/home/cc/EnvGym/data/Metis/driver-fs-state/config.h` to match the configuration in `setup.sh`.
+            3.  **Verify `mcfs-main.pml`:** Ensure the `c_track` statements for the filesystem images are generated correctly by `setup.sh`.
+    *   **Running Tests via Makefile:**
+        *   It is possible to run the checker via `make run` from `/home/cc/EnvGym/data/Metis/fs-state/`.
+        *   This is not recommended as it requires manual setup of all devices and filesystems beforehand (e.g., using `./setup.sh -s`).
+        *   Other useful make targets include `make clean`, `make replayer`, and `make abstractfs-test`.
+    *   **Debugging and Analysis Utilities:**
+        *   `/home/cc/EnvGym/data/Metis/fs-state/replay_dump`: Inspect the contents of a `sequence-pan-*.log` file.
+        *   `/home/cc/EnvGym/data/Metis/fs-state/min_repro`: Minimize a sequence log to find a minimal reproducer.
+        *   `/home/cc/EnvGym/data/Metis/fs-state/absfs_test`: A demo program to compute and display the "abstract file system state" (MD5 hash) of a directory, useful for understanding the state comparison logic.
+        *   `/home/cc/EnvGym/data/IOCov/MCFS/parser-mcfs-log-input.py`: Parses a `sequence-pan-*.log` file to analyze input coverage for system calls.
+        *   `lsof-pan*.txt` logs: Useful for debugging hangs or file descriptor issues.
+    *   **Performance Profiling (gprof) and Code Coverage (gcov):**
+        *   Enable by modifying the `Makefile` to add `-pg` (profiling) or `--coverage` (coverage) to `CFLAGS` and `LDFLAGS`.
+        *   After a test run, analyze `gmon.out` with `gprof` or process `.gcda`/`.gcno` files with `lcov`.
+    *   **NFS Testing (Manual Setup):**
+        *   `scripts/setup-kernel-nfs.sh` and `scripts/setup-nfs-ganesha.sh` are empty templates requiring manual implementation based on system configuration.
+    *   **Experimental Result Reproduction:**
+        *   `/home/cc/EnvGym/data/Metis/ae-experiments/figure-3-exp.sh`: Reproduces input coverage data for `open` flags. It runs three 40-minute tests (Metis-Uniform, Metis-RSD, Metis-IRSD) by recompiling the driver with different `MY_OPEN_FLAG_PATTERN` settings. Total run time is ~2 hours.
+        *   `/home/cc/EnvGym/data/Metis/ae-experiments/figure-4-exp.sh`: Reproduces input coverage data for `write` sizes (40 mins).
+        *   `/home/cc/EnvGym/data/Metis/ae-experiments/figure-5-exp.sh`: Reproduces input coverage data for `write` sizes (4 hours).
+        *   `/home/cc/EnvGym/data/Metis/ae-experiments/figure-6-exp.sh` & `figure-6-analysis.sh`: Reproduces performance/scalability results using Swarm.
+        *   `/home/cc/EnvGym/data/Metis/ae-experiments/figure-7-exp.sh`: Reproduces performance comparison of reference file systems.
+    *   **Bug Reproduction:**
+        *   `/home/cc/EnvGym/data/Metis/fs_bugs/jffs2/write_begin/reproduce_jffs2_write_begin_issue.sh`: Specific C reproducer for a JFFS2 bug.
+        *   `/home/cc/EnvGym/data/Metis/ae-experiments/run-metis-jffs2.sh`: Runs Metis to find the JFFS2 bug automatically.
+
+4.  **COMPLETE TODO LIST:**
+
+    > **Important Considerations for Containerized Environments (Docker):**
+    > *   **User:** The following steps assume you are running as the `root` user inside the container. The `sudo` command has been removed.
+    > *   **Privileged Mode:** This environment requires direct interaction with the host kernel to load modules (`modprobe`, `insmod`) and create devices (`/dev/ram*`). The container **must** be run with the `--privileged` flag (e.g., `docker run --privileged -it ...`).
+    > *   **Kernel Headers:** To build the custom `brd.ko` kernel module, the kernel headers matching the **host's** running kernel must be available inside the container. You may need to install them (`apt-get install linux-headers-$(uname -r)`) or mount the host's `/usr/src` and `/lib/modules` directories into the container.
+    > *   **System Services:** Standard Docker containers do not use `systemd`. Commands like `systemctl` will fail. For NFS testing (Steps 16 & 17), you must start the required daemons (`rpcbind`, `nfsd`, `ganesha.nfsd`) manually in the foreground or via a wrapper script. This part of the setup is complex in a container and may require significant adaptation.
+    > *   **Distributed Swarm:** The distributed Swarm test (Step 19) requires `ssh` between containers and stable hostnames. This requires advanced Docker networking (e.g., creating a custom network, defining container names) and is significantly more complex than on bare-metal machines.
+
+    ---
+
+    *   **Step 1: Initial System Setup**
+        *   Start a container from a supported base image (e.g., `ubuntu:20.04`) using the `--privileged` and `--platform linux/amd64` flags.
+        *   Install initial tools and configure SSH keys with your GitHub account.
+            ```bash
+            # Run inside the container
+            apt-get update && apt-get install -y git python3-pip
+            ```
+
+    *   **Step 2: Clone Source Code Repositories**
+        *   Navigate to the target directory and clone the main repositories:
+            ```bash
+            cd /home/cc/EnvGym/data
+            git clone git@github.com:sbu-fsl/Metis.git
+            git clone git@github.com:sbu-fsl/RefFS.git
+            git clone git@github.com:sbu-fsl/IOCov.git
+            ```
+        *   **Verification:** Check that `Metis`, `RefFS`, and `IOCov` directories exist in `/home/cc/EnvGym/data`.
+
+    *   **Step 3: Install All Dependencies**
+        *   Run the bootstrap script to install system packages and build dependent projects (including `fsl-spin` and `swarm-mcfs`):
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/scripts
+            ./setup-deps.sh
+            ```
+        *   Manually install the kernel NFS server if needed for NFS tests: `apt-get install -y nfs-kernel-server`.
+        *   Install Python packages: `pip3 install numpy scipy matplotlib`.
+        *   **Verification:** Ensure all commands complete without errors. Check for `spin` and `swarm-mcfs` in your path (`which spin` and `which swarm-mcfs`).
+
+    *   **Step 4: Build and Install Metis Libraries**
+        *   Compile and install the core `libmcfs.so` library:
+            ```bash
+            cd /home/cc/EnvGym/data/Metis
+            make
+            make install
+            ```
+        *   **Verification:** Run `ls /usr/local/lib/libmcfs.so` and `ls /usr/local/include/mcfs/`.
+
+    *   **Step 5: (Conditional) Build Custom Kernel Module for Newer Kernels**
+        *   Necessary for kernels 6.6.1+ or for testing filesystems with varied size requirements. Requires host kernel headers.
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/kernel/brd-for-6.6.1/
+            make
+            ```
+        *   **Verification:** A `brd.ko` file should now exist in the directory.
+
+    *   **Step 6: Setup and Mount RefFS**
+        *   Prepare the RefFS runtime environment:
+            ```bash
+            cd /home/cc/EnvGym/data/RefFS
+            ./setup_verifs2.sh
+            ```
+        *   **Verification:** Run `mount | grep mnt` and confirm `VeriFS2` is mounted on `/mnt/test-verifs2`.
+
+    *   **Step 7: (Optional) Customize Test Configuration**
+        *   To test a custom set of filesystems (e.g., XFS vs. NILFS2):
+            1.  Edit `/home/cc/EnvGym/data/Metis/fs-state/setup.sh`. Modify the `FSLIST` and `DEVLIST` arrays. Add new `setup_$fs` functions if necessary.
+            2.  Edit `/home/cc/EnvGym/data/Metis/driver-fs-state/config.h`. Modify the `fslist[]` and `devlist[]` C arrays to match the changes in `setup.sh`.
+        *   To adjust general test parameters, edit other macros in `/home/cc/EnvGym/data/Metis/driver-fs-state/config.h`.
+
+    *   **Step 8: Perform a Simple Comparison Test Run (Ext2 vs. Ext4)**
+        *   Load the kernel modules. This script loads standard `brd` by default.
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/driver-fs-state/
+            # Note: To use the custom module, you might need to 'rmmod brd' first,
+            # then 'insmod ../kernel/brd-for-6.6.1/brd.ko rd_nr=... rd_sizes=...'
+            ./loadmods.sh
+            ```
+        *   Navigate to the test directory and execute the main setup script.
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/fs-state/
+            ./setup.sh -f "ext4:256:ext2:256"
+            ```
+        *   Let it run, then open a **new terminal/shell** into the container and run the stop script.
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/driver-fs-state/
+            ./stop.sh
+            ```
+        *   **Verification:** Check modules (`lsmod | grep brd`), log files (`output.log`, `perf.csv`), and the `pan` executable.
+
+    *   **Step 9: Perform a Single-Filesystem Fuzzing Test**
+        *   This test uses a helper script to fuzz a single filesystem for a specified duration.
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/fs-state/mcfs_scripts/
+            # Usage: ./only_one_fs.sh <fs_name> <duration>
+            # Example for a 5 minute test on ext4:
+            ./only_one_fs.sh ext4 5m
+            ```
+        *   **Verification:** The script will run for the specified duration and then stop automatically. Check `/home/cc/EnvGym/data/Metis/fs-state/error.log` for any reported issues.
+
+    *   **Step 10: Test the Metis Replayer**
+        *   Ensure a `sequence-pan-*.log` file exists from Step 8.
+        *   Reload kernel modules to get clean devices.
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/driver-fs-state/
+            ./stop.sh
+            ./loadmods.sh
+            ```
+        *   Edit `replay.c` to point to the correct log file: `vim /home/cc/EnvGym/data/Metis/fs-state/replay.c`.
+        *   Run the setup script with the replay flag.
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/fs-state/
+            ./setup.sh -r -f "ext4:256:ext2:256"
+            ```
+        *   **Verification:** Check `replay.log` for the sequence of replayed operations.
+
+    *   **Step 11: Analyze and Minimize a Bug Reproducer**
+        *   Build the analysis utilities.
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/fs-state/
+            make min_repro replay_dump abstractfs-test
+            ```
+        *   View the sequence log: `./replay_dump sequence-pan-*.log`.
+        *   Shrink the sequence log: `./min_repro sequence-pan-*.log`.
+        *   Check abstract state calculation: `./absfs_test /mnt/test-ext4`.
+        *   **Verification:** Observe the output of the tools.
+
+    *   **Step 12 (Optional): Run with Code Coverage or Profiling**
+        *   Clean previous builds and re-compile with special flags.
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/driver-fs-state/
+            make clean
+            # For coverage: make CFLAGS="--coverage" LDFLAGS="--coverage"
+            # For profiling: make CFLAGS="-pg" LDFLAGS="-pg"
+            ```
+        *   Run a test (e.g., via `only_one_ext4.sh`), then analyze `gmon.out` with `gprof` or generate coverage reports with `lcov`.
+
+    *   **Step 13: Reproduce Figure 3, 4, and 5 Experiments (Input Coverage)**
+        *   Run the experiment scripts (total time may be several hours).
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/ae-experiments
+            # This script runs for ~2 hours (3 stages of 40 mins each)
+            ./figure-3-exp.sh
+            ./figure-4-exp.sh
+            ```
+        *   **Verification:** Check for new `.json` files in `/home/cc/EnvGym/data/IOCov/MCFS/` and new PDF files in `/home/cc/EnvGym/data/Metis/ae-experiments/`.
+
+    *   **Step 14: Reproduce JFFS2 Bug (on host with kernel <= 6.2)**
+        *   Edit `/home/cc/EnvGym/data/Metis/fs-state/parameters.py` to remove the `O_DIRECT` flag (`0o40101`).
+        *   Run the Metis test for JFFS2: `cd /home/cc/EnvGym/data/Metis/ae-experiments/ && ./run-metis-jffs2.sh`.
+        *   **Verification:** Check `error.log` in `/home/cc/EnvGym/data/Metis/fs-state/` for a discrepancy.
+        *   Alternatively, run the instant C reproducer:
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/fs_bugs/jffs2/write_begin/
+            make
+            bash reproduce_jffs2_write_begin_issue.sh
+            ```
+        *   **Verification:** The script output will show incorrect file content.
+
+    *   **Step 15: Verify JFFS2 Bug Fix (on host with kernel >= 6.3)**
+        *   On a machine with a newer kernel, run the same C reproducer from the previous step.
+        *   **Verification:** The script output will now show the correct file content.
+
+    *   **Step 16: Perform a Test Run with Kernel NFS (Advanced/Container-Unfriendly)**
+        *   Create a backing filesystem, configure `/etc/exports`, and start the service manually.
+            ```bash
+            mkfs.ext4 /dev/ram0
+            mkdir -p /tmp/knfs_export /mnt/nfs_client
+            mount /dev/ram0 /tmp/knfs_export
+            echo '/tmp/knfs_export *(rw,sync,no_subtree_check,no_root_squash)' | tee -a /etc/exports
+            # The following systemctl command will likely fail. Start daemons manually.
+            # systemctl restart nfs-kernel-server
+            rpcbind && rpc.mountd && rpc.nfsd && exportfs -rav
+            mount -t nfs -o vers=4,soft localhost:/tmp/knfs_export /mnt/nfs_client
+            ```
+        *   **Verification:** Run `showmount -e localhost` and `mount | grep nfs_client`.
+
+    *   **Step 17: Perform a Test Run with NFS-Ganesha (Advanced/Container-Unfriendly)**
+        *   Create a backing filesystem, copy the config file, and start the service manually.
+            ```bash
+            mkfs.ext4 /dev/ram1
+            mkdir -p /mnt/test-nfs-ganesha-export /mnt/ganesha_client
+            mount /dev/ram1 /mnt/test-nfs-ganesha-export
+            cp /home/cc/EnvGym/data/Metis/fs-state/ganesha.conf /etc/ganesha/ganesha.conf
+            # The following systemctl command will likely fail. Start daemon manually.
+            # systemctl restart nfs-ganesha
+            ganesha.nfsd -F -L /var/log/ganesha.log # Run in foreground
+            # In a separate terminal:
+            mount -t nfs -o vers=4,soft localhost:/ /mnt/ganesha_client
+            ```
+        *   **Verification:** Check service logs and `mount | grep ganesha_client`.
+
+    *   **Step 18: Perform a Swarm Test (Single Machine)**
+        *   Ensure kernel modules are loaded with at least 8 RAM disks.
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/driver-fs-state/
+            ./loadmods.sh # This creates 32 devices, which is sufficient
+            ```
+        *   Run the swarm checker with 4 cores. It is recommended to run this inside `screen` or `tmux`.
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/fs-state/
+            swarm-mcfs -c4 -f mcfs-main.pml
+            ```
+        *   **Verification:** Observe the log output from the parallel `pan` instances. Check for `script*.out` and `script*.err` files.
+
+    *   **Step 19: Perform a Swarm Test (Distributed, Multi-Machine - Advanced)**
+        *   **a) Master/Client System Prep:** Requires advanced Docker networking setup. On **ALL** containers:
+            *   Ensure containers can resolve each other by name.
+            *   Ensure the `Metis` repo is cloned and libraries are installed (Steps 2 & 4).
+            *   On the master, ensure passwordless SSH access to all clients: `ssh-copy-id user@client-container-name`.
+        *   **b) Device Prep:** On **ALL** client containers, manually load the kernel modules.
+            ```bash
+            cd /home/cc/EnvGym/data/Metis/driver-fs-state/ && ./loadmods.sh
+            ```
+        *   **c) Master Node Configuration:** On the **master container only**:
+            *   Copy a Swarm template: `cd /home/cc/EnvGym/data/Metis/fs-state/ && cp swarm-fast24ae.lib swarm.lib`.
+            *   Edit `swarm.lib` and configure the `cpus` line with the container names of your master and client machines.
+        *   **d) Test Execution:** On the **master container only**:
+            *   Run an experiment script that utilizes Swarm, for example:
+                ```bash
+                cd /home/cc/EnvGym/data/Metis/ae-experiments/
+                ./figure-6-exp.sh
+                ```
+        *   **Verification:** Monitor the output on the master. Check for generated `script*`, `mcfs-main.pml.swarm`, and log files on the master. Check for `pan` processes running on the client containers.

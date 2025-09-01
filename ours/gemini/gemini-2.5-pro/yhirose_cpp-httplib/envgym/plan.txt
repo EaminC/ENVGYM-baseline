@@ -1,0 +1,392 @@
+This is the adjusted plan, updated to ensure compatibility and feasibility with your specified `linux/amd64` hardware and working directory.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    -   **C++ Compiler**: A C++ compiler. A C++11 compliant compiler is required for the library's examples; a C++23 compiler is recommended for the custom user application.
+        -   **Linux**: GCC (version 12 or later) or Clang (version 15 or later). This is fully compatible with your `linux/amd64` architecture.
+    -   **Docker Engine and CLI**: For building and running the containerized application. Your version (28.1.1) is fully supported.
+    -   **Docker Compose**: For orchestrating the application services. On Linux, this requires a separate installation.
+    -   **Docker Buildx and QEMU**: Required for local multi-platform builds (e.g., `linux/arm64` on your `amd64` machine) to match the CI pipeline. This requires installing `qemu-user-static` on your Linux host.
+    -   **cpp-httplib Source Code**: The full source repository from GitHub. This includes `httplib.h`, build files, a comprehensive test suite (`test/`), a directory of example applications (`example/`), and modern CMake integration files (like `cmake/httplibConfig.cmake.in` and `cmake/FindBrotli.cmake`) that support building and installing the library for use with `find_package` and provide robust dependency detection.
+    -   **Git**: For cloning the `cpp-httplib` repository and managing the project source for CI/CD.
+    -   **GitHub Account and Repository**: Required to use the GitHub Actions CI/CD workflows.
+    -   **Build System Generator (For local builds)**:
+        -   CMake (version 3.15 or later).
+        -   Meson (version 0.63.0 or later) and Ninja.
+        -   **make**: For building the standalone example and running the library's internal test suite and example suite.
+    -   **Python 3 and pip**: Required for `pre-commit`, for the Meson option to compile `cpp-httplib` as a separate library, and for the `split.py` script used in some build configurations.
+    -   **pre-commit**: A framework for managing and maintaining multi-language pre-commit hooks.
+    -   **Package Manager**:
+        -   **Linux**: `apt`, `yum`, or `dnf`. For your environment, we will use `apt`.
+    -   **Local Dependencies (for extended features and testing)**:
+        -   **OpenSSL**: Version 3.0 or later (for HTTPS). This includes both the development libraries (e.g., `libssl-dev`) and the **`openssl` command-line tool**, which is required by the test suite, the example `Makefile`, and the `gen-certs.sh` script to generate certificates.
+        -   **Zlib**: Development library (for gzip compression).
+        -   **Brotli**: Development library (for brotli compression).
+        -   **Zstd**: Development library (for zstd compression).
+        -   **libcurl**: Development library (used in tests).
+        -   **Google Test (`gtest`)**: C++ testing framework.
+            -   **For CMake builds**: The library's CMake build can download this automatically via `FetchContent` if it's not found on the system.
+            -   **For `make` builds**: The source code for Google Test must be cloned or placed into the `libs/cpp-httplib/test/gtest/` subdirectory. The `Makefile` expects this specific structure.
+        -   **libanl**: For non-blocking `getaddrinfo`.
+        -   **pkg-config**: Helper tool for finding libraries.
+        -   **netcat**: Networking utility required for proxy tests (`netcat-openbsd` on Debian/Ubuntu).
+        -   **abigail-tools**: Toolset for ABI compatibility checking (`abidiff`).
+        -   **squid**: (Installed via Docker) Proxy server used for library testing.
+        -   **apache2-utils**: Provides the `htpasswd` and `htdigest` utilities for creating password files for basic and digest authentication, respectively, used in proxy tests.
+        -   **OSS-Fuzz/CIFuzz Toolchain (for local fuzzing)**: A specific version of Clang with libFuzzer and sanitizers (ASan, UBSan). This is for advanced users who want to run fuzz tests locally. The CI pipeline handles this automatically.
+    -   **Code Formatting Tool**:
+        -   **clang-format**: For running style checks. Will be managed automatically by `pre-commit` or can be run manually via `make style_check`.
+    -   **Benchmarking Tools**:
+        -   **Go Toolchain**: Required to install `bombardier` and `ali`.
+        -   **bombardier**: A powerful HTTP benchmarking tool.
+        -   **ali**: A load testing tool with real-time analysis.
+    -   **Third-Party Libraries for Comparison**:
+        -   **Crow C++ Framework**: A fast C++ micro web framework, used for performance comparison.
+    -   **Platform Requirement**: A 64-bit operating system is required. Your `x86_64` architecture is fully supported. The test suite includes a check for build failures on 32-bit platforms.
+    -   **CI/CD Environment Requirements**:
+        -   **GitHub Repository Secrets**:
+            -   `DOCKERHUB_USERNAME`: Your Docker Hub username.
+            -   `DOCKERHUB_TOKEN`: A Docker Hub access token with write permissions.
+    -   **Note on Windows/macOS specific files**: The plan includes files like `.sln`/`.vcxproj` for Visual Studio and references macOS frameworks. These are included for completeness to support cross-platform CI/CD and other developers, but will not be used directly on your local Linux hardware.
+
+2.  FILES TO CREATE:
+    -   **`docker/main.cc`**: The main source file for the web server application.
+        -   **Path**: `./docker/main.cc`
+    -   **`docker/html/index.html`**: A sample HTML file to be served.
+        -   **Path**: `./docker/html/index.html`
+    -   **`Dockerfile`**: Defines the steps to build a minimal, static container image for the server.
+        -   **Path**: `./Dockerfile`
+    -   **`docker-compose.yml`**: Defines the Docker Compose service for easy management.
+        -   **Path**: `./docker-compose.yml`
+    -   **`example/hello.cc`**: A minimal "Hello World" server example, distinct from the examples included with the library.
+        -   **Path**: `./example/hello.cc`
+    -   **`example/Makefile`**: Makefile for building the custom `hello.cc` example.
+        -   **Path**: `./example/Makefile`
+    -   **`example/Dockerfile.hello`**: Dockerfile for building the `hello` example with Alpine Linux.
+        -   **Path**: `./example/Dockerfile.hello`
+    -   **`example/simplesvr.cc`**: A simple server application, part of the user's Visual Studio project (for CI).
+        -   **Path**: `./example/simplesvr.cc`
+        -   **Content**:
+            ```cpp
+            #include <iostream>
+            #include "httplib.h"
+
+            int main(void) {
+                httplib::Server svr;
+
+                svr.Get("/", [](const httplib::Request &, httplib::Response &res) {
+                    res.set_content("Welcome to the user server!", "text/plain");
+                });
+
+                std::cout << "User server listening on port 8080..." << std::endl;
+                svr.listen("0.0.0.0", 8080);
+
+                return 0;
+            }
+            ```
+    -   **`example/client.cc`**: A simple client application to test the example server (for CI).
+        -   **Path**: `./example/client.cc`
+    -   **`example/example.sln`**: Visual Studio Solution for building `server` and `client` on Windows (for CI).
+        -   **Path**: `./example/example.sln`
+    -   **`example/server.vcxproj`**: Visual Studio Project for the custom `server` application (for CI).
+        -   **Path**: `./example/server.vcxproj`
+        -   **Content**: (Content as provided in the original plan)
+    -   **`example/client.vcxproj`**: Visual Studio Project for the `client` example (for CI).
+        -   **Path**: `./example/client.vcxproj`
+        -   **Content**: (Content as provided in the original plan)
+    -   **`benchmark/Makefile`**: Makefile for building and running performance benchmarks.
+        -   **Path**: `./benchmark/Makefile`
+    -   **`benchmark/cpp-httplib/main.cpp`**: The benchmark application source for `cpp-httplib`.
+        -   **Path**: `./benchmark/cpp-httplib/main.cpp`
+    -   **`benchmark/crow/main.cpp`**: The benchmark application source for the `Crow` framework.
+        -   **Path**: `./benchmark/crow/main.cpp`
+    -   **`test/proxy/basic_squid.conf`**: Configuration file for the Squid proxy server using Basic Authentication.
+        -   **Path**: `./test/proxy/basic_squid.conf`
+        -   **Content**: (Content as provided in the original plan)
+    -   **`test/proxy/digest_squid.conf`**: Configuration file for the Squid proxy server using Digest Authentication.
+        -   **Path**: `./test/proxy/digest_squid.conf`
+        -   **Content**: (Content as provided in the original plan)
+    -   **`test/proxy/passwd`**: A password file for Squid's basic authentication.
+        -   **Path**: `./test/proxy/passwd`
+    -   **`test/proxy/passwd_digest`**: A password file for Squid's digest authentication.
+        -   **Path**: `./test/proxy/passwd_digest`
+    -   **`test/test.conf`**: OpenSSL configuration for generating test certificates.
+        -   **Path**: `./test/test.conf`
+        -   **Content**: (Content as provided in the original plan)
+    -   **`test/test.rootCA.conf`**: OpenSSL configuration for generating the test Root CA.
+        -   **Path**: `./test/test.rootCA.conf`
+        -   **Content**: (Content as provided in the original plan)
+    -   **`.clang-format`**: The configuration file for the C++ code formatter.
+        -   **Path**: `./.clang-format`
+    -   **`.pre-commit-config.yaml`**: The configuration for pre-commit hooks.
+        -   **Path**: `./.pre-commit-config.yaml`
+    -   **`.gitignore`**: Specifies intentionally untracked files to ignore.
+        -   **Path**: `./.gitignore`
+    -   **`.github/workflows/release-docker.yml`**: The GitHub Actions workflow to build and publish the Docker image on release.
+        -   **Path**: `./.github/workflows/release-docker.yml`
+    -   **`.github/workflows/test.yaml`**: The GitHub Actions workflow for continuous integration testing.
+        -   **Path**: `./.github/workflows/test.yaml`
+    -   **`.github/workflows/cifuzz.yaml`**: The GitHub Actions workflow for continuous fuzz testing.
+        -   **Path**: `./.github/workflows/cifuzz.yaml`
+    -   **`.github/workflows/test_proxy.yaml`**: The GitHub Actions workflow for proxy functionality testing.
+        -   **Path**: `./.github/workflows/test_proxy.yaml`
+    -   **`.github/workflows/abidiff.yaml`**: The GitHub Actions workflow for ABI compatibility checking.
+        -   **Path**: `./.github/workflows/abidiff.yaml`
+    -   **`CMakeLists.txt` (For local builds using `add_subdirectory`)**: The build configuration file for CMake.
+        -   **Path**: `./CMakeLists.txt`
+    -   **`meson.build` (For local builds with Meson)**: The build configuration file for Meson.
+        -   **Path**: `./meson.build`
+    -   **`subprojects/cpp-httplib.wrap` (For local builds with Meson)**: A Meson wrap file to locate the local `cpp-httplib` source.
+        -   **Path**: `./subprojects/cpp-httplib.wrap`
+    -   **`find_package_example/main.cc`**: Example application demonstrating CMake's `find_package`.
+        -   **Path**: `./find_package_example/main.cc`
+    -   **`find_package_example/CMakeLists.txt`**: CMake build file demonstrating `find_package`.
+        -   **Path**: `./find_package_example/CMakeLists.txt`
+    -   **`libs/cpp-httplib/`**: Directory containing the `cpp-httplib` library source.
+        -   **Path**: `./libs/cpp-httplib/`
+    -   **`libs/cpp-httplib/test/gtest/`**: Directory for Google Test source code.
+        -   **Path**: `./libs/cpp-httplib/test/gtest/`
+    -   **`libs/crow/crow_all.h`**: The single-header file for the Crow C++ framework.
+        -   **Path**: `./libs/crow/crow_all.h`
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    -   **Docker Image Build (Server)**: The `docker build` or `docker compose build` command must complete successfully for the main server.
+    -   **Docker Image Build (Hello Example)**: The `docker build -f example/Dockerfile.hello .` command must complete successfully.
+    -   **Container Execution (Docker Compose)**: `docker compose up` must start the service correctly, and the server must listen on the specified port.
+    -   **Container Execution (Hello Example)**: The container built from the `hello` example must run, start a server, and respond to requests.
+    -   **Static File Serving**: A client (e.g., `curl`) must be able to request `/index.html` and receive the correct file content with a `200 OK` status.
+    -   **Live Reload (Volume Mount Test)**: Modifying `docker/html/index.html` on the host should be immediately reflected in subsequent HTTP requests without a container restart.
+    -   **Command-Line Argument Parsing**: The server executable must correctly parse `--host`, `--port`, and `--mount` arguments.
+    -   **Local Application Compilation (CMake `add_subdirectory`)**: The main server project defined in the root `CMakeLists.txt` must be buildable locally using CMake.
+    -   **CMake `find_package` Integration**: After `cpp-httplib` is built and installed to a local prefix, a separate CMake project (e.g., `find_package_example`) using `find_package(httplib)` must successfully configure, build, and link against the installed library. The resulting executable must run correctly.
+    -   **CMake Build with Brotli Integration**: When building `cpp-httplib` with CMake and `-DHTTPLIB_BROTLI=ON`, the build system must successfully find the system-installed Brotli library using the `FindBrotli.cmake` module and enable Brotli compression features. The resulting library/application must correctly handle Brotli-compressed requests/responses.
+    -   **Local Application Compilation (Meson)**: The example server project must be buildable locally using Meson and Ninja.
+    -   **Meson Build with Feature Toggles**: The project must be buildable using Meson with specific library features explicitly enabled or disabled (e.g., building as a compiled library with `-Dcompile=true`).
+    -   **Local Custom Example Compilation (make)**: The custom `hello` example in the root `example/` directory must be buildable locally using `make -f example/Makefile`.
+    -   **Local Library Example Compilation (make)**: All example applications included with the `cpp-httplib` library must be buildable via `make all` in the `libs/cpp-httplib/example/` directory.
+    -   **Local Library Example Execution**: At least one compiled example from the library's suite (e.g., `libs/cpp-httplib/example/server`) must run correctly.
+    -   **Local Server Test**: The locally compiled executable should run and serve files from the specified directory.
+    -   **Library Unit Tests (CMake Build)**: The `httplib-test` executable defined in `libs/cpp-httplib/test/CMakeLists.txt` must compile and run successfully.
+    -   **Library Unit Tests (make Build)**: The `test` executable built via `make` in `libs/cpp-httplib/test/` must compile and run successfully.
+    -   **Library Split-Compilation Test**: The `test_split` executable must compile successfully via `make test_split` in `libs/cpp-httplib/test/`.
+    -   **Automated SSL Certificate Generation and Testing**: During the build of the test suite (via CMake or `make`), the `openssl` command-line tool must successfully generate all required test certificates (`cert.pem`, etc.) non-interactively using the settings from `test/test.conf`. The generated certificate must contain the correct Subject Alternative Name (SAN) `IP:127.0.0.1`. The subsequent SSL tests must pass using these artifacts.
+    -   **Custom Certificate Authority (CA) Verification**: The test suite must successfully generate a Root CA certificate using `test.rootCA.conf`, use it to sign a server certificate, and then verify that a client configured with this Root CA can successfully validate the server's certificate chain.
+    -   **Example SSL Certificate Generation**: The `make pem` command in `libs/cpp-httplib/example/` must successfully generate `key.pem` and `cert.pem`.
+    -   **Library Unit Tests (gtest)**: The internal test suite of `cpp-httplib` must pass on your Linux system.
+    -   **Library Proxy Tests**: The proxy-specific tests for the library must pass. This can be executed via `make proxy` in `libs/cpp-httplib/test/`, which automates starting/stopping proxy containers and running the `test_proxy` executable.
+    -   **Authenticated Proxy Test (Basic Auth)**: The library client must be able to successfully connect through the Squid proxy using basic authentication credentials, as configured in `test/proxy/basic_squid.conf`.
+    -   **Authenticated Proxy Test (Digest Auth)**: The library client must be able to successfully connect through the Squid proxy using digest authentication credentials, as configured in `test/proxy/digest_squid.conf`.
+    -   **Library Fuzz Tests (Local Execution)**: The fuzz test targets for the library should compile and run successfully against the test corpus via `make fuzz_test`.
+    -   **ABI Compatibility Check**: The `abidiff` tool must report no breaking ABI changes. This can be run via `make check_abi` or the corresponding shell script.
+    -   **Style Check (clang-format)**: The codebase must adhere to the coding style defined in `.clang-format`, verifiable via `make style_check` or `pre-commit`.
+    -   **Pre-commit Hook Execution**: Committing a C++ file with incorrect formatting should trigger the `pre-commit` hook, which automatically reformats the file according to `.clang-format`. The commit will only succeed after the formatted file is staged.
+    -   **`.gitignore` Functionality**: After a local build, generated artifacts (e.g., `build/`, `example/hello`, `install/`) must be correctly ignored by Git.
+    -   **32-bit Build Check**: The library should fail to compile on a 32-bit Linux environment, as expected, confirming the platform limitations.
+    -   **Benchmarking Tests**:
+        -   **Benchmark Server Compilation (`cpp-httplib`)**: The `make -C benchmark server` command must succeed.
+        -   **Benchmark Server Compilation (`Crow`)**: The `make -C benchmark server-crow` command must succeed.
+        -   **Benchmark Execution (`bombardier`)**: The `make -C benchmark bench-all` command must run without errors and produce performance reports.
+        -   **Load Test Execution (`ali`)**: The `make -C benchmark monitor` command must run without errors and start the real-time monitoring interface.
+    -   **CI/CD Test Cases (Executed on GitHub Actions, not locally)**:
+        -   **GitHub Actions CI Workflow (Build & Test)**: The `test.yaml` workflow must complete successfully for pushes and pull requests across all platforms (Linux, macOS, Windows). The Windows job must successfully build the user project solution `example.sln` and the library test solution `libs/cpp-httplib/test/test.sln`.
+        -   **macOS Keychain Integration Test**: On the macOS CI runner, the test suite must verify Keychain integration.
+        -   **GitHub Actions CI Workflow (Fuzzing)**: The `cifuzz.yaml` workflow must complete successfully.
+        -   **GitHub Actions CI Workflow (Proxy Test)**: The `test_proxy.yaml` workflow must complete successfully.
+        -   **GitHub Actions CI Workflow (ABI Diff)**: The `abidiff.yaml` workflow must complete successfully.
+        -   **GitHub Actions CI Workflow (Release)**: The `release-docker.yml` workflow must complete successfully when triggered.
+        -   **Multi-platform Docker Image Availability**: The release workflow must produce and push Docker images for both `linux/amd64` and `linux/arm64`.
+        -   **Docker Image Tagging**: The pushed Docker image must be correctly tagged with `latest` and the release version number.
+
+4.  COMPLETE TODO LIST:
+    -   **1. Install Core Tools and Dependencies on your Linux System**:
+        -   **Action**: Use `apt` to install all required tools and libraries. Using a modern distribution like Ubuntu 22.04 LTS is recommended to easily meet the GCC 12+ requirement.
+        -   **Command**:
+            ```bash
+            sudo apt-get update && sudo apt-get install -y \
+              build-essential \
+              git \
+              cmake \
+              meson \
+              ninja-build \
+              clang-format \
+              qemu-user-static \
+              python3 \
+              python3-pip \
+              make \
+              openssl \
+              golang-go \
+              apache2-utils \
+              libssl-dev \
+              zlib1g-dev \
+              libbrotli-dev \
+              libzstd-dev \
+              libcurl4-openssl-dev \
+              libanl-dev \
+              pkg-config \
+              netcat-openbsd \
+              abigail-tools
+            
+            # Install Python and Go tools
+            sudo pip3 install pre-commit
+            go install github.com/codesenberg/bombardier@latest
+            go install github.com/nakabonne/ali@latest
+
+            # Add Go binaries to your PATH. Add this line to your ~/.bashrc or ~/.zshrc
+            export PATH=$PATH:$(go env GOPATH)/bin
+            source ~/.bashrc # Or ~/.zshrc
+            ```
+        -   **Verification**: Run `c++ --version` (should be 12+), `docker --version`, `git --version`, `cmake --version`, `meson --version`, `clang-format --version`, `pre-commit --version`, `make --version`, `openssl version`, `go version`, `bombardier -v`, `ali -v`, `htpasswd`, `htdigest`, `abidiff --version`. Run `docker buildx ls` to see `linux/amd64` and `linux/arm64` platforms.
+
+    -   **2. Set Up Project Directory Structure**:
+        -   **Action**: Navigate to your working directory and create the necessary subdirectories.
+        -   **Commands**:
+            ```bash
+            cd /home/cc/EnvGym/data/yhirose_cpp-httplib
+            mkdir -p .github/workflows
+            mkdir -p docker/html
+            mkdir -p example
+            mkdir -p find_package_example
+            mkdir -p libs/crow
+            mkdir -p subprojects # For Meson
+            mkdir -p benchmark/cpp-httplib
+            mkdir -p benchmark/crow
+            mkdir -p test/proxy
+            ```
+        -   **Verification**: The directories `.github/workflows/`, `docker/html/`, `example/`, etc., should exist inside `/home/cc/EnvGym/data/yhirose_cpp-httplib`.
+
+    -   **3. Download Library Sources**:
+        -   **Action**: Clone the `cpp-httplib` repository, download the `Crow` single-header file, and clone `googletest` for the test suite.
+        -   **Commands**:
+            ```bash
+            # Clone cpp-httplib into the libs/ subdirectory
+            git clone https://github.com/yhirose/cpp-httplib.git libs/cpp-httplib
+            # Download Crow framework header
+            curl -L https://raw.githubusercontent.com/CrowCpp/Crow/master/include/crow.h -o libs/crow/crow_all.h
+            # Clone Google Test into the required directory for make builds
+            git clone https://github.com/google/googletest.git libs/cpp-httplib/test/gtest
+            ```
+        -   **Verification**: The `libs/cpp-httplib` and `libs/cpp-httplib/test/gtest` directories are populated. `libs/crow/crow_all.h` exists.
+
+    -   **4. Create Application Source and Content Files**:
+        -   **Action**: Create all the source, content, and configuration files as defined in the "FILES TO CREATE" section. This includes `docker/main.cc`, `example/hello.cc`, `.vcxproj` files for CI, etc.
+        -   **Content for `example/client.cc`**:
+            ```cpp
+            #include <iostream>
+            #include "httplib.h"
+
+            int main(void) {
+                httplib::Client cli("localhost", 8080);
+                if (auto res = cli.Get("/")) {
+                    std::cout << "Status: " << res->status << std::endl;
+                    std::cout << "Content-Type: " << res->get_header_value("Content-Type") << std::endl;
+                    std::cout << "Body: " << res->body << std::endl;
+                } else {
+                    auto err = res.error();
+                    std::cout << "HTTP error: " << httplib::to_string(err) << std::endl;
+                    return 1;
+                }
+                return 0;
+            }
+            ```
+        -   **Note**: Populate all other files with their respective content as defined in the "FILES TO CREATE" section.
+        -   **Verification**: All specified files exist in their respective paths with the correct content.
+
+    -   **5. Create Test Configuration Files**:
+        -   **Action**: Create the Squid and OpenSSL configuration files, and generate password files for proxy tests.
+        -   **Commands**:
+            ```bash
+            # Create the squid config files and the openssl config files by pasting the content from Section 2
+            touch test/proxy/basic_squid.conf
+            touch test/proxy/digest_squid.conf
+            touch test/test.conf
+            touch test/test.rootCA.conf
+
+            # Create the password file for basic auth: user 'testuser', password 'testpass'
+            htpasswd -cb test/proxy/passwd testuser testpass
+
+            # Create the password file for digest auth: user 'testuser', realm 'proxy', password 'testpass'
+            htdigest -c test/proxy/passwd_digest proxy testuser
+            # (htdigest will prompt for the password 'testpass')
+            ```
+        -   **Verification**: The `.conf`, `passwd`, and `passwd_digest` files exist in the `test/` directory and have content.
+
+    -   **6. Create Git Ignore, Formatting, and Pre-commit Files**:
+        -   **Action**: Create `.gitignore`, `.clang-format`, and `.pre-commit-config.yaml` in the project root with the content specified in Section 2.
+        -   **Content for `.gitignore`**: (Content as provided in the original plan)
+        -   **Verification**: The files `.gitignore`, `.clang-format`, and `.pre-commit-config.yaml` exist in the project root.
+
+    -   **7. Create Docker and CI/CD Files**:
+        -   **Action**: Create `Dockerfile`, `docker-compose.yml`, `example/Dockerfile.hello`, and all GitHub Actions workflow `.yml` files in `.github/workflows/`.
+        -   **Verification**: All Docker-related and workflow files exist in their respective paths.
+
+    -   **8. Set up Git Repository and GitHub Secrets**:
+        -   **Action**: Initialize a Git repository, install pre-commit hooks, commit all files, create a repository on GitHub, push the code, and configure secrets.
+        -   **Commands**: `git init`, `pre-commit install`, `git add .`, `git commit -m "Initial project setup"`.
+        -   **GitHub Secrets**: In your GitHub repository's settings, create `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`.
+        -   **Verification**: Code is pushed to GitHub, secrets are configured, and `.git/hooks/pre-commit` exists.
+
+    -   **9. Build and Run Applications with Docker**:
+        -   **Action**: Build and run the main service and the example service, test them, and then shut them down.
+        -   **Commands for Main Service**: `docker compose up -d --build`, `curl http://localhost:8080/index.html`, `docker compose down`.
+        -   **Commands for Hello Example**: `docker build -t hello-example -f example/Dockerfile.hello .`, `docker run -d --rm -p 8081:8080 --name hello-app hello-example`, `curl http://localhost:8081/`, `docker stop hello-app`.
+        -   **Verification**: Both `curl` commands return the expected content. Live reload works for the main service.
+
+    -   **10. Configure and Build Application Locally with CMake (`add_subdirectory`)**:
+        -   **Action**: Create `CMakeLists.txt` and build the main server executable.
+        -   **Commands**: `mkdir -p build && cd build && cmake .. && cmake --build .`
+        -   **Run/Test**: `./build/server --port 8080 --mount /:../docker/html` and `curl http://localhost:8080/index.html`.
+        -   **Verification**: The server runs correctly. `git status` shows `build/` is ignored.
+
+    -   **11. Configure and Build Application Locally with Meson**:
+        -   **Action**: Create Meson build files and build the main server executable.
+        -   **Commands**: `meson setup build-meson`, `meson compile -C build-meson`.
+        -   **Run/Test**: `./build-meson/server --port 8080 --mount /:./docker/html` and `curl http://localhost:8080/index.html`.
+        -   **Verification**: The server runs correctly. `git status` shows `build-meson/` is ignored.
+
+    -   **12. Build, Install, and Test with CMake (`find_package`)**:
+        -   **Action**: Compile and install `cpp-httplib` as a standalone library, then build the `find_package_example` project against it.
+        -   **Commands**:
+            ```bash
+            # Configure the library itself, enabling compilation and setting an install prefix
+            cmake -S libs/cpp-httplib -B build/lib -DCMAKE_INSTALL_PREFIX=$PWD/install -DHTTPLIB_COMPILE=ON
+            # Build and install the library
+            cmake --build build/lib --target install
+            # Configure the example project, pointing it to the installed library
+            cmake -S find_package_example -B build/fp_example -DCMAKE_PREFIX_PATH=$PWD/install
+            # Build the example
+            cmake --build build/fp_example
+            ```
+        -   **Run/Test**: `./build/fp_example/fp_server` and `curl http://localhost:8080/`.
+        -   **Verification**: The `fp_server` executable builds and runs correctly. `git status` shows `build/` and `install/` are ignored.
+
+    -   **13. Run Library Test Suite and Examples Locally**:
+        -   **Action**: Run the tests and examples included with `cpp-httplib` using `make` and `CMake`. Test the local custom example and the pre-commit hook.
+        -   **Library Tests (make)**: `cd libs/cpp-httplib/test && make && ./test && make proxy && cd ../../..`. (Note: `make proxy` runs the comprehensive proxy test suite).
+        -   **Library Tests (CMake)**: `cmake -B build-test -S libs/cpp-httplib -DHTTPLIB_TEST=ON -DHTTPLIB_BROTLI=ON && cmake --build build-test && cd build-test && ctest --output-on-failure && cd ..`.
+        -   **Build and Run Library Examples (make)**: `cd libs/cpp-httplib/example && make all && ./server & ./client && kill $! && cd ../../..`.
+        -   **Custom Hello Example (make)**: `cd example && make && ./hello & curl http://localhost:8080/ && kill $! && cd ..`.
+        -   **Pre-commit Hook Test**: Modify a C++ file, `git add`, `git commit`. The commit should trigger auto-formatting.
+        -   **Local Fuzzing (Advanced)**: `cd libs/cpp-httplib/test && make fuzz_test`.
+
+    -   **14. Run Performance Benchmarks Locally**:
+        -   **Action**: Build the benchmark servers and run the performance tests.
+        -   **Commands**:
+            ```bash
+            # Build both benchmark servers
+            make -C benchmark build
+
+            # Run all benchmarks using bombardier
+            make -C benchmark bench-all
+
+            # Run an interactive load test on cpp-httplib using ali
+            make -C benchmark monitor
+            ```
+        -   **Verification**: The `bench-all` target runs and prints performance statistics. The `monitor` target starts the `ali` real-time dashboard.
+
+    -   **15. Trigger and Verify CI/CD Pipelines**:
+        -   **Action**: Push code to trigger the CI workflow, and create a release to trigger the CD workflow.
+        -   **CI (Test)**: Push commits to GitHub and open a pull request.
+        -   **Verification (CI)**: Go to the "Actions" tab. The `test`, `CIFuzz`, `Proxy Test`, and `abidiff` workflows should run and pass.
+        -   **CD (Release)**: Tag a commit (`git tag v1.0.0`), push the tag (`git push origin v1.0.0`), and create a release on GitHub.
+        -   **Verification (CD)**: The `Release Docker Image` workflow runs and succeeds. The multi-platform image is available on Docker Hub.

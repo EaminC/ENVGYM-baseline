@@ -1,0 +1,406 @@
+=== Docker Execution Log - 20250828_212938 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756416389
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 5.82kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 60B done
+#3 DONE 0.0s
+
+#4 [ 1/15] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 662.62kB 0.1s done
+#5 DONE 0.1s
+
+#6 [ 5/15] RUN install -m 0755 -d /etc/apt/keyrings &&     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg &&     chmod a+r /etc/apt/keyrings/docker.gpg &&     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null &&     apt-get update && apt-get install -y docker-ce-cli &&     apt-get clean && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [ 3/15] RUN mkdir -p /etc/apt/keyrings &&     wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor -o /etc/apt/keyrings/adoptium.gpg &&     echo "deb [signed-by=/etc/apt/keyrings/adoptium.gpg] https://packages.adoptium.net/artifactory/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/adoptium.list > /dev/null &&     apt-get update && apt-get install -y temurin-21-jdk &&     apt-get clean && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [ 6/15] RUN curl -L "https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)" -o /usr/local/bin/docker-compose &&     chmod +x /usr/local/bin/docker-compose
+#8 CACHED
+
+#9 [ 2/15] RUN apt-get update && apt-get install -y --no-install-recommends     build-essential     libssl-dev     libreadline-dev     zlib1g-dev     autoconf     bison     libyaml-dev     libffi-dev     git     curl     wget     unzip     python3     python3-pip     ca-certificates     gnupg     lsb-release     && apt-get clean && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [ 9/15] RUN echo 'export PATH="/home/cc/.rbenv/bin:$PATH"' >> /home/cc/.bashrc &&     echo 'eval "$(rbenv init -)"' >> /home/cc/.bashrc
+#10 CACHED
+
+#11 [ 4/15] RUN wget -q https://go.dev/dl/go1.23.0.linux-amd64.tar.gz -O go.tar.gz &&     tar -C /usr/local -xzf go.tar.gz &&     rm go.tar.gz
+#11 CACHED
+
+#12 [ 7/15] RUN useradd -m -s /bin/bash cc &&     mkdir -p /home/cc/EnvGym/data/elastic_logstash &&     chown -R cc:cc /home/cc
+#12 CACHED
+
+#13 [ 8/15] RUN git clone --depth 1 https://github.com/rbenv/rbenv.git /home/cc/.rbenv &&     git clone --depth 1 https://github.com/rbenv/ruby-build.git /home/cc/.rbenv/plugins/ruby-build &&     bash -c 'eval "$(rbenv init -)" &&              rbenv install jruby-9.4.13.0 &&              rbenv global jruby-9.4.13.0 &&              gem install bundler &&              rbenv rehash'
+#13 CACHED
+
+#14 [10/15] WORKDIR /home/cc/EnvGym/data/elastic_logstash
+#14 CACHED
+
+#15 [11/15] COPY --chown=cc:cc . .
+#15 DONE 0.3s
+
+#16 [12/15] RUN cat <<EOF > versions.yml
+#16 DONE 0.3s
+
+#17 [13/15] RUN pip install --user pre-commit
+#17 0.856 Collecting pre-commit
+#17 0.940   Downloading pre_commit-4.3.0-py2.py3-none-any.whl (220 kB)
+#17 0.977      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 221.0/221.0 KB 6.4 MB/s eta 0:00:00
+#17 1.068 Collecting pyyaml>=5.1
+#17 1.073   Downloading PyYAML-6.0.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (751 kB)
+#17 1.138      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 751.2/751.2 KB 12.0 MB/s eta 0:00:00
+#17 1.172 Collecting nodeenv>=0.11.1
+#17 1.178   Downloading nodeenv-1.9.1-py2.py3-none-any.whl (22 kB)
+#17 1.205 Collecting cfgv>=2.0.0
+#17 1.210   Downloading cfgv-3.4.0-py2.py3-none-any.whl (7.2 kB)
+#17 1.308 Collecting identify>=1.0.0
+#17 1.313   Downloading identify-2.6.13-py2.py3-none-any.whl (99 kB)
+#17 1.321      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 99.2/99.2 KB 14.7 MB/s eta 0:00:00
+#17 1.426 Collecting virtualenv>=20.10.0
+#17 1.430   Downloading virtualenv-20.34.0-py3-none-any.whl (6.0 MB)
+#17 1.966      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.0/6.0 MB 11.2 MB/s eta 0:00:00
+#17 2.036 Collecting typing-extensions>=4.13.2
+#17 2.041   Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+#17 2.048      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 44.6/44.6 KB 6.6 MB/s eta 0:00:00
+#17 2.090 Collecting filelock<4,>=3.12.2
+#17 2.094   Downloading filelock-3.19.1-py3-none-any.whl (15 kB)
+#17 2.134 Collecting platformdirs<5,>=3.9.1
+#17 2.139   Downloading platformdirs-4.4.0-py3-none-any.whl (18 kB)
+#17 2.161 Collecting distlib<1,>=0.3.7
+#17 2.166   Downloading distlib-0.4.0-py2.py3-none-any.whl (469 kB)
+#17 2.213      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 469.0/469.0 KB 10.4 MB/s eta 0:00:00
+#17 2.261 Installing collected packages: distlib, typing-extensions, pyyaml, platformdirs, nodeenv, identify, filelock, cfgv, virtualenv, pre-commit
+#17 2.389   WARNING: The script nodeenv is installed in '/home/cc/.local/bin' which is not on PATH.
+#17 2.389   Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+#17 2.402   WARNING: The script identify-cli is installed in '/home/cc/.local/bin' which is not on PATH.
+#17 2.402   Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+#17 2.507   WARNING: The script virtualenv is installed in '/home/cc/.local/bin' which is not on PATH.
+#17 2.507   Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+#17 2.563   WARNING: The script pre-commit is installed in '/home/cc/.local/bin' which is not on PATH.
+#17 2.563   Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+#17 2.567 Successfully installed cfgv-3.4.0 distlib-0.4.0 filelock-3.19.1 identify-2.6.13 nodeenv-1.9.1 platformdirs-4.4.0 pre-commit-4.3.0 pyyaml-6.0.2 typing-extensions-4.15.0 virtualenv-20.34.0
+#17 DONE 2.7s
+
+#18 [14/15] RUN echo 'export PATH="/home/cc/.local/bin:$PATH"' >> /home/cc/.bashrc
+#18 DONE 0.3s
+
+#19 [15/15] RUN chmod +x gradlew &&     ./gradlew bootstrap &&     ./gradlew installDefaultGems &&     ./gradlew installDevelopmentGems
+#19 0.449 Downloading https://services.gradle.org/distributions/gradle-8.7-bin.zip
+#19 0.941 ............10%.............20%.............30%.............40%............50%.............60%.............70%.............80%.............90%............100%
+#19 14.17 
+#19 14.17 Welcome to Gradle 8.7!
+#19 14.17 
+#19 14.17 Here are the highlights of this release:
+#19 14.17  - Compiling and testing with Java 22
+#19 14.17  - Cacheable Groovy script compilation
+#19 14.17  - New methods in lazy collection properties
+#19 14.17 
+#19 14.17 For more details see https://docs.gradle.org/8.7/release-notes.html
+#19 14.17 
+#19 14.27 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.7/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+#19 15.07 Daemon will be stopped at the end of the build 
+#19 19.27 > Task :buildSrc:compileJava NO-SOURCE
+#19 31.17 > Task :buildSrc:compileGroovy
+#19 31.17 > Task :buildSrc:processResources NO-SOURCE
+#19 31.17 > Task :buildSrc:classes
+#19 31.17 > Task :buildSrc:jar
+#19 44.27 > Task :compileJava NO-SOURCE
+#19 44.27 > Task :processResources NO-SOURCE
+#19 44.27 > Task :classes UP-TO-DATE
+#19 44.27 > Task :jar
+#19 44.27 > Task :assemble
+#19 44.27 > Task :buildCustomJRuby SKIPPED
+#19 44.27 > Task :installCustomJRuby SKIPPED
+#19 46.27 
+#19 46.27 > Task :downloadJRuby
+#19 46.27 Download https://repo1.maven.org/maven2/org/jruby/jruby-dist/9.4.13.0/jruby-dist-9.4.13.0-bin.tar.gz
+#19 46.97 
+#19 46.97 > Task :verifyFile
+#19 47.77 > Task :downloadAndInstallJRuby
+#19 49.27 > Task :benchmark-cli:compileJava
+#19 49.27 > Task :benchmark-cli:processResources
+#19 49.27 > Task :benchmark-cli:classes
+#19 49.27 > Task :benchmark-cli:jar
+#19 50.77 > Task :benchmark-cli:shadowJar
+#19 50.77 > Task :benchmark-cli:assemble
+#19 50.97 > Task :dependencies-report:compileJava
+#19 51.07 > Task :dependencies-report:processResources
+#19 51.07 > Task :dependencies-report:classes
+#19 51.17 > Task :dependencies-report:jar
+#19 51.47 > Task :dependencies-report:shadowJar
+#19 51.47 > Task :dependencies-report:assemble
+#19 51.57 > Task :jvm-options-parser:compileJava
+#19 51.57 > Task :jvm-options-parser:processResources NO-SOURCE
+#19 51.57 > Task :jvm-options-parser:classes
+#19 51.67 > Task :jvm-options-parser:jar
+#19 51.67 > Task :jvm-options-parser:assemble
+#19 53.67 
+#19 53.67 > Task :logstash-core:compileJava
+#19 53.67 Note: Processing Log4j annotations
+#19 53.67 Note: Annotations processed
+#19 53.67 Note: Processing Log4j annotations
+#19 53.67 Note: No elements to process
+#19 56.87 
+#19 56.87 > Task :logstash-core:generateVersionInfoResources
+#19 56.87 > Task :markAliasDefinitions
+#19 56.87 > Task :copyPluginAlias_java
+#19 56.87 > Task :copyPluginAlias_ruby
+#19 56.87 > Task :copyPluginAlias NO-SOURCE
+#19 56.87 > Task :logstash-core:processResources
+#19 56.87 > Task :logstash-core:classes
+#19 56.97 > Task :logstash-core:jar
+#19 57.17 > Task :logstash-core:copyRuntimeLibs
+#19 57.17 > Task :logstash-core:sourcesJar
+#19 57.27 > Task :logstash-core:copyGemjar
+#19 61.77 > Task :logstash-core:javadoc
+#19 61.97 > Task :logstash-core:javadocJar
+#19 61.97 > Task :logstash-core:assemble
+#19 62.87 > Task :logstash-core-benchmarks:compileJava
+#19 62.87 > Task :logstash-core-benchmarks:processResources
+#19 62.87 > Task :logstash-core-benchmarks:classes
+#19 62.97 > Task :logstash-core-benchmarks:jar
+#19 62.97 > Task :logstash-core-benchmarks:assemble
+#19 62.97 > Task :logstash-integration-tests:compileJava NO-SOURCE
+#19 62.97 > Task :logstash-integration-tests:processResources NO-SOURCE
+#19 62.97 > Task :logstash-integration-tests:classes UP-TO-DATE
+#19 62.97 > Task :logstash-integration-tests:jar
+#19 62.97 > Task :logstash-integration-tests:assemble
+#19 62.97 > Task :logstash-xpack:compileJava NO-SOURCE
+#19 62.97 > Task :logstash-xpack:processResources NO-SOURCE
+#19 62.97 > Task :logstash-xpack:classes UP-TO-DATE
+#19 62.97 > Task :logstash-xpack:jar
+#19 62.97 > Task :logstash-xpack:assemble
+#19 78.97 > Task :bootstrap
+#19 78.97 
+#19 78.97 BUILD SUCCESSFUL in 1m 18s
+#19 78.97 34 actionable tasks: 34 executed
+#19 79.91 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.7/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+#19 80.71 Daemon will be stopped at the end of the build 
+#19 83.71 > Task :buildSrc:compileJava NO-SOURCE
+#19 83.71 > Task :buildSrc:compileGroovy UP-TO-DATE
+#19 83.71 > Task :buildSrc:processResources NO-SOURCE
+#19 83.71 > Task :buildSrc:classes UP-TO-DATE
+#19 83.81 > Task :buildSrc:jar UP-TO-DATE
+#19 85.41 > Task :compileJava NO-SOURCE
+#19 85.41 > Task :processResources NO-SOURCE
+#19 85.41 > Task :classes UP-TO-DATE
+#19 85.41 > Task :jar UP-TO-DATE
+#19 85.41 > Task :assemble UP-TO-DATE
+#19 85.41 > Task :buildCustomJRuby SKIPPED
+#19 85.41 > Task :installCustomJRuby SKIPPED
+#19 85.81 
+#19 85.81 > Task :downloadJRuby UP-TO-DATE
+#19 85.81 Download https://repo1.maven.org/maven2/org/jruby/jruby-dist/9.4.13.0/jruby-dist-9.4.13.0-bin.tar.gz
+#19 85.81 
+#19 85.81 > Task :verifyFile UP-TO-DATE
+#19 86.01 > Task :downloadAndInstallJRuby UP-TO-DATE
+#19 86.01 > Task :benchmark-cli:compileJava UP-TO-DATE
+#19 86.01 > Task :benchmark-cli:processResources UP-TO-DATE
+#19 86.01 > Task :benchmark-cli:classes UP-TO-DATE
+#19 86.01 > Task :benchmark-cli:jar UP-TO-DATE
+#19 86.11 > Task :benchmark-cli:shadowJar UP-TO-DATE
+#19 86.11 > Task :benchmark-cli:assemble UP-TO-DATE
+#19 86.11 > Task :dependencies-report:compileJava UP-TO-DATE
+#19 86.11 > Task :dependencies-report:processResources UP-TO-DATE
+#19 86.11 > Task :dependencies-report:classes UP-TO-DATE
+#19 86.11 > Task :dependencies-report:jar UP-TO-DATE
+#19 86.11 > Task :dependencies-report:shadowJar UP-TO-DATE
+#19 86.11 > Task :dependencies-report:assemble UP-TO-DATE
+#19 86.11 > Task :jvm-options-parser:compileJava UP-TO-DATE
+#19 86.21 > Task :jvm-options-parser:processResources NO-SOURCE
+#19 86.21 > Task :jvm-options-parser:classes UP-TO-DATE
+#19 86.21 > Task :jvm-options-parser:jar UP-TO-DATE
+#19 86.21 > Task :jvm-options-parser:assemble UP-TO-DATE
+#19 86.21 > Task :logstash-core:compileJava UP-TO-DATE
+#19 86.31 > Task :logstash-core:generateVersionInfoResources UP-TO-DATE
+#19 86.31 > Task :markAliasDefinitions UP-TO-DATE
+#19 86.31 > Task :copyPluginAlias_java UP-TO-DATE
+#19 86.31 > Task :copyPluginAlias_ruby UP-TO-DATE
+#19 86.31 > Task :copyPluginAlias NO-SOURCE
+#19 86.31 > Task :logstash-core:processResources UP-TO-DATE
+#19 86.31 > Task :logstash-core:classes UP-TO-DATE
+#19 86.31 > Task :logstash-core:jar UP-TO-DATE
+#19 86.41 > Task :logstash-core:copyRuntimeLibs
+#19 86.41 > Task :logstash-core:sourcesJar UP-TO-DATE
+#19 86.41 > Task :logstash-core:copyGemjar
+#19 86.41 > Task :logstash-core:javadoc UP-TO-DATE
+#19 86.41 > Task :logstash-core:javadocJar UP-TO-DATE
+#19 86.41 > Task :logstash-core:assemble
+#19 86.51 > Task :logstash-core-benchmarks:compileJava UP-TO-DATE
+#19 86.51 > Task :logstash-core-benchmarks:processResources UP-TO-DATE
+#19 86.51 > Task :logstash-core-benchmarks:classes UP-TO-DATE
+#19 86.51 > Task :logstash-core-benchmarks:jar UP-TO-DATE
+#19 86.51 > Task :logstash-core-benchmarks:assemble UP-TO-DATE
+#19 86.51 > Task :logstash-integration-tests:compileJava NO-SOURCE
+#19 86.51 > Task :logstash-integration-tests:processResources NO-SOURCE
+#19 86.51 > Task :logstash-integration-tests:classes UP-TO-DATE
+#19 86.51 > Task :logstash-integration-tests:jar UP-TO-DATE
+#19 86.51 > Task :logstash-integration-tests:assemble UP-TO-DATE
+#19 86.51 > Task :logstash-xpack:compileJava NO-SOURCE
+#19 86.51 > Task :logstash-xpack:processResources NO-SOURCE
+#19 86.51 > Task :logstash-xpack:classes UP-TO-DATE
+#19 86.51 > Task :logstash-xpack:jar UP-TO-DATE
+#19 86.51 > Task :logstash-xpack:assemble UP-TO-DATE
+#19 94.31 > Task :bootstrap
+#19 96.31 
+#19 96.31 > Task :installDefaultGems
+#19 96.31 Skipping bundler install...
+#19 96.31 Building logstash-core using gradle
+#19 96.31 ./gradlew assemble
+#19 102.8 [plugin:install-default] Installing default plugins
+#19 104.1 Installing logstash-codec-avro, logstash-codec-cef, logstash-codec-collectd, logstash-codec-dots, logstash-codec-edn, logstash-codec-edn_lines, logstash-codec-es_bulk, logstash-codec-fluent, logstash-codec-graphite, logstash-codec-json, logstash-codec-json_lines, logstash-codec-line, logstash-codec-msgpack, logstash-codec-multiline, logstash-codec-netflow, logstash-codec-plain, logstash-codec-rubydebug, logstash-filter-aggregate, logstash-filter-anonymize, logstash-filter-cidr, logstash-filter-clone, logstash-filter-csv, logstash-filter-date, logstash-filter-de_dot, logstash-filter-dissect, logstash-filter-dns, logstash-filter-drop, logstash-filter-elastic_integration, logstash-filter-elasticsearch, logstash-filter-fingerprint, logstash-filter-geoip, logstash-filter-grok, logstash-filter-http, logstash-filter-json, logstash-filter-kv, logstash-filter-memcached, logstash-filter-metrics, logstash-filter-mutate, logstash-filter-prune, logstash-filter-ruby, logstash-filter-sleep, logstash-filter-split, logstash-filter-syslog_pri, logstash-filter-throttle, logstash-filter-translate, logstash-filter-truncate, logstash-filter-urldecode, logstash-filter-useragent, logstash-filter-uuid, logstash-filter-xml, logstash-input-azure_event_hubs, logstash-input-beats, logstash-input-couchdb_changes, logstash-input-dead_letter_queue, logstash-input-elasticsearch, logstash-input-exec, logstash-input-file, logstash-input-ganglia, logstash-input-gelf, logstash-input-generator, logstash-input-graphite, logstash-input-heartbeat, logstash-input-http, logstash-input-http_poller, logstash-input-jms, logstash-input-pipe, logstash-input-redis, logstash-input-stdin, logstash-input-syslog, logstash-input-tcp, logstash-input-twitter, logstash-input-udp, logstash-input-unix, logstash-input-elastic_serverless_forwarder, logstash-integration-jdbc, logstash-integration-kafka, logstash-integration-logstash, logstash-integration-rabbitmq, logstash-integration-snmp, logstash-integration-aws, logstash-output-csv, logstash-output-elasticsearch, logstash-output-email, logstash-output-file, logstash-output-graphite, logstash-output-http, logstash-output-lumberjack, logstash-output-nagios, logstash-output-null, logstash-output-pipe, logstash-output-redis, logstash-output-stdout, logstash-output-tcp, logstash-output-udp, logstash-output-webhdfs
+#19 132.5 Installation successful
+#19 132.8 cleaned orphaned dependency public_suffix (6.0.2)
+#19 132.8 cleaned orphaned dependency ruby-maven (3.9.3)
+#19 132.8 cleaned orphaned dependency ruby-maven-libs (3.9.9)
+#19 132.8 
+#19 132.8 BUILD SUCCESSFUL in 53s
+#19 132.8 35 actionable tasks: 4 executed, 31 up-to-date
+#19 133.8 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.7/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+#19 134.6 Daemon will be stopped at the end of the build 
+#19 137.6 > Task :buildSrc:compileJava NO-SOURCE
+#19 137.7 > Task :buildSrc:compileGroovy UP-TO-DATE
+#19 137.7 > Task :buildSrc:processResources NO-SOURCE
+#19 137.7 > Task :buildSrc:classes UP-TO-DATE
+#19 137.7 > Task :buildSrc:jar UP-TO-DATE
+#19 139.3 > Task :compileJava NO-SOURCE
+#19 139.3 > Task :processResources NO-SOURCE
+#19 139.3 > Task :classes UP-TO-DATE
+#19 139.4 > Task :jar UP-TO-DATE
+#19 139.4 > Task :assemble UP-TO-DATE
+#19 139.4 > Task :buildCustomJRuby SKIPPED
+#19 139.4 > Task :installCustomJRuby SKIPPED
+#19 139.7 
+#19 139.7 > Task :downloadJRuby UP-TO-DATE
+#19 139.7 Download https://repo1.maven.org/maven2/org/jruby/jruby-dist/9.4.13.0/jruby-dist-9.4.13.0-bin.tar.gz
+#19 139.8 
+#19 139.8 > Task :verifyFile UP-TO-DATE
+#19 139.9 > Task :downloadAndInstallJRuby UP-TO-DATE
+#19 139.9 > Task :benchmark-cli:compileJava UP-TO-DATE
+#19 139.9 > Task :benchmark-cli:processResources UP-TO-DATE
+#19 140.0 > Task :benchmark-cli:classes UP-TO-DATE
+#19 140.0 > Task :benchmark-cli:jar UP-TO-DATE
+#19 140.0 > Task :benchmark-cli:shadowJar UP-TO-DATE
+#19 140.0 > Task :benchmark-cli:assemble UP-TO-DATE
+#19 140.0 > Task :dependencies-report:compileJava UP-TO-DATE
+#19 140.0 > Task :dependencies-report:processResources UP-TO-DATE
+#19 140.0 > Task :dependencies-report:classes UP-TO-DATE
+#19 140.1 > Task :dependencies-report:jar UP-TO-DATE
+#19 140.1 > Task :dependencies-report:shadowJar UP-TO-DATE
+#19 140.1 > Task :dependencies-report:assemble UP-TO-DATE
+#19 140.1 > Task :jvm-options-parser:compileJava UP-TO-DATE
+#19 140.1 > Task :jvm-options-parser:processResources NO-SOURCE
+#19 140.1 > Task :jvm-options-parser:classes UP-TO-DATE
+#19 140.1 > Task :jvm-options-parser:jar UP-TO-DATE
+#19 140.1 > Task :jvm-options-parser:assemble UP-TO-DATE
+#19 140.2 > Task :logstash-core:compileJava UP-TO-DATE
+#19 140.2 > Task :logstash-core:generateVersionInfoResources UP-TO-DATE
+#19 140.2 > Task :markAliasDefinitions UP-TO-DATE
+#19 140.2 > Task :copyPluginAlias_java UP-TO-DATE
+#19 140.2 > Task :copyPluginAlias_ruby UP-TO-DATE
+#19 140.2 > Task :copyPluginAlias NO-SOURCE
+#19 140.2 > Task :logstash-core:processResources UP-TO-DATE
+#19 140.2 > Task :logstash-core:classes UP-TO-DATE
+#19 140.3 > Task :logstash-core:jar UP-TO-DATE
+#19 140.3 > Task :logstash-core:copyRuntimeLibs
+#19 140.3 > Task :logstash-core:sourcesJar UP-TO-DATE
+#19 140.3 > Task :logstash-core:copyGemjar
+#19 140.4 > Task :logstash-core:javadoc UP-TO-DATE
+#19 140.4 > Task :logstash-core:javadocJar UP-TO-DATE
+#19 140.4 > Task :logstash-core:assemble
+#19 140.4 > Task :logstash-core-benchmarks:compileJava UP-TO-DATE
+#19 140.4 > Task :logstash-core-benchmarks:processResources UP-TO-DATE
+#19 140.4 > Task :logstash-core-benchmarks:classes UP-TO-DATE
+#19 140.4 > Task :logstash-core-benchmarks:jar UP-TO-DATE
+#19 140.4 > Task :logstash-core-benchmarks:assemble UP-TO-DATE
+#19 140.4 > Task :logstash-integration-tests:compileJava NO-SOURCE
+#19 140.4 > Task :logstash-integration-tests:processResources NO-SOURCE
+#19 140.4 > Task :logstash-integration-tests:classes UP-TO-DATE
+#19 140.4 > Task :logstash-integration-tests:jar UP-TO-DATE
+#19 140.5 > Task :logstash-integration-tests:assemble UP-TO-DATE
+#19 140.5 > Task :logstash-xpack:compileJava NO-SOURCE
+#19 140.5 > Task :logstash-xpack:processResources NO-SOURCE
+#19 140.5 > Task :logstash-xpack:classes UP-TO-DATE
+#19 140.5 > Task :logstash-xpack:jar UP-TO-DATE
+#19 140.5 > Task :logstash-xpack:assemble UP-TO-DATE
+#19 151.1 > Task :bootstrap
+#19 153.1 
+#19 153.1 > Task :installDevelopmentGems
+#19 153.1 Skipping bundler install...
+#19 153.1 Building logstash-core using gradle
+#19 153.1 ./gradlew assemble
+#19 159.6 [plugin:install-development-dependencies] Installing development dependencies
+#19 160.5 Installing logstash-devutils, insist, logstash-codec-line, logstash-input-generator, logstash-codec-json, logstash-output-null, benchmark-ips, rspec, cabin, webrick, logstash-patterns-core, logstash-filter-grok, logstash-codec-plain, logstash-filter-date, rspec-sequencing, rspec-wait, flores, stud, pry, childprocess, ftw, logstash-output-elasticsearch, timecop, rufus-scheduler, gmetric, gelf, logstash-codec-json_lines, manticore, logstash-codec-cef, logstash-codec-multiline, digest-crc, ruby-kafka, snappy, rspec-collection_matchers, random-port, webmock, elasticsearch, rumbster, gserver, logstash-filter-kv, logstash-filter-ruby, sinatra, rackup
+#19 160.5 Preserving Gemfile gem options for plugin logstash-devutils
+#19 160.5 Preserving Gemfile gem options for plugin benchmark-ips
+#19 160.5 Preserving Gemfile gem options for plugin rspec
+#19 160.5 Preserving Gemfile gem options for plugin flores
+#19 160.5 Preserving Gemfile gem options for plugin stud
+#19 160.5 Preserving Gemfile gem options for plugin childprocess
+#19 160.5 Preserving Gemfile gem options for plugin webmock
+#19 168.9 Installation successful
+#19 169.1 cleaned orphaned dependency et-orbi (1.3.0)
+#19 169.1 cleaned orphaned dependency fugit (1.11.2)
+#19 169.1 cleaned orphaned dependency raabro (1.4.0)
+#19 169.1 cleaned orphaned dependency rufus-scheduler (3.9.2)
+#19 169.4 Validating logstash-codec-plain
+#19 171.6 Validating logstash-filter-clone
+#19 171.6 Validating logstash-filter-date
+#19 171.6 Validating logstash-filter-drop
+#19 171.6 Validating logstash-filter-geoip
+#19 171.7 Validating logstash-filter-json
+#19 171.7 Validating logstash-filter-mutate
+#19 171.7 Validating logstash-filter-ruby
+#19 171.7 Validating logstash-filter-xml
+#19 171.7 Validating logstash-input-beats
+#19 171.8 Validating logstash-input-generator
+#19 171.8 Validating logstash-input-stdin
+#19 171.8 Validating logstash-input-tcp
+#19 171.8 Validating logstash-output-elasticsearch
+#19 171.9 Validating logstash-output-file
+#19 171.9 Validating logstash-output-null
+#19 171.9 Validating logstash-output-stdout
+#19 171.9 Installing logstash-codec-plain, logstash-filter-clone, logstash-filter-date, logstash-filter-drop, logstash-filter-geoip, logstash-filter-json, logstash-filter-mutate, logstash-filter-ruby, logstash-filter-xml, logstash-input-beats, logstash-input-generator, logstash-input-stdin, logstash-input-tcp, logstash-output-elasticsearch, logstash-output-file, logstash-output-null, logstash-output-stdout
+#19 175.9 Installation successful
+#19 176.1 
+#19 176.1 BUILD SUCCESSFUL in 42s
+#19 176.1 35 actionable tasks: 4 executed, 31 up-to-date
+#19 DONE 176.7s
+
+#20 exporting to image
+#20 exporting layers
+#20 exporting layers 7.9s done
+#20 writing image sha256:1a16759cff83a0e6b06bf52ba0210a7fbf79e2c56239037ea1f3c95ef5a5676c done
+#20 naming to docker.io/library/envgym_test_1756416389 done
+#20 DONE 7.9s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

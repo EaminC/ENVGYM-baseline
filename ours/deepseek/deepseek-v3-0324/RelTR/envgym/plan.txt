@@ -1,0 +1,71 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN (CPU-ONLY VERSION) ===
+
+1. DOWNLOADS NEEDED:
+   - Git
+   - Conda (Miniconda or Anaconda)
+   - Python 3.6
+   - PyTorch 1.6.0 with torchvision 0.7.0 (CPU-only version)
+   - matplotlib
+   - scipy 1.5.2
+   - pycocotools (from GitHub)
+   - RelTR pretrained models (Visual Genome and OpenImages V6)
+   - Visual Genome dataset
+   - OpenImages V6 dataset
+   - Cython
+   - numpy
+
+2. FILES TO CREATE:
+   - data/vg/rel.json
+   - data/vg/test.json
+   - data/vg/train.json
+   - data/vg/val.json
+   - data/vg/images/ (directory)
+   - data/oi/rel.json
+   - data/oi/test.json
+   - data/oi/train.json
+   - data/oi/val.json
+   - data/oi/images/ (directory)
+   - ckpt/checkpoint0149.pth
+   - ckpt/checkpoint0149_oi.pth
+   - lib/fpn/box_intersections_cpu/bbox.pyx (compiled extension)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Test inference on sample VG image (CPU)
+   - Test inference on custom image (CPU)
+   - Test training initialization on VG dataset (CPU)
+   - Test training initialization on OI dataset (CPU)
+   - Test evaluation on VG dataset (CPU)
+   - Test evaluation on OI dataset (CPU)
+   - Test FPN box intersection compilation
+   - Test bbox_cython module functionality
+   - Test numpy compatibility with bbox operations
+
+4. COMPLETE TODO LIST:
+   - Install Git
+   - Install Conda
+   - Create conda environment: conda create -n reltr python=3.6
+   - Activate environment: conda activate reltr
+   - Install PyTorch (CPU version): conda install pytorch==1.6.0 torchvision==0.7.0 cpuonly -c pytorch
+   - Install matplotlib: conda install matplotlib
+   - Install Cython: conda install cython
+   - Install numpy: conda install numpy
+   - Clone repository: git clone https://github.com/yrcong/RelTR.git
+   - Change directory: cd RelTR
+   - Install scipy: conda install scipy
+   - Install pycocotools: pip install -U 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
+   - Download pretrained models and place in ckpt directory
+   - Prepare datasets according to data/README.md
+   - Compile FPN: cd lib/fpn && sh make.sh
+   - Compile bbox module: cd lib/fpn/box_intersections_cpu && python setup.py build_ext --inplace
+   - Verify inference (CPU): python inference.py --img_path demo/vg1.jpg --resume ckpt/checkpoint0149.pth --device cpu
+   - Verify training (CPU): python main.py --dataset vg --img_folder data/vg/images/ --ann_path data/vg/ --batch_size 2 --output_dir ckpt --device cpu
+   - Verify evaluation (CPU): python main.py --dataset vg --img_folder data/vg/images/ --ann_path data/vg/ --eval --batch_size 1 --resume ckpt/checkpoint0149.pth --device cpu
+   - Verify bbox module: python -c "from lib.fpn.box_intersections_cpu import bbox_cython; print(bbox_cython.__doc__)"
+
+Key Changes Made:
+1. Removed CUDA Toolkit requirement
+2. Changed PyTorch installation to CPU-only version
+3. Added --device cpu flag to all PyTorch-related commands
+4. Removed distributed training option (--nproc_per_node)
+5. Kept all paths and directory structures as they are compatible with x86_64
+6. Maintained all CPU-compatible components (Cython, numpy compilation)

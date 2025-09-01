@@ -1,0 +1,64 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - OpenJDK 8 (jdk1.8) [x86_64 compatible]
+   - Ant build tool [x86_64 compatible]
+   - MiniSat (latest x86_64 version from https://github.com/niklasso/minisat)
+   - CMake (version 3.10 or higher) [x86_64 compatible]
+   - Make (latest x86_64 version)
+   - Git (for repository cloning)
+   - Kodkod library JAR files (x86_64 compatible)
+   - org.alloytools.alloy.dist.jar (x86_64 compatible)
+   - Zlib development libraries (x86_64)
+   - GMP and GMP++ libraries (libgmp-dev, libgmpxx4ldbl for x86_64)
+
+2. FILES TO CREATE:
+   - /home/cc/EnvGym/data/SymMC/.bashrc environment configuration
+   - /home/cc/EnvGym/data/SymMC/build.sh
+   - /home/cc/EnvGym/data/SymMC/Datasets/specs/test_spec.als
+   - /home/cc/EnvGym/data/SymMC/verification_script.sh
+   - /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib directory
+   - /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/bin directory
+   - /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/build.sh
+   - /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/run.sh
+   - /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/build.sh
+   - /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/cmake-build-release
+
+3. NECESSARY TEST CASES (x86_64 specific):
+   - x86_64 architecture verification test
+   - Multi-core build verification test
+   - 64-bit library linkage tests
+   - Memory usage monitoring tests
+   - All existing tests from original plan (updated for x86_64 paths)
+
+4. COMPLETE TODO LIST (x86_64 specific):
+   - Install OpenJDK 8: sudo apt-get install openjdk-8-jdk
+   - Install Ant: sudo apt-get install ant
+   - Install Zlib: sudo apt-get install zlib1g-dev
+   - Install GMP: sudo apt-get install libgmp-dev libgmpxx4ldbl
+   - Verify Java: java -version (should show 1.8 x86_64)
+   - Verify Ant: ant -version
+   - Clone MiniSat: git clone https://github.com/niklasso/minisat.git
+   - Build MiniSat (x86_64): cd minisat && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j$(nproc)
+   - Install CMake: sudo apt-get install cmake
+   - Install Make: sudo apt-get install make
+   - Prepare Enhanced_Kodkod: mkdir -p /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib
+   - Create build/run scripts with absolute paths
+   - Make scripts executable: chmod +x /home/cc/EnvGym/data/SymMC/*.sh
+   - Build with multi-core: make -j$(nproc) where applicable
+   - All path references updated to /home/cc/EnvGym/data/SymMC/
+   - Add memory monitoring to test scripts
+   - Verify x86_64 binaries: file /path/to/binary | grep "x86-64"
+   - Set JAVA_HOME in /home/cc/EnvGym/data/SymMC/.bashrc
+
+Changes made:
+1. All paths updated to absolute paths based on working directory
+2. Added x86_64 architecture verification steps
+3. Added multi-core build support with -j$(nproc)
+4. Removed GPU-related considerations
+5. Added memory monitoring for x86_64 environment
+6. Ensured all library installations specify x86_64 versions
+7. Added architecture-specific binary verification
+8. Updated build flags for x86_64 optimization
+9. Set explicit build type (Release) for CMake
+10. Added environment variable configuration in project-specific .bashrc

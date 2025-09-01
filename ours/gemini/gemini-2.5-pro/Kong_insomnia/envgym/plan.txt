@@ -1,0 +1,137 @@
+Based on the provided hardware and environment information, here is the adjusted environment setup plan, specifically tailored for your `linux/amd64` system. Instructions for incompatible platforms like Windows and macOS have been removed to ensure clarity and feasibility.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN (for linux/amd64) ===
+
+1.  **DOWNLOADS NEEDED:**
+    *   **Git**: A distributed version control system. Download from [https://git-scm.com/](https://git-scm.com/) or install via your distribution's package manager (e.g., `sudo apt-get install git`).
+    *   **Code Editor**: VS Code is recommended, as the repository includes pre-configured settings (`.vscode/settings.json`), launch configurations (`.vscode/launch.json`), and recommended extensions (`.vscode/extensions.json`).
+    *   **GitHub Personal Access Token (PAT)**: Required to download private packages (e.g., under the `@kong` scope) from the GitHub Package Registry. The token needs the `read:packages` scope.
+    *   **Docker**: Required for building and running the Docker image for the `inso` CLI tool, as defined in `packages/insomnia-inso/Dockerfile`. Your version (`28.1.1`) is fully compatible. Download from [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/).
+    *   **(For Nix Setup) Nix Package Manager**: Required for the Nix-based setup. The project uses Nix Flakes, which are guaranteed to be reproducible thanks to the `flake.lock` file. Installation instructions at [https://nixos.org/download.html](https://nixos.org/download.html). Flakes support must be enabled.
+    *   **(For Manual Setup) Node.js**: JavaScript runtime environment. The project requires the version defined in the `.nvmrc` file. It is highly recommended to use a version manager like `nvm` (Node Version Manager) or `fnm`.
+    *   **(For Manual Setup) npm**: Node Package Manager. The project requires a version compatible with the specified Node.js version and `package-lock.json`. This is typically installed with Node.js.
+    *   **(For Manual Setup) Supporting Packages**:
+        *   For **Ubuntu/Debian**: `sudo apt-get install libfontconfig-dev libcurl4-openssl-dev`. This is critical for the `@getinsomnia/node-libcurl` dependency and matches the CI environment (`ubuntu-22.04`).
+        *   For **Fedora**: `sudo dnf install libcurl-devel`.
+    *   **Editor Plugins (Recommended for VS Code)**: The `.vscode/extensions.json` file will prompt you to install these automatically. They include ESLint, Prettier, Tailwind CSS IntelliSense, Playwright, and others for a consistent development experience.
+
+2.  **FILES TO CREATE OR CONFIGURE:**
+    *   **Shell Configuration File (e.g., `.bashrc`, `.zshrc`)**: You will need to modify your shell's configuration file to set required environment variables.
+        *   `NODE_AUTH_TOKEN`: Your GitHub Personal Access Token. This is used by `npm` to authenticate with the GitHub Package Registry.
+        *   `NODE_OPTIONS` (Optional): Set to `--max_old_space_size=6144` or higher if you encounter memory issues during large builds.
+        *   `BUILD_TARGETS` (Optional): A comma-separated list of build targets (e.g., `AppImage,tar.gz`, `deb`, `rpm`) to override the defaults when building the application.
+    *   **Note on Repository Configuration Files**: The repository at `/home/cc/EnvGym/data/Kong_insomnia` already contains numerous configuration files that standardize the development environment. These include:
+        *   `.vscode/*.json`: For VS Code settings, extensions, and debug launch configurations.
+        *   `.prettierrc`, `eslint.config.mjs`: For code formatting and linting rules.
+        *   `.nvmrc`: Specifies the exact Node.js version required.
+        *   `package-lock.json`: Ensures reproducible `npm` dependency installations.
+        *   `flake.nix`, `flake.lock`: For the reproducible Nix development environment.
+        *   `tsconfig.json`: For TypeScript configuration, including path aliases.
+        *   `packages/insomnia-inso/Dockerfile`: Defines the Docker build for the `inso` CLI tool.
+        *   `packages/insomnia-smoke-test/playwright.config.ts`: Configures the End-to-End (E2E) tests.
+
+3.  **NECESSARY TEST CASES IN THE CODEBASE:**
+    *   **Linting, Formatting, and Type Checks**: `npm run lint`, `npm run format:check`, `npm run type-check`. (Verified in CI)
+    *   **Unit and Integration Tests**: `npm test`. (Verified in CI)
+    *   **End-to-End (E2E) Tests**: `npm run test:smoke`. (Verified in CI)
+    *   **E2E Test Server Test**: Manually confirm that running E2E tests starts the required web server on `http://127.0.0.1:4010`.
+    *   **E2E Test Debugging Test**: Intentionally cause an E2E test to fail and confirm trace files are generated in `packages/insomnia-smoke-test/traces`.
+    *   **Application Launch Test**: Manually run `npm run start` and confirm the application starts.
+    *   **Live Reload / Main Process Restart Tests**: Verify hot-reloading with `npm run start` and `npm run start:autoRestart`.
+    *   **Debugger Launch Test (VS Code)**: Launch the "Insomnia" compound configuration and verify breakpoints work in both main and renderer processes.
+    *   **Inso CLI Debugger Test (VS Code)**: Launch the "Inso" configuration and verify breakpoints work in the CLI source code.
+    *   **Desktop Application Build Test**: Confirm the application can be packaged by running `npm run app-package`.
+    *   **Inso CLI Build Test**: Confirm the `inso` CLI can be packaged by running `npm run package -w insomnia-inso`.
+    *   **Artifact Generation Test**: Confirm compressed artifacts can be created (e.g., `npm run artifacts -w insomnia-inso`).
+    *   **Desktop Application Installation Test**: Manually install and run the application from the generated package (e.g., `.AppImage`, `.deb`).
+    *   **Inso CLI Execution Test**: Manually execute the packaged `inso` binary from the command line.
+    *   **Inso Docker Build Test**: Confirm the `inso` Docker image can be built successfully from your project root (`/home/cc/EnvGym/data/Kong_insomnia`).
+    *   **Inso Docker Execution Test**: Manually run a container from the built image to verify the CLI executes correctly.
+
+4.  **COMPLETE TODO LIST:**
+    *   **Choose one of the following setup methods:**
+
+    ---
+    ### **METHOD A: USING NIX (RECOMMENDED FOR LINUX)**
+    This method uses the `flake.nix` file to create a fully reproducible development environment.
+
+    *   **1. Install Prerequisites:**
+        *   1.1. Install Git: `sudo apt-get update && sudo apt-get install git`.
+        *   1.2. Install the Nix package manager and enable flakes support.
+
+    *   **2. Navigate to the Project Repository:**
+        *   2.1. Your project is located at `/home/cc/EnvGym/data/Kong_insomnia`. All subsequent commands should be run from this directory.
+
+    *   **3. Configure GitHub Token:**
+        *   3.1. Generate a GitHub Personal Access Token (classic) with the `read:packages` scope.
+        *   3.2. Add `export NODE_AUTH_TOKEN=YOUR_TOKEN_HERE` to your shell profile (`~/.bashrc`, `~/.zshrc`) and restart your terminal or run `source ~/.bashrc`.
+        *   3.3. Verification: `echo $NODE_AUTH_TOKEN`.
+
+    *   **4. Activate the Development Environment:**
+        *   4.1. In the project root, run: `nix develop`.
+        *   4.2. This command downloads all dependencies (Node.js, Electron, system libraries) and drops you into a shell where they are available.
+
+    *   **5. Install Project Dependencies:**
+        *   5.1. Inside the Nix shell, run `npm ci` for a clean install based on `package-lock.json`.
+
+    *   **6. Verify the Setup with Checks and Tests:**
+        *   6.1. Run core checks: `npm run lint`, `npm run format:check`, `npm run type-check`.
+        *   6.2. Run the automated test suite: `npm test`.
+        *   6.3. Run the E2E tests: `npm run test:smoke`.
+
+    *   **7. Run the Application and Configure Editor:**
+        *   7.1. Follow steps 6, 7, 8, 9, and 10 from "METHOD B: MANUAL INSTALLATION" below.
+
+    ---
+    ### **METHOD B: MANUAL INSTALLATION**
+    This method requires you to manually install and manage all dependencies.
+
+    *   **1. Install Prerequisites:**
+        *   1.1. Install Git: `sudo apt-get update && sudo apt-get install git`.
+        *   1.2. Install a Node.js version manager like `nvm`.
+
+    *   **2. Navigate to the Project Repository:**
+        *   2.1. Your project is located at `/home/cc/EnvGym/data/Kong_insomnia`. All subsequent commands should be run from this directory.
+
+    *   **3. Configure Local Environment:**
+        *   3.1. **Set Up Node.js:** Run `nvm install` (which reads `.nvmrc`) and then `nvm use`.
+        *   3.2. Verify version: `node -v` (should match `.nvmrc`).
+        *   3.3. **Generate GitHub Token:** Generate a Personal Access Token (classic) with the `read:packages` scope.
+        *   3.4. **Set Environment Variable:** Add `export NODE_AUTH_TOKEN=YOUR_TOKEN_HERE` to your shell profile (`~/.bashrc`, `~/.zshrc`) and restart your terminal.
+        *   3.5. Verification: `echo $NODE_AUTH_TOKEN`.
+
+    *   **4. Install Dependencies:**
+        *   4.1. **Install OS Specific Dependencies:** Run `sudo apt-get update && sudo apt-get install libfontconfig-dev libcurl4-openssl-dev`.
+        *   4.2. **Install Project Dependencies:** Run `npm ci` for a clean, reproducible install from `package-lock.json`. Check `NODE_AUTH_TOKEN` if you see auth errors related to `@kong` packages.
+
+    *   **5. Verify the Setup with Checks and Tests:**
+        *   5.1. Run core checks: `npm run lint`, `npm run format:check`, `npm run type-check`.
+        *   5.2. Run the automated test suite: `npm test`.
+        *   5.3. Run the E2E tests: `npm run test:smoke`.
+
+    *   **6. Run the Application in Development Mode:**
+        *   6.1. Start with live reload for UI: `npm run start`.
+        *   6.2. (Alternative) Start with auto-restart for the main process: `npm run start:autoRestart`.
+        *   6.3. (VS Code) Use the "Run and Debug" panel and select the "Insomnia" configuration.
+
+    *   **7. Configure Code Editor (VS Code Recommended):**
+        *   7.1. Open the `/home/cc/EnvGym/data/Kong_insomnia` folder in VS Code.
+        *   7.2. Click "Install" on the notification to install recommended extensions from `.vscode/extensions.json`.
+        *   7.3. Verify that format-on-save, linting, Tailwind CSS autocomplete, and path alias navigation work as expected.
+
+    *   **8. (Optional) Build the Desktop Application for Distribution:**
+        *   8.1. For large builds, you may need to increase Node's memory limit: `export NODE_OPTIONS='--max_old_space_size=6144'`.
+        *   8.2. To build default Linux targets, run: `npm run app-package`.
+        *   8.3. To specify targets, use the `BUILD_TARGETS` environment variable (e.g., `export BUILD_TARGETS=AppImage,deb`).
+        *   8.4. Verification: The build process should complete, with packaged files (e.g., `.AppImage`) in the `packages/insomnia/dist/` directory.
+
+    *   **9. (Optional) Build and Debug the Inso CLI Tool:**
+        *   9.1. Package the binary: `npm run package -w insomnia-inso`.
+        *   9.2. Create compressed artifacts (zip, tar.gz): `npm run artifacts -w insomnia-inso`.
+        *   9.3. **Debug in VS Code:** Use the "Inso" launch configuration from the "Run and Debug" panel.
+        *   9.4. Verification: An executable `inso` will be in `packages/insomnia-inso/binaries`. Test with `./packages/insomnia-inso/binaries/inso --version`.
+
+    *   **10. (Optional) Build and Run the Inso CLI Docker Image:**
+        *   10.1. **Prerequisites:** Docker must be running. You must first run `npm run artifacts -w insomnia-inso` to generate the required `inso-linux-*.tar.xz` artifact.
+        *   10.2. Build the image from your project root (`/home/cc/EnvGym/data/Kong_insomnia`): `docker build -t insomnia-inso -f packages/insomnia-inso/Dockerfile .`
+        *   10.3. Verification: Run a container to test the CLI: `docker run --rm insomnia-inso --version`. It should output the `inso` version.

@@ -1,0 +1,210 @@
+Based on the provided hardware information, the environment setup plan has been adjusted for compatibility, feasibility, and to align with best practices for automated or containerized builds. The core software stack remains the same due to project requirements, but the installation and verification procedures have been refined.
+
+Here is the complete adjusted plan:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1.  **DOWNLOADS NEEDED:**
+    *   **Operating System**: An `amd64/x86_64` Debian-based Linux distribution (e.g., Ubuntu 20.04) is required.
+    *   **Source Code Control**: Git, for initial project setup.
+    *   **Core Build Tools**: `build-essential`, `bc`, `wget`, `software-properties-common`, `ca-certificates`.
+    *   **Programming Language**: Python 2.7.
+    *   **Java Development Kit**: Oracle Java 8. This is a runtime dependency for the ANTLR parser generator.
+    *   **Python Package Manager**: `pip` for Python 2.
+    *   **Parser Generator**: ANTLR v4.7.1 (`antlr-4.7.1-complete.jar`), which will be downloaded by the installation script.
+    *   **Probabilistic Programming Systems (PPS) and Libraries**: The installation scripts will install these specific versions, ensuring they are CPU-compatible as no GPU is available.
+        *   **Stan**: Python interface `pystan`.
+        *   **Edward**: The `edward` library.
+        *   **TensorFlow**: Version `1.5.0` (CPU version, dependency for Edward).
+        *   **Pyro**: Version `0.2.1` (`pyro-ppl`).
+        *   **PyTorch**: Version `0.4.0` (**CPU version**, dependency for Pyro).
+        *   **Other Python Libraries**: `antlr4-python2-runtime`, `six`, `astunparse`, `ast`, `pandas`, `scipy`.
+    *   **Project Source Code**: The Probfuzz project repository, which includes all necessary scripts and configuration templates.
+
+2.  **PREREQUISITE PROJECT FILES:**
+    The following files must exist in the project's source directory (`/home/cc/EnvGym/data/probfuzz`) before initiating the setup. In a containerized build, these files will be copied into the environment, not created within it.
+
+    *   **`.gitignore`**: Located in the project root, this file ensures that generated output and caches are not tracked by Git. Content:
+        ```
+        output/
+        __pycache__/
+        *.pyc
+        .idea/*
+        *~
+        ```
+    *   **`language/antlr/.gitignore`**: Located in `language/antlr/`, this file prevents ANTLR-generated parser files from being tracked. Content:
+        ```
+        *.java
+        *.tokens
+        *.interp
+        *.py
+        ```
+    *   **`config.json`**: Located in the project root, this file controls the tool's runtime behavior. Content:
+        ```json
+        {
+          "max_threads": 1,
+          "output_dir": "output",
+          "structured" : true,
+          "current_template": "mlr",
+          "metric" : "mlr_smape",
+          "runConfigurations": [
+            {
+              "tool": "stan",
+              "enabled": true,
+              "algorithm": "nuts",
+              "timeout": "5m",
+              "python" : "python"
+            },
+            {
+              "tool": "edward",
+              "enabled": true,
+              "algorithm": "all",
+              "timeout": "5m",
+              "python" : "python"
+            },
+            {
+              "tool": "pyro",
+              "enabled": true,
+              "algorithm": "all",
+              "timeout": "5m",
+              "python" : "python"
+            }
+          ],
+          "templates": {
+            "simple" : "language/templates/simple.template",
+            "lr": "language/templates/linearregression.template",
+            "mlr": "language/templates/mlr.template",
+            "lrc": "language/templates/cond.template"
+          },
+          "pyro" : {
+              "optimizers" : [
+                  {
+                  "name" : "Adam",
+                  "params" : [
+                  {
+                      "name" : "lr",
+                      "type" : "(0,1)",
+                      "special" : false
+                  },
+                  {
+                      "name" : "betas",
+                      "type" : "(0,1)",
+                      "size" : 2,
+                      "special" : false
+                  }
+                  ]
+              }
+              ]
+          }
+        }
+        ```
+    *   **`language/stanmodels.json`**: Located in the `language/` directory, this file defines statistical distributions and inference configurations. Content:
+        ```json
+        {
+            "models": [
+                {
+                    "name" : "normal",
+                    "stan" : "normal",
+                    "psiname" : "gauss",
+                    "edward" : "ed.models.Normal",
+                    "pyro" : "dist.Normal",
+                    "venture": "normal",
+                    "scipy" : "st.norm.mean({0}, {1})",
+                    "args" : [
+                        {
+                            "name" : "mu",
+                            "type" : "f"
+                        },
+                        {
+                            "name" : "sigma",
+                            "type" : "f+"
+                        }
+                    ],
+                    "type" : "C",
+                    "support" : "f"
+                }
+            ],
+            "inferences" : [],
+            "util_functions" :[]
+        }
+        ```
+        *(Note: The full content of `stanmodels.json` from the original plan should be used here; it is truncated for brevity.)*
+
+3.  **NECESSARY TEST CASES IN THE CODEBASE:**
+    These tests are used to validate the environment after the setup is complete. They should be run from within the configured environment (e.g., inside the Docker container).
+
+    *   **Java Runtime Environment Test**:
+        *   **Objective**: Ensure Oracle Java 8 is correctly installed.
+        *   **Verification**: Execute `java -version`. The output must include `java version "1.8.0_..."`.
+    *   **Installation Script Test**:
+        *   **Objective**: Ensure `install.sh` completed successfully.
+        *   **Verification**: Use `pip2 list` to confirm `tensorflow==1.5.0`, `pyro-ppl==0.2.1`, `torch==0.4.0`, and other required libraries are installed. Check that the script's final `./check.py` step (if present) completed without error.
+    *   **ANTLR Parser Generation Test**:
+        *   **Objective**: Confirm ANTLR parser files were generated.
+        *   **Verification**: The directory `language/antlr/` must contain `TemplateLexer.py`, `TemplateParser.py`, `TemplateVisitor.py`, and `__init__.py`.
+    *   **Configuration Loading Test**:
+        *   **Objective**: Ensure `probfuzz.py` correctly parses configuration files.
+        *   **Verification**: Temporarily modify `config.json` to set `"enabled": false` for the "stan" tool. Run `./probfuzz.py 1`. Verify that Stan-related files are not generated, then revert the change.
+    *   **Program Generation Test**:
+        *   **Objective**: Verify that `probfuzz.py` can generate a valid program set.
+        *   **Verification**: Run `./probfuzz.py 1`. Check that the directory `output/progs.../prob_rand_1` is created and contains `model.stan`, `edward_prog.py`, and `pyro_prog.py`.
+    *   **Differential Testing Output Test**:
+        *   **Objective**: Confirm output files are generated in the correct format.
+        *   **Verification**: Run `./probfuzz.py 1`. Check for the existence and format of `pplout_*`, `edwardout_*`, and `pyroout_*`.
+    *   **MLR Model Metric Script Execution Test**:
+        *   **Objective**: Verify the `metrics/mlr_smape.sh` script can parse outputs.
+        *   **Verification**: After a successful run, execute `metrics/mlr_smape.sh output/progs*/prob_rand_1 stan`. The script should print a numerical value. Repeat for `edward` and `pyro`.
+    *   **Results Summary Script Test**:
+        *   **Objective**: Verify `summary.sh` can generate a summary report.
+        *   **Verification**: After a multi-program run (`./probfuzz.py 5`), execute `./summary.sh -d output/progs* -m mlr_smape`. The script should produce a valid CSV output to the console.
+
+4.  **COMPLETE TODO LIST (AUTOMATED SETUP):**
+    This sequence of steps is designed for an automated build process, such as a Dockerfile, within the `x86_64` architecture. All commands are executed from the project's root directory (`/home/cc/EnvGym/data/probfuzz` or the `WORKDIR` in a container). `sudo` is not used as commands are run with root privileges in this context.
+
+    *   **Step 1: Install Prerequisite System Tools**
+        *   **Action**: Update package lists and install essential system-level dependencies in a non-interactive way.
+        *   **Command**: `apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends git build-essential python2.7 python-pip bc wget software-properties-common ca-certificates`
+        *   **Verification**: Run `python2.7 --version` and `pip --version` to ensure they are installed correctly.
+
+    *   **Step 2: Execute the Java Installation Script**
+        *   **Action**: Run the script to install the Oracle Java 8 JDK. The script must be executable and capable of running non-interactively.
+        *   **Command**: `./install_java.sh`
+        *   **Verification**: Run `java -version`; the output should contain `java version "1.8.0_..."`.
+
+    *   **Step 3: Install Python Deep Learning Frameworks (CPU-Specific)**
+        *   **Action**: Install the specific CPU-only versions of PyTorch and TensorFlow required by the project. This is critical as no GPU is available.
+        *   **Commands**:
+            ```bash
+            pip2 install torch==0.4.0 -f https://download.pytorch.org/whl/cpu/torch_stable.html
+            pip2 install tensorflow==1.5.0
+            ```
+        *   **Verification**: Run `pip2 list | grep -E "torch|tensorflow"` and confirm the versions are `0.4.0` and `1.5.0` respectively.
+
+    *   **Step 4: Execute the Main Installation Script**
+        *   **Action**: Run the main script to install all remaining software dependencies (like `pystan`, `edward`, `pyro-ppl`) and generate the ANTLR parser files.
+        *   **Command**: `./install.sh`
+        *   **Verification**: The script should complete without errors. Check for the existence of `language/antlr/TemplateParser.py`. Run `pip2 list` to confirm all required Python packages are present.
+
+    *   **Step 5: Perform an Initial Test Run**
+        *   **Action**: Run the Probfuzz tool for a single iteration to ensure the entire pipeline is functional.
+        *   **Command**: `./probfuzz.py 1`
+        *   **Verification**: The script should exit with code 0. An `output` directory containing a program subdirectory (e.g., `progs.../prob_rand_1`) should be created.
+
+    *   **Step 6: Verify Metric Script Functionality**
+        *   **Action**: Execute the metric script against the generated output for each PPS to ensure result parsing is correct. Note that the `progs*` glob may need to be adjusted based on the exact directory name created.
+        *   **Commands**:
+            ```bash
+            metrics/mlr_smape.sh output/progs*/prob_rand_1 stan
+            metrics/mlr_smape.sh output/progs*/prob_rand_1 edward
+            metrics/mlr_smape.sh output/progs*/prob_rand_1 pyro
+            ```
+        *   **Verification**: Each command should execute successfully and output a single numerical value.
+
+    *   **Step 7: Perform a Full Example Run and Summarize**
+        *   **Action**: Execute a multi-iteration run and use the summary script to generate a consolidated report. This validates the end-to-end workflow.
+        *   **Commands**:
+            ```bash
+            ./probfuzz.py 5
+            ./summary.sh -d output/progs* -m mlr_smape
+            ```
+        *   **Verification**: The `summary.sh` script should print a CSV-formatted table to the console with a header row and five data rows, confirming that the analysis and reporting tools are working correctly. The environment is now fully configured and validated.

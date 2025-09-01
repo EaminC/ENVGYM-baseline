@@ -1,0 +1,91 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Node.js (version >=22.17.1) - x86_64 Linux build
+   - npm (version >=10)
+   - Git
+   - libfontconfig-dev (Ubuntu/Debian) - since base image is Ubuntu/Debian compatible
+   - Insomnia client (from https://insomnia.rest) - Linux version
+   - Electron (via dependencies) - Linux compatible
+   - Playwright (for smoke tests) - Linux dependencies will be auto-installed
+   - patch-package (for postinstall)
+
+2. FILES TO CREATE:
+   - .env file in root directory (/home/cc/EnvGym/data/Kong_insomnia/.env)
+   - .eslintrc (using @eslint/js and plugins)
+   - .prettierrc (with prettier-plugin-tailwindcss)
+   - jest.config.js (if custom test configuration needed)
+   - tsconfig.json (for TypeScript configuration)
+   - Workspace-specific configs in:
+     - /home/cc/EnvGym/data/Kong_insomnia/packages/[package-name]
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - API request handling tests
+   - Plugin system integration tests
+   - Authentication flow tests
+   - Local Vault storage tests
+   - Git Sync functionality tests
+   - Cloud Sync functionality tests
+   - Smoke tests (Smoke and Critical projects)
+   - TypeScript type checking
+   - Electron-specific tests (Linux-specific)
+   - Playwright tests (Linux environment)
+   - REST client functionality tests
+   - Workspace interoperability tests
+   - Node-libcurl integration tests (Linux)
+   - Patch-package verification tests
+
+4. COMPLETE TODO LIST:
+   - Install Node.js (>=22.17.1) x86_64 Linux version and verify (node -v)
+   - Install npm (>=10) and verify (npm -v)
+   - Install Git and verify (git --version)
+   - Clone to /home/cc/EnvGym/data/Kong_insomnia (git clone https://github.com/Kong/insomnia)
+   - Install dependencies (npm i)
+   - Run postinstall script (patch-package)
+   - Clear Electron cache (rm -rf ~/.cache/electron)
+   - Install Ubuntu/Debian dependencies: sudo apt-get install libfontconfig-dev
+   - Install libcurl-electron (npm run install-libcurl-electron)
+   - Run linting (npm run lint)
+   - Run type checking (npm run type-check)
+   - Run tests (npm test)
+   - Start development server (npm run dev)
+   - Verify Linux application launch
+   - Create config files in /home/cc/EnvGym/data/Kong_insomnia:
+     - .env with required variables
+     - ESLint config
+     - Prettier config
+   - Install Insomnia Linux client
+   - Verify storage options:
+     - Local Vault
+     - Git Sync
+     - Cloud Sync
+   - Test premium features
+   - Verify plugin system
+   - Verify API protocols:
+     - GraphQL
+     - REST
+     - WebSockets
+     - SSE
+     - gRPC
+   - Test collaboration features
+   - Verify documentation generation
+   - Run smoke tests (npm run test:smoke:dev)
+   - Run critical tests (npm run test:crit:package)
+   - Verify workspace interoperability
+   - Test inso CLI tool (npm run inso-start)
+   - Verify patch-package
+   - Check TypeScript compilation
+   - Verify Electron Linux build (npm run app-build)
+   - Test Playwright in Linux environment
+
+REMOVED ITEMS:
+- Windows Build Tools (not needed for Linux)
+- Fedora-specific libcurl-devel (using Ubuntu/Debian)
+- Cross-platform compatibility tests (focus on Linux)
+- GPU-related considerations
+
+ADJUSTMENTS:
+- All paths updated to /home/cc/EnvGym/data/Kong_insomnia
+- Focus on Linux-specific builds and tests
+- Removed Windows-specific instructions
+- Kept Ubuntu/Debian specific packages only

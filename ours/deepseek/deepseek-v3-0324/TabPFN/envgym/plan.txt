@@ -1,0 +1,51 @@
+Here's the adjusted environment setup plan based on your hardware information:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.9+ (3.9, 3.10, 3.11, 3.12, or 3.13)
+   - pip (latest version)
+   - Git
+   - TabPFN package (via pip or source)
+   - TabPFN model weights (auto-downloaded or manual)
+   - uv (pip replacement)
+   - Core dependencies (same as original)
+   - Development tools (same as original)
+   - REMOVED: CUDA Toolkit and cuDNN (no GPU detected)
+
+2. FILES TO CREATE:
+   - Adjusted .env file:
+     ```
+     TABPFN_MODEL_CACHE_DIR=/home/cc/EnvGym/data/TabPFN/models
+     TABPFN_ALLOW_CPU_LARGE_DATASET=false
+     TABPFN_EXCLUDE_DEVICES=mps
+     FORCE_CONSISTENCY_TESTS=0
+     ```
+     (Removed PYTORCH_CUDA_ALLOC_CONF as no GPU is present)
+   - requirements-dev.txt (same as original)
+   - .pre-commit-config.yaml (same as original)
+   - .github/dependabot.yml (same as original)
+   - .github/workflows/pull_request.yml (same as original)
+   - tests/reference_predictions/ (same as original)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Removed GPU-specific test cases (keeping CPU compatibility tests)
+   - Kept all other test cases except those specifically for CUDA/GPU
+   - Added emphasis on CPU memory management tests
+   - Added x86_64 architecture-specific test validation
+
+4. COMPLETE TODO LIST:
+   1-3, 5-16 same as original
+   REMOVED: 4. (Optional) Install CUDA Toolkit and cuDNN for GPU support
+   ADJUSTED: 9. Create .env file with adjusted configurations (no GPU settings)
+   ADJUSTED: 15. Verify installation (CPU-only version):
+        - Run Python interpreter
+        - Execute: `from tabpfn import TabPFNClassifier; clf = TabPFNClassifier(device='cpu')`
+
+Key adjustments made:
+- Removed all GPU/CUDA-related components since no NVIDIA GPU is detected
+- Updated .env file paths to match your working directory and removed GPU-specific settings
+- Simplified installation verification to use CPU-only mode
+- Maintained all CPU-specific and development-related components
+- Kept architecture-specific testing for x86_64
+- Maintained all Linux/amd64 compatible components

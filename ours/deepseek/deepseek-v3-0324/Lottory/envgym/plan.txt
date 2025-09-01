@@ -1,0 +1,77 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.7.x
+   - pip3 package manager
+   - PyTorch 1.2.0 (CPU-only version)
+   - torchvision 0.4.0 (CPU-only version)
+   - matplotlib 3.1.1
+   - numpy 1.17.2
+   - pandas 0.25.1
+   - Pillow 6.2.0
+   - scipy 1.3.1
+   - seaborn 0.9.0
+   - tensorboardX 1.8
+   - tqdm 4.36.1
+   - git (for repository cloning)
+
+2. FILES TO CREATE:
+   - requirements.txt (verified with provided content)
+   - config.yaml (for storing default hyperparameters)
+     - Contents should mirror command line args from README
+   - test_config.py (for environment verification)
+     - Should verify Python version, PyTorch availability (CPU-only)
+     - Add checks for pandas, seaborn, and tensorboardX
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Test model initialization for all architecture types (CPU-only)
+   - Test data loading for all dataset options
+   - Test pruning functionality (lt and reinit types) with CPU
+   - Test training loop execution (CPU)
+   - Test validation frequency handling
+   - Test plot generation functionality
+   - Test custom model/dataset integration
+   - Test tensorboardX logging
+   - Test pandas data handling
+   - Test seaborn visualization integration
+
+4. COMPLETE TODO LIST:
+   1. Install Python 3.7.x
+      - Verify with: python --version
+   2. Install pip3
+      - Verify with: pip3 --version
+   3. Clone repository
+      - git clone <repo_url>
+   4. Navigate to project directory
+      - cd Lottery-Ticket-Hypothesis-in-Pytorch
+   5. Install requirements with CPU-only flags
+      - pip3 install -r requirements.txt --no-cache-dir
+      - For PyTorch: pip3 install torch==1.2.0+cpu torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      - Verify with: pip3 list
+   6. Remove GPU verification steps (no CUDA needed)
+   7. Verify PyTorch CPU installation
+      - Run: python -c "import torch; print(torch.device('cpu'))"
+   8. Verify additional package installations
+      - Run: python -c "import pandas, seaborn, tensorboardX; print('All imports successful')"
+   9. Run basic test case with CPU
+      - python3 main.py --prune_type=lt --arch_type=fc1 --dataset=mnist --no-cuda
+   10. Verify output files created
+       - Check /saves and /plots directories
+       - Verify tensorboard logs generation
+   11. Add custom models/datasets (if needed)
+       - Follow README instructions for new architectures
+       - Verify integration with test runs
+   12. Set up test suite
+       - Create test files for core functionality
+       - Add tests for CPU-specific operations
+       - Run with: python -m pytest
+
+Key Adjustments Made:
+- Removed all CUDA/cuDNN related components
+- Specified CPU-only versions for PyTorch/torchvision
+- Added --no-cuda flag for test runs
+- Updated verification steps for CPU-only environment
+- Added --no-cache-dir flag for pip install to reduce disk usage
+- Adjusted PyTorch installation command for CPU-only version
+- Removed GPU-specific test cases
+- Updated path references to match /home/cc/EnvGym/data/Lottory

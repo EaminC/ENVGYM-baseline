@@ -1,0 +1,182 @@
+Based on the provided hardware and environment information, here is the adjusted and validated environment setup plan. The modifications primarily focus on adapting GUI-dependent steps to a command-line-only Linux container environment and clarifying the execution of Android instrumented tests.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    *   **JDK (Java Development Kit):** Version 8, 11, 17, or 21. The project is tested against these LTS versions. Recommended distributions include Adoptium Temurin or Zulu OpenJDK. `JAVA_HOME` must be set correctly. **Note:** The Android build uses Gradle (compatible with JDK 8-18) but the module's source code is configured for **Java 8 compatibility**. For the Android module build environment, it is recommended to use **JDK 11 or 17**. The `example-spring-test` and `example-solon-test` modules require **Java 8**. The `example-spring6-test`, `fastjson2-extension-spring6`, `fastjson2-example-graalvm-native`, and `test-jdk17` modules require **JDK 17+**. Building the `fastjson2-codegen` module on JDK 8 requires a full JDK installation (not a JRE) as it depends on `tools.jar`.
+    *   **Go (Golang):** Version **1.18+** is required for building and running the native Go-based performance benchmarks (e.g., against the Sonic library) located in the `benchmark` module.
+    *   **Android SDK:** Required for building the Android module. **As this is a non-GUI Linux environment, the SDK must be installed using the Android SDK Command-Line Tools.** The `ANDROID_HOME` or `ANDROID_SDK_ROOT` environment variable must be set.
+        *   **Required SDK Platform:** **Android API 31 (`compileSdk 31`)**, **Build-Tools**, and **Platform-Tools** must be installed via the `sdkmanager` command-line tool.
+        *   The project targets **Android API 29 (`targetSdk 29`)** and has a minimum requirement of **Android API 26 (`minSdk 26`)**.
+    *   **Build Tools:**
+        *   **Maven Wrapper:** The core project uses the Maven Wrapper (`mvnw`/`mvnw.cmd`), so a global installation of Apache Maven is **optional**. The wrapper should be configured to automatically download and use a recent Maven version (e.g., **Apache Maven 3.9.x**).
+        *   **Gradle Wrapper:** The Android project uses the Gradle Wrapper (`gradlew`/`gradlew.bat`), so a global installation of Gradle is **optional**. The wrapper is configured to automatically download and use **Gradle 7.5**.
+        *   **JMH (Java Microbenchmark Harness):** (Managed by Maven) Required for running performance benchmarks in the `benchmark` module. The necessary dependencies (`jmh-core`, `jmh-generator-annprocess`) are included in the build file.
+        *   **Maven Checkstyle Plugin:** (Managed by Maven) Used to enforce code style and quality standards during the build process, based on a project-specific configuration file.
+    *   **IDE (Integrated Development Environment):** **Note: The specified `linux/amd64` container environment is intended for command-line builds and testing (CI/CD). IDEs are GUI-based and should be run on a developer's host machine, not within the container.**
+        *   **Recommended for Host Machine:** **Android Studio** or **IntelliJ IDEA Ultimate/Community Edition** (with the Android plugin).
+        *   Alternatives for Host Machine: Eclipse (with Android Developer Tools), or Visual Studio Code with appropriate extensions.
+        *   The project includes an `.editorconfig` file. Ensure the IDE on your host machine has the EditorConfig plugin enabled to maintain consistent code style.
+        *   It is highly recommended to install a **Checkstyle plugin** in your host IDE (e.g., "Checkstyle-IDEA" for IntelliJ) for real-time feedback on code style.
+        *   For working on the `benchmark`, `example-spring-test`, `example-spring6-test`, and `example-solon-test` modules, an IDE plugin for **Lombok** is recommended on the host machine.
+    *   **Git:** Required for version control and to utilize the `.gitignore` configuration.
+    *   **Required Command-Line Utilities:**
+        *   These must be installed using the container's package manager (e.g., `apt-get install -y curl wget unzip` on Debian/Ubuntu).
+        *   For Unix-like systems (`mvnw`, `gradlew`): `curl` or `wget` and `unzip` or `tar` should be available in the system's `PATH`.
+        *   For Windows (`mvnw.cmd`, `gradlew.bat`): **PowerShell** is required for the Maven wrapper script.
+    *   **Kotlin:** A recent version is required. The `kotlin-maven-plugin` is used for the `fastjson2-kotlin` module. Key dependencies like `kotlin-stdlib-jdk8` and `kotlin-reflect` are managed by the build tools.
+    *   **GraalVM:** (Optional, Advanced) Required for building native images. The `fastjson2-example-graalvm-native` module specifically requires it. A version compatible with `native-maven-plugin:0.10.6` is needed. This is fully compatible with the `linux/amd64` environment.
+    *   **Maven Daemon (mvnd):** (Optional, Advanced) For faster Maven builds.
+    *   **Dokka:** (Optional, Advanced) The `dokka-maven-plugin` is used in a release profile to generate documentation for the Kotlin module.
+    *   **Project Modules (Managed by build tools):**
+        *   **`fastjson2`:** The core library.
+        *   **`fastjson2-kotlin`:** A dedicated module for enhanced serialization/deserialization of Kotlin classes, data classes, and other Kotlin-specific features.
+        *   **`fastjson` (v1 compatibility):** A module named `fastjson1-compatible` with artifactId `fastjson` provides a compatibility layer for projects migrating from `fastjson v1.x`.
+        *   **`fastjson2-extension`:** Provides optional support for various third-party libraries (e.g., Retrofit, Redisson, Apache Arrow).
+        *   **`fastjson2-extension-spring5`:** Provides integration support for Spring Framework 5.x and Spring Boot 2.x.
+        *   **`fastjson2-extension-spring6`:** Provides integration support for Spring Framework 6.x and Spring Boot 3.x.
+        *   **`fastjson2-extension-solon`:** Provides integration support for the Solon framework.
+        *   **`fastjson2-extension-jaxrs`:** Parent module for JAX-RS (Java API for RESTful Web Services) support.
+        *   **`fastjson2-extension-jaxrs-javax`:** Provides JAX-RS integration for the `javax.ws.rs` namespace.
+        *   **`fastjson2-codegen`:** For compile-time code generation, used to improve performance and support environments like GraalVM Native Image.
+        *   **`fastjson2-benchmark`:** A module containing JMH performance benchmarks to compare `fastjson2` against other libraries.
+        *   **`fastjson2-example-graalvm-native`:** An example module demonstrating native image compilation with GraalVM.
+        *   **`example-spring-test`:** An example module demonstrating integration with Spring Boot 2.x and Spring Framework 5.x.
+        *   **`example-spring6-test`:** An example module demonstrating integration with Spring Boot 3.x, Spring Framework 6.x, Spring Data, and MyBatis-Plus.
+        *   **`example-solon-test`:** An example module demonstrating integration with the Solon framework.
+        *   **`safemode-test`:** A module for testing the library's "safe mode" functionality.
+        *   **`test-jdk17`:** A module for testing compatibility with Java 17+ language features (e.g., Records, Sealed Classes).
+    *   **Third-Party Libraries for Integration/Testing/Benchmarking (Managed by build tools):**
+        *   **JSON/Serialization Libraries:** Jackson (`jackson-databind`), Gson (`gson`), **Kryo**, **Apache Fury**, **DSL-JSON**, `json-lib`, `json-path`, `json-simple`, `jsoniter`, `wast`.
+        *   **Native JSON Libraries (for benchmarking):** **Go/Sonic** (`github.com/bytedance/sonic`).
+        *   **Frameworks:** Dubbo, **Spring Framework (v5, v6)**, **Spring Boot (v2, v3)**, **Spring Data (Redis, Elasticsearch, MongoDB)**, **Spring Security (v6)**, **MyBatis Plus**, **Solon** (including `solon-parent` BOM, `solon-boot-jdkhttp`, `solon-logging-simple`, and `solon-test`), Springfox, **Retrofit**, **Flink**, **Hibernate**, **JAX-RS** (including `javax.ws.rs:javax.ws.rs-api`, `jakarta.ws.rs:jakarta.ws.rs-api`, and implementations like **Jersey**).
+        *   **Data Formats & Protocols:** Protocol Buffers, Apache Arrow, Hessian, BSON (`org.mongodb:bson`), MessagePack, **OpenCSV**, **Univocity Parsers**, **JavaCSV**.
+        *   **Schema Validation:** **Everit JSON Schema**, **NetworkNT JSON Schema Validator**.
+        *   **Common Libraries:** Guava, Joda-Time, Apache Commons Lang/IO, Java Money API (`moneta`), Jakarta Bean Validation, Reactor Core, **Airlift Slice**, **CGLIB**, **Lombok**, **Hutool**, **Log4j2**.
+        *   **Database Drivers:** Oracle (`ojdbc8`), Dameng (`DmJdbcDriver18`), **H2 Database** (`com.h2database:h2`), **ClickHouse JDBC**.
+        *   **Cloud/Service SDKs:** Aliyun ODPS & DingTalk SDKs.
+        *   **In-Memory Data Grids:** **Redisson**.
+        *   **Embedded Servers:** **Jetty**.
+        *   **Other JVM Languages:** **Clojure**, **Groovy**.
+    *   **Recommended System Resources:**
+        *   At least 4GB of RAM is recommended for smooth Gradle builds, as the build is configured to use up to 2GB of heap space. This is especially important when allocating resources to the Docker container.
+
+2.  FILES TO CREATE:
+    *   **(This section is unchanged as it describes the project's file structure, which is independent of the execution environment.)**
+    *   **`.gitignore`:** Defines which files and directories should be ignored by Git.
+        *   **Path:** Project root directory (`/.gitignore`)
+        *   **Content Description:** Should contain standard ignore patterns for Java, Maven (`target/`), **Gradle** (`.gradle/`, `build/`), various IDEs (IntelliJ, Android Studio, Eclipse, VSCode), OS-specific files, and **Android artifacts** (`*.apk`, `local.properties`).
+    *   **`.editorconfig`:** Defines and maintains consistent code style settings across various editors and IDEs.
+        *   **Path:** Project root directory (`/.editorconfig`)
+        *   **Content Description:** Configures all files to use `utf-8` charset, `lf` line endings, and a final newline. It sets a default of 4-space indentation, trimming trailing whitespace. Specific overrides include 2-space indentation for `yaml`, `sh`, and `ps1` files, and disables trailing whitespace trimming for Markdown files. It also includes IntelliJ-specific settings for JavaDoc alignment and continuation indentation for Java and Android XML files.
+    *   **Checkstyle Configuration (`fastjson2-checks.xml`):** Defines the code style and quality rules enforced by Checkstyle.
+        *   **Path:** `src/checkstyle/fastjson2-checks.xml`
+        *   **Content Description:** An XML file containing a comprehensive set of Checkstyle rules. It enforces policies such as using LF line endings, no tabs, no trailing whitespace, specific import ordering, required braces for control statements, whitespace conventions around operators, naming conventions, and other code quality checks. This file is used by the `maven-checkstyle-plugin` to validate the codebase during the build.
+    *   **Parent Project Build File (`pom.xml`):** The parent POM for the multi-module Maven project.
+        *   **Path:** Project root directory (`/pom.xml`)
+        *   **Content Description:** Defines group ID, version, shared properties (like `fastjson1x.version`, `springboot3.version`, `solon.version`), and dependency management for all submodules. It must declare the project modules, including `<module>core</module>`, `<module>kotlin</module>`, `<module>extension</module>`, `<module>extension-spring5</module>`, `<module>extension-spring6</module>`, `<module>extension-solon</module>`, `<module>extension-jaxrs</module>`, `<module>fastjson1-compatible</module>`, `<module>codegen</module>`, `<module>benchmark</module>`, `<module>fastjson2-example-graalvm-native</module>`, `<module>example-spring-test</module>`, `<module>example-spring6-test</module>`, `<module>example-solon-test</module>`, `<module>safemode-test</module>`, and `<module>test-jdk17</module>`. It must also configure the `maven-checkstyle-plugin` in the `<build>` section, pointing it to the `src/checkstyle/fastjson2-checks.xml` configuration file and binding it to the `validate` lifecycle phase to ensure code style is checked early in the build process.
+    *   **... (All other file descriptions from the original plan remain unchanged) ...**
+    *   **Android Resource Files:** Required resources for the Android application.
+        *   **Path:** `android-test/app/src/main/res/`
+        *   **Content Description:** Includes `values/strings.xml`, `values/themes.xml`, and `mipmap` directories for launcher icons.
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    *   **(This section is mostly unchanged, with crucial clarifications for Android instrumented testing in a container.)**
+    *   **Code Quality and Style Conformance:**
+        *   **Static Analysis:** The build process must include a static analysis step using Checkstyle. A build should fail if the code violates the rules defined in `fastjson2-checks.xml`, such as incorrect formatting, unused imports, or other quality issues.
+    *   **Core JVM Module Tests (`core` module):**
+        *   **Object to JSON Serialization:** Serialize a `User` instance to a JSON string and byte array.
+        *   **JSON to Object Deserialization:** Parse a JSON string into a `User` instance.
+        *   **Generic JSON Parsing:** Parse JSON into `JSONObject` and `JSONArray`.
+        *   **JSONB Format Usage:** Serialize to and deserialize from the binary `JSONB` format.
+        *   **JSONPath Usage:** Extract values using `JSONPath` expressions.
+        *   **Java Platform Module System (JPMS):** Verify compatibility with the Java 9+ module system by consuming the library as a JPMS module. This includes checking that all exported packages are accessible, that reflective operations enabled by the `open module` directive work as expected, and that features relying on `jdk.unsupported` (e.g., `Unsafe`) function correctly when run on a modular classpath.
+    *   **... (All other test case descriptions from the original plan remain unchanged until the Android section) ...**
+    *   **Android Module Tests (`android-test/app`):**
+        *   **Android Runtime Compatibility:** Verify core serialization/deserialization functions work on the Android Runtime.
+        *   **Kotlin Data Class Serialization:** Verify seamless serialization and deserialization of Kotlin data classes using the `fastjson2-kotlin` module.
+        *   **Android Unit Tests:** (Run on local JVM) Test library logic without needing a device. These are fully supported in the container environment.
+        *   **Android Instrumented Tests:** (Run on an Android emulator or device) Test library behavior in a true Android environment. **Note: Running these tests within a standard Docker container is non-trivial as it requires a connected device or a specially configured emulator (e.g., using a privileged container with KVM access). The primary focus in this environment should be on successfully building the app and running unit tests.**
+        *   **Benchmark/Compatibility Tests:** Compare serialization/deserialization performance against Jackson and Gson on the Android runtime.
+        *   **ProGuard/R8 Shrinking and Obfuscation Test:** Build a release version of the Android app with code shrinking and obfuscation enabled (`minifyEnabled true`). The build process itself validates that the ProGuard rules are syntactically correct. **To fully confirm runtime correctness, the generated release APK must be manually installed and tested on a physical device or an emulator running outside of this basic container setup.**
+
+    *   **... (All subsequent test case descriptions from the original plan remain unchanged) ...**
+
+4.  COMPLETE TODO LIST:
+    *   **Step 1: Install Prerequisites**
+        *   Download and install a JDK (version 8, 11, 17, or 21). Set `JAVA_HOME`. For building the Android module, **JDK 11 or 17 is recommended**. For the `example-spring-test` and `example-solon-test` modules, **JDK 8 is required**. For the Spring Boot 3, Spring 6 extension, GraalVM example, and `test-jdk17` modules, **JDK 17+ is required**.
+        *   Download and install **Go (Golang) version 1.18 or newer**. This is required for the native performance benchmarks.
+        *   **Download and install the Android SDK Command-Line Tools.**
+        *   Unzip the tools to a location of your choice (e.g., `/opt/android-sdk`).
+        *   Set the `ANDROID_HOME` (or `ANDROID_SDK_ROOT`) environment variable to this location (e.g., `export ANDROID_HOME=/opt/android-sdk`).
+        *   Add the command-line tools to your path: `export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"`.
+        *   Using the command-line `sdkmanager`, accept licenses and install the required packages:
+            *   `yes | sdkmanager --licenses`
+            *   `sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0"`
+        *   Download and install Git.
+        *   **Note on IDEs:** Remember that IDEs (Android Studio, IntelliJ) and their plugins (EditorConfig, Checkstyle, Lombok) are to be installed on your **host development machine**, not inside the Linux build container.
+        *   (Optional) Download and install GraalVM and set it as `JAVA_HOME` if you intend to build the native image example.
+        *   **Verification:** Run `java -version`, `go version`, `git --version`, and `adb version`.
+
+    *   **Step 2: Create a Multi-Module Project Structure and Initialize Git**
+        *   Create a root project directory. Inside, create a `core` directory, a `kotlin` directory, an `extension` directory, an `extension-spring5` directory, an `extension-spring6` directory, an `extension-solon` directory, an `extension-jaxrs` directory (and its submodule directory `extension-jaxrs/extension-jaxrs-javax`), a `fastjson1-compatible` directory, a `codegen` directory, a `benchmark` directory, an `android-test` directory, a `fastjson2-example-graalvm-native` directory, an `example-spring-test` directory, an `example-spring6-test` directory, an `example-solon-test` directory, a `safemode-test` directory, a `test-jdk17` directory, and a `src/checkstyle` directory.
+        *   Navigate into the root directory and initialize a Git repository: `git init`.
+
+    *   **Step 3: Add and Configure the Maven and Gradle Wrappers**
+        *   **Maven:** In the project root, create a minimal parent `pom.xml` and run `mvn -N io.takari:maven:wrapper` to add `mvnw`.
+        *   **Gradle:** Navigate into the `android-test` directory. Create a minimal `settings.gradle` and run `gradle wrapper --gradle-version 7.5` to generate the `gradlew` files.
+        *   On Unix-like systems, ensure both wrappers are executable: `chmod +x mvnw` and `chmod +x android-test/gradlew`.
+        *   **Verification:** Run `./mvnw --version` from the root and `./gradlew --version` from the `android-test` directory.
+
+    *   **Step 4: Create Project Configuration Files (`.gitignore`, `.editorconfig`)**
+        *   In the project root, create a file named `.gitignore`. Add standard Java/Maven (`target/`), IDE patterns, and also add **Gradle (`.gradle/`, `build/`) and Android (`*.apk`, `local.properties`)** ignore patterns.
+        *   In the project root, create a file named `.editorconfig` with the content specified in Section 2.
+        *   **Verification:** Run `git status`. Ignored directories like `core/target/` and `android-test/build/` should not appear.
+
+    *   **Step 5: Configure Project Dependencies and Modules**
+        *   **(This step is unchanged as it involves creating build scripts, which are environment-agnostic.)**
+        *   **Verification:** Run `./mvnw clean install` from the root. Then run `cd android-test && ./gradlew :app:assembleDebug`. Both should succeed. The Maven build will fail if there are any code style violations.
+
+    *   **Step 6: Create Source Code and Test Files**
+        *   **(This step is unchanged as it involves creating source code, which is environment-agnostic.)**
+
+    *   **Step 7: Implement Functionality and Tests**
+        *   **(This step is unchanged as it involves writing code, which is environment-agnostic.)**
+
+    *   **Step 8 (Optional): Add CI Workflow**
+        *   Create `.github/workflows/ci.yaml`.
+        *   Configure the workflow to install Java, **Go**, set up the Android SDK (using command-line tools), run `./mvnw clean install`, and then run `cd android-test && ./gradlew build`. **Note that running `connectedCheck` in CI requires a more complex setup with an active emulator or device.**
+
+    *   **Step 9: Build and Run the Application and Tests**
+        *   **Core Module (Maven):**
+            *   Compile & Test: `./mvnw install` (This will first validate code style with Checkstyle, then compile and run tests for all applicable Maven modules).
+            *   Run App: `./mvnw -pl core exec:java -Dexec.mainClass="com.example.app.App"`
+        *   **Spring Boot 2 Module (Maven):**
+            *   Run App: `./mvnw -pl example-spring-test spring-boot:run`
+        *   **Spring Boot 3 Module (Maven):**
+            *   Run App: `./mvnw -pl example-spring6-test spring-boot:run`
+            *   Access H2 Console: `http://localhost:8080/h2-console`
+        *   **Solon Module (Maven):**
+            *   Build App: `./mvnw -pl example-solon-test package`
+            *   Run App: `java -jar example-solon-test/target/example-solon-test.jar`
+        *   **Benchmark Module (Maven):**
+            *   Build Go Executable: `cd benchmark/src/test/java/com/alibaba/fastjson2/benchmark/sonic/ && go build && cd ../../../../../../../..`
+            *   Build Uberjar: `./mvnw -pl benchmark package`
+            *   Run Benchmarks: `java -jar benchmark/target/fastjson2-benchmarks.jar` (add JMH options as needed, e.g., `-f 1 -wi 1 -i 1` for a quick test run).
+        *   **Android Module (Gradle):**
+            *   (Navigate to `android-test` directory)
+            *   Build: `./gradlew :app:assembleDebug`
+            *   Run Unit Tests: `./gradlew :app:testDebugUnitTest`
+            *   Run Instrumented Tests (requires connected device/emulator): `./gradlew :app:connectedDebugAndroidTest`
+                *   **Environment Note:** This command will fail in the standard container setup unless an Android device is connected (e.g., via `adb connect`) or an emulator is running in a specially configured environment.
+            *   Build Release APK (with shrinking): `./gradlew :app:assembleRelease`
+            *   **Verification Note:** After building the release APK, it must be manually installed and tested on a physical device or a properly configured emulator to verify that the ProGuard/R8 rules are working correctly at runtime.
+        *   **Verification:** All builds and unit tests should pass. The Spring Boot applications, Solon application, Android app, and benchmarks should be launchable.
+
+    *   **Step 10 (Optional, Advanced): Build and Run as GraalVM Native Image**
+        *   This step is fully compatible with the `linux/amd64` command-line environment.
+        *   Ensure GraalVM is your active `JAVA_HOME`.
+        *   Build the native image: `./mvnw -pl fastjson2-example-graalvm-native -Pnative package`.
+        *   Run native tests: `./mvnw -pl fastjson2-example-graalvm-native -Pnative test`.
+        *   Run the executable from the `fastjson2-example-graalvm-native/target` directory (e.g., `./fastjson2-example-graalvm-native/target/my-app`).
+        *   **Verification:** The native executable should run and produce the same output as the JVM version. The native tests should pass.

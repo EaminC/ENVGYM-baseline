@@ -1,0 +1,5 @@
+current progress
+The Dockerfile successfully prepares the environment by installing all specified system dependencies, Rust toolchains (stable, nightly, 1.61), and necessary components (clippy, miri). It correctly clones the project source code and completes a preliminary workspace build, which downloads and compiles all project dependencies.
+
+next step
+Modify the Dockerfile to execute the project's test suite for validation. Replace the generic `RUN cargo build --workspace` command with the main test command from the plan: `RUN rustup default nightly && cd test_suite && cargo test --features unstable`. After that, add the additional verification checks from the plan, such as the `no_std` compatibility build and MSRV check, as subsequent `RUN` commands.

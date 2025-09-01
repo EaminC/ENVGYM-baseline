@@ -1,0 +1,280 @@
+Of course. Based on the hardware and environment information you provided, I have reviewed and adjusted the environment setup plan. The primary adjustments involve updating all relevant paths to reflect the specified working directory (`/home/cc/EnvGym/data/ELECT`), incorporating build parallelization to leverage the 96-core CPU, and ensuring overall compatibility with the described `x86_64` containerized environment.
+
+Here is the complete adjusted plan:
+
+***
+
+### **ADJUSTED ENVIRONMENT SETUP PLAN**
+
+**Note on Adjustments:** This plan has been updated to align with the provided hardware specifications. Key changes include:
+*   All project paths have been updated to use the specified working directory: `/home/cc/EnvGym/data/ELECT`.
+*   Build commands for `make` and `mvnw` have been modified to utilize the available 96 CPU cores for significantly faster compilation (`-j96`, `-T 96`).
+*   The plan's compatibility with the `x86_64` architecture and a generic Linux container environment is confirmed.
+
+---
+
+### 1. DOWNLOADS NEEDED:
+
+   - Project Source Code: The ELECT repository itself, and the `cassandra-dtest` repository (`https://github.com/apache/cassandra-dtest.git`) for running distributed tests.
+   - Java Development Kit: openjdk-11-jdk (Version 11) for the main build and runtime. **openjdk-8-jdk (Version 8)** is also required for running certain test suites and building compatibility JARs. The YCSB component's test suite is validated against openjdk8, openjdk11, and oraclejdk11.
+   - Java Runtime Environment: openjdk-11-jre or openjdk-11-jre-headless (Version 11) and **openjdk-8-jre or openjdk-8-jre-headless (Version 8)**. The runtime requirement for a packaged installation is JRE 1.8 or JRE 11.
+   - Build Tools:
+     - For Debian-based systems: ant (Version 1.10 or newer), ant-optional, ant-junit, maven (Version 3.6.3 is recommended; the project includes a Maven Wrapper `mvnw` which should be used), clang, llvm, make, quilt, debhelper, dh-python.
+     - For Red Hat-based systems (for RPM packaging): `rpmbuild`, `ant >= 1.9`, `ant-junit >= 1.9`.
+   - C/C++ Libraries: libisal-dev, python3-dev (Version 3.6 or newer).
+   - Scripting Runtimes: **python2.7**, **python3.6**, **python3.8**, python3-pip, python3-virtualenv. Multiple Python versions are needed for comprehensive `cqlsh` and distributed testing. A minimum of Python 3.6 is required for runtime.
+   - System Utilities: ansible (critical for deployment), bc, git, jq, rsync, curl, xz-utils, postgresql-client, bash-completion, and a time synchronization service like `ntp` or `chrony`.
+     - For Debian-based systems: `procps`.
+     - For Red Hat-based systems: `procps-ng`, `shadow-utils`.
+   - **Optional Services for YCSB Component Testing**: For running the full test suite of the YCSB tool itself, the following services are required: `postgresql` (Version 9.5 or newer), `mongodb`, `apache-ignite`.
+   - Python Libraries: The setup script installs `cassandra-driver`, `numpy`, and `scipy` directly. For full dependency management, all required libraries are also defined in `src/elect/pylib/requirements.txt` and can be installed from there. This includes `ccm` (Cassandra Cluster Manager), `pytest`, and `coverage`. A key build-time dependency, **`cython`**, is also required to compile Python utility libraries for performance. The `cassandra-dtest` repository has its own `requirements.txt` for test dependencies.
+   - **System Configuration**: A dedicated service user should be created on all nodes.
+     - The provided Ansible playbooks and SSH configuration use a user named `cc`.
+     - An RPM-based installation will automatically create and use a user named `cassandra`. The chosen deployment method will determine the user account.
+   - Note: The build processes (`ant` for ELECT and `mvnw` for YCSB) will automatically download all required Java libraries (e.g., Guava, Jackson, Netty, SLF4J, etc.). They do not need to be downloaded manually.
+
+### 2. FILES TO CREATE:
+
+   - **Note on Deployment Models**: The location and management of files depend on the chosen deployment model.
+     - **Model A: Source-Based (via Ansible/Manual)**: Files are managed within the cloned project directory, located at `/home/cc/EnvGym/data/ELECT`.
+     - **Model B: Packaged (e.g., RPM)**: Files are installed to standard system locations (e.g., `/etc`, `/var/lib`) and managed by the system's package manager. The service user for this model is `cassandra`.
+
+   - **Files for Both Models:**
+     - `/home/cc/EnvGym/data/ELECT/scripts/playbook/hosts.ini`: A new, critical Ansible inventory file on the control node. It defines the cluster topology based on the 8 available nodes.
+       - **[elect_servers]**: Lists all 6 storage nodes (e.g., `ccNode1` through `ccNode6`).
+       - **[elect_oss]**: Defines the single cold tier (Object Storage Server) node (e.g., `ccNode7`).
+       - **[elect_client]**: Defines the single client node for running benchmarks (e.g., `ccNode8`).
+       - **[elect_failure]**: (Optional) Defines nodes for failure injection testing.
+     - `/home/cc/EnvGym/data/ELECT/scripts/settings.sh`: A configuration file on the control node used by helper shell scripts. It must be synchronized with `hosts.ini`. It defines environment variables like `UserName`, paths, and node hostnames (`NodesList`, `OSSServerNode`, `ClientNode`). The `UserName` must be set to `cc`.
+     - `~/.m2/settings.xml`: (Optional) To be created on the build machine if it is behind a firewall. A template is provided at `/home/cc/EnvGym/data/ELECT/scripts/env/settings.xml`. This file needs to be copied to `~/.m2/settings.xml` and the placeholder values (proxy host, port, etc.) must be updated with the correct network settings.
+     - `~/.ssh/config`: To be created on the control node by copying the project's `/home/cc/EnvGym/data/ELECT/scripts/env/config` file. This file provides aliases (`ccNode1`-`ccNode8`) and connection details for all cluster nodes. An SSH key (`~/.ssh/id_rsa`) is required.
+
+   - **Configuration Files (Location varies by model):**
+     - `elect.yaml` (or `cassandra.yaml`): The main configuration file.
+       - **Model A Path**: `/home/cc/EnvGym/data/ELECT/src/elect/conf/elect.yaml` on each storage node.
+       - **Model B Path**: `/etc/cassandra/cassandra.yaml` on each storage node.
+       - Key fields to modify: `cluster_name`, `ec_data_nodes` (e.g., 4), `parity_nodes` (e.g., 2), `enable_migration`, `enable_erasure_coding`, `listen_address`, `rpc_address`, `cold_tier_ip`, `cold_tier_port`, `seeds`, `initial_token`, `token_ranges`, `user_name` (should be `cc`).
+     - `jvm-server.options`: Configures static JVM options like `-ea`, GC settings, and manual heap size (`-Xms`/`-Xmx`).
+       - **Model A Path**: `/home/cc/EnvGym/data/ELECT/src/elect/conf/jvm-server.options`.
+       - **Model B Path**: `/etc/cassandra/jvm-server.options`.
+     - `cassandra-env.sh`: Script for calculating and appending dynamic JVM settings, including heap sizes if not manually set.
+       - **Model A Path**: `/home/cc/EnvGym/data/ELECT/src/elect/conf/cassandra-env.sh`.
+       - **Model B Path**: `/etc/cassandra/cassandra-env.sh`.
+
+   - **Files Specific to Packaged (RPM) Installation (Model B):**
+     - `/etc/security/limits.d/cassandra.conf`: Sets memory locking and file handle limits for the `cassandra` user.
+     - `/etc/default/cassandra`: Environment file sourced by the init script for service-wide settings.
+     - Systemd service unit or init.d script: e.g., `/usr/lib/systemd/system/cassandra.service` or `/etc/rc.d/init.d/cassandra`, used to manage the service via `systemctl` or `service` commands.
+
+   - **Data and Log Directories (Location varies by model):**
+     - **Model A Paths**: Created by automation scripts under the service user's home directory.
+       - `/home/cc/ELECTExpDBBackup/`: Database backups.
+       - `/home/cc/ELECTLogs/`: Experiment logs.
+       - `/home/cc/ELECTResults/`: Experiment results.
+       - Data/Logs for the application itself are within `/home/cc/EnvGym/data/ELECT/src/elect/`.
+     - **Model B Paths**: Created by the RPM package in standard FHS locations.
+       - `/var/lib/cassandra/`: Data, commitlog, saved caches, hints.
+       - `/var/log/cassandra/`: Application logs.
+       - `/var/run/cassandra/`: PID file for the running service.
+
+### 3. NECESSARY TEST CASES IN THE CODEBASE:
+
+   - The codebase includes a comprehensive set of test suites, as evidenced by the project's continuous integration (`Jenkinsfile`), for validation before and after deployment.
+     - **Java Unit and Integration Tests:** A large suite of tests executable via Ant. Key targets include:
+       - `ant test`, `ant long-test`, `ant stress-test`, `ant test-burn`, `ant test-cdc`, `ant test-compression`, `ant test-fqltool`.
+     - **Java Distributed Tests (JVM DTests):** In-JVM distributed tests simulating a multi-node environment.
+       - `ant test-jvm-dtest`, `ant test-jvm-dtest-upgrade`.
+     - **Java Upgrade Tests:** Specific tests to validate rolling upgrades.
+     - **Python Distributed Tests (dtest):** Out-of-process distributed tests using `pytest` and the `cassandra-dtest` repository.
+       - Standard `dtest`, `dtest-large`, `dtest-novnode`, `dtest-offheap`, `dtest-upgrade`.
+     - **Python CQLSH and Library Tests:** Python-based tests for `cqlsh` and `pylib` components.
+     - **YCSB Component Self-Tests:** Maven-based test suite in the `scripts/ycsb` submodule. Requires optional services (PostgreSQL, MongoDB, Ignite).
+   - The primary method for end-to-end system validation is to run the included YCSB benchmark against the deployed 6-node cluster.
+   - Key functionality points to test via the benchmark:
+     - Data Loading and Workload Execution (`ycsb.sh load`, `ycsb.sh run`).
+     - Cluster Stability and Monitoring (`nodetool ring`).
+     - **JVM Configuration Verification**: Check the running Java process to confirm JVM options have been applied correctly.
+     - **CQL Shell Functionality**: Use `cqlsh` to create the keyspace.
+     - Log Analysis: Check application and GC logs for errors.
+   - **Failure Injection Test:** Utilize the `[elect_failure]` Ansible group to simulate and verify recovery from node failures.
+   - **Automated Startup Test**: Verify cluster startup using `playbook-startup.yaml` (for source-based setup).
+   - **New - Packaged Installation Test**: If deploying via RPM, perform additional verification:
+     - **Service Management**: Check that the service can be started, stopped, and reports status correctly (e.g., `systemctl status cassandra`).
+     - **User and Ownership**: Verify the service runs as the `cassandra` user and that file permissions in `/var/lib/cassandra` and `/var/log/cassandra` are correct.
+     - **Path Verification**: Confirm that tools like `nodetool` and `cqlsh` are in the system `PATH` (`/usr/bin`) and are executable.
+
+### 4. COMPLETE TODO LIST:
+
+   - **Phase 1: Control Node Preparation**
+     - 1.1. **Provision Machines/Containers:** Acquire 8 machines or containers for the cluster. Ensure they can communicate over a shared network.
+     - 1.2. **Setup SSH Access:** On the control node:
+       - Generate an SSH key pair if one doesn't exist: `ssh-keygen -t rsa -b 4096`.
+       - Copy the public key to all 8 cluster nodes for the `cc` user: `ssh-copy-id cc@<node_ip>`.
+       - Copy the project's SSH config file: `cp /home/cc/EnvGym/data/ELECT/scripts/env/config ~/.ssh/config`.
+       - Verify passwordless login: `ssh ccNode1 'hostname'`.
+     - 1.3. **Clone Repositories (on Control Node):**
+       ```shell
+       # The main project directory is pre-defined as /home/cc/EnvGym/data/ELECT
+       # If not already present, clone it:
+       # git clone <repository_url> /home/cc/EnvGym/data/ELECT
+       
+       # Clone the dtest repository into the home directory
+       git clone https://github.com/apache/cassandra-dtest.git /home/cc/cassandra-dtest
+       cd /home/cc/EnvGym/data/ELECT
+       ```
+     - 1.4. **Configure `hosts.ini` (on Control Node):** Create `/home/cc/EnvGym/data/ELECT/scripts/playbook/hosts.ini` with the 8-node cluster topology (e.g., 6 storage, 1 OSS, 1 client using `ccNode1` to `ccNode8`).
+     - 1.5. **Configure `settings.sh` (on Control Node):** Create `/home/cc/EnvGym/data/ELECT/scripts/settings.sh`, setting `UserName=cc` and ensuring node hostnames match `hosts.ini`.
+
+   - **Phase 2: Automated Cluster Deployment**
+     - 2.1. **Run Ansible Playbook (from Control Node):** Execute the main playbook to set up users, install dependencies, and distribute source code.
+       ```shell
+       cd /home/cc/EnvGym/data/ELECT/scripts/playbook
+       ansible-playbook setup.yml -i hosts.ini
+       ```
+     - 2.2. **Understand Playbook Actions:** The playbook automates setup for a source-based deployment. It installs dependencies, creates the `cc` user (if not present), distributes code, and creates directories under `/home/cc`.
+     - 2.3. **Verification:** SSH from the control node to any cluster node without a password to confirm setup (e.g., `ssh ccNode1`).
+
+   - **Phase 3: Build Project Components (on Control Machine)**
+     - 3.1. **(Optional) Configure Maven Proxy:** If the build machine is behind a firewall, copy the provided template and edit it with your proxy details.
+       ```shell
+       # On the control/build node, if behind a proxy
+       mkdir -p ~/.m2
+       cp /home/cc/EnvGym/data/ELECT/scripts/env/settings.xml ~/.m2/settings.xml
+       # Now, edit ~/.m2/settings.xml to replace placeholders with actual proxy details.
+       ```
+     - 3.2. **Set Build Environment:** Set Java 11 and other environment variables for a stable build.
+       ```shell
+       export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+       export PATH=$JAVA_HOME/bin:$PATH
+       export LANG=en_US.UTF-8
+       export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8"
+       ```
+     - 3.3. **Build Erasure Coding Library:**
+       ```shell
+       cd /home/cc/EnvGym/data/ELECT/src/elect/src/native/src/org/apache/cassandra/io/erasurecode/
+       ./genlib.sh
+       cd ../../../../../../../../
+       cp src/native/src/org/apache/cassandra/io/erasurecode/libec.so lib/sigar-bin
+       ```
+     - 3.4. **Build ELECT Prototype (using Java 11):**
+       ```shell
+       cd /home/cc/EnvGym/data/ELECT/src/elect
+       mkdir -p build lib
+       ant realclean
+       ant -Duse.jdk11=true
+       ```
+     - 3.5. **Build Python Libraries:**
+       ```shell
+       cd /home/cc/EnvGym/data/ELECT/src/elect/pylib
+       python3 setup.py build
+       ```
+     - 3.6. **Build Object Storage Backend (Accelerated):**
+       ```shell
+       cd /home/cc/EnvGym/data/ELECT/src/coldTier
+       make clean
+       make -j96
+       ```
+     - 3.7. **Build YCSB Tool (Accelerated):**
+       ```shell
+       cd /home/cc/EnvGym/data/ELECT/scripts/ycsb
+       ./mvnw -T 96 clean package
+       ```
+     - 3.8. **Distribute Final Build (for Source-Based Deployment):** Re-run the synchronization part of the Ansible playbook.
+       ```shell
+       cd /home/cc/EnvGym/data/ELECT/scripts/playbook
+       ansible-playbook setup.yml -i hosts.ini --tags sync
+       ```
+
+   - **Phase 3b: Build and Deploy via RPM Package (Alternative to 3.8)**
+     - 3b.1. **Install RPM Build Tools:** Ensure `rpmbuild` is installed on the build machine.
+     - 3b.2. **Prepare Source Tarball:** Create a source tarball matching the name in `cassandra.spec` (e.g., `apache-cassandra-4.0-src.tar.gz`).
+     - 3b.3. **Build the RPM:**
+       ```shell
+       cd /home/cc/EnvGym/data/ELECT/src/elect
+       # The 'ant jar' target is used for the package build
+       ant clean jar -Dversion=<version_from_spec>
+       # Now build the RPM package
+       rpmbuild -ba redhat/cassandra.spec
+       ```
+     - 3b.4. **Distribute and Install RPMs:** Copy the generated RPMs from the `rpmbuild/RPMS` directory to all target nodes and install them using `yum` or `dnf`. This will create the `cassandra` user and set up the system paths. Note the user mismatch with the source-based `cc` user.
+
+   - **Phase 4: Configure ELECT Nodes**
+     - 4.1. **Generate Tokens:** On the control machine, run `python3 /home/cc/EnvGym/data/ELECT/scripts/genToken.py 6` (for 6 storage nodes) and save the output.
+     - 4.2. **Configure `elect.yaml` / `cassandra.yaml`:** For each of the 6 storage nodes, edit the main configuration file.
+       - **Source-Based Path**: `/home/cc/EnvGym/data/ELECT/src/elect/conf/elect.yaml`
+       - **RPM-Based Path**: `/etc/cassandra/cassandra.yaml`
+       - Update parameters: `cluster_name`, `ec_data_nodes=4`, `parity_nodes=2`, `initial_token`, `token_ranges`, `listen_address`, `rpc_address`, `cold_tier_ip`, `seeds` (list of `ccNode`s), `user_name=cc`, etc.
+     - 4.3. **Review and Configure JVM Options:** Review and optionally modify `jvm-server.options` to set heap sizes or other flags.
+       - **Source-Based Path**: `/home/cc/EnvGym/data/ELECT/src/elect/conf/jvm-server.options`
+       - **RPM-Based Path**: `/etc/cassandra/jvm-server.options`
+     - 4.4. **(Optional) Review JVM Environment Script:** Review `cassandra-env.sh`. No changes are typically needed.
+
+   - **Phase 5: Launch the Cluster**
+     - 5.1a. **(Source-Based Method) Execute Startup Playbook:** From the control node, run the provided Ansible playbook.
+       ```shell
+       cd /home/cc/EnvGym/data/ELECT/scripts/playbook
+       ansible-playbook playbook-startup.yaml -i hosts.ini
+       ```
+     - 5.1b. **(RPM-Based Method) Start System Service:** On each storage and OSS node, start the service. This can be automated with an Ansible playbook using the `service` or `systemd` module.
+       ```shell
+       # On each node, or via Ansible
+       sudo systemctl start cassandra
+       ```
+     - 5.2. **Verify Cluster Status:** After startup, check the cluster status from any storage node.
+       ```shell
+       # Source-Based Path
+       ssh cc@ccNode1 '/home/cc/EnvGym/data/ELECT/src/elect/bin/nodetool ring'
+       # RPM-Based Path (command is in system PATH)
+       ssh cc@ccNode1 'nodetool ring'
+
+       # Check the running Java process to verify JVM options
+       ssh cc@ccNode1 'ps aux | grep CassandraDaemon'
+       ```
+       - **Verification:** The `nodetool ring` output should list all 6 storage nodes with `Status=Up` and `State=Normal`.
+
+   - **Phase 6: Run Comprehensive Tests (Optional, on Control Node)**
+     - 6.1. **Run Java Unit and Integration Tests:**
+        ```shell
+        cd /home/cc/EnvGym/data/ELECT/src/elect
+        export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+        ant test && ant long-test && ant test-jvm-dtest # etc.
+        ```
+     - 6.2. **Run Python-based Distributed Tests (dtest):**
+        ```shell
+        cd /home/cc/cassandra-dtest
+        virtualenv -p python3.8 venv && source venv/bin/activate
+        pip install -r requirements.txt
+        pytest --cassandra-dir=/home/cc/EnvGym/data/ELECT/src/elect [test_name_or_marker]
+        ```
+     - 6.3. **Run CQLSH Library Tests:**
+        ```shell
+        cd /home/cc/EnvGym/data/ELECT/src/elect/pylib
+        ./cassandra-cqlsh-tests.sh ..
+        ```
+     - 6.4. **Run YCSB Component Self-Tests (Accelerated):** Requires optional services to be installed and configured.
+        ```shell
+        # Prepare PostgreSQL
+        psql -c 'CREATE database test;' -U postgres
+        psql -c 'CREATE TABLE usertable0 (YCSB_KEY VARCHAR(255) PRIMARY KEY not NULL, YCSB_VALUE JSONB not NULL);' -U postgres -d test
+        # Run tests
+        cd /home/cc/EnvGym/data/ELECT/scripts/ycsb
+        ./mvnw -T 96 test -q
+        ```
+
+   - **Phase 7: Run Benchmark**
+     - 7.1. **Create Keyspace:** On the client node (e.g., `ccNode8`), connect to any storage node.
+       ```shell
+       # Source-Based Path
+       /home/cc/EnvGym/data/ELECT/src/elect/bin/cqlsh ccNode1 -e "create keyspace ycsb WITH REPLICATION = {'class' : 'SimpleStrategy', 'replication_factor': 3 }; USE ycsb; create table usertable0 (y_id varchar primary key, field0 varchar);"
+       ```
+     - 7.2. **Load Data:** On the client node (e.g., `ccNode8`).
+       ```shell
+       cd /home/cc/EnvGym/data/ELECT/scripts/ycsb
+       bin/ycsb.sh load cassandra-cql -p hosts=ccNode1,ccNode2,ccNode3,ccNode4,ccNode5,ccNode6 -p cassandra.keyspace=ycsb -threads 64 -s -P workloads/workloada
+       ```
+     - 7.3. **Run Benchmark:** On the client node (e.g., `ccNode8`).
+       ```shell
+       cd /home/cc/EnvGym/data/ELECT/scripts/ycsb
+       bin/ycsb.sh run cassandra-cql -p hosts=ccNode1,ccNode2,ccNode3,ccNode4,ccNode5,ccNode6 -p cassandra.readconsistencylevel=ONE -p cassandra.keyspace=ycsb -threads 64 -s -P workloads/workloada
+       ```
+       - **Verification:** The command will output performance statistics, confirming the environment is fully operational.

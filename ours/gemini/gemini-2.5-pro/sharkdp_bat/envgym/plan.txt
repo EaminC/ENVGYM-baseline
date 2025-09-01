@@ -1,0 +1,162 @@
+This is the adjusted environment setup plan based on the provided hardware information.
+
+=== ENVIRONMENT SETUP PLAN (ADJUSTED FOR DOCKER/LINUX/X86_64) ===
+
+1.  DOWNLOADS NEEDED:
+    *   **Note**: The following dependencies are for the **build environment** (e.g., the 'builder' stage in a multi-stage Dockerfile). The final runtime environment will only require a minimal set of shared libraries.
+
+    *   **Rust Toolchain**: Rust version 1.74 or higher. This includes `rustc`, `cargo`, and standard components like `rustfmt`, `clippy`, and `llvm-tools-preview`. The `Cargo.toml` specifies `rust-version = "1.74"`.
+    *   **Git**: Required for cloning the source code and all syntax/theme submodules listed in `.gitmodules`.
+    *   **C Compiler Toolchain and Build Dependencies**: Required for compiling dependencies like `libgit2`.
+        *   **Linux (x86_64)**: A C compiler (`gcc` or `clang`), `pkg-config`, `cmake`, `zlib` development headers, `OpenSSL` development headers, and the `patch` utility. On a Debian/Ubuntu base image, this corresponds to: `build-essential`, `pkg-config`, `cmake`, `libssl-dev`, `zlib1g-dev`, and `patch`.
+        *   **macOS**: Not applicable for the specified Linux environment.
+        *   **Windows**: Not applicable for the specified Linux environment.
+    *   **Bash-compatible Shell**: Required to run developer scripts like `assets/create.sh`. Standard in all recommended Linux base images.
+    *   **(Windows Users Only) Microsoft Visual C++ Redistributable**: Not applicable for the specified Linux environment.
+    *   **(Optional) Pager**: A pager like `less` is recommended for the final runtime environment. Most minimal base images (e.g., `debian:slim`) include it.
+    *   **(Optional) Integration Tools**:
+        *   `fzf`: For file searching with `bat` as a previewer.
+        *   `fd`: An alternative to `find`.
+        *   `ripgrep`: For searching with `batgrep`.
+        *   `xclip`: For clipboard integration on Linux.
+        *   `bat-extras`: A collection of scripts (`batgrep`, `batdiff`, `batman`, `prettybat`) that integrate `bat` with other tools.
+        *   Code Formatters (`prettier`, `shfmt`): For use with the `prettybat` script.
+    *   **(Optional) Developer & Release Engineering Tools**:
+        *   `cargo-audit`: For checking security vulnerabilities in dependencies.
+        *   `cross`: For cross-compilation testing and building.
+        *   `jq`: A command-line JSON processor, useful for scripting with `cargo metadata`.
+        *   `fakeroot`, `dpkg-deb`: For creating Debian packages on Linux systems.
+        *   `7z`: For creating `.zip` archives.
+        *   `grcov`: For generating code coverage reports.
+
+2.  FILES TO CREATE:
+    *   **Note**: Paths described below are relative to the container's filesystem.
+
+    *   **Configuration Files (Created by User/Administrator)**:
+        *   **System Configuration File**:
+            *   **Path**: `/etc/bat/config`. The base path can be overridden by the `BAT_SYSTEM_CONFIG_PREFIX` environment variable.
+            *   **Content Description**: A plain text file with default command-line arguments for all users on the system. It is read before the user-specific configuration file.
+        *   **User Configuration File**:
+            *   **Path**: Run `bat --config-file` to determine the path (e.g., `/root/.config/bat/config` if running as root). Can be overridden by the `BAT_CONFIG_PATH` environment variable.
+            *   **Content Description**: A plain text file containing command-line arguments to set default behavior for a specific user. For example:
+                ```
+                # Specify desired highlighting theme (e.g. "TwoDark").
+                --theme="TwoDark"
+
+                # Show line numbers, Git modifications and file header (but no grid)
+                --style="numbers,changes,header"
+
+                # Enable this to use italic text on the terminal.
+                #--italic-text=always
+                
+                # Uncomment the following line to disable automatic paging:
+                #--paging=never
+
+                # Syntax mappings: map a certain filename pattern to a language.
+                --map-syntax "*.ino:C++"
+                ```
+        *   **Custom Syntax Directory**:
+            *   **Path**: `$(bat --config-dir)/syntaxes`
+            *   **Content Description**: A directory to store custom `.sublime-syntax` files for additional language support.
+        *   **Custom Themes Directory**:
+            *   **Path**: `$(bat --config-dir)/themes`
+            *   **Content Description**: A directory to store custom `.tmTheme` files for additional highlighting themes.
+        *   **Shell Configuration File (Modification)**:
+            *   **Path**: Depends on the shell used in the container (e.g., `/etc/bash.bashrc` for system-wide, `/root/.bashrc` for root user).
+            *   **Content Description**: Add aliases, functions, and environment variables (e.g., `BAT_THEME`, `BAT_STYLE`, `BAT_PAGING`, `BAT_OPTS`) to integrate `bat` into the container's shell workflow.
+    *   **Developer-Modified Files (Modified by Contributor)**:
+        *   **`CHANGELOG.md`**: For contributions that change behavior, add an entry to the "unreleased" section.
+        *   **`tests/integration_tests.rs`**: For functional changes or bug fixes, add new integration tests to this file.
+    *   **Key Project Configuration Files (For Developer Awareness)**:
+        *   **`.cargo/audit.toml`**: This file configures `cargo-audit` to ignore specific, vetted security advisories. Contributors should be aware of this file when running security checks. It is part of the repository and does not need to be created.
+        *   **`.github/.codecov.yml`**: This file configures the Codecov.io service's behavior on pull requests (e.g., disabling comments). It is part of the repository and does not need to be created.
+        *   **`tests/examples/bat.conf`**: A sample configuration file used in the test suite to verify the loading of configuration options, specifically for testing custom pager behavior (e.g., `--pager="echo ..."`). It is part of the repository and does not need to be created.
+        *   **`tests/examples/system_config/bat/config`**: A sample *system-wide* configuration file used in a dedicated integration test. It verifies that `bat` correctly loads configuration from a system path (e.g., `/etc/bat/config`) when the `BAT_SYSTEM_CONFIG_PREFIX` environment variable is used to point to the `tests/examples/system_config` directory. The file sets a custom pager (`--pager="echo dummy-pager-from-system-config"`) to confirm its options are applied. It is part of the repository and does not need to be created.
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    *   **Note**: These tests should be executed within the **build environment**, which contains the full source code and developer tooling.
+
+    *   **User Functionality Tests**:
+        *   Test displaying a single file: `bat <file>`.
+        *   Test displaying multiple files: `bat <file1> <file2>`.
+        *   Test reading from standard input: `echo "test" | bat`.
+        *   Verify that a source code file (e.g., `.rs`, `.py`) is displayed with correct color highlighting.
+        *   In a Git repository, run `bat <modified_file>` and verify that modification markers appear.
+        *   Test `bat` on a long file; verify that a pager is invoked. Test `--paging=never` to disable it.
+        *   Test `--show-all`/`-A` on a file with non-printable characters.
+        *   Test configuration generation: `bat --generate-config-file`.
+    *   **Configuration Loading Tests**:
+        *   **User Config**: Set a theme in the user config file and verify it is applied by default.
+        *   **System Config**: Test that options from a system-wide config file are applied. This is verified by running a specific test that uses the `BAT_SYSTEM_CONFIG_PREFIX` environment variable to point to a directory containing a sample system config file (`tests/examples/system_config/bat/config`). The test confirms that options within that file, such as `--pager="echo dummy-pager-from-system-config"`, are correctly loaded and executed.
+        *   **Custom Pager**: Test that a custom pager set in a user config file (e.g., `--pager="echo dummy-pager-from-config"`, as seen in `tests/examples/bat.conf`) is correctly executed instead of a real pager.
+        *   **Environment Variables**: Set an environment variable like `export BAT_THEME="Solarized (dark)"` and verify it takes effect.
+        *   **Precedence Test**: Verify the correct order of precedence: command-line arguments > user config file > system config file. Environment variables like `BAT_THEME` also have specific precedence rules to check.
+    *   **Developer Contribution Tests**:
+        *   **Add Regression Tests**: Add new tests for any functional changes or bug fixes, typically in `tests/integration_tests.rs`.
+        *   **Update Changelog**: For most contributions, add an entry to `CHANGELOG.md` with a description of the change, linking the PR number and GitHub username.
+        *   **Linting and Formatting**: `cargo fmt -- --check` (verifies code formatting against the project's `rustfmt.toml`) and `cargo clippy --locked --all-targets --all-features -- -D warnings`.
+        *   **Full Test Suite**: Run the complete internal test suite: `cargo test --locked --all-features`.
+        *   **Minimum Supported Rust Version (MSRV) Check**: Install the MSRV toolchain and run `cargo test --locked --no-default-features --features minimal-application,bugreport,build-assets`.
+        *   **Asset and Syntax Tests**:
+            *   Rebuild bundled assets: `bash assets/create.sh`. This script initializes Git submodules, applies patches, builds the binary asset cache, and generates documentation like the man page (`assets/manual/bat.1`) and shell completion scripts (`assets/completions/*`). After running, verify these generated files exist as a prerequisite for other asset tests.
+            *   Run ignored asset tests: `cargo test --locked --release --test assets -- --ignored`.
+            *   Run syntax regression tests: `tests/syntax-tests/regression_test.sh`.
+            *   Run custom asset tests: `tests/syntax-tests/test_custom_assets.sh`.
+        *   **System Configuration Test**: `BAT_SYSTEM_CONFIG_PREFIX=tests/examples/system_config cargo test --locked --test system_wide_config -- --ignored`. This test uses the sample configuration file at `tests/examples/system_config/bat/config` to verify system-wide configuration loading.
+        *   **License Check**: `tests/scripts/license-checks.sh`.
+        *   **Security Audit**: `cargo audit`. Note that the project may ignore specific, vetted advisories via the `.cargo/audit.toml` configuration file.
+        *   **Documentation Build**: `RUSTDOCFLAGS='-D warnings' cargo doc --locked --no-deps --document-private-items --all-features`.
+        *   **Feature Combination Checks**: Verify that different feature sets compile successfully, e.g., `cargo check --locked --lib --no-default-features --features regex-onig,git`.
+        *   **Code Coverage Generation**: (Optional, local) Run tests with coverage instrumentation enabled and generate a report using `grcov` to check the coverage impact of changes.
+
+4.  COMPLETE TODO LIST:
+    *   **Note**: This plan is structured as a multi-stage build process to create a minimal, optimized final container image, leveraging the high core count for parallel compilation.
+
+    *   --- **STAGE 1: BUILDER** ---
+    *   **Goal**: Compile the `bat` binary and generate all necessary assets. This stage will contain all build-time dependencies.
+
+    *   **Step 1: Set Up Build Environment**
+        *   **Action**: Start from a `rust:1.74` base image or an Ubuntu/Debian image.
+        *   **Action**: Install build dependencies. On a Debian/Ubuntu base: `apt-get update && apt-get install -y --no-install-recommends build-essential pkg-config cmake libssl-dev zlib1g-dev git jq patch`.
+        *   **Action**: If not using a Rust base image, install the Rust toolchain (1.74+) and required components: `rustup toolchain install 1.74 --component rustfmt clippy llvm-tools-preview --profile minimal && rustup default 1.74`.
+        *   **Verification**: `rustc --version`, `git --version`, `cmake --version` commands succeed.
+    *   **Step 2: Prepare Source Code**
+        *   **Action**: Set the working directory, e.g., `WORKDIR /build`.
+        *   **Action**: Copy the project source from the host working directory (`/home/cc/EnvGym/data/sharkdp_bat`) into the container: `COPY . .`.
+        *   **Action**: Initialize git submodules required for syntaxes and themes: `git submodule update --init --recursive`.
+        *   **Verification**: The `/build/assets/syntaxes` directory is populated. Key developer files like `.cargo/audit.toml` are present at `/build/.cargo/audit.toml`.
+    *   **Step 3: Generate Build-time Assets**
+        *   **Action**: Run the asset creation script: `bash assets/create.sh`. This prepares submodules and generates the binary asset cache, man page, and shell completion files.
+        *   **Verification**: The script completes successfully. Files like `/build/assets/manual/bat.1` and `/build/assets/completions/bat.bash` have been created.
+    *   **Step 4: Build the `bat` Binary**
+        *   **Action**: Compile the application in release mode. The build process will automatically utilize the available CPU cores for parallel compilation. Use `--locked` to ensure a reproducible build from `Cargo.lock`.
+            `cargo build --release --locked`
+        *   **Verification**: The compiled binary exists at `/build/target/release/bat`.
+
+    *   --- **STAGE 2: FINAL IMAGE** ---
+    *   **Goal**: Create a minimal runtime image containing only the compiled binary and its essential files.
+
+    *   **Step 5: Set Up Final Environment**
+        *   **Action**: Start from a minimal base image, e.g., `debian:12-slim` or `ubuntu:22.04`.
+        *   **Action**: Install only the required *runtime* dependencies. On a Debian/Ubuntu base: `apt-get update && apt-get install -y --no-install-recommends libssl3 zlib1g ca-certificates && rm -rf /var/lib/apt/lists/*`.
+        *   **Verification**: The image is small and does not contain build tools like `rustc` or `gcc`.
+    *   **Step 6: Copy Artifacts from Builder Stage**
+        *   **Action**: Copy the compiled `bat` binary from the builder stage to a location in the `PATH`: `COPY --from=builder /build/target/release/bat /usr/local/bin/bat`.
+        *   **Action**: Copy the generated man page: `COPY --from=builder /build/assets/manual/bat.1 /usr/local/share/man/man1/bat.1`.
+        *   **Action**: Copy shell completion scripts:
+            *   `COPY --from=builder /build/assets/completions/bat.bash /usr/share/bash-completion/completions/bat`
+            *   `COPY --from=builder /build/assets/completions/bat.zsh /usr/local/share/zsh/site-functions/_bat`
+            *   `COPY --from=builder /build/assets/completions/bat.fish /usr/share/fish/vendor_completions.d/bat.fish`
+        *   **Verification**: The files `bat`, `bat.1`, and completion scripts exist at their respective destination paths in the final image.
+    *   **Step 7: Final Verification**
+        *   **Action**: Set `bat` as the default entry point or run a verification command.
+        *   **Verification**: Running `bat --version` inside the final container executes successfully and prints the correct version. Running `man bat` displays the manual page.
+    *   **Step 8: (Optional) Configure the Runtime Environment**
+        *   **Action**: Create a system-wide configuration file at `/etc/bat/config` with desired defaults.
+        *   **Action**: Add environment variables (e.g., `ENV BAT_THEME="TwoDark"`) or aliases to the shell profile (`/etc/profile.d/bat.sh`). For example:
+            ```sh
+            # /etc/profile.d/bat.sh
+            export BAT_THEME="OneHalfDark"
+            alias cat='bat --paging=never'
+            ```
+        *   **Verification**: In an interactive session in the final container, `bat` uses the specified theme, and the `cat` alias works as expected. The environment is now fully configured and optimized.

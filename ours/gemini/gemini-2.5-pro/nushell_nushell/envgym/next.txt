@@ -1,0 +1,5 @@
+current progress
+The Dockerfile successfully automates the creation of a comprehensive development environment as specified in the plan. It installs all required system dependencies, the Rust toolchain, and optional developer tools on the recommended Ubuntu 22.04 base. It then clones the source repository and performs a full release build of the project, making all compiled executables and plugins available in the final image's PATH. The resulting image contains a complete, ready-to-use build environment.
+
+next step
+Refactor the Dockerfile to use a multi-stage build. Add a `RUN cargo test --release --locked --workspace` step to the initial build stage to validate the compilation. Create a second, minimal final stage that installs only the required runtime libraries and copies the compiled executables (e.g., `nu`, `nu-lsp`, plugins) from the first stage. This will produce a smaller, more secure, production-ready image optimized for distribution and execution.

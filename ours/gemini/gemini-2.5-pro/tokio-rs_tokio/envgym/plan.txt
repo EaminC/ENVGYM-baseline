@@ -1,0 +1,468 @@
+This is the adjusted plan based on the provided hardware information.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+**Hardware Context:**
+- **Architecture**: `x86_64` (linux/amd64)
+- **Operating System**: Linux (Debian/Ubuntu-based, e.g., `ubuntu:20.04`)
+- **Working Directory**: `/home/cc/EnvGym/data/tokio-rs_tokio`
+- **Container Engine**: Docker 28.1.1 available.
+
+1. DOWNLOADS NEEDED:
+   - **Git**: A distributed version control system.
+     - Version: Latest stable version recommended.
+   - **Rust Toolchain (via `rustup`)**: The official Rust toolchain installer.
+     - **Stable Channel**: The project's Minimum Supported Rust Version (MSRV) is **1.70**. Install this version or newer. The CI primarily uses `stable`.
+     - **Nightly Channel**: Required for specific jobs like documentation builds, ASAN tests, and minimal version checks. The CI uses specific dated versions (e.g., `nightly-2025-01-25`), so a recent nightly is recommended.
+     - **Specific Toolchain Versions**: Certain checks may require specific toolchains (e.g., `1.82` for stress tests, `1.88` for Clippy, `nightly-2025-06-02` for Miri).
+   - **C/C++ Build Toolchain**: Required for compiling native dependencies on the specified `x86_64` Linux environment.
+     - **Packages (Debian/Ubuntu)**: `build-essential` is the base. For specific features and tests, additional packages are needed: `liburing-dev` (for `tokio_uring`), `llvm` and `clang` (for ASAN/fuzzing), `valgrind`, `bison`, `flex`, `libssl-dev`, `libelf-dev` (for advanced `io_uring` kernel tests), and `hunspell` with a dictionary like `hunspell-en-us` (for spell checking).
+   - **Container Engine (for `cross`)**: Required for managing cross-compilation environments.
+     - **Engine**: Docker is confirmed to be available.
+   - **QEMU and Kernel Build Tools (for advanced `io_uring` tests)**: Required to run tests against specific Linux kernel versions in a virtualized environment.
+     - **Packages (Debian/Ubuntu)**: `qemu-system-x86`, `busybox-static`, `cpio`, `xz-utils`, `wget`.
+   - **Linux Kernel Source (Optional)**: Specific versions of the Linux kernel source are required for running the `io_uring` compatibility tests. Downloaded on-demand by the test script.
+   - **cargo-nextest**: A fast, next-generation test runner used heavily in the CI.
+     - Command: `cargo install cargo-nextest`
+     - Version: Latest version.
+   - **cargo-hack**: A cargo subcommand for feature powerset checks.
+     - Command: `cargo install cargo-hack`
+     - Version: Latest version.
+   - **cargo-spellcheck**: A cargo subcommand for spell-checking documentation.
+     - Command: `cargo install cargo-spellcheck`
+     - Version: Latest version.
+   - **cargo-fuzz**: A cargo subcommand for fuzz testing.
+     - Command: `cargo install cargo-fuzz`
+     - Version: Latest version.
+   - **cargo-deny**: A tool for checking dependencies for security vulnerabilities and license compatibility.
+     - Command: `cargo install cargo-deny`
+     - Version: Latest version.
+   - **cross**: A "zero-setup" cross-compilation tool for Rust.
+     - Command: `cargo install cross`
+     - Version: Latest version.
+   - **cargo-check-external-types**: A tool to check for leaked external types in public APIs. Requires a specific nightly compiler.
+     - Command: `cargo install cargo-check-external-types --version 0.1.13`
+   - **Wasmtime**: A standalone runtime for WebAssembly & WASI.
+     - Command: `cargo install wasmtime-cli`
+   - **wasm-pack**: A tool for building and testing Rust-generated WebAssembly.
+     - Command: `cargo install wasm-pack`
+   - **Cross-Compilation Build Targets (Optional)**: Required for running the full suite of cross-platform checks. These will be managed by `cross` using Docker.
+     - Commands: `rustup target add <target-name>`
+     - **Tier 2 Targets**: `aarch64-unknown-linux-gnu`, `armv7-unknown-linux-gnueabihf`, `i686-unknown-linux-gnu`, `powerpc-unknown-linux-gnu`, `powerpc64-unknown-linux-gnu`, `aarch64-pc-windows-msvc`, `x86_64-unknown-linux-musl`.
+     - **Tier 3 Targets**: `x86_64-unknown-haiku`, `armv7-sony-vita-newlibeabihf`, `x86_64-fortanix-unknown-sgx`, `x86_64-unknown-redox`.
+     - **WASM/WASI Targets**: `wasm32-unknown-unknown`, `wasm32-wasip1`, `wasm32-wasip1-threads`.
+     - **Other Targets**: `armv5te-unknown-linux-gnueabi`, `arm-linux-androideabi`.
+
+2. FILES TO CREATE:
+   - **`.gitignore`**: Specifies intentionally untracked files to be ignored by Git.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/.gitignore`
+     - **Basic Content Description**: Excludes build artifacts (`target`), dependency lock files (`Cargo.lock`), and local Cargo configuration (`.cargo/config.toml`) from version control. Ignoring `Cargo.lock` is crucial for libraries to ensure they are tested against a range of dependency versions.
+       ```
+       target
+       Cargo.lock
+
+       .cargo/config.toml
+       .cargo/config
+       ```
+   - **`.cargo/config.toml`** (Optional, for local development): A local configuration file for Cargo. Since it is git-ignored, each developer can customize their environment.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/.cargo/config.toml`
+     - **Basic Content Description**: Can be used to set default flags to simplify running tests, such as automatically enabling unstable features.
+       ```toml
+       # .cargo/config.toml
+       [build]
+       # Automatically enable unstable features for local builds and tests.
+       rustflags = ["--cfg", "tokio_unstable", "--cfg", "tokio_taskdump"]
+       ```
+   - **`deny.toml`**: Configuration file for `cargo-deny`.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/deny.toml`
+     - **Basic Content Description**: Defines strict rules for licenses (MIT, Apache-2.0), bans wildcard dependencies, and ensures all dependencies come from known sources.
+       ```toml
+       # https://embarkstudios.github.io/cargo-deny/cli/init.html
+
+       [graph]
+       all-features = true
+
+       [licenses]
+       allow = [
+           "MIT",
+           "Apache-2.0",
+       ]
+       exceptions = [
+           { allow = ["Unicode-3.0", "Unicode-DFS-206"], crate = "unicode-ident" },
+       ]
+
+       [bans]
+       multiple-versions = "allow"
+       wildcards = "deny"
+
+       [sources]
+       unknown-registry = "deny"
+       unknown-git = "deny"
+       ```
+   - **`.spellcheck.toml`**: Configuration file for `cargo-spellcheck`.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/.spellcheck.toml`
+     - **Basic Content Description**: Configures the Hunspell checker, specifies the language, and includes an extra dictionary file.
+       ```toml
+       dev_comments = false
+       skip_readme = false
+
+       [Hunspell]
+       lang = "en_US"
+       search_dirs = ["."]
+       extra_dictionaries = ["spellcheck.dic"]
+       skip_os_lookups = true
+       use_builtin = true
+
+       [Hunspell.quirks]
+       allow_concatenation = true
+       ```
+   - **`spellcheck.dic`**: A custom dictionary file containing allowed words.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/spellcheck.dic`
+     - **Basic Content Description**: A plain text file where the first line is the word count, and subsequent lines are words to be allowed, sorted alphabetically.
+       ```
+       5
+       async
+       clippy
+       docsrs
+       runtime
+       tokio
+       ```
+   - **`rust-toolchain.toml`** (Recommended): To ensure all developers use the same version of the Rust compiler.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/rust-toolchain.toml`
+     - **Basic Content Description**: Specifies the exact Rust toolchain, aligning with the project's MSRV of 1.70.
+       ```toml
+       # rust-toolchain.toml
+       [toolchain]
+       # Pin to a specific version >= 1.70 (the MSRV) for consistent builds.
+       channel = "1.70"
+       components = [ "rustfmt", "clippy" ]
+       # Optional: include targets for comprehensive testing.
+       targets = [ "aarch64-unknown-linux-gnu", "i686-unknown-linux-gnu", "wasm32-wasip1", "wasm32-wasip1-threads" ]
+       ```
+   - **`Cross.toml`**: Configuration file for the `cross` cross-compilation tool.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/Cross.toml`
+     - **Basic Content Description**: Specifies which environment variables should be passed from the host to the containerized build environment.
+       ```toml
+       # Cross.toml
+       [build.env]
+       passthrough = [
+           "RUSTFLAGS",
+           "RUST_BACKTRACE",
+       ]
+       ```
+   - **`target-specs/i686-unknown-linux-gnu.json`**: A custom target specification file used for testing on 32-bit Linux targets without 64-bit atomic support.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/target-specs/i686-unknown-linux-gnu.json`
+     - **Content**: This file modifies the default `i686-unknown-linux-gnu` target by setting `max-atomic-width` to 32. This is used to test code paths on 32-bit systems that lack native 64-bit atomic operations.
+       ```json
+       {
+         "arch": "x86",
+         "cpu": "pentium4",
+         "crt-objects-fallback": "false",
+         "crt-static-respected": true,
+         "data-layout": "e-m:e-p:32:32-p270:32:32-p271:32:32-p272:64:64-i128:128-f64:32:64-f80:32-n8:16:32-S128",
+         "dynamic-linking": true,
+         "env": "gnu",
+         "has-rpath": true,
+         "has-thread-local": true,
+         "linker-flavor": "gnu-cc",
+         "llvm-target": "i686-unknown-linux-gnu",
+         "max-atomic-width": 32,
+         "metadata": {
+           "description": null,
+           "host_tools": null,
+           "std": null,
+           "tier": null
+         },
+         "os": "linux",
+         "position-independent-executables": true,
+         "pre-link-args": {
+           "gnu-cc": [
+             "-m32"
+           ],
+           "gnu-lld-cc": [
+             "-m32"
+           ]
+         },
+         "relro-level": "full",
+         "stack-probes": {
+           "kind": "inline"
+         },
+         "supported-sanitizers": [
+           "address"
+         ],
+         "supported-split-debuginfo": [
+           "packed",
+           "unpacked",
+           "off"
+         ],
+         "target-family": [
+           "unix"
+         ],
+         "target-pointer-width": "32"
+       }
+       ```
+   - **`.github/workflows/labeler.yml`**: A GitHub Actions workflow that automatically labels pull requests.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/.github/workflows/labeler.yml`
+     - **Basic Content Description**: Defines a job that runs on pull requests and uses the `actions/labeler` action to apply labels based on a separate configuration file.
+       ```yaml
+       # .github/workflows/labeler.yml
+       name: "Pull Request Labeler"
+       on:
+       - pull_request_target
+
+       concurrency:
+         group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+         cancel-in-progress: true
+
+       permissions:
+         contents: read
+
+       jobs:
+         triage:
+           permissions:
+             contents: read
+             pull-requests: write
+           runs-on: ubuntu-latest
+           if: github.repository_owner == 'tokio-rs'
+           steps:
+           - uses: actions/labeler@v3
+             with:
+               repo-token: "${{ secrets.GITHUB_TOKEN }}"
+               sync-labels: true
+       ```
+   - **`.github/labeler.yml`**: Configuration file for the `actions/labeler` GitHub Action.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/.github/labeler.yml`
+     - **Basic Content Description**: A YAML file that maps labels to glob patterns for file paths. When a pull request modifies files matching a pattern, the corresponding label is applied. This is used for both general categorization and for triggering specific, resource-intensive CI jobs.
+       ```yaml
+       # .github/labeler.yml
+       # Labels for general code areas
+       net:
+         - 'tokio/src/net/**/*'
+       docs:
+         - '**/*.md'
+         - 'tokio/src/lib.rs'
+
+       # Labels for triggering specific, resource-intensive loom tests in CI
+       R-loom-sync:
+       - tokio/src/sync/*
+       - tokio/src/sync/**/*
+
+       R-loom-time-driver:
+       - tokio/src/runtime/time/*
+       - tokio/src/runtime/time/**/*
+
+       R-loom-current-thread:
+       - tokio/src/runtime/scheduler/*
+       - tokio/src/runtime/scheduler/current_thread/*
+       - tokio/src/runtime/task/*
+       - tokio/src/runtime/task/**
+
+       R-loom-multi-thread:
+       - tokio/src/runtime/scheduler/*
+       - tokio/src/runtime/scheduler/multi_thread/*
+       - tokio/src/runtime/scheduler/multi_thread/**
+       - tokio/src/runtime/task/*
+       - tokio/src/runtime/task/**
+       ```
+   - **`.github/buildomat/config.toml`**: Configuration file for the Buildomat CI management tool.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/.github/buildomat/config.toml`
+     - **Basic Content Description**: Enables Buildomat and configures it to run on pull requests from any user, not just organization members.
+       ```toml
+       # Repository-level Buildomat configuration.
+       # See: https://github.com/oxidecomputer/buildomat#per-repository-configuration
+
+       # Enable buildomat. This one should be self-explanatory.
+       enable = true
+       # Allow CI runs for PRs from users outside the `tokio-rs` organization. Our
+       # buildomat jobs don't touch any secrets/keys, so this should be fine.
+       org_only = false
+       ```
+   - **`.github/ISSUE_TEMPLATE/config.yml`**: Configures the "New Issue" page on GitHub.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/.github/ISSUE_TEMPLATE/config.yml`
+     - **Basic Content Description**: Provides links to other resources, such as GitHub Discussions for questions, to guide users before they create a new issue.
+       ```yaml
+       contact_links:
+         - name: Question
+           url: https://github.com/tokio-rs/tokio/discussions
+           about: Questions about Tokio should be posted as a GitHub discussion.
+       ```
+   - **`netlify.toml`**: Configuration for deploying project documentation via Netlify.
+     - **File Path**: `/home/cc/EnvGym/data/tokio-rs_tokio/netlify.toml`
+     - **Basic Content Description**: Defines the build command, environment variables, and deployment settings for the documentation website.
+       ```toml
+       [build]
+         command = """
+           rustup install nightly --profile minimal && cargo doc --no-deps --all-features
+           """
+         publish = "target/doc"
+
+       [build.environment]
+         RUSTDOCFLAGS="""
+           --cfg docsrs \
+           --cfg tokio_unstable \
+           --cfg tokio_taskdump \
+           """
+         RUSTFLAGS="--cfg tokio_unstable --cfg tokio_taskdump --cfg docsrs"
+
+       [[redirects]]
+         from = "/"
+         to = "/tokio"
+       ```
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - All test cases described in the original plan are compatible with the specified `x86_64` Linux hardware. This includes unit/integration tests, memory safety tests (Miri, Valgrind, ASAN), concurrency tests (`loom`), `io_uring` kernel version tests (via QEMU), cross-compilation checks (via Docker), and fuzz tests. The hardware is the primary supported platform for this comprehensive test suite.
+
+4. COMPLETE TODO LIST:
+   - **Step 1: Install Prerequisites**
+     - **Action**: On the Linux host (or in a container based on `ubuntu:20.04`), install Git and all required build/test dependencies.
+     - **Command**:
+       ```bash
+       apt-get update && apt-get install -y \
+         build-essential \
+         git \
+         curl \
+         wget \
+         llvm \
+         clang \
+         liburing-dev \
+         valgrind \
+         bison \
+         flex \
+         libssl-dev \
+         libelf-dev \
+         hunspell-en-us \
+         qemu-system-x86 \
+         busybox-static \
+         cpio \
+         xz-utils
+       ```
+     - **Verification**: Run `git --version`, `gcc --version`, `docker --version`, `llvm-config --version`, `valgrind --version`, and `qemu-system-x86_64 --version`.
+   - **Step 2: Install Rust Toolchain**
+     - **Action**: Install `rustup` and then install the stable toolchain (must be >= 1.70). Optionally, install nightly and additional targets for full test coverage.
+     - **Commands**:
+       ```bash
+       # Install a toolchain >= 1.70
+       rustup install stable
+       # Optional: Install nightly for docs, ASAN, etc.
+       rustup install nightly
+       # Optional: Install key targets for cross-testing
+       rustup target add aarch64-unknown-linux-gnu
+       rustup target add i686-unknown-linux-gnu
+       rustup target add wasm32-wasip1
+       rustup target add wasm32-wasip1-threads
+       rustup target add x86_64-unknown-linux-musl
+       ```
+     - **Verification**: Run `rustc --version`. The reported version should be 1.70 or newer.
+   - **Step 3: Prepare Project Repository**
+     - **Action**: Ensure the project source code is available at the specified working directory. If it's not present, clone it.
+     - **Command**: `git clone https://github.com/tokio-rs/tokio /home/cc/EnvGym/data/tokio-rs_tokio`
+     - **Verification**: The directory `/home/cc/EnvGym/data/tokio-rs_tokio` contains the project files, including `.gitignore`.
+   - **Step 4: Install Project-Specific Cargo Tools**
+     - **Action**: Install the cargo subcommands required for development and testing.
+     - **Commands**:
+       ```bash
+       cargo install cargo-nextest
+       cargo install cargo-hack
+       cargo install cargo-spellcheck
+       cargo install cargo-fuzz
+       cargo install cargo-deny
+       cargo install cross
+       cargo install wasmtime-cli
+       cargo install wasm-pack
+       # Requires a specific nightly toolchain
+       cargo +nightly install cargo-check-external-types --version 0.1.13
+       ```
+     - **Verification**: Run `cargo nextest --version`, `cargo cross --version`, etc.
+   - **Step 5: Verify Configuration Files**
+     - **Action**: Ensure all configuration files from section 2 are present in the working directory (`/home/cc/EnvGym/data/tokio-rs_tokio`). Optionally, create a local `.cargo/config.toml` to simplify development.
+     - **Verification**: Check for the existence and content of these files. For example, `ls /home/cc/EnvGym/data/tokio-rs_tokio/deny.toml`.
+   - **Step 6: Build the Workspace**
+     - **Action**: Compile the entire workspace to download and build all dependencies.
+     - **Command**: `cd /home/cc/EnvGym/data/tokio-rs_tokio && cargo build --workspace --all-features`
+     - **Verification**: The command completes without errors.
+   - **Step 7: Run the Full Test Suite**
+     - **Action**: Execute all unit and integration tests using `cargo-nextest`.
+     - **Command**: `cd /home/cc/EnvGym/data/tokio-rs_tokio && cargo nextest run --workspace --all-features`
+     - **Verification**: The command reports that all tests passed successfully.
+   - **Step 8: Run Linter and Formatter**
+     - **Action**: Check code for formatting and common programmatic errors.
+     - **Commands**:
+       ```bash
+       cd /home/cc/EnvGym/data/tokio-rs_tokio
+       # Check formatting
+       rustfmt --check --edition 2021 $(git ls-files '*.rs')
+       # Run clippy with standard features
+       cargo clippy --workspace --all-features -- -D warnings
+       # Run clippy with unstable features
+       RUSTFLAGS="--cfg tokio_unstable --cfg tokio_taskdump --cfg tokio_uring" cargo clippy --workspace --all-features -- -D warnings
+       ```
+     - **Verification**: Commands complete without reporting errors or changes needed.
+   - **Step 9: Run Code Quality, Security, and Spell Checks**
+     - **Action**: Run security audit, spell-checker, and check for trailing whitespace.
+     - **Commands**:
+       ```bash
+       cd /home/cc/EnvGym/data/tokio-rs_tokio
+       # Run security and dependency audit
+       cargo deny check
+       # Check dictionary validity
+       (sed '1d' spellcheck.dic | LC_ALL=en_US.UTF8 sort -uc) || echo "Dictionary not sorted/unique"
+       # Run spell check
+       cargo spellcheck
+       # Check for trailing whitespace
+       grep --exclude-dir=.git --exclude-dir=target -rne '\s$' . && echo "Found trailing whitespace"
+       ```
+     - **Verification**: Commands complete without errors.
+   - **Step 10: Check Documentation Build**
+     - **Action**: Build the documentation using the nightly toolchain to emulate the docs.rs environment.
+     - **Command**:
+       ```bash
+       cd /home/cc/EnvGym/data/tokio-rs_tokio
+       RUSTDOCFLAGS="--cfg docsrs --cfg tokio_unstable --cfg tokio_taskdump --cfg tokio_uring -Dwarnings" \
+       RUSTFLAGS="--cfg docsrs --cfg tokio_unstable --cfg tokio_taskdump --cfg tokio_uring" \
+       cargo +nightly doc --workspace --all-features --no-deps --document-private-items
+       ```
+     - **Verification**: The command completes without any errors or warnings.
+   - **Step 11: Run Benchmarks**
+     - **Action**: Execute the performance benchmarks.
+     - **Command**: `cd /home/cc/EnvGym/data/tokio-rs_tokio && cargo bench --workspace`
+     - **Verification**: Benchmarks run to completion and output their results.
+   - **Step 12: (Advanced) Run Specialized Test Suites**
+     - **Action**: Run advanced tests for memory safety, concurrency, MSRV, etc. These can be very time-consuming. All commands should be run from `/home/cc/EnvGym/data/tokio-rs_tokio`.
+     - **Commands**:
+       - **MSRV Check (1.70)**: `cargo +1.70 check --workspace --all-features`
+       - **Minimal Versions Check**:
+         ```bash
+         cargo +nightly hack --remove-dev-deps --workspace
+         cargo +nightly update -Z minimal-versions
+         cargo +nightly hack check --all-features --ignore-private
+         ```
+       - **Unstable Features Test**: `RUSTFLAGS="--cfg tokio_unstable --cfg tokio_taskdump --cfg tokio_uring" cargo nextest run --workspace --all-features`
+       - **Miri (Undefined Behavior)**: `MIRIFLAGS="-Zmiri-disable-isolation" cargo +nightly miri nextest run -p tokio --features full`
+       - **ASAN (AddressSanitizer)**: `RUSTFLAGS="-Z sanitizer=address" cargo +nightly test --workspace --all-features --target x86_64-unknown-linux-gnu -Zbuild-std -- --test-threads 1`
+       - **Valgrind Stress Test**:
+         ```bash
+         cargo build -p stress-test --release --example simple_echo_tcp
+         valgrind --error-exitcode=1 --leak-check=full --show-leak-kinds=all --fair-sched=yes ./target/release/examples/simple_echo_tcp
+         ```
+       - **Loom (Concurrency)**:
+         ```bash
+         export LOOM_MAX_PREEMPTIONS=2
+         export LOOM_MAX_BRANCHES=10000
+         RUSTFLAGS="--cfg loom --cfg tokio_unstable" cargo test -p tokio --release --features full --test-threads=1 -- --nocapture sync::tests
+         ```
+       - **Fuzz Test**: `(cd tokio/fuzz && cargo fuzz run fuzz_linked_list)`
+       - **Cross-Compilation Tests**:
+         ```bash
+         # Test on a 64-bit ARM Linux target
+         cross test -p tokio --target aarch64-unknown-linux-gnu --features full
+         # Test on a 32-bit Linux target without 64-bit atomics using a custom spec
+         cross test -p tokio --target ./target-specs/i686-unknown-linux-gnu.json --features full
+         ```
+       - **WASI Test**: `cargo test -p tokio --target wasm32-wasip1 --features full`
+       - **Feature Powerset Check**: `cargo hack check --all --feature-powerset --depth 2 --keep-going`
+       - **`io_uring` Kernel Version Test (QEMU)**: This is a complex, multi-stage test. A conceptual guide:
+         1.  Download and build a specific Linux kernel version.
+         2.  Build static test binaries: `RUSTFLAGS="--cfg tokio_uring" cargo test -p tokio --features full --target x86_64-unknown-linux-musl --no-run`
+         3.  Create a minimal root filesystem (initramfs) containing the test binaries.
+         4.  Launch QEMU with the compiled kernel and initramfs to run the tests.
+     - **Verification**: The specialized test commands execute and report their results without environment-related errors.

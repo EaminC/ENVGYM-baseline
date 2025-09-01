@@ -1,0 +1,92 @@
+=== Docker Execution Log - 20250828_143222 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756391539
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.78kB done
+#1 WARN: UndefinedVar: Usage of undefined variable '$CLASSPATH' (line 44)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.7-slim-buster
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/11] FROM docker.io/library/python:3.7-slim-buster@sha256:9bd2bfc822a533f99cbe6b1311d5bf0ff136f776ebac9b985407829f17278935
+#4 DONE 0.0s
+
+#5 [ 2/11] WORKDIR /app
+#5 CACHED
+
+#6 [internal] load build context
+#6 transferring context: 202.04kB 0.0s done
+#6 DONE 0.0s
+
+#7 [ 3/11] RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list &&     sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list &&     sed -i '/stretch-updates/d' /etc/apt/sources.list &&     apt-get update && apt-get install -y --no-install-recommends     ca-certificates     software-properties-common     openjdk-8-jdk     bc     htop     && rm -rf /var/lib/apt/lists/*
+#7 0.298 Get:1 http://archive.debian.org/debian buster InRelease [122 kB]
+#7 0.315 Get:2 http://archive.debian.org/debian-security buster/updates InRelease [34.8 kB]
+#7 0.316 Get:3 http://archive.debian.org/debian buster-updates InRelease [56.6 kB]
+#7 0.498 Get:4 http://archive.debian.org/debian buster/main amd64 Packages [7909 kB]
+#7 0.657 Get:5 http://archive.debian.org/debian-security buster/updates/main amd64 Packages [610 kB]
+#7 0.829 Get:6 http://archive.debian.org/debian buster-updates/main amd64 Packages [8788 B]
+#7 1.544 Fetched 8741 kB in 1s (6936 kB/s)
+#7 1.544 Reading package lists...
+#7 2.012 Reading package lists...
+#7 2.457 Building dependency tree...
+#7 2.531 Reading state information...
+#7 2.579 E: Unable to locate package openjdk-8-jdk
+#7 ERROR: process "/bin/sh -c sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list &&     sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list &&     sed -i '/stretch-updates/d' /etc/apt/sources.list &&     apt-get update && apt-get install -y --no-install-recommends     ca-certificates     software-properties-common     openjdk-8-jdk     bc     htop     && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
+------
+ > [ 3/11] RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list &&     sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list &&     sed -i '/stretch-updates/d' /etc/apt/sources.list &&     apt-get update && apt-get install -y --no-install-recommends     ca-certificates     software-properties-common     openjdk-8-jdk     bc     htop     && rm -rf /var/lib/apt/lists/*:
+0.315 Get:2 http://archive.debian.org/debian-security buster/updates InRelease [34.8 kB]
+0.316 Get:3 http://archive.debian.org/debian buster-updates InRelease [56.6 kB]
+0.498 Get:4 http://archive.debian.org/debian buster/main amd64 Packages [7909 kB]
+0.657 Get:5 http://archive.debian.org/debian-security buster/updates/main amd64 Packages [610 kB]
+0.829 Get:6 http://archive.debian.org/debian buster-updates/main amd64 Packages [8788 B]
+
+
+2.457 Building dependency tree...
+2.531 Reading state information...
+2.579 E: Unable to locate package openjdk-8-jdk
+------
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - UndefinedVar: Usage of undefined variable '$CLASSPATH' (line 44)
+envgym.dockerfile:6
+--------------------
+   5 |     # Install system dependencies with network fixes
+   6 | >>> RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
+   7 | >>>     sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list && \
+   8 | >>>     sed -i '/stretch-updates/d' /etc/apt/sources.list && \
+   9 | >>>     apt-get update && apt-get install -y --no-install-recommends \
+  10 | >>>     ca-certificates \
+  11 | >>>     software-properties-common \
+  12 | >>>     openjdk-8-jdk \
+  13 | >>>     bc \
+  14 | >>>     htop \
+  15 | >>>     && rm -rf /var/lib/apt/lists/*
+  16 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list &&     sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list &&     sed -i '/stretch-updates/d' /etc/apt/sources.list &&     apt-get update && apt-get install -y --no-install-recommends     ca-certificates     software-properties-common     openjdk-8-jdk     bc     htop     && rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

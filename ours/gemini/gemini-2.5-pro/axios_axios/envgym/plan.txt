@@ -1,0 +1,240 @@
+Based on the provided hardware information, the following is the adjusted and validated environment setup plan. The plan is fully compatible with the specified `x86_64` Linux architecture, and the adjustments primarily clarify installation and path-related steps for this specific environment.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    *   **Node.js**: An LTS version (v18.x or newer) is recommended for development and is used in the release pipeline. The project is tested for compatibility across a wide range of versions, from Node.js 12.x up to 24.x, as defined in the CI pipeline. Npm is included with Node.js.
+    *   **Git**: Latest stable version for version control.
+    *   **Code Editor**: A modern code editor such as Visual Studio Code, Sublime Text, or WebStorm.
+    *   **Web Browser**: At least one modern web browser (e.g., Chrome, Firefox) for running local browser-based tests. Headless versions are sufficient for automated testing on a server.
+    *   **GitHub Personal Access Token (Optional)**: For contributors involved in the release process, a GitHub token may be needed to avoid API rate limiting when updating the contributors list.
+    *   **Sauce Labs Credentials (Optional)**: For running the full cross-browser test suite, a `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` are required.
+    *   **NPM Token (For Release Maintainers)**: Required for publishing the package to the NPM registry and managing distribution tags. This is configured as a repository secret (`NPM_TOKEN`) for the automated release workflows.
+    *   **Development Tools**: The project uses a comprehensive suite of development tools. All of the following will be installed locally via `npm` and do not require separate global installation:
+        *   **Bundlers**: `webpack`, `rollup`
+        *   **Transpiler / Type Checker**: `@babel/core`, `@babel/preset-env`, `typescript`
+        *   **Release Automation**: `release-it`
+        *   **Rollup Plugins**: `@rollup/plugin-alias`, `@rollup/plugin-babel`, `@rollup/plugin-commonjs`, `@rollup/plugin-json`, `@rollup/plugin-node-resolve`, `rollup-plugin-auto-external`, `rollup-plugin-bundle-size`, `rollup-plugin-terser`
+        *   **Task Runner**: `gulp`
+        *   **Test Frameworks**: `mocha`, `karma`, `jasmine-core`, `jasmine-ajax`, `sinon`
+        *   **Linters**: `eslint`, `dtslint` (for TypeScript definitions), `@commitlint/cli` (for commit messages)
+        *   **Git Hooks**: `husky`
+        *   **Utilities**: `fs-extra` (for file system operations), `minimist` (for command-line argument parsing)
+        *   **Test Fixture Dependencies**: `@types/node` (used within specific TypeScript test fixtures)
+
+2.  FILES TO CREATE:
+    *   This plan is for setting up a development environment for the existing `axios` project. No new files need to be created initially. The project will be cloned from a Git repository.
+    *   **`.env` (Optional, Local)**: For local development, you can create a `.env` file at the project root to store environment variables like `SAUCE_USERNAME`, `SAUCE_ACCESS_KEY`, and `GITHUB_TOKEN`. This file is listed in `.gitignore` and will not be committed to version control.
+    *   **Key Project Files and Directories**:
+        *   **`package.json`**: The core project manifest, defining scripts, dependencies, and project metadata. Its `contributors` list is dynamically generated via a Gulp task.
+        *   **`package-lock.json`**: Ensures reproducible builds by locking dependency versions. It is used by `npm ci` in the CI environment.
+        *   **`README.md`**: The main project documentation file. It contains a sponsor list section that is automatically updated by a scheduled GitHub Actions workflow.
+        *   **`index.js`**, **`index.d.ts`**, **`index.d.cts`**: Root-level files that serve as the main entry points and type definitions for consumers of the NPM package.
+        *   **`tsconfig.json`**: Configures the TypeScript compiler. It is used for static type checking of the JavaScript/TypeScript source code to ensure type safety, often with the `noEmit` option enabled to use Babel for transpilation.
+        *   **`bower.json`**: Manifest file for the Bower package manager. It contains metadata like name, version, and license, and specifies the main distributable file (`dist/axios.js`). It is kept in sync with `package.json` via a Gulp task and defines which files to ignore for Bower consumers.
+        *   **`MIGRATION_GUIDE.md`**: A document that provides instructions and details on breaking changes for users upgrading from older versions of the library (e.g., from `0.x.x` to `1.1.0`).
+        *   **`lib/`**: Contains the main source code for the `axios` library. This directory is included in the published NPM package.
+            *   **`lib/core/`**: Contains modules specific to the domain logic of `axios`, such as request dispatching, interceptor management, and config handling. The `lib/core/README.md` provides an overview of this directory's purpose.
+            *   **`lib/adapters/`**: Contains modules that handle the actual dispatching of requests for different environments (e.g., Node.js, browsers). The `lib/adapters/README.md` file provides crucial documentation on how this system works and how to create custom adapters.
+            *   **`lib/helpers/`**: Contains generic, domain-agnostic helper modules that are not specific to the core logic of `axios` (e.g., cookie management, header parsing, polyfills). As documented in `lib/helpers/README.md`, these modules are designed to be reusable and could theoretically be published as standalone packages.
+        *   **`lib/env/data.js`**: A file generated by the build process that contains environment-specific data like the project version. As documented in the accompanying `lib/env/README.md`, this file is updated automatically during version upgrades and must not be edited manually.
+        *   **`test/`**: Contains the test suites, including unit tests (`test/unit`), browser-based spec tests (`test/specs`), and module import/entry point tests (`test/module`). The `test/module` directory contains sub-projects that act as test fixtures to validate package consumption in different environments. Examples include `test/module/cjs/`, `test/module/esm/`, `test/module/ts/`, `test/module/ts-require/`, `test/module/ts-require-default/`, `test/module/typings/cjs/`, and `test/module/typings/esm/`. These fixtures have their own `package.json` (e.g., `test/module/esm/package.json` and `test/module/typings/esm/package.json` both set `"type": "module"`) and install the root `axios` project as a local file dependency. The TypeScript test fixtures also include their own `tsconfig.json` files, which configure the compiler with various settings to validate the library's type definitions in realistic consumer environments. For example, some use strict settings (`"strict": true`) and different module systems (`"module": "commonjs"`), while others, like `test/module/typings/cjs/tsconfig.json` and `test/module/typings/esm/tsconfig.json`, use modern resolution strategies (`"module": "node16"`) and enable JavaScript type checking (`"checkJs": true`) to test compatibility with conditional exports and JS-based projects in both CommonJS and native ESM environments.
+        *   **`examples/`**: Contains example code demonstrating usage, which can be run for manual testing. It includes an `examples/README.md` with instructions on how to start the examples server.
+        *   **`sandbox/`**: Contains a sandbox environment for interactive development and testing in the browser or terminal.
+        *   **`dist/`**: Contains the distributable, built files. This directory is generated by the build process and should not be manually edited or included in pull requests from contributors. It is a key part of the published NPM package, as defined in `.npmignore`. It includes subdirectories for different environments and module formats (e.g., `dist/esm/`, `dist/browser/`, `dist/node/`) containing ESM, UMD, and CJS bundles.
+        *   **`coverage/`**: Contains code coverage reports generated by the test suite. This directory is generated by running tests and is ignored by Git.
+        *   **`bin/`**: Contains helper scripts for build, release, and automation tasks (e.g., `check-build-version.js`, `resolveNPMTag.js`, `actions/notify_published.js`, `pr.js`, `sponsors.js`).
+        *   **`webpack.config.js`**: Configuration for Webpack, used to bundle the library for distribution.
+        *   **`karma.conf.cjs`**: Configuration file for the Karma test runner. It uses Jasmine, Sinon, and `jasmine-ajax` for browser-based testing. It preprocesses test files with Rollup and is configured to run tests locally in Chrome/Firefox, in headless browsers on GitHub Actions, and on a wide range of browsers (Safari, Edge, IE, etc.) via Sauce Labs integration.
+        *   **`rollup.config.js`**: Configuration for Rollup, used to create multiple distributable bundles (ESM, UMD, CJS) for browser and Node.js environments.
+        *   **`gulpfile.js`**: Configuration for Gulp, the task runner used for build, versioning, and release-related tasks such as updating `bower.json`, generating `lib/env/data.js`, and fetching contributor data from GitHub.
+        *   **`.gitignore`**: Specifies intentionally untracked files to be ignored by Git, such as `node_modules`, build artifacts (`dist`, `coverage`), temporary directories (`temp/`), IDE configuration (`.idea`, `*.iml`), and local environment files (`.env`, `.npmrc`).
+        *   **`.npmignore`**: Defines which files and directories should be excluded from the package when it is published to the NPM registry. It ensures that only essential production files (like `dist/`, `lib/`, `index.js`, `README.md`) are included, keeping the package size minimal.
+        *   **`.eslintrc.cjs`**: Configuration file for the ESLint linter. It is a CommonJS module that extends the recommended ESLint rules, configures the parser for ES2018 module syntax, and sets up environments for browser and Node.js code, with a custom rule to disable `no-cond-assign`.
+        *   **`tslint.json`**: Configuration file for `dtslint`, which is used to lint the project's TypeScript definition files. It extends the default `dtslint` configuration, disables specific rules (like `no-unnecessary-generics`), and excludes certain directories (like `test/module/`) from the linting process.
+        *   **`.commitlintrc.js`** (or similar): Configuration for commit message linting based on Conventional Commits.
+        *   **`.husky/`**: Contains Git hooks configuration. This directory is generated locally by the `prepare` script after dependency installation and is intentionally excluded from version control by `.gitignore`.
+        *   **`.github/`**: Contains GitHub-specific configuration.
+            *   **`workflows/`**: Defines Continuous Integration (CI) and Continuous Deployment (CD) pipelines using GitHub Actions.
+                *   **`ci.yml`**: Orchestrates the automated build and test process for all pull requests and pushes.
+                *   **`pr.yml`**: Defines a manually triggered GitHub Actions workflow to automate the creation of a release pull request. It bumps the version, generates a changelog, and opens a PR with the changes for maintainer review.
+                *   **`publish.yml`**: Automates the entire release process, including version validation, Git tagging, GitHub Release creation, and publishing to NPM. It is triggered by merging a specially labeled pull request created by the `pr.yml` workflow.
+                *   **`notify.yml`**: Defines a GitHub Actions workflow to notify contributors of pull requests that have been included in a new release. This workflow is typically triggered manually after a successful publication and uses the script at `bin/actions/notify_published.js`.
+                *   **`npm-tag.yml`**: Defines a GitHub Actions workflow that allows maintainers to manually change the NPM distribution tag for a specific version of the package. This is used for managing tags like `latest`, `beta`, or `next` post-publication.
+                *   **`codeql-analysis.yml`**: Defines a GitHub Actions workflow to perform Static Analysis Security Testing (SAST) using CodeQL. This workflow automatically scans the JavaScript codebase for potential security vulnerabilities on every push and pull request.
+                *   **`depsreview.yaml`**: Defines a GitHub Actions workflow to automatically review dependency changes in pull requests. It scans for known vulnerabilities and license compliance issues, providing an extra layer of supply chain security.
+                *   **`labeler.yml`**: Defines a GitHub Actions workflow that automatically adds labels to pull requests based on the paths of the files that were changed. It is configured by a separate file (`.github/labeler.yml`).
+                *   **`pr-guard.yml`**: Defines a GitHub Actions workflow that runs on pull requests from forks. It checks for changes made to the `dist/` directory and posts a warning comment if any are found, reminding contributors not to commit generated build artifacts.
+                *   **`sponsors.yml`**: Defines a GitHub Actions workflow that runs on a daily schedule to automatically update the sponsor list in the `README.md`. It runs the `bin/sponsors.js` script and creates a pull request if any changes are detected.
+                *   **`stale.yml`**: Defines a scheduled GitHub Actions workflow that automatically identifies and closes stale issues and pull requests. It targets items labeled `status:more info needed` that have been inactive for a set period, first marking them as stale and then closing them if no further activity occurs.
+            *   **`dependabot.yml`**: Configures Dependabot to automatically create pull requests for dependency updates, including GitHub Actions.
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    *   The project contains a comprehensive test suite. When contributing, you should run these tests and add new ones for your changes.
+    *   **Linting (ESLint)**: Code style and quality checks, following the node style guide.
+    *   **Static Type Checking (TypeScript)**: Uses the TypeScript compiler (`tsc`) to analyze the source code for type errors, ensuring type safety throughout the project.
+    *   **Unit Tests (Mocha)**: Tests for individual modules and functions in a Node.js environment. Covers core logic from `lib/core/` (e.g., interceptor management, config handling), generic utilities from `lib/helpers/` (e.g., cookie and header parsing), and request adapters. The adapters are a critical component, responsible for dispatching requests, and their tests ensure reliability across different JavaScript environments.
+    *   **Browser Compatibility Tests (Karma/Jasmine)**: Tests that run in actual web browsers to ensure `axios` works correctly in a browser environment. It uses the Jasmine framework with Sinon for mocks and `jasmine-ajax` for mocking requests. These tests can be run in three primary modes:
+        *   **Local**: Runs in a locally installed browser like Chrome.
+        *   **CI (GitHub Actions)**: Runs in headless versions of Chrome and Firefox.
+        *   **Cloud (Sauce Labs)**: Can be run against a wide matrix of browsers and operating systems (e.g., Safari, IE 11, Edge) for comprehensive compatibility checks, typically triggered by the CI pipeline for releases or manually by developers with credentials.
+    *   **TypeScript Definition Tests (dtslint)**: Verifies the correctness and integrity of the TypeScript type definitions (`.d.ts` files). This process is configured by `tslint.json`, which sets specific linting rules and excludes certain paths to ensure the type definitions are valid and consistent for consumers of the library.
+    *   **Module Exports and Consumption Tests**: Ensures that the package's entry points and conditional exports work correctly for different module systems and environments. This is achieved using test fixtures, which are small, self-contained projects located in directories like `test/module/cjs/` and `test/module/esm/`. These fixtures simulate real-world usage by defining their own `package.json` (some with `"type": "module"` to enforce native ESM rules), installing the main `axios` project as a dependency, and then attempting to import and run code. The TypeScript fixtures use their own `tsconfig.json` files with various settings to verify type definitions under different conditions, such as `strict` mode, different import styles (ES `import` vs. CommonJS `require()`), and modern Node.js module resolution strategies (`"module": "node16"`), as seen in the tsconfig.json files for both the CJS and ESM typings test fixtures. These tests validate type safety in both CommonJS and native ES Module (`"type": "module"`) TypeScript projects. Some tests also use `"checkJs": true` to validate that the types are correctly inferred in plain JavaScript projects.
+    *   **Bundle Integrity Tests**: Verifies that the final distributable files in the `dist/` directory (including ESM, UMD, and CJS bundles) are correctly formatted and functional in their target environments.
+    *   **Package Integrity Test**: Verifies that the final NPM package tarball (`.tgz`) contains only the files specified in `.npmignore` and excludes all development-related files (e.g., test files, configuration files, CI scripts). This ensures a lean and secure production package.
+    *   **Manual Testing (Examples & Sandbox)**: The project includes an examples server (`npm run examples`) and a sandbox environment (`npm start`) that can be used for manual, interactive testing of changes in a browser or terminal.
+    *   **Code Coverage Analysis**: The test suite generates a coverage report (in the `coverage/` directory) to measure the percentage of the codebase covered by tests.
+    *   **Build Process Integrity**: Ensures that all build and versioning tasks (managed by Gulp and other scripts) execute successfully, correctly generating all necessary artifacts like `dist/` files, `bower.json` updates, and version data files.
+    *   **Commit Message Linting (commitlint)**: Enforces Conventional Commits format for all commit messages, triggered by a Git hook.
+    *   **Continuous Integration (CI) Pipeline Checks (GitHub Actions)**: Pull requests and pushes trigger automated workflows defined in `.github/workflows/ci.yml`. These pipelines run the full suite of tests (linting, type checking, unit tests, Karma tests in headless browsers) on an Ubuntu environment across a matrix of Node.js versions (from 12.x to 24.x) to ensure changes are safe to merge. The CI process is optimized to skip tests for changes that only affect documentation, examples, or other non-source files.
+    *   **PR Guard Check (GitHub Actions)**: An automated workflow defined in `.github/workflows/pr-guard.yml` runs on every pull request from a fork. It checks if the contributor has accidentally committed changes to the generated `dist/` directory and, if so, posts a comment asking them to remove those changes.
+    *   **Static Analysis Security Testing (CodeQL)**: An automated workflow defined in `.github/workflows/codeql-analysis.yml` runs on every push and pull request. It uses GitHub's CodeQL engine to scan the codebase for a wide range of common security vulnerabilities and quality issues, ensuring code security is maintained.
+    *   **Dependency Vulnerability and License Review (GitHub Actions)**: An automated workflow defined in `.github/workflows/depsreview.yaml` runs on every pull request. It uses the `dependency-review-action` to scan changes to dependencies (e.g., in `package-lock.json`), flagging any newly introduced packages with known security vulnerabilities or incompatible licenses. This helps secure the project's software supply chain.
+    *   **Automated Pull Request Labeling (GitHub Actions)**: A workflow defined in `.github/workflows/labeler.yml` automatically applies labels to pull requests based on which files have been modified. This helps categorize PRs for easier review and management.
+    *   **Automated Release PR Creation (GitHub Actions)**: A manually triggered workflow defined in `.github/workflows/pr.yml` automates the preparation of a new release. Maintainers can trigger this workflow to automatically bump the package version, generate changelog entries, and create a new pull request labeled for release. This standardizes the release preparation process.
+    *   **Continuous Deployment (CD) Pipeline Checks (GitHub Actions)**: Upon merging a release pull request (generated by the `pr.yml` workflow), an automated workflow defined in `.github/workflows/publish.yml` triggers to handle version validation (using `bin/check-build-version.js`), Git tagging, creating a GitHub Release with extracted notes, and publishing the new version to the NPM registry. This ensures a consistent and reliable release process.
+    *   **Post-Release Notification (GitHub Actions)**: A workflow defined in `.github/workflows/notify.yml` can be run after a release is published. It executes a script to identify all pull requests included in the release and posts a notification comment on each one, informing the contributors that their changes are now live. This enhances community engagement and communication.
+    *   **NPM Distribution Tag Management (GitHub Actions)**: A manual workflow defined in `.github/workflows/npm-tag.yml` allows maintainers to manage NPM distribution tags (`latest`, `beta`, etc.) for specific package versions. This provides flexibility in the release lifecycle, such as promoting a pre-release version to the official `latest` tag after a period of testing.
+    *   **Automated Sponsor List Update (GitHub Actions)**: A workflow defined in `.github/workflows/sponsors.yml` runs on a daily schedule, as well as manually. It executes the `bin/sponsors.js` script to fetch the latest list of project sponsors. If the list has changed, the workflow automatically creates a new pull request with the updated sponsor block for the `README.md` file, ensuring sponsors are always up-to-date.
+    *   **Automated Stale Issue and PR Management (GitHub Actions)**: A scheduled workflow defined in `.github/workflows/stale.yml` runs weekly to help manage the issue tracker. It automatically marks issues and pull requests that have the `status:more info needed` label and have been inactive for 30 days as stale. If there is no further activity for another 14 days, it will close them. This ensures the issue tracker remains focused on active, actionable items.
+
+4.  COMPLETE TODO LIST:
+    *   **Step 1: Install Prerequisites on Linux (`x86_64`)**
+        *   **Action**: On a Linux system, install prerequisites using the system's package manager. For a Debian/Ubuntu-based system, you can use `apt`. Headless versions of browsers are sufficient for automated testing.
+        *   **Command (Example for Debian/Ubuntu)**:
+            ```bash
+            # Update package lists
+            sudo apt-get update
+            # Install Git and tools to add Node.js repository
+            sudo apt-get install -y git curl
+            # Add NodeSource repository for Node.js LTS (e.g., v18.x)
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            # Install Node.js (includes npm)
+            sudo apt-get install -y nodejs
+            # Install a headless browser for Karma tests (e.g., Chromium)
+            sudo apt-get install -y chromium-browser
+            ```
+        *   **Alternative (Docker)**: The recommended approach for a containerized environment is to use a pre-built Node.js image. A `Dockerfile` might start with: `FROM node:18-bullseye`. Git and other tools can be installed within the container.
+        *   **Verification**: Open a terminal and run `node -v`, `npm -v`, and `git --version`. Ensure they return version numbers without errors. The specified `x86_64` architecture is fully supported. No GPU is required.
+
+    *   **Step 2: Clone the Project Repository**
+        *   **Action**: Navigate to the parent directory (`/home/cc/EnvGym/data`) and clone the `axios` repository into a directory named `axios_axios` to match the specified working directory.
+        *   **Command**:
+            ```bash
+            cd /home/cc/EnvGym/data
+            git clone https://github.com/axios/axios.git axios_axios
+            ```
+
+    *   **Step 3: Navigate into Project Directory**
+        *   **Action**: Change your current directory to the newly cloned project folder.
+        *   **Command**: `cd /home/cc/EnvGym/data/axios_axios`
+
+    *   **Step 4: Install Project Dependencies**
+        *   **Action**: Install all dependencies from `package-lock.json`. Using `npm ci` is recommended for a clean, reproducible installation that mirrors the CI environment.
+        *   **Command**: `npm ci`
+        *   **Alternative**: You can use `npm install` for subsequent dependency updates.
+        *   **Verification**: The command should complete without errors. A `node_modules` directory will be present in the project root.
+
+    *   **Step 5: Configure Local Environment Variables (Optional)**
+        *   **Action**: For features like cross-browser testing with Sauce Labs or updating the contributors list, you'll need to provide secrets. The recommended way is to create a `.env` file in the project root. This file is ignored by Git.
+        *   **Example `.env` file content**:
+            ```
+            SAUCE_USERNAME=your-sauce-labs-username
+            SAUCE_ACCESS_KEY=your-sauce-labs-access-key
+            GITHUB_TOKEN=your-github-personal-access-token
+            ```
+        *   **Docker Context**: When running inside a Docker container, these variables can be passed using the `--env-file .env` flag or individually with the `-e` flag (e.g., `docker run -e SAUCE_USERNAME=...`).
+        *   **Verification**: Scripts requiring these variables will now be able to access them automatically.
+
+    *   **Step 6: Set up Git Hooks**
+        *   **Action**: The `prepare` script in `package.json` automatically runs `husky install` after `npm ci` or `npm install`. This sets up local Git hooks from the configuration files.
+        *   **Verification**: A `.husky/` directory should exist locally in your project root (note: this directory is not tracked by Git). When you try to commit, `commitlint` will validate your message format.
+
+    *   **Step 7: Run the Full Test Suite**
+        *   **Action**: Execute the main test script to run all checks, including linting, type checking, unit tests (Mocha), local browser tests (Jasmine/Karma), and module entry point tests. These entry point tests use fixtures to validate consumption in various environments, including CommonJS (`require`), native ESM (`import` with `"type": "module"`), and multiple TypeScript configurations. These configurations test various scenarios, including strictness settings and modern module resolution strategies (like `commonjs` and `node16`) for both CommonJS and ESM-style TypeScript projects.
+        *   **Command**: `npm test`
+        *   **Verification**: The entire suite of tests should run and pass on a clean `main` branch. This confirms your environment is correctly configured. A `coverage/` directory with a test coverage report will also be generated.
+
+    *   **Step 8: Run Specific Test Suites**
+        *   **Action**: To speed up development, you can run specific parts of the test suite. Check `package.json` for a full list of available scripts.
+        *   Run only linter: `npm run test:eslint`
+        *   Run only type checking: `npm run test:types`
+        *   Run only Node.js unit tests: `npm run test:mocha`
+        *   Run only browser tests: `npm run test:karma`
+
+    *   **Step 9: Configure for Cross-Browser Testing (Optional)**
+        *   **Action**: To run the comprehensive browser test suite on Sauce Labs, ensure your `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` are set (see Step 5).
+        *   **Verification**: After setting the variables, run `npm run test:karma`. The test output will indicate that it is connecting to Sauce Labs and launching cloud-based browsers.
+
+    *   **Step 10: Build the Project**
+        *   **Action**: Run the build process to generate the distributable files from the source code in `lib/`. This process utilizes bundlers like Rollup and Webpack, as well as Gulp tasks, to create multiple bundle formats (ESM, UMD, CJS) for different environments.
+        *   **Command**: `npm run build`
+        *   **Verification**: The `dist/` directory will be created or updated with subdirectories like `esm/`, `browser/`, and `node/` containing the various bundled and minified versions of `axios`.
+
+    *   **Step 11: Inspect Package Contents (Optional)**
+        *   **Action**: To verify what will be published to NPM, you can create a local tarball of the package. This respects the `.npmignore` file.
+        *   **Command**: `npm pack`
+        *   **Verification**: This command will create a file like `axios-v1.2.3.tgz`. You can inspect its contents with `tar -tvf axios-v1.2.3.tgz` to ensure no development files (like tests or configs) are included and that all distributable files from `dist/` and `lib/` are present.
+
+    *   **Step 12: Run Examples and Sandbox for Manual Testing**
+        *   **Action**: Run the built-in examples or sandbox to manually test changes in a live environment.
+        *   **Run Examples Server**: `npm run examples`. Then open `http://localhost:3000` in your browser.
+        *   **Run Sandbox in Browser**: `npm start`. Then open `http://localhost:3000` in your browser.
+        *   **Run Sandbox in Terminal**: Run `npm start` in one terminal, then run `node ./sandbox/client` in another.
+        *   **Docker Context**: If running inside a Docker container, ensure you map the necessary port to your host machine using the `-p` flag (e.g., `docker run -p 3000:3000 ...`). You can then access the server from your host machine's browser at `http://localhost:3000`.
+        *   **Verification**: The server starts without errors, and you can interact with the examples/sandbox.
+
+    *   **Step 13: Understanding Versioning Tasks**
+        *   **Action**: For release preparation, the project uses Gulp tasks (`bower`, `env`, `package`) to synchronize version numbers and metadata across files like `bower.json`, `lib/env/data.js`, and `package.json`.
+        *   **Note**: These tasks are no longer run manually. They are automated as part of the release scripts (e.g., `npm run release`) which are executed by the GitHub Actions release workflows.
+
+    *   **Step 14: Making Contributions**
+        *   **Action**: When making changes, create a new branch (`git checkout -b your-feature-name`).
+        *   **Action**: Add or modify code in the `lib/` directory and corresponding tests in the `test/` directory.
+        *   **Note**: For contributions related to the core domain logic of `axios` (e.g., interceptors, config handling), see the `lib/core/README.md`. For contributions related to how requests are dispatched (e.g., adding support for a new JavaScript environment), familiarize yourself with the adapter system by reading `lib/adapters/README.md`. For contributions involving generic, reusable utility functions that are not specific to the axios domain (e.g., cookie parsing, header manipulation), refer to the guidance in `lib/helpers/README.md`.
+        *   **Important**: Do not include the generated `dist/` directory in your pull requests. These files are only updated during the official release process. The CI pipeline includes an automated check (`pr-guard.yml`) that will warn you if it detects changes in this directory.
+        *   **Verification**: Ensure `npm test` passes with your changes. This includes code style, type safety, and all functional tests. Your changes will also be validated by the automated CI pipelines on GitHub upon opening a pull request.
+
+    *   **Step 15: Committing Changes**
+        *   **Action**: Commit your changes. The project uses Conventional Commits, enforced by `commitlint` via a Git hook. Your commit message must follow this format (e.g., `feat: add new request adapter`).
+        *   **Command**: `git commit -m "feat: your descriptive commit message"`
+        *   **Verification**: The commit will be rejected by the pre-commit hook if the message format is incorrect. After pushing your branch and opening a pull request, multiple GitHub Actions CI pipelines will run against your changes. This includes functional tests across Node.js versions (`ci.yml`), a comprehensive security scan with CodeQL (`codeql-analysis.yml`), a dependency review to check for vulnerabilities in added or updated packages (`depsreview.yaml`), a check to ensure no `dist/` files were committed (`pr-guard.yml`), and an automatic labeler (`labeler.yml`) to categorize your PR. This ensures your changes are safe, secure, and properly managed.
+
+    *   **Step 16: Performing a Release and Other Maintenance (For Maintainers)**
+        *   **Action**: The release process and other routine maintenance tasks are highly automated via GitHub Actions workflows.
+        *   **Release Process Overview**:
+            1.  **Automated PR Creation**: A maintainer manually triggers the `Release PR` workflow, which prepares a release PR with a version bump and changelog.
+            2.  **Review and Merge**: The automated PR is reviewed and merged.
+            3.  **Automated Publishing**: Merging the PR triggers the `Publish` workflow, which builds, tags, and publishes the package to NPM.
+            4.  **Post-Release Tasks**: After publishing, maintainers can run optional workflows to notify contributors or manage NPM tags.
+        *   **Detailed Release Steps**:
+            1.  **Initiate the Release PR Workflow**:
+                *   **Action**: Navigate to the "Actions" tab of the GitHub repository, select the "Release PR" workflow from the list, and click "Run workflow".
+                *   **Inputs**:
+                    *   `type`: Choose the release type (`patch`, `minor`, `major`, or `auto`).
+                    *   `beta`: Check the box if this is a pre-release (e.g., `1.2.3-beta.0`).
+                *   **Verification**: The workflow will run and create a new pull request titled `[Release] vX.Y.Z` with the `release` and `bot` labels.
+            2.  **Review and Merge the Release PR**:
+                *   **Action**: Review the automatically created pull request. Check the version bump in `package.json` and the generated `CHANGELOG.md`. Once approved, merge the pull request.
+            3.  **Monitor the Automated Publishing**:
+                *   **Action**: Upon merging, the `publish` workflow (`publish.yml`) will automatically trigger. Monitor its progress in the "Actions" tab.
+                *   **Verification**: The workflow should complete successfully. A new Git tag, a GitHub Release, and a new version on npmjs.com will be created.
+            4.  **Run Post-Release Notifications (Optional but Recommended)**: After the package is published, run the notification workflow.
+                *   **Action**: Navigate to the "Actions" tab, select the "notify" workflow, and click "Run workflow".
+                *   **Input**: Enter the new release tag (e.g., `v1.2.3`) in the `tag` input field and run the workflow.
+                *   **Verification**: The workflow will run and post comments on all PRs included in that release.
+            5.  **Manage NPM Distribution Tags (As Needed)**: If you need to change the NPM distribution tag for a version (e.g., promote a beta to latest), use the manual `NPM Tag` workflow.
+                *   **Action**: Navigate to the "Actions" tab, select the "NPM Tag" workflow, and click "Run workflow".
+                *   **Inputs**:
+                    *   `version`: The exact package version to modify (e.g., `1.2.3`).
+                    *   `tag`: The new distribution tag to apply (e.g., `latest`, `beta`, `legacy`).
+                *   **Verification**: Check the package's page on npmjs.com to confirm the distribution tag has been updated.
+        *   **Other Automated Maintenance Workflows**:
+            *   **Update Sponsor List**:
+                *   **Action**: This workflow (`sponsors.yml`) runs automatically on a daily schedule. It can also be triggered manually from the "Actions" tab.
+                *   **Process**: It runs a script to fetch the latest sponsor information. If there are changes, it automatically creates a pull request to update the sponsor list in the `README.md`.
+                *   **Verification**: Monitor the "Actions" tab for successful runs. If a PR is created, it will appear in the "Pull Requests" tab for review and merging.
+            *   **Automated Stale Issue/PR Management**:
+                *   **Action**: This workflow (`stale.yml`) runs automatically on a weekly schedule.
+                *   **Process**: It identifies issues and PRs that have the `status:more info needed` label and have been inactive. It will first post a comment and apply a `status:stale` label. If no further activity occurs after a grace period, the issue/PR will be automatically closed.
+                *   **Verification**: This is a background maintenance task. Contributors and maintainers will see comments from the `stale` bot on relevant issues and PRs.

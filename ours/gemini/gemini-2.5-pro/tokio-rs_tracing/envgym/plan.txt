@@ -1,0 +1,204 @@
+Based on the provided hardware and environment information, here is the adjusted and comprehensive setup plan.
+
+The plan has been modified to be fully compatible with your `linux/amd64` (x86_64) environment. It assumes a non-interactive setup suitable for containerization (like Docker), where the source code is already present in the working directory `/home/cc/EnvGym/data/tokio-rs_tracing` rather than being cloned. The interactive steps, such as using a code editor or manually reading files, have been removed.
+
+***
+
+### **ADJUSTED ENVIRONMENT SETUP PLAN**
+
+**Environment Context:**
+*   **Working Directory:** `/home/cc/EnvGym/data/tokio-rs_tracing`
+*   **Architecture:** `x86_64` (linux/amd64)
+*   **Operating System:** Linux (Debian/Ubuntu-based assumed for package management)
+*   **Setup Type:** Non-interactive, scriptable build environment.
+
+---
+
+### 1. DOWNLOADS NEEDED:
+
+*   **Rust Toolchain:** Install via `rustup`.
+    *   **Recommended Version:** The latest stable version is recommended for general development. The `nightly` toolchain is required for building documentation according to CI specifications. A minimum Rust version of 1.74 is required for full support of workspace lint configurations.
+    *   **Minimum Supported Version (MSRV):** The project aims to compile on several Rust versions. The internal `tracing-test` crate requires `1.49.0`. The `tracing-appender` crate requires `1.63.0`. The `tracing-examples` crate requires `1.64.0`. Most other crates like `tracing-attributes`, `tracing-core`, `tracing-error`, `tracing-flame`, `tracing-futures`, `tracing-journald`, `tracing-log`, `tracing-macros`, `tracing-mock`, `tracing-serde`, `tracing-subscriber`, and `tracing-tower` require `1.65.0`. You should install all four MSRV versions for full compatibility checks.
+    *   **Required Components:** The `rustfmt` and `clippy` components are necessary for code formatting and linting.
+    *   **Required Target:** The WebAssembly target `wasm32-unknown-unknown` is needed for WASM compatibility checks.
+*   **Git:** Required by some build scripts and for version control context, even though the source is copied directly.
+*   **System Dependencies (for `tracing-journald`):** To build and test the `tracing-journald` crate, a Linux environment with the `systemd` development libraries is required.
+    *   **Command (Debian/Ubuntu):** `apt-get install -y libsystemd-dev`
+*   **Additional Cargo Tools:** These tools are used in the CI process and are essential for running the complete test and check suite.
+    *   **`cargo-nextest`:** A faster, next-generation test runner. Install with `cargo install cargo-nextest`.
+    *   **`cargo-hack`:** A tool for running checks with different feature flag combinations. Install with `cargo install cargo-hack`.
+    *   **`cargo-minimal-versions`:** A tool to check against the minimum declared dependency versions. Install with `cargo install cargo-minimal-versions`.
+    *   **`wasm-pack`:** A tool for building and testing WebAssembly applications. Install with `cargo install wasm-pack`.
+    *   **`cargo-audit`:** A tool for auditing Cargo.lock for security vulnerabilities. Install with `cargo install cargo-audit`.
+    *   **`trybuild`:** A tool for testing procedural macros, ensuring they produce correct code and expected compile errors. Install with `cargo install trybuild`.
+
+### 2. FILES TO CREATE:
+
+This setup assumes the project source code is already present in the working directory `/home/cc/EnvGym/data/tokio-rs_tracing`, not created from scratch. The main configuration files are at the root of this directory.
+
+*   **Project Root (`/home/cc/EnvGym/data/tokio-rs_tracing/`):** The main project directory. Note that as a library project, `Cargo.lock` is intentionally not included in the source (as specified in `.gitignore`) and will be generated locally by Cargo on first build/check.
+*   **Contribution Guidelines (`CONTRIBUTING.md`):** This file provides a comprehensive guide for contributors, covering the code of conduct, how to report issues, the pull request process, commit message guidelines, and the release process.
+*   **Workspace Configuration (`Cargo.toml`):** This file defines the workspace, its member crates, and shared settings.
+    *   **Content Description:** The file specifies a Cargo workspace with members like `tracing`, `tracing-core`, `tracing-subscriber`, etc. It uses the version "2" resolver and configures workspace-level lints.
+    ```toml
+    [workspace]
+    resolver = "2"
+    members = [
+        "tracing",
+        "tracing-core",
+        # ... and all other member crates
+    ]
+    [workspace.lints.rust]
+    unexpected_cfgs = { level = "warn", check-cfg = ["cfg(flaky_tests)", "cfg(tracing_unstable)", "cfg(unsound_local_offset)"] }
+    ```
+*   **Per-Crate Manifest (`<crate-name>/Cargo.toml`):** Each crate in the workspace has its own `Cargo.toml` file defining its specific metadata, dependencies, and features.
+    *   **Content Description:** These files specify the crate's version, authors, dependencies, and `rust-version` (e.g., `1.65.0`, `1.63.0`), and opt into workspace lints with `lints.workspace = true`.
+*   **Clippy Configuration (`clippy.toml`):** This file provides workspace-wide configuration for the Clippy linter.
+*   **Git Ignore Configuration (`.gitignore`):** Configured for Rust projects, ignoring the `target/` directory and `Cargo.lock`.
+*   **Security Audit Configuration (`.cargo/audit.toml`):** Configures `cargo-audit` to ignore specific, vetted security advisories for compatibility reasons.
+*   **Nextest Configuration (`.config/nextest.toml`):** Provides a custom `ci` profile for `cargo-nextest` optimized for non-interactive environments.
+*   **Netlify Deployment Configuration (`netlify.toml`):** Configures the documentation build, specifying the `nightly` toolchain and necessary `RUSTFLAGS`.
+*   **GitHub Configuration (`.github/`):** Contains GitHub Actions workflows, issue templates, and other repository-specific configurations.
+*   **Per-Crate Changelogs (`<crate-name>/CHANGELOG.md`):** Each published crate has its own changelog file tracking user-facing changes.
+*   **Release Scripts (`bin/`):** Contains helper scripts for the release process.
+*   **Source Code Files:** The project contains multiple crates, each with its own `src` directory.
+
+### 3. NECESSARY TEST CASES IN THE CODEBASE:
+
+The following test cases validate the integrity, correctness, and compatibility of the codebase. All commands assume they are run from the project root (`/home/cc/EnvGym/data/tokio-rs_tracing`).
+
+*   **Test Case 1: Full Workspace Compilation Check.**
+    *   **Key Functionality:** `cargo check --all --tests --benches` and `(cd test_static_max_level_features && cargo check)`.
+*   **Test Case 2: Workspace-wide Test Execution.**
+    *   **Key Functionality:** `cargo nextest run --workspace --profile ci` (recommended) or `cargo test --workspace`.
+*   **Test Case 3: Documentation Tests.**
+    *   **Key Functionality:** `cargo test --doc --workspace`.
+*   **Test Case 4: Documentation Build.**
+    *   **Key Functionality (CI Emulation):** `rustup run nightly cargo doc --no-deps --all-features` with `RUSTFLAGS` and `RUSTDOCFLAGS` set as defined in `netlify.toml`.
+*   **Test Case 5: Running Example Applications.**
+    *   **Key Functionality:** `cargo run -p tracing-examples --bin <example-name>`.
+*   **Test Case 6: Code Formatting and Lints Check.**
+    *   **Key Functionality:** `cargo fmt --all -- --check` and `cargo clippy --all --examples --tests --benches -- -D warnings`.
+*   **Test Case 7: Feature Combination Check.**
+    *   **Key Functionality:** `cargo hack check --feature-powerset -p <crate-name>`.
+*   **Test Case 8: MSRV and Minimal Versions Check.**
+    *   **Key Functionality:** `rustup run <msrv-version> cargo minimal-versions check -p <crate-name>`.
+*   **Test Case 9: WebAssembly (WASM) Target Check.**
+    *   **Key Functionality:** `cargo test --no-run --target wasm32-unknown-unknown -p <crate-name>` and `wasm-pack test --node`.
+*   **Test Case 10: Security Audit Check.**
+    *   **Key Functionality:** `cargo audit`.
+*   **Test Case 11: Macro Compile-Time UI Tests.**
+    *   **Key Functionality:** Run via `cargo test -p tracing-attributes` as part of the main test suite.
+*   **Test Case 12: Benchmark Execution.**
+    *   **Key Functionality:** `cargo bench --workspace`.
+*   **Test Case 13: Isolated Workspace Test.**
+    *   **Key Functionality:** `(cd test_static_max_level_features && cargo test)`.
+*   **Test Case 14: Publish Readiness Check (Advanced).**
+    *   **Key Functionality:** `bin/publish --dry-run <CRATE NAME> <CRATE VERSION>`.
+
+### 4. COMPLETE TODO LIST:
+
+The following steps assume the project source code is located at `/home/cc/EnvGym/data/tokio-rs_tracing` and all commands are run from this directory.
+
+*   **Step 1: Install System Dependencies.**
+    *   **Action:** Open your terminal and use the package manager to install Git and the `systemd` development libraries required for `tracing-journald`.
+        ```sh
+        # On Debian/Ubuntu-based systems
+        apt-get update && apt-get install -y git libsystemd-dev
+        ```
+    *   **Verification:** The command completes successfully.
+*   **Step 2: Install Rust Toolchain and Components.**
+    *   **Action:** Install `rustup` and use it to install the stable, MSRV (`1.49.0`, `1.63.0`, `1.64.0`, `1.65.0`), and nightly toolchains, required components (`rustfmt`, `clippy`), and the WASM target in a non-interactive manner.
+        ```sh
+        # Install rustup non-interactively
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        # Add cargo to the current shell's PATH
+        source "$HOME/.cargo/env"
+        # Configure the toolchains and components
+        rustup toolchain install stable
+        rustup toolchain install 1.49.0
+        rustup toolchain install 1.63.0
+        rustup toolchain install 1.64.0
+        rustup toolchain install 1.65.0
+        rustup toolchain install nightly
+        rustup component add rustfmt clippy
+        rustup target add wasm32-unknown-unknown
+        ```
+    *   **Verification:** Run `rustc --version` (should show latest stable) and `rustup show` (should list `stable`, `1.49.0`, `1.63.0`, `1.64.0`, `1.65.0`, and `nightly`).
+*   **Step 3: Install Additional Development Tools.**
+    *   **Action:** Use `cargo` to install the helper tools for testing and checking.
+        ```sh
+        cargo install cargo-nextest
+        cargo install cargo-hack
+        cargo install cargo-minimal-versions
+        cargo install wasm-pack
+        cargo install cargo-audit
+        cargo install trybuild
+        ```
+    *   **Verification:** Run `cargo nextest --version`, `cargo hack --version`, `cargo minimal-versions --version`, `wasm-pack --version`, `cargo audit --version`, and `trybuild --version`. All commands should execute successfully.
+*   **Step 4: Check Workspace Compilation.**
+    *   **Action:** Inside the project directory, run the `cargo check` command for the entire main workspace and for the isolated test workspace. This is a quick way to verify that everything compiles and generates the `Cargo.lock` file.
+        ```sh
+        # Main workspace check
+        cargo check --all --tests --benches
+        # Isolated workspace check for static max level features
+        (cd test_static_max_level_features && cargo check)
+        ```
+    *   **Verification:** Both commands should complete successfully without any compilation errors.
+*   **Step 5: Run the Workspace Test Suites.**
+    *   **Action:** Run the unit/integration tests (including macro compile-time tests) and the documentation tests for all crates. Using `cargo-nextest` with the `ci` profile is recommended.
+        ```sh
+        # Run main test suite using the CI profile
+        # Note: tracing-journald tests will only run on Linux.
+        cargo nextest run --workspace --profile ci
+        # Run documentation tests
+        cargo test --doc --workspace
+        # Run tests for the isolated static max level features workspace
+        (cd test_static_max_level_features && cargo test)
+        ```
+    *   **Verification:** All test suites should run, and all tests should pass.
+*   **Step 6: Build Project Documentation (CI Emulation).**
+    *   **Action:** Build the full project documentation using the same strict settings as the official deployment pipeline.
+        ```sh
+        export RUSTDOCFLAGS="-D warnings --force-warn rustdoc::redundant-explicit-links --force-warn renamed-and-removed-lints --cfg docsrs --cfg tracing_unstable"
+        export RUSTFLAGS="--cfg tracing_unstable"
+        rustup run nightly cargo doc --no-deps --all-features
+        ```
+    *   **Verification:** The command completes without any warnings or errors. The generated documentation can be found in `target/doc/`.
+*   **Step 7: Run an Example Application.**
+    *   **Action:** Run one of the examples to verify end-to-end functionality.
+        ```sh
+        cargo run -p tracing-examples --bin simple
+        ```
+    *   **Verification:** The console displays structured log output generated by the `tracing` crates.
+*   **Step 8: Check Code Quality, Formatting, and Security.**
+    *   **Action:** Verify that the code passes the formatter, linter, and security checks.
+        ```sh
+        # Check formatting
+        cargo fmt --all -- --check
+        # Check lints
+        cargo clippy --all --examples --tests --benches -- -D warnings
+        # Check for security vulnerabilities
+        cargo audit
+        ```
+    *   **Verification:** All `cargo` commands complete without reporting any errors or unignored vulnerabilities.
+*   **Step 9: Run Benchmarks (Optional).**
+    *   **Action:** Run the performance benchmarks for the workspace.
+        ```sh
+        cargo bench --workspace
+        ```
+    *   **Verification:** The benchmarks complete and report performance numbers without errors.
+*   **Step 10: Perform Advanced Compatibility Checks (Optional).**
+    *   **Action:** Run advanced checks used by the CI to ensure compatibility across Rust versions, dependency versions, and feature flags.
+        ```sh
+        # Check MSRV (1.63.0) and minimal dependencies for `tracing-appender`
+        rustup run 1.63.0 cargo minimal-versions check -p tracing-appender
+        # Check MSRV (1.65.0) and minimal dependencies for `tracing-subscriber`
+        rustup run 1.65.0 cargo minimal-versions check -p tracing-subscriber
+        # Check feature flag combinations for a crate
+        cargo hack check --feature-powerset -p tracing-subscriber
+        ```
+    *   **Verification:** The commands complete successfully, ensuring broad configuration compatibility.
+*   **Step 11: Final Environment Check.**
+    *   **Action:** The environment is now fully configured and verified.
+    *   **Verification:** The project workspace compiles, passes all primary and documentation tests, and the environment contains all necessary tools for development and contribution.

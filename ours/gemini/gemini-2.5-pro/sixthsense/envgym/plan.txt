@@ -1,0 +1,87 @@
+Based on the provided hardware and environment details, the setup plan has been adjusted to utilize a containerized Docker workflow. This approach enhances reproducibility, ensures compatibility, and isolates dependencies from the host system.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN (DOCKER-BASED) ===
+
+1.  **ENVIRONMENT PREREQUISITES:**
+    - **Docker:** Version 20.10 or higher installed and running.
+    - **SixthSense Source Code:** The complete project repository cloned to your local machine, which will serve as the Docker build context (e.g., in `/home/cc/EnvGym/data/sixthsense`).
+
+2.  **FILES TO CREATE / MODIFY:**
+    - **File: `Dockerfile`**:
+        - **Path:** Create this file in the root of the SixthSense project directory (`/home/cc/EnvGym/data/sixthsense/Dockerfile`).
+        - **Description:** This file contains all the instructions to build a portable Docker image with the complete environment, dependencies, and data needed to run the project.
+        - **Content:**
+          ```dockerfile
+          # Use a modern, slim, and platform-compatible Python base image
+          FROM --platform=linux/amd64 python:3.10-slim
+
+          # Set the working directory inside the container
+          WORKDIR /app
+
+          # Install system dependencies needed for downloading the dataset
+          RUN apt-get update && apt-get install -y --no-install-recommends \
+              wget \
+              && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+          # Copy the requirements file first to leverage Docker layer caching
+          COPY requirements.txt .
+
+          # Install Python dependencies
+          RUN pip install --no-cache-dir -r requirements.txt
+
+          # Copy the rest of the application source code
+          COPY . .
+
+          # Create directories for outputs and data
+          RUN mkdir -p plots models results csvs
+
+          # Download the dataset CSV files from Zenodo directly into the csvs directory
+          # Note: Add other required CSVs to this list if needed for other tests
+          RUN wget -O csvs/lrm_features.csv https://zenodo.org/record/6388301/files/lrm_features.csv && \
+              wget -O csvs/lrm_metrics.csv https://zenodo.org/record/6388301/files/lrm_metrics.csv && \
+              wget -O csvs/timeseries_features.csv https://zenodo.org/record/6388301/files/timeseries_features.csv && \
+              wget -O csvs/timeseries_metrics.csv https://zenodo.org/record/6388301/files/timeseries_metrics.csv
+
+          # Set a default command (optional, but good practice)
+          ENTRYPOINT ["python", "train.py"]
+          ```
+
+3.  **REFERENCE TEST CASES (FOR CONTAINER EXECUTION):**
+    The following commands are executed *inside* the container, where the file paths (`csvs/`, `plots/`) are valid.
+
+    - **Test Case 1: Standard Training and Prediction Run**
+        - **Command:** `python train.py -f csvs/lrm_features.csv -l csvs/lrm_metrics.csv -a rf -m rhat_min -suf avg -bw -plt -saveas plots/results_rhat_min_lrm.png -keep _ast_ dt_ var_min var_max data_size -st -tname naive-bayes-unsup -cv -ignore_vi`
+        - **Expected Outcome:** The script completes without errors. Prediction scores are printed to the console. A results file is created in the container's `/app/results` directory, and a plot file is created in `/app/plots`. These will be accessible on the host via volume mounts.
+
+    - **Test Case 2: Feature Importance Analysis Run**
+        - **Command:** `python train.py -f csvs/lrm_features.csv -l csvs/lrm_metrics.csv -a rf -m rhat_min -suf avg -bw -th 1.05 -saveas plots/temp.png -keep _ast_ dt_ var_min var_max data_size -st -tname naive-bayes-unsup -ignore_vi --tree --special progs20200425-172437571193_prob_rand_7`
+        - **Expected Outcome:** The script completes and outputs the top 20 features and their contribution scores to the console.
+
+    - **Test Case 3: Training with Runtime Samples**
+        - **Command:** `python train.py -f csvs/lrm_features.csv -l csvs/lrm_metrics.csv -a rf -m rhat_min -suf avg -bw -runtime -saveas plots/results_runtime_rhat_min_lrm.png -keep _ast_ dt_ var_min var_max data_size -st -tname naive-bayes-unsup -cv -ignore_vi`
+        - **Expected Outcome:** The script completes without errors. A results file and a plot file are generated and will be accessible on the host.
+
+4.  **COMPLETE TODO LIST (DOCKER WORKFLOW):**
+    - **Step 1: Prepare the Build Context**
+        - Action: Ensure you are in the project's root directory (`/home/cc/EnvGym/data/sixthsense`) and that it contains the source code (`train.py`, `requirements.txt`, etc.).
+        - Action: Create the `Dockerfile` in this directory with the content provided in section 2.
+        - Verification: The command `ls` should show `Dockerfile`, `train.py`, and `requirements.txt`.
+
+    - **Step 2: Build the Docker Image**
+        - Action: Run the Docker build command from the project's root directory. This will execute all steps in the `Dockerfile`, creating a self-contained image named `sixthsense-env`.
+        - Command: `docker build --platform linux/amd64 -t sixthsense-env .`
+        - Verification: The command should complete with a message "Successfully tagged sixthsense-env:latest". Running `docker images` will show the new image.
+
+    - **Step 3: Create Local Directories for Output**
+        - Action: Before running the container, create the output directories on your host machine. The container will mount its internal output directories to these.
+        - Command: `mkdir -p plots results`
+        - Verification: `ls` shows the `plots` and `results` directories.
+
+    - **Step 4: Run Verification Test Case in Container**
+        - Action: Execute the standard training run (Test Case 1) using a `docker run` command. This command starts a temporary container from the image, mounts the local `plots` and `results` directories for output persistence, and then runs the training script.
+        - Command: `docker run --rm -v "$(pwd)/plots:/app/plots" -v "$(pwd)/results:/app/results" sixthsense-env -f csvs/lrm_features.csv -l csvs/lrm_metrics.csv -a rf -m rhat_min -suf avg -bw -plt -saveas plots/results_rhat_min_lrm.png -keep _ast_ dt_ var_min var_max data_size -st -tname naive-bayes-unsup -cv -ignore_vi`
+        - Verification: The script should run to completion inside the container without errors and print prediction scores to your terminal. The `--rm` flag ensures the container is automatically removed after execution.
+
+    - **Step 5: Confirm Output Generation on Host**
+        - Action: Check the local `plots` and `results` directories on your host machine.
+        - Verification: The `plots` directory should now contain the output plot `results_rhat_min_lrm.png`. The `results` directory should contain a new file with the prediction scores. The environment is now fully configured and verified.

@@ -1,0 +1,139 @@
+Based on the provided hardware information, here is the adjusted environment setup plan. The plan is optimized for a containerized `linux/amd64` environment with a high core count and uses the specified working directory.
+
+=== ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    -   **Rust Toolchain**: The project is tested against Stable and Nightly. A recent stable version (1.88+) is recommended for general development. Nightly is used for specific release builds (e.g., MUSL, macOS, Windows) and for generating full documentation. Installation via `rustup` is standard.
+        -   **`rustfmt` component**: Required for code formatting checks. Install via `rustup component add rustfmt`.
+        -   **Nightly toolchain (Optional)**: Required for full documentation builds. Install via `rustup toolchain install nightly`.
+    -   **Git**: Required for cloning the repository and embedding the commit hash into the binary.
+    -   **Build Essentials / C Compiler**: A C compiler (GCC, Clang, or MSVC) is required by some Rust dependencies (like `libc`). The target environment is Linux, so `build-essential` or equivalent is needed.
+    -   **PCRE2 Development Libraries**: Required for the `pcre2` feature, which is enabled by default for all official release builds.
+        -   On Debian/Ubuntu: `libpcre2-dev`
+        -   On Fedora/CentOS/RHEL: `pcre2-devel`
+        -   **Note**: Release builds are configured to link PCRE2 statically via the `PCRE2_SYS_STATIC=1` environment variable.
+    -   **pkg-config**: Helper tool to find PCRE2 libraries on Linux. Usually installed alongside PCRE2 dev libraries.
+    -   **CI/Testing Dependencies (Optional, for full test suite on Linux)**:
+        -   `musl-tools`: Required on Debian/Ubuntu for building against the MUSL C library.
+        -   `zsh`: Required for testing Zsh shell completions.
+        -   `xz-utils`, `liblz4-tool`, `brotli`, `zstd`: Required for tests involving searching compressed files.
+    -   **cross (Optional)**: A tool for cross-compiling Rust projects, required for building for different architectures. The CI uses version `v0.2.5`.
+    -   **cargo-deb (Optional)**: A cargo subcommand for building Debian packages.
+    -   **snapcraft (Optional)**: A tool for building Snap packages for Linux distributions. Requires Python.
+    -   **cargo-timing (Optional)**: A cargo subcommand for generating HTML reports of compilation times.
+    -   **Additional Rust Targets (Optional)**: For cross-compilation from the `x86_64` host, additional targets are needed. Official releases are built for: `x86_64-unknown-linux-musl`, `i6686-unknown-linux-gnu`, `aarch64-unknown-linux-gnu`, `armv7-unknown-linux-gnueabihf`, `armv7-unknown-linux-musleabi`, `powerpc64-unknown-linux-gnu`, `s390x-unknown-linux-gnu`, `x86_64-apple-darwin`, `x86_64-pc-windows-msvc`, `x86_64-pc-windows-gnu`, `i686-pc-windows-msvc`, and `wasm32-wasip1`. Install via `rustup target add <target-name>`.
+    -   **GitHub CLI (`gh`) (Optional)**: Required for maintainers to create and upload official releases.
+    -   **Archiving/Checksum Tools (Optional)**: `tar` and `shasum` are used by the release workflow to package artifacts.
+
+2.  FILES TO CREATE:
+    -   No new configuration files need to be created by the user. The project should be cloned from the source repository into the specified working directory. Key files included in the repository that define the environment and build process are:
+        -   `Cargo.toml` and `Cargo.lock`: Define project dependencies and ensure reproducible builds for the entire workspace.
+        -   `.gitignore`: Specifies intentionally untracked files for Git to ignore.
+        -   `.ignore`: Specifies file traversal rules for `ripgrep` itself.
+        -   `crates/.../Cargo.toml`: Define the individual crates of the workspace (`grep`, `matcher`, `pcre2`, `searcher`, etc.).
+        -   `rustfmt.toml`: Defines project-specific code formatting rules.
+        -   `.cargo/config.toml`: Configures `rustflags` for specific targets.
+        -   `build.rs`: Build script for embedding git hash and other metadata.
+        -   `.github/workflows/ci.yml`: Defines the continuous integration pipeline.
+        -   And other packaging and configuration files (`Manifest.xml`, `ripgrep-bin.rb`, `snapcraft.yaml`).
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    -   The project includes a comprehensive test suite executed via `cargo test --workspace --all-features`, which covers all crates and features. The `x86_64` architecture is the primary target and is fully supported.
+    -   Key functionality points to verify via tests and build checks:
+        -   **Core Search Features**: Line-oriented search, recursion, context control, colored output.
+        -   **Ignore/Hidden/Binary Files**: Correctly respecting `.gitignore`, `.ignore`, and glob rules.
+        -   **PCRE2 Feature**: Correctly compiling and statically linking the PCRE2 library.
+        -   **Character Encoding**: Correctly searching files with non-UTF-8 encodings.
+        -   **JSON Output**: Production of valid JSON output.
+        -   **Compressed File Search**: Searching within `xz`, `lz4`, `brotli`, and `zstd` compressed files.
+        -   **Cross-Compilation Builds**: The release pipeline validates builds across numerous targets, all of which can be cross-compiled from the `x86_64` host.
+        -   **Static Linking (Linux MUSL)**: Release builds for `*-unknown-linux-musl` targets must be fully static executables.
+        -   **WASM Build**: Successful compilation for the `wasm32-wasip1` target.
+        -   **Code Formatting**: Adherence to `rustfmt` standards.
+        -   **Documentation Build**: Successful documentation generation.
+        -   **Shell Completions and Man Pages**: Successful generation for packaging.
+        -   **Build Metadata**: `rg --version` must include the git commit hash and `+pcre2`.
+        -   **Version Consistency (Release)**: Git tag must match versions in `Cargo.toml` and packaging scripts.
+        -   **Debian/Snap Package Build**: Successful package creation.
+        -   **Release Archive Integrity**: Verification of `.tar.gz` archive contents.
+
+4.  COMPLETE TODO LIST:
+    1.  **Install Rust and Components**:
+        -   Run `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable` to perform a non-interactive installation of `rustup`.
+        -   Add Cargo to the environment's `PATH`. For subsequent steps in a script or Dockerfile, this can be done with `export PATH="$HOME/.cargo/bin:$PATH"`.
+        -   Install the `rustfmt` component: `rustup component add rustfmt`.
+        -   **Verification**: Run `rustc --version`. The output should be `1.88.0` or higher.
+
+    2.  **Clone the Repository**:
+        -   Install Git if needed.
+        -   Run `git clone https://github.com/BurntSushi/ripgrep.git /home/cc/EnvGym/data/BurntSushi_ripgrep`
+        -   Navigate into the project directory: `cd /home/cc/EnvGym/data/BurntSushi_ripgrep`
+
+    3.  **Install System Dependencies**:
+        -   **Note**: The following command is for Debian/Ubuntu-based images. It is scripted for non-interactive execution.
+        -   `export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y --no-install-recommends build-essential libpcre2-dev pkg-config zsh xz-utils liblz4-tool musl-tools brotli zstd`
+
+    4.  **Perform a Debug Build**:
+        -   In the project root (`/home/cc/EnvGym/data/BurntSushi_ripgrep`), run: `cargo build --workspace`
+        -   **Performance Note**: `cargo` will automatically detect and use all 96 available CPU cores, significantly reducing compilation time.
+        -   **Verification**: Check for the executable at `/home/cc/EnvGym/data/BurntSushi_ripgrep/target/debug/rg`.
+
+    5.  **Run Linter and Doc Checks**:
+        -   Check code formatting: `cargo fmt --all --check`
+        -   Build and check documentation: `cargo doc --no-deps --workspace`
+        -   **Advanced Doc Check (Optional)**: `RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features --workspace`.
+        -   **Verification**: All commands should complete without errors.
+
+    6.  **Run the Full Test Suite**:
+        -   Execute all tests: `cargo test --workspace --all-features`
+        -   **Performance Note**: The test suite will also run in parallel, taking advantage of the high core count.
+        -   **Verification**: All tests should pass.
+
+    7.  **Perform an Official Release Build**:
+        -   This command replicates the standard build process for releases.
+        -   `PCRE2_SYS_STATIC=1 cargo build --release --workspace --features pcre2`
+        -   **Verification**: An optimized binary will be at `/home/cc/EnvGym/data/BurntSushi_ripgrep/target/release/rg`. Run `/home/cc/EnvGym/data/BurntSushi_ripgrep/target/release/rg --version` to confirm the version, git hash, and `+pcre2` feature flag are present.
+
+    8.  **Perform Advanced Builds (Optional)**:
+        -   **Cross-compilation Build (MUSL)**:
+            -   Install cross: `cargo install cross --version 0.2.5`
+            -   Add a target: `rustup target add x86_64-unknown-linux-musl`
+            -   Build: `PCRE2_SYS_STATIC=1 cross build --release --workspace --features pcre2 --target x86_64-unknown-linux-musl`
+            -   **Verification**: Run `ldd /home/cc/EnvGym/data/BurntSushi_ripgrep/target/x86_64-unknown-linux-musl/release/rg`. The output should be `not a dynamic executable`, confirming it is fully statically linked.
+        -   **WASM Build**:
+            -   Add the target: `rustup target add wasm32-wasip1`
+            -   Build: `cargo build --release --workspace --target wasm32-wasip1`
+
+    9.  **Create a Debian Package (Optional)**:
+        -   Install `cargo-deb`: `cargo install cargo-deb`
+        -   Build the package for the MUSL target: `cargo deb --profile deb --target x86_64-unknown-linux-musl`
+        -   **Verification**: A `.deb` package will be created in `/home/cc/EnvGym/data/BurntSushi_ripgrep/target/x86_64-unknown-linux-musl/debian/`.
+
+    10. **Create a Snap Package (Optional)**:
+        -   Install `snapcraft`: `snap install snapcraft --classic`
+        -   Build the package: `snapcraft`
+        -   **Verification**: A `.snap` package will be created in the project root.
+
+    11. **Analyze Build Times (Optional)**:
+        -   Install `cargo-timing`: `cargo install cargo-timing`
+        -   Run a build with timing enabled: `cargo build --timings`
+        -   **Verification**: An HTML report will be generated in `/home/cc/EnvGym/data/BurntSushi_ripgrep/target/cargo-timings/`.
+
+    12. **Prepare and Verify Release Artifacts (Maintainers)**:
+        -   Generate shell completions and man pages (handled by build scripts).
+        -   Create release archives (e.g., `.tar.gz`) using `tar`.
+        -   **Verification**: Unpack an archive and verify its contents (`rg` binary, man page, completion files).
+        -   Generate checksums for the archives using `shasum -a 256`.
+
+    13. **Final Verification**:
+        -   Change to the working directory: `cd /home/cc/EnvGym/data/BurntSushi_ripgrep`
+        -   Create a test directory and file:
+            ```bash
+            mkdir test_dir
+            echo -e "hello\nworld\nhello again" > test_dir/sample.txt
+            ```
+        -   Run the compiled binary for standard output: `./target/release/rg hello test_dir/`
+        -   **Verification (Standard)**: The output should correctly display the two lines containing "hello".
+        -   Run a search inside the `.github` directory to test ignore rules: `./target/release/rg workflow .github/`
+        -   **Verification (Ignore Rules Result)**: The command should find and display matches within the workflow YAML files, confirming that the `.ignore` file rule `!/.github/` is working correctly.
+        -   A final check of `./target/release/rg --version` should confirm the version, git hash, and `+pcre2` feature.

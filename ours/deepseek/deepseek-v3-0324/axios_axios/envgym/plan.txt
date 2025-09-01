@@ -1,0 +1,136 @@
+Here's the adjusted environment setup plan with considerations for the provided hardware information (x86_64 architecture, Linux environment):
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Node.js (v16.0.0 or higher, Linux x64 build)
+   - npm (v8.0.0 or higher) or yarn (v1.22.0 or higher) or pnpm (v7.0.0 or higher)
+   - Git (for version control, Linux package)
+   - axios package (v1.11.0 or higher)
+   - form-data package (v4.0.4 or higher)
+   - follow-redirects (v1.15.6 or higher)
+   - proxy-from-env (v1.1.0 or higher)
+   - TypeScript (v4.9.5 or higher, if using TypeScript)
+   - Additional dev tools (optional):
+     - @babel/core
+     - eslint
+     - mocha
+     - karma
+     - rollup
+     - husky
+     - release-it
+
+2. FILES TO CREATE:
+   - package.json:
+     ```
+     {
+       "name": "axios-project",
+       "version": "1.0.0",
+       "main": "index.js",
+       "type": "module",
+       "scripts": {
+         "start": "node index.js",
+         "test": "npm run test:eslint && npm run test:mocha",
+         "test:eslint": "eslint lib/**/*.js",
+         "test:mocha": "mocha test/unit/**/*.js --timeout 30000 --exit",
+         "build": "rollup -c -m"
+       },
+       "dependencies": {
+         "axios": "^1.11.0",
+         "form-data": "^4.0.4",
+         "follow-redirects": "^1.15.6",
+         "proxy-from-env": "^1.1.0"
+       },
+       "devDependencies": {
+         "@babel/core": "^7.23.9",
+         "eslint": "^8.56.0",
+         "mocha": "^10.3.0",
+         "rollup": "^2.79.1",
+         "typescript": "^4.9.5"
+       },
+       "engines": {
+         "node": ">=16.0.0",
+         "npm": ">=8.0.0"
+       }
+     }
+     ```
+   - tsconfig.json (if using TypeScript):
+     ```
+     {
+       "compilerOptions": {
+         "module": "ESNext",
+         "target": "ES6",
+         "moduleResolution": "node16",
+         "esModuleInterop": true,
+         "strict": true
+       }
+     }
+     ```
+   - .gitignore:
+     ```
+     node_modules/
+     dist/
+     .env
+     coverage/
+     *.swp
+     .DS_Store
+     ```
+   - .eslintrc (optional)
+   - rollup.config.js (optional)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Basic GET request with parameters
+   - POST request with JSON payload
+   - File upload using FormData
+   - Error handling for failed requests
+   - Request cancellation using AbortController
+   - Request/response interceptors
+   - Progress tracking for uploads/downloads
+   - Custom instance creation and usage
+   - Header manipulation using AxiosHeaders
+   - Browser compatibility tests
+   - Module export validation
+   - TypeScript type definitions validation
+   - Redirect following tests
+   - Proxy configuration tests
+   - Bundle size verification
+
+4. COMPLETE TODO LIST:
+   - Install Node.js (Linux x64 build) and verify installation with `node -v`
+   - Install package manager (npm/yarn/pnpm) and verify with `npm -v`/`yarn -v`/`pnpm -v`
+   - Create project directory at /home/cc/EnvGym/data/axios_axios
+   - Initialize package.json with Linux-compatible configurations
+   - Install axios and required dependencies
+   - Set up TypeScript configuration if needed
+   - Create basic implementation file (index.js/index.ts)
+   - Set up ESLint configuration
+   - Configure Rollup for bundling
+   - Write test cases for core functionality
+   - Verify all functionality works in Linux environment
+   - Document API usage and examples
+   - Add error handling for different error types
+   - Implement request/response interceptors
+   - Test with different content types (JSON, FormData, URLSearchParams)
+   - Verify cross-browser compatibility
+   - Test in Node.js environment
+   - Verify cancellation functionality
+   - Test rate limiting implementation
+   - Verify progress tracking works
+   - Test header manipulation functionality
+   - Validate all test cases pass
+   - Set up husky for git hooks
+   - Configure release-it for version management
+   - Verify bundle size meets requirements
+   - Test redirect following functionality
+   - Validate proxy configuration
+   - Document Linux environment setup for other developers
+
+Key adjustments made:
+1. Added "engines" field to package.json to specify Node.js and npm versions
+2. Added Linux-specific notes for installation steps
+3. Confirmed all packages are compatible with x86_64 architecture
+4. Added common Linux ignore patterns to .gitignore
+5. Specified full project path in TODO list
+6. Removed GPU-specific considerations as none are needed
+7. Ensured all tool versions are compatible with Linux environment
+8. Simplified browser testing notes since there's no GPU requirement

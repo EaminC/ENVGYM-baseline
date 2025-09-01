@@ -1,0 +1,137 @@
+=== Docker Execution Log - 20250828_164246 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756398909
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 904B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/rust:1.64-slim-bullseye
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/rust:1.64-slim-bullseye@sha256:07f3fda67888f706916d97c2ab6539a1421304f991d74d066ca59037945c938b
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 140.35kB 0.0s done
+#5 DONE 0.0s
+
+#6 [2/8] RUN apt-get update && apt-get install -y --no-install-recommends     make     git     bash-completion     jq     fish     zsh     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [3/8] WORKDIR /app
+#7 CACHED
+
+#8 [4/8] COPY . .
+#8 DONE 0.0s
+
+#9 [5/8] RUN cargo build --release     && mkdir -p /usr/share/zsh/vendor-completions     && mkdir -p /usr/local/share/man/man1     && [ -f contrib/completion/_fd ] && cp contrib/completion/_fd /usr/share/zsh/vendor-completions/ || true     && [ -f doc/fd.1 ] && cp doc/fd.1 /usr/local/share/man/man1/ || true
+#9 0.420     Updating crates.io index
+#9 451.3  Downloading crates ...
+#9 451.3   Downloaded anstyle v1.0.11
+#9 451.3   Downloaded anstyle-parse v0.2.7
+#9 451.3   Downloaded anstyle-query v1.1.3
+#9 451.3   Downloaded anstream v0.6.19
+#9 451.4   Downloaded anyhow v1.0.98
+#9 451.4   Downloaded aho-corasick v1.1.3
+#9 451.4   Downloaded shlex v1.3.0
+#9 451.4   Downloaded crossbeam-utils v0.8.21
+#9 451.4   Downloaded faccess v0.2.4
+#9 451.4   Downloaded crossbeam-deque v0.8.6
+#9 451.4   Downloaded etcetera v0.10.0
+#9 451.4   Downloaded terminal_size v0.4.2
+#9 451.4   Downloaded same-file v1.0.6
+#9 451.4   Downloaded crossbeam-epoch v0.9.18
+#9 451.4   Downloaded serde v1.0.219
+#9 451.4   Downloaded is_terminal_polyfill v1.70.1
+#9 451.4   Downloaded cfg_aliases v0.2.1
+#9 451.4   Downloaded globset v0.4.16
+#9 451.4   Downloaded argmax v0.4.0
+#9 451.4   Downloaded errno v0.3.13
+#9 451.4   Downloaded clap_derive v4.5.41
+#9 451.4   Downloaded clap_builder v4.5.42
+#9 451.4   Downloaded jiff-static v0.2.15
+#9 451.4   Downloaded clap_lex v0.7.5
+#9 451.4   Downloaded bitflags v2.9.1
+#9 451.4   Downloaded cfg-if v1.0.1
+#9 451.4   Downloaded version_check v0.9.5
+#9 451.4   Downloaded home v0.5.9
+#9 451.4   Downloaded normpath v1.3.0
+#9 451.4   Downloaded heck v0.5.0
+#9 451.4   Downloaded bitflags v1.3.2
+#9 451.4   Downloaded utf8parse v0.2.2
+#9 451.4   Downloaded strsim v0.11.1
+#9 451.4   Downloaded ctrlc v3.4.7
+#9 451.4   Downloaded colorchoice v1.0.4
+#9 451.4   Downloaded walkdir v2.5.0
+#9 451.4   Downloaded tikv-jemallocator v0.6.0
+#9 451.4   Downloaded nu-ansi-term v0.50.1
+#9 451.4   Downloaded lscolors v0.20.0
+#9 451.4   Downloaded once_cell v1.21.3
+#9 451.4   Downloaded clap_complete v4.5.55
+#9 451.4   Downloaded clap v4.5.42
+#9 451.4   Downloaded log v0.4.27
+#9 451.4   Downloaded quote v1.0.40
+#9 451.5   Downloaded unicode-ident v1.0.18
+#9 451.5   Downloaded ignore v0.4.23
+#9 451.5   Downloaded proc-macro2 v1.0.95
+#9 451.5   Downloaded cc v1.2.29
+#9 451.5   Downloaded memchr v2.7.5
+#9 451.5   Downloaded crossbeam-channel v0.5.15
+#9 451.5   Downloaded syn v2.0.104
+#9 451.6   Downloaded regex v1.11.1
+#9 451.6   Downloaded regex-syntax v0.8.5
+#9 451.7   Downloaded bstr v1.12.0
+#9 451.7   Downloaded nix v0.30.1
+#9 451.7   Downloaded rustix v1.0.7
+#9 451.9   Downloaded regex-automata v0.4.9
+#9 451.9   Downloaded jiff v0.2.15
+#9 452.0   Downloaded libc v0.2.174
+#9 452.0   Downloaded tikv-jemalloc-sys v0.6.0+5.3.0-1-ge13ca993e8ccb9ba9847cc330696e02839f328f7
+#9 452.2   Downloaded linux-raw-sys v0.9.4
+#9 452.3 error: package `tikv-jemalloc-sys v0.6.0+5.3.0-1-ge13ca993e8ccb9ba9847cc330696e02839f328f7` cannot be built because it requires rustc 1.71.0 or newer, while the currently active rustc version is 1.64.0
+#9 452.3 cp: cannot create regular file '/usr/local/share/man/man1/': Not a directory
+#9 DONE 452.6s
+
+#10 [6/8] RUN mkdir -p ~/.config/fd     && touch ~/.fdignore ~/.config/fd/ignore
+#10 DONE 0.3s
+
+#11 [7/8] RUN echo "alias fd='fdfind'" >> ~/.bashrc     && echo "alias fd='fdfind'" >> ~/.zshrc
+#11 DONE 0.4s
+
+#12 [8/8] WORKDIR /app
+#12 DONE 0.0s
+
+#13 exporting to image
+#13 exporting layers
+#13 exporting layers 2.9s done
+#13 writing image sha256:c27512c42b123df5abab99818f869e7701ef79e497cc2dd221b1053c7991427b done
+#13 naming to docker.io/library/envgym_test_1756398909 done
+#13 DONE 2.9s
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - UndefinedVar: Usage of undefined variable '$FZF_DEFAULT_COMMAND' (line 24)
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

@@ -1,0 +1,122 @@
+=== Docker Execution Log - 20250828_162541 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756398319
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 32.71kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/27] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0
+#4 DONE 0.0s
+
+#5 [ 2/27] WORKDIR /home/cc/EnvGym/data/anvil
+#5 CACHED
+
+#6 [15/27] RUN <<EOF > verifiable-controllers/deploy.sh
+#6 CACHED
+
+#7 [22/27] RUN <<EOF > verifiable-controllers/deploy/kind.yaml
+#7 CACHED
+
+#8 [ 3/27] RUN apt-get update && apt-get install -y     build-essential     git     golang-go     docker.io     openssl     pkg-config     libssl-dev     python3     python3-pip     wget     unzip     curl     ca-certificates     sudo     && apt-get clean     && rm -rf /var/lib/apt/lists/*     && pip3 install tabulate     && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"     && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl     && rm kubectl     && go install sigs.k8s.io/kind@v0.23.0
+#8 CACHED
+
+#9 [ 8/27] RUN <<EOF > verifiable-controllers/.github/workflows/ci.yml
+#9 CACHED
+
+#10 [20/27] RUN <<EOF > verifiable-controllers/docker/controller/Dockerfile.remote
+#10 CACHED
+
+#11 [ 6/27] RUN mkdir -p verifiable-controllers/.github/workflows     && mkdir -p verifiable-controllers/src/deps_hack/src     && mkdir -p verifiable-controllers/deploy/{vreplicaset,vdeployment,vstatefulset,zookeeper,rabbitmq,fluent}     && mkdir -p verifiable-controllers/e2e/src     && mkdir -p verifiable-controllers/e2e/manifests     && mkdir -p verifiable-controllers/docker/controller     && mkdir -p verifiable-controllers/docker/verus     && mkdir -p verifiable-controllers/tools
+#11 CACHED
+
+#12 [ 9/27] RUN <<EOF > verifiable-controllers/.github/workflows/controller-build.yml
+#12 CACHED
+
+#13 [ 7/27] RUN <<EOF > verifiable-controllers/.gitignore
+#13 CACHED
+
+#14 [12/27] RUN <<EOF > verifiable-controllers/rust-toolchain.toml
+#14 CACHED
+
+#15 [17/27] RUN <<EOF > verifiable-controllers/reproduce-verification-result.sh
+#15 CACHED
+
+#16 [13/27] RUN <<EOF > verifiable-controllers/src/deps_hack/Cargo.toml
+#16 CACHED
+
+#17 [ 4/27] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain none -y
+#17 CACHED
+
+#18 [19/27] RUN <<EOF > verifiable-controllers/docker/verus/Dockerfile
+#18 CACHED
+
+#19 [10/27] RUN <<EOF > verifiable-controllers/.github/workflows/verus-build.yml
+#19 CACHED
+
+#20 [11/27] RUN <<EOF > verifiable-controllers/Cargo.toml
+#20 CACHED
+
+#21 [14/27] RUN <<EOF > verifiable-controllers/build.sh
+#21 CACHED
+
+#22 [23/27] RUN <<EOF > verifiable-controllers/e2e/Cargo.toml
+#22 CACHED
+
+#23 [18/27] RUN <<EOF > verifiable-controllers/verify-controller-only.sh
+#23 CACHED
+
+#24 [21/27] RUN <<EOF > verifiable-controllers/docker/controller/Dockerfile.local
+#24 CACHED
+
+#25 [16/27] RUN <<EOF > verifiable-controllers/local-test.sh
+#25 CACHED
+
+#26 [ 5/27] RUN git clone https://github.com/verus-lang/verus.git     && cd verus     && git checkout 8bd7c3292aad57d3926ed8024cde13ca53d6e1a7     && . "/root/.cargo/env"     && rustup toolchain install     && cd source     && ./tools/get-z3.sh     && . ../tools/activate     && vargo clean     && vargo build --release
+#26 CACHED
+
+#27 [24/27] RUN touch verifiable-controllers/tools/gen-t1.py     verifiable-controllers/src/anvil.rs     verifiable-controllers/src/vreplicaset_controller.rs     verifiable-controllers/src/vdeployment_controller.rs     verifiable-controllers/src/vstatefulset_controller.rs     verifiable-controllers/src/vreplicaset_admission_controller.rs     verifiable-controllers/src/vdeployment_admission_controller.rs     verifiable-controllers/src/vstatefulset_admission_controller.rs     verifiable-controllers/src/zookeeper_controller.rs     verifiable-controllers/src/rabbitmq_controller.rs     verifiable-controllers/src/fluent_controller.rs     verifiable-controllers/src/deps_hack/src/lib.rs     verifiable-controllers/e2e/src/main.rs     verifiable-controllers/e2e/manifests/admission_server.yaml     verifiable-controllers/e2e/manifests/admission_webhooks.yaml
+#27 CACHED
+
+#28 [25/27] RUN for controller in vreplicaset vdeployment vstatefulset zookeeper rabbitmq fluent; do         mkdir -p verifiable-controllers/deploy/${controller} &&         touch verifiable-controllers/deploy/${controller}/crd.yaml               verifiable-controllers/deploy/${controller}/rbac.yaml               verifiable-controllers/deploy/${controller}/deploy_local.yaml               verifiable-controllers/deploy/${controller}/deploy_remote.yaml;     done
+#28 DONE 0.3s
+
+#29 [26/27] RUN chmod +x verifiable-controllers/build.sh     verifiable-controllers/deploy.sh     verifiable-controllers/local-test.sh     verifiable-controllers/reproduce-verification-result.sh     verifiable-controllers/verify-controller-only.sh
+#29 DONE 0.4s
+
+#30 [27/27] WORKDIR /home/cc/EnvGym/data/anvil/verifiable-controllers
+#30 DONE 0.0s
+
+#31 exporting to image
+#31 exporting layers
+#31 exporting layers 20.4s done
+#31 writing image sha256:ca67de4490b67b69138f9d40b739ac42272ec4abaae7c8d769bdf95b03d9f371 done
+#31 naming to docker.io/library/envgym_test_1756398319 done
+#31 DONE 20.4s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

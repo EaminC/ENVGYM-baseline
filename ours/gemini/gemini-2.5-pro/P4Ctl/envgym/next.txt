@@ -1,0 +1,5 @@
+current progress
+A multi-stage Dockerfile has been successfully created and built. This file automates the setup of a base image with all common dependencies (Python, build tools, Scapy) and pre-builds the `netcl` policy compiler. It further creates specialized images for the `switch` (with Tofino SDE environment variables set) and `host` (with eBPF/BCC tools installed) roles. This completes most of the software installation and initial compilation tasks from the plan (Phases 1, 3, and 5) within the image build process.
+
+next step
+To further automate the setup and minimize manual configuration within running containers, the Dockerfile should be modified. In the `host` stage, add a `RUN` command using `sed` to permanently change the network interface name to `"eth0"` in the `host_agent/host_agent.py` file. Additionally, in the `switch` stage, add a `RUN` command to execute the P4 build script (`./p4_build.sh -p switch/p4control.p4`) to pre-compile the P4 program.

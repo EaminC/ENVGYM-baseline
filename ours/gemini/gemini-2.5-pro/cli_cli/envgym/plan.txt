@@ -1,0 +1,228 @@
+Based on the provided hardware information, here is the adjusted environment setup plan. The adjustments focus on Linux compatibility, removing inapplicable OS-specific steps, and clarifying tool requirements for your `linux/amd64` environment.
+
+***
+
+=== ENVIRONMENT SETUP PLAN (ADJUSTED FOR LINUX/AMD64) ===
+
+1.  DOWNLOADS NEEDED:
+    This project offers two primary methods for environment setup: an automated approach using Dev Containers (recommended for consistency) and a traditional manual setup.
+
+    **For Automated Setup (Dev Container):**
+    -   **Docker Engine:** Required to build and run the development container. For Linux distributions like Ubuntu or Debian, this can be installed by following the official guide for installing `docker-ce`. Download instructions at [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/).
+    -   **Visual Studio Code:** The editor required to use the Dev Container functionality. Download from [https://code.visualstudio.com/](https://code.visualstudio.com/).
+    -   **VS Code Dev Containers Extension:** The extension that integrates Docker with VS Code. Install from the VS Code Marketplace.
+
+    **For Manual Setup:**
+    -   **Go Programming Language:** Version 1.24.6. The `go.mod` file specifies toolchain `go1.24.6` and is the source of truth for the required version. Download the `linux-amd64` tarball from the official Go website: [https://go.dev/dl/](https://go.dev/dl/).
+    -   **Git:** Latest stable version. Required for cloning the source code repository and for the build script to determine the version string. Install via your distribution's package manager (e.g., `sudo apt-get install git`).
+    -   **Make:** A build automation tool required to use the project's `Makefile`. This is typically pre-installed on most Linux distributions.
+    -   **Bash:** A Bourne-Again Shell environment is required to run specific integration test scripts and release scripts. This is the default shell on your Linux system.
+    -   **GoReleaser:** Version `~1.17.1`. Required for running local release builds that mimic the CI process. Download the `linux_amd64` binary from the [GoReleaser GitHub releases page](https://github.com/goreleaser/goreleaser/releases).
+    -   **golangci-lint:** Version `v1.59.1`. Required for running the code linter. Download the `linux-amd64` binary from the [golangci-lint GitHub releases page](https://github.com/golangci/golangci-lint/releases).
+    -   **go-licenses:** Required for generating third-party license reports. Install using `go install github.com/google/go-licenses@5348b744d0983d85713295ea08a20cca1654a45e`.
+    -   **reprepro:** Optional. Required for managing the APT repository for Debian/Ubuntu distributions as part of the release process. Install via your package manager (e.g., `sudo apt-get install reprepro`).
+    -   **GnuPG (GPG):** Optional. Required for signing release artifacts and APT repository metadata. Install via your package manager (e.g., `sudo apt-get install gnupg`).
+    -   **CodeQL CLI:** Optional. Required for running local static analysis security scans. Download the `linux64` version from the [CodeQL CLI GitHub releases page](https://github.com/github/codeql-cli/releases).
+    -   **direnv:** Optional. A tool to automatically load and unload environment variables. Download from [https://direnv.net/](https://direnv.net/).
+    -   **Node.js and npm:** Optional. Required only for developers who need to modify or test the custom GitHub Actions workflows located in the `.github/actions/` directory.
+    -   **PowerShell Core (`pwsh`):** Optional. Version 7.0 or newer. This is only required if you intend to test or modify the Windows-specific build scripts from your Linux environment. For general development and building for Linux, this is not needed.
+
+2.  FILES TO CREATE:
+    -   **Local Environment Variables File (`.env` or `.envrc`):** Recommended for development in either setup path, especially for running acceptance and integration tests that require authentication or for creating custom builds. Create one of the following files in the project root (`/home/cc/EnvGym/data/cli_cli`).
+        -   **Option A: `.env` file (manual sourcing)**
+            -   **File Path:** Create this file in the project root. You will need to source it manually (`source .env`) before running tests.
+            -   **Basic Content Description:**
+                ```
+                # .env
+                # GitHub token with appropriate scopes for running acceptance tests.
+                export GITHUB_TOKEN="your_personal_access_token"
+                
+                # Optional: For creating custom builds with your own GitHub OAuth app
+                # export GH_OAUTH_CLIENT_ID="your_oauth_client_id"
+                # export GH_OAUTH_CLIENT_SECRET="your_oauth_client_secret"
+
+                # Other development-specific variables can be added here
+                export DEBUG=true
+                ```
+        -   **Option B: `.envrc` file (for use with `direnv`)**
+            -   **File Path:** Create this file in the project root. After installing `direnv` and hooking it into your shell, run `direnv allow` in the directory.
+            -   **Basic Content Description:**
+                ```sh
+                # .envrc
+                # Load variables from a .env file (recommended)
+                source_env .env
+                
+                # Or define them directly
+                # export GITHUB_TOKEN="your_personal_access_token"
+                # export DEBUG=true
+                ```
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    -   **Go Modules Tidy Check:** `go mod tidy`, then check `git status`.
+    -   **Go Code Formatting Check:** `make fmt`, then check `git status`.
+    -   **Third-Party License Verification:** `make licenses`, then check `git status`.
+    -   **Linter Execution:** `golangci-lint run`
+    -   **Unit Test Execution:** `make test`
+    -   **Build Verification Test:** `go run script/build.go bin/gh` (or `make bin/gh`).
+    -   **Runtime Execution Test:** `./bin/gh --version`
+    -   **Comprehensive Unit & Integration Tests:** `go test -race -tags=integration ./...`
+    -   **Go Vulnerability Check (Binary Scan):** `make && go run golang.org/x/vuln/cmd/govulncheck@d1f380186385b4f64e00313f31743df8e4b89a77 -mode=binary bin/gh`
+    -   **Go Vulnerability Check (Source Scan):** `go run golang.org/x/vuln/cmd/govulncheck@d1f380186385b4f64e00313f31743df8e4b89a77 ./...`
+    -   **CodeQL Security Scan:**
+        1.  `codeql database create --language=go --source-root=. codeql-db`
+        2.  `codeql database analyze codeql-db --format=sarif-latest --output=results.sarif github/codeql/go/qlpacks/codeql-go-queries/codeql-suites/go-security-and-quality.qls`
+    -   **Secret Scanning Verification:** Manual review of changes before committing.
+    -   **Build Artifact Generation Test:** `go run script/build.go manpages && make completions && go run ./cmd/gen-docs --website --doc-path dist/manual`.
+    -   **GitHub Actions Build Verification:** `cd .github/actions/<action-name> && npm install && npm run build`
+    -   **Release Build Simulation Test:** `TAG_NAME=v9.9.9 script/release --local "$TAG_NAME" --platform linux`
+    -   **Go Version Bump Script Verification:** `bash .github/workflows/scripts/bump-go.sh --apply go.mod`
+    -   **Spam Detection Script Verification:** `GH_TOKEN=<your_token> ./.github/workflows/scripts/spam-detection/process-issue.sh <test_issue_url>`
+    -   **Discussion Triage Workflow Verification:** Manual verification on GitHub.
+    -   **Feature Request Comment Workflow Verification:** Manual verification on GitHub.
+    -   **Homebrew Formula Bump Workflow Verification:** Manual verification on GitHub.
+    -   **Issue Automation Workflow Verification:** Manual verification on GitHub.
+    -   **"Help Wanted" PR Check Verification:** `GH_TOKEN=<your_token> bash .github/workflows/scripts/check-help-wanted.sh <test_pr_url>`
+    -   **PR Automation Workflow Verification:** Manual verification on GitHub.
+    -   **Stale Issue Management Workflow Verification:** Manual verification on GitHub.
+    -   **(Windows Only) MSI Installer Build Test:** Not applicable for your Linux environment.
+    -   **(macOS Only) PKG Installer Build Test:** Not applicable for your Linux environment.
+    -   **Acceptance Test Execution:** `make acceptance`
+    -   **Attestation Command Integration Tests:** `bash ./test/integration/attestation-cmd/run-all-tests.sh`
+
+4.  COMPLETE TODO LIST:
+    Choose one of the following setup paths.
+
+    **PATH A: AUTOMATED SETUP VIA DEV CONTAINER (RECOMMENDED)**
+
+    -   **Step 1: Install Prerequisites**
+        -   Action: Install Docker Engine, Visual Studio Code, and the VS Code Dev Containers extension.
+        -   Verification: Docker daemon is running (`docker info`), and the "Dev Containers" extension is visible in VS Code.
+
+    -   **Step 2: Clone the Project Repository**
+        -   Action: Use Git to clone the source code.
+        -   Command: `git clone https://github.com/cli/cli.git /home/cc/EnvGym/data/cli_cli`
+        -   Verification: The directory `/home/cc/EnvGym/data/cli_cli` is populated with the project source.
+
+    -   **Step 3: Launch the Dev Container**
+        -   Action: Open the cloned folder (`/home/cc/EnvGym/data/cli_cli`) in VS Code. A pop-up will appear asking to "Reopen in Container". Click it.
+        -   Verification: VS Code will build the Docker image and reload. The bottom-left corner will show "Dev Container: Go". The integrated terminal is now running inside the container with all tools pre-installed.
+
+    -   **Step 4: Proceed to Verification**
+        -   Action: Your environment is now fully configured. Proceed to the "POST-SETUP VERIFICATION" section.
+
+    **PATH B: MANUAL LOCAL SETUP**
+
+    -   **Step 1: Install Go Toolchain**
+        -   Action: Download and install Go version 1.24.6.
+        -   Verification: `go version` outputs the correct version.
+
+    -   **Step 2: Install Git**
+        -   Action: Install Git using your package manager (e.g., `sudo apt-get install git`).
+        -   Verification: `git --version` executes successfully.
+
+    -   **Step 3: Install Make and Bash**
+        -   Action: Ensure `make` and `bash` are installed. They are typically pre-installed on Linux.
+        -   Verification: `make --version` and `bash --version` execute successfully.
+
+    -   **Step 4: Install Go Linter**
+        -   Action: Download and install `golangci-lint` version `v1.59.1`.
+        -   Verification: `golangci-lint --version` shows the correct version.
+
+    -   **Step 5: Install GoReleaser**
+        -   Action: Download and install GoReleaser version `~1.17.1`.
+        -   Verification: `goreleaser --version` shows the correct version.
+
+    -   **Step 6: Install Go Licenses Tool**
+        -   Action: Install the `go-licenses` tool.
+        -   Command: `go install github.com/google/go-licenses@5348b744d0983d85713295ea08a20cca1654a45e`
+        -   Verification: The `go-licenses` binary is in your `$GOPATH/bin` directory.
+
+    -   **Step 7: (Optional) Install Release Packaging Tools**
+        -   Action: For creating Linux packages, install `reprepro` and `GnuPG` via your package manager.
+        -   Verification: `reprepro --version` and `gpg --version` execute successfully.
+
+    -   **Step 8: (Optional) Install Additional Developer Tools**
+        -   Action: Install any of the following: CodeQL CLI, `direnv`, Node.js/npm.
+        -   Verification: Check versions with `--version` flags for each tool.
+
+    -   **Step 9: (Not Applicable) Install Platform-Specific Build Tools**
+        -   Action: The tools for building Windows MSI (MSBuild, WiX) and macOS PKG (Xcode) installers are not required for your Linux environment.
+
+    -   **Step 10: Configure Go Environment Variables**
+        -   Action: Ensure your `GOPATH` is set and that `$GOPATH/bin` is in your system `PATH`.
+        -   Verification: `go env GOPATH` shows your path, and `echo $PATH` includes the Go bin directory.
+
+    -   **Step 11: Clone the Project Repository**
+        -   Action: Use Git to clone the source code.
+        -   Command: `git clone https://github.com/cli/cli.git /home/cc/EnvGym/data/cli_cli`
+        -   Verification: The directory `/home/cc/EnvGym/data/cli_cli` is populated. Navigate into it with `cd /home/cc/EnvGym/data/cli_cli`.
+
+    -   **Step 12: Download Go Dependencies**
+        -   Action: Download all required Go modules.
+        -   Command: `go mod download`
+        -   Verification: The command completes without errors. `go mod verify` also succeeds.
+
+    **POST-SETUP VERIFICATION (FOR BOTH PATHS)**
+    *Perform these steps inside your configured environment (Dev Container or local terminal).*
+
+    -   **Step 13: Verify Go Modules**
+        -   Command: `go mod tidy`
+        -   Verification: `git status` reports no changes to `go.mod` or `go.sum`.
+
+    -   **Step 14: Verify Code Formatting**
+        -   Command: `make fmt`
+        -   Verification: `git status` reports no changes.
+
+    -   **Step 15: Verify Third-Party Licenses**
+        -   Command: `make licenses`
+        -   Verification: `git status` reports no changes.
+
+    -   **Step 16: Run Linter**
+        -   Command: `golangci-lint run`
+        -   Verification: The linter completes without errors.
+
+    -   **Step 17: Run Unit Tests**
+        -   Command: `make test`
+        -   Verification: All tests pass.
+
+    -   **Step 18: Build the Executable**
+        -   Command: `go run script/build.go bin/gh`
+        -   Verification: An executable file named `gh` appears in the `bin/` directory.
+
+    -   **Step 19: Perform a Runtime Verification**
+        -   Command: `./bin/gh --version`
+        -   Verification: The command outputs the CLI version information.
+
+    -   **Step 20: (Optional) Run Comprehensive Tests**
+        -   Command: `go test -race -tags=integration ./...`
+        -   Verification: The test suite completes without panics or race warnings.
+
+    -   **Step 21: (Optional) Run Vulnerability Scans**
+        -   Binary Scan: `go run golang.org/x/vuln/cmd/govulncheck@d1f380186385b4f64e00313f31743df8e4b89a77 -mode=binary bin/gh`
+        -   Source Scan: `go run golang.org/x/vuln/cmd/govulncheck@d1f380186385b4f64e00313f31743df8e4b89a77 ./...`
+        -   Verification: Both commands exit with code 0.
+
+    -   **Step 22: (Optional) Run CodeQL Security Scan**
+        -   Commands: `codeql database create ...` and `codeql database analyze ...`
+        -   Verification: Commands complete successfully. Review `results.sarif`.
+
+    -   **Step 23: (Optional) Generate Build Artifacts**
+        -   Command: `go run script/build.go manpages && make completions && go run ./cmd/gen-docs --website --doc-path dist/manual`
+        -   Verification: Files are created in `./share/` and `./dist/manual/`.
+
+    -   **Step 24: (Optional) Run a Local Release Build**
+        -   Action: Simulate a CI release build for Linux. Requires `reprepro` and `GnuPG`.
+        -   Command: `TAG_NAME=v9.9.9 script/release --local "$TAG_NAME" --platform linux`
+        -   Verification: The `dist/` directory is populated with `.tar.gz`, `.deb`, `.rpm` packages, checksums, and APT repository files.
+
+    -   **Step 25: (Not Applicable) Build MSI/PKG Installer**
+        -   Action: Building native installers for Windows and macOS is not applicable to your environment.
+
+    -   **Step 26: (Optional) Run Attestation Integration Tests**
+        -   Action: Requires `GITHUB_TOKEN` to be set.
+        -   Command: `bash ./test/integration/attestation-cmd/run-all-tests.sh`
+        -   Verification: The script runs to completion and reports success.
+
+    -   **Step 27: (Optional, For Maintainers) Verify Internal Scripts & Workflows**
+        -   Action: Run the verification steps for internal maintenance scripts (Go version bump, spam detection, etc.) and manually verify the logic of the various GitHub Actions workflows as detailed in the original plan.
+        -   Verification: Scripts execute as expected, and workflow logic is confirmed to be correct.

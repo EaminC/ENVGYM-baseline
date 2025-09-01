@@ -1,0 +1,5 @@
+current progress
+The Dockerfile successfully automates the setup of the complete build environment by installing all specified prerequisites, including Adoptium JDK 21, Go 1.23, JRuby 9.4.13.0, and the Docker CLI. It correctly configures the non-root user, copies the source code, creates the required `versions.yml` file, and executes the initial project bootstrap and gem installation steps (`./gradlew bootstrap`, `./gradlew installDefaultGems`, `./gradlew installDevelopmentGems`). One Python dependency installation step for health report tests is currently commented out.
+
+next step
+Uncomment the line `RUN pip install --user -r .buildkite/scripts/health-report-tests/requirements.txt` to ensure all Python dependencies are installed. Following that, add a new `RUN` instruction to execute the primary validation steps from the plan, such as `pre-commit install`, `pre-commit run --all-files`, and `./gradlew test`. This will integrate the code quality checks and unit tests directly into the image build process, ensuring the resulting image contains a fully validated and tested codebase.

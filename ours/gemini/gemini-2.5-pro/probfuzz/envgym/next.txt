@@ -1,0 +1,7 @@
+current progress
+The Dockerfile has been updated to align with the automated setup plan. It now installs system dependencies, Python 2.7, and project files. It attempts to install the specified CPU versions of PyTorch (0.4.0) and TensorFlow (1.5.0). However, the previous build failed due to a missing `setuptools` Python module during the TensorFlow installation. The current Dockerfile deviates from the plan by installing OpenJDK 8 via `apt-get` instead of executing the prescribed `./install_java.sh` script for Oracle Java 8.
+
+next step
+1.  Add `python-setuptools` to the initial `apt-get install` command to explicitly resolve the `ImportError: No module named setuptools` that caused the previous build failure.
+2.  Replace the `apt-get install -y openjdk-8-jdk` command with the `RUN ./install_java.sh` command to adhere to Step 2 of the plan, which requires Oracle Java 8.
+3.  Combine the two separate `apt-get` installation blocks into a single `RUN` instruction to optimize the image build by reducing the number of layers.

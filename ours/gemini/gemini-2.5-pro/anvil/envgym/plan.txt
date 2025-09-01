@@ -1,0 +1,1004 @@
+Based on the provided hardware information, I have reviewed and adjusted the environment setup plan. The plan is fully compatible with the specified x86_64 architecture and does not require a GPU. The primary adjustments involve updating the instructions and commands in the "COMPLETE TODO LIST" section to use the specific working directory `/home/cc/EnvGym/data/anvil`, ensuring all paths are correct and commands are executed from the proper location.
+
+Here is the complete adjusted plan:
+
+=== ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    -   **Git**: For cloning source code repositories. Any recent version is acceptable.
+    -   **Rust Toolchain Manager (rustup)**: To install and manage Rust compilers. The project requires the specific stable toolchain version `1.88.0` as defined in `rust-toolchain.toml`. The Verus project itself will also use its own specified toolchain.
+    -   **Verus Project Repository**: The source code for the Verus formal verification tool. It will be cloned from a specific commit (`8bd7c3292aad57d3926ed8024cde13ca53d6e1a7`) and **built from source** for local development.
+    -   **Z3 SMT Solver**: Required by Verus for solving logical formulas. The recommended installation method is to use the `get-z3.sh` script provided in the Verus repository, which handles downloading a compatible version (4.12.1 or newer).
+    -   **C/C++ Build Tools**: Required for compiling Verus and other native dependencies.
+        -   **Linux (Debian/Ubuntu)**: `build-essential`, `wget`, `unzip`
+        -   **Linux (Fedora)**: `gcc`, `gcc-c++`, `make`, `wget`, `unzip`
+        -   **macOS**: `Xcode Command Line Tools`
+        -   **Windows**: `Build Tools for Visual Studio` (C++ build tools component)
+    -   **Go**: Version `^1.20` is required to install `kind` using Go's package manager.
+    -   **Docker**: For containerizing the controller application for Kubernetes deployment.
+    -   **kubectl**: The Kubernetes command-line tool, used to interact with the cluster.
+    -   **kind**: A tool for running local Kubernetes clusters using Docker container "nodes". Version `v0.23.0` is recommended.
+    -   **openssl**: Required for generating TLS certificates for Kubernetes admission webhooks.
+    -   **pkg-config**: A helper tool used when compiling applications and libraries, often required by Rust crates.
+    -   **libssl-dev**: Development libraries for OpenSSL, required for compiling Rust crates with crypto features.
+        -   **Linux (Debian/Ubuntu)**: `libssl-dev`
+        -   **Linux (Fedora)**: `openssl-devel`
+        -   **macOS**: `openssl` (can be installed via Homebrew)
+        -   **Windows**: Can be installed via `vcpkg` or by downloading pre-compiled binaries.
+    -   **Python 3 and pip**: Required for build or utility scripts, such as generating result tables.
+    -   **tabulate (Python package)**: A Python library required by a project script.
+
+2.  FILES TO CREATE:
+    -   **`verifiable-controllers/.gitignore`**: Specifies intentionally untracked files to ignore.
+        -   **Path**: `verifiable-controllers/.gitignore`
+        -   **Description**: Prevents generated files, build artifacts, local configurations, and sensitive data from being committed to the repository.
+        -   **Content**:
+            ```
+            # Except this file
+            !.gitignore
+            .vscode/
+            src/*_controller
+            src/*.long-type-*.txt
+            src/.verus-log/
+            e2e/target/
+            /target
+            /Cargo.lock
+            src/liblib.rlib
+            verifiable-controllers.code-workspace
+            src/.verus-solver-log/
+            src/*.d
+            src/*.rlib
+            tools/*.json
+            vreplicaset_controller.*.txt
+            certs
+            ```
+    -   **`verifiable-controllers/.github/workflows/ci.yml`**: The GitHub Actions workflow for continuous integration.
+        -   **Path**: `verifiable-controllers/.github/workflows/ci.yml`
+        -   **Description**: Defines CI jobs for building Verus, running formal verification on the framework and multiple controllers, and executing end-to-end tests.
+        -   **Content**:
+            ```yaml
+            name: Continuous integration
+            run-name: Continuous integration run by ${{ github.actor }}
+            on:
+              # push:
+              #   branches:
+              #     - main
+              #   paths-ignore:
+              #     - "README.md"
+              #     - ".gitignore"
+              #     - "doc/**"
+              pull_request:
+              merge_group:
+              workflow_dispatch:
+            env:
+              verus_commit: 8bd7c3292aad57d3926ed8024cde13ca53d6e1a7
+              kind_version: 0.23.0
+              go_version: "^1.20"
+              home_dir: /home/runner
+
+            jobs:
+              build-and-cache-verus:
+              # keep consistent with dockerfile
+                runs-on: ubuntu-22.04
+                steps:
+                  - uses: actions/checkout@v4
+                  - name: Get HOME env variable
+                    id: get-home
+                    run: |
+                      echo "home_dir=$HOME" >> $GITHUB_ENV
+                      echo "home_dir=$HOME"
+                  - name: Find Verus build and Rust toolchain from cache
+                    id: cache-verus
+                    uses: actions/cache@v4
+                    with:
+                      path: |
+                        ${{ env.home_dir }}/verus/source
+                        ${{ env.home_dir }}/verus/dependencies
+                        ${{ env.home_dir }}/.cargo
+                        ${{ env.home_dir }}/.rustup
+                      key: verus-${{ runner.os }}-${{ env.verus_commit }}-${{ hashFiles('rust-toolchain.toml') }}
+                  - name: Download Verus if cache is missing
+                    if: steps.cache-verus.outputs.cache-hit != 'true'
+                    uses: actions/checkout@v4
+                    with:
+                      repository: verus-lang/verus
+                      path: verus
+                      ref: ${{ env.verus_commit }}
+                  - name: Download Rust toolchain and build Verus if cache is missing
+                    if: steps.cache-verus.outputs.cache-hit != 'true'
+                    run: |
+                      mv verus $HOME/verus
+                      cd $HOME/verus
+                      curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused -fsSL "https://sh.rustup.rs" | sh -s -- --default-toolchain none -y
+                      . "$HOME/.cargo/env"
+                      rustup toolchain install
+                      cd source
+                      ./tools/get-z3.sh
+                      . ../tools/activate
+                      vargo clean
+                      vargo build --release
+              anvil-verification:
+                needs: build-and-cache-verus
+                runs-on: ubuntu-22.04
+                steps:
+                  - uses: actions/checkout@v4
+                  - name: Restore Verus cache
+                    uses: actions/cache@v4
+                    with:
+                      path: |
+                        ${{ env.home_dir }}/verus/source
+                        ${{ env.home_dir }}/verus/dependencies
+                        ${{ env.home_dir }}/.cargo
+                        ${{ env.home_dir }}/.rustup
+                      key: verus-${{ runner.os }}-${{ env.verus_commit }}-${{ hashFiles('rust-toolchain.toml') }}
+                  - name: Verify Anvil framework
+                    run: |
+                      . "$HOME/.cargo/env"
+                      VERUS_DIR="${HOME}/verus" ./build.sh anvil.rs --crate-type=lib --rlimit 50 --time
+              vreplicaset-verification:
+                needs: build-and-cache-verus
+                runs-on: ubuntu-22.04
+                steps:
+                  - uses: actions/checkout@v4
+                  - name: Restore Verus cache
+                    uses: actions/cache@v4
+                    with:
+                      path: |
+                        ${{ env.home_dir }}/verus/source
+                        ${{ env.home_dir }}/verus/dependencies
+                        ${{ env.home_dir }}/.cargo
+                        ${{ env.home_dir }}/.rustup
+                      key: verus-${{ runner.os }}-${{ env.verus_commit }}-${{ hashFiles('rust-toolchain.toml') }}
+                  - name: Verify vreplicaset controller
+                    run: |
+                      . "$HOME/.cargo/env"
+                      VERUS_DIR="${HOME}/verus" ./build.sh vreplicaset_controller.rs --rlimit 50 --time --verify-module vreplicaset_controller
+              vdeployment-verification:
+                needs: build-and-cache-verus
+                runs-on: ubuntu-22.04
+                steps:
+                  - uses: actions/checkout@v4
+                  - name: Restore Verus cache
+                    uses: actions/cache@v4
+                    with:
+                      path: |
+                        ${{ env.home_dir }}/verus/source
+                        ${{ env.home_dir }}/verus/dependencies
+                        ${{ env.home_dir }}/.cargo
+                        ${{ env.home_dir }}/.rustup
+                      key: verus-${{ runner.os }}-${{ env.verus_commit }}-${{ hashFiles('rust-toolchain.toml') }}
+                  - name: Verify vdeployment controller
+                    run: |
+                      . "$HOME/.cargo/env"
+                      VERUS_DIR="${HOME}/verus" ./build.sh vdeployment_controller.rs --rlimit 50 --time --verify-module vdeployment_controller
+              zookeeper-verification:
+                needs: build-and-cache-verus
+                runs-on: ubuntu-22.04
+                steps:
+                  - uses: actions/checkout@v4
+                  - name: Restore Verus cache
+                    uses: actions/cache@v4
+                    with:
+                      path: |
+                        ${{ env.home_dir }}/verus/source
+                        ${{ env.home_dir }}/verus/dependencies
+                        ${{ env.home_dir }}/.cargo
+                        ${{ env.home_dir }}/.rustup
+                      key: verus-${{ runner.os }}-${{ env.verus_commit }}-${{ hashFiles('rust-toolchain.toml') }}
+                  - name: Verify Zookeeper controller
+                    run: |
+                      . "$HOME/.cargo/env"
+                      VERUS_DIR="${HOME}/verus" ./build.sh zookeeper_controller.rs --rlimit 50 --time --verify-module zookeeper_controller
+              vreplicaset-e2e-test:
+                needs:
+                  - build-and-cache-verus
+                runs-on: ubuntu-22.04
+                steps:
+                  - uses: actions/checkout@v4
+                  - name: Restore Verus cache
+                    uses: actions/cache@v4
+                    with:
+                      path: |
+                        ${{ env.home_dir }}/verus/source
+                        ${{ env.home_dir }}/verus/dependencies
+                        ${{ env.home_dir }}/.cargo
+                        ${{ env.home_dir }}/.rustup
+                      key: verus-${{ runner.os }}-${{ env.verus_commit }}-${{ hashFiles('rust-toolchain.toml') }}
+                  - name: Setup Go
+                    uses: actions/setup-go@v5
+                    with:
+                      go-version: ${{ env.go_version }}
+                  - name: Install kind
+                    run: go install sigs.k8s.io/kind@v$kind_version
+                  - name: Build Verus toolchain image
+                    run: docker build --build-arg VERUS_VER="${{ env.verus_commit }}" -t verus-toolchain:local docker/verus
+                  - name: Deploy vreplicaset controller
+                    run: ./local-test.sh vreplicaset --build-remote
+                  - name: Run vreplicaset e2e tests
+                    run: . "$HOME/.cargo/env" && cd e2e && cargo run -- vreplicaset
+            ```
+    -   **`verifiable-controllers/.github/workflows/controller-build.yml`**: The GitHub Actions workflow for building and publishing controller images.
+        -   **Path**: `verifiable-controllers/.github/workflows/controller-build.yml`
+        -   **Description**: Defines jobs to build Docker images for each controller and push them to the GitHub Container Registry. It uses the pre-built Verus image from the `verus-build` workflow as a builder.
+        -   **Content**:
+            ```yaml
+            name: Controller build
+            on:
+              workflow_dispatch:
+            env:
+              IMAGE_NAME: ${{ github.repository }}
+            jobs:
+              build-zookeeper-controller:
+                runs-on: ubuntu-22.04
+                permissions:
+                  contents: read
+                  packages: write
+                steps:
+                  - name: Checkout repository
+                    uses: actions/checkout@v3
+                  - name: Log into registry ghcr.io
+                    run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+                  - name: Build zookeeper controller image
+                    run: |
+                      docker build -t ghcr.io/${{ env.IMAGE_NAME }}/zookeeper-controller:latest \
+                        --build-arg APP=zookeeper \
+                        --build-arg BUILDER_IMAGE=ghcr.io/${{ env.IMAGE_NAME }}/verus:latest \
+                        -f docker/controller/Dockerfile.remote .
+                      docker tag ghcr.io/${{ env.IMAGE_NAME }}/zookeeper-controller:latest ghcr.io/${{ env.IMAGE_NAME }}/zookeeper-controller:${{ github.sha }}
+                  - name: Push zookeeper controller image
+                    run: |
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/zookeeper-controller:latest
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/zookeeper-controller:${{ github.sha }}
+              build-rabbitmq-controller:
+                runs-on: ubuntu-22.04
+                permissions:
+                  contents: read
+                  packages: write
+                steps:
+                  - name: Checkout repository
+                    uses: actions/checkout@v3
+                  - name: Log into registry ghcr.io
+                    run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+                  - name: Build rabbitmq controller image
+                    run: |
+                      docker build -t ghcr.io/${{ env.IMAGE_NAME }}/rabbitmq-controller:latest \
+                        --build-arg APP=rabbitmq \
+                        --build-arg BUILDER_IMAGE=ghcr.io/${{ env.IMAGE_NAME }}/verus:latest \
+                        -f docker/controller/Dockerfile.remote .
+                      docker tag ghcr.io/${{ env.IMAGE_NAME }}/rabbitmq-controller:latest ghcr.io/${{ env.IMAGE_NAME }}/rabbitmq-controller:${{ github.sha }}
+                  - name: Push rabbitmq controller image
+                    run: |
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/rabbitmq-controller:latest
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/rabbitmq-controller:${{ github.sha }}
+              build-fluent-controller:
+                runs-on: ubuntu-22.04
+                permissions:
+                  contents: read
+                  packages: write
+                steps:
+                  - name: Checkout repository
+                    uses: actions/checkout@v3
+                  - name: Log into registry ghcr.io
+                    run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+                  - name: Build fluent controller image
+                    run: |
+                      docker build -t ghcr.io/${{ env.IMAGE_NAME }}/fluent-controller:latest \
+                        --build-arg APP=fluent \
+                        --build-arg BUILDER_IMAGE=ghcr.io/${{ env.IMAGE_NAME }}/verus:latest \
+                        -f docker/controller/Dockerfile.remote .
+                      docker tag ghcr.io/${{ env.IMAGE_NAME }}/fluent-controller:latest ghcr.io/${{ env.IMAGE_NAME }}/fluent-controller:${{ github.sha }}
+                  - name: Push fluent controller image
+                    run: |
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/fluent-controller:latest
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/fluent-controller:${{ github.sha }}
+              build-vreplicaset-controller:
+                runs-on: ubuntu-22.04
+                permissions:
+                  contents: read
+                  packages: write
+                steps:
+                  - name: Checkout repository
+                    uses: actions/checkout@v3
+                  - name: Log into registry ghcr.io
+                    run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+                  - name: Build vreplicaset controller image
+                    run: |
+                      docker build -t ghcr.io/${{ env.IMAGE_NAME }}/vreplicaset-controller:latest \
+                        --build-arg APP=vreplicaset \
+                        --build-arg BUILDER_IMAGE=ghcr.io/${{ env.IMAGE_NAME }}/verus:latest \
+                        -f docker/controller/Dockerfile.remote .
+                      docker tag ghcr.io/${{ env.IMAGE_NAME }}/vreplicaset-controller:latest ghcr.io/${{ env.IMAGE_NAME }}/vreplicaset-controller:${{ github.sha }}
+                  - name: Push vreplicaset controller image
+                    run: |
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/vreplicaset-controller:latest
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/vreplicaset-controller:${{ github.sha }}
+              build-vreplicaset-admission-controller:
+                runs-on: ubuntu-22.04
+                permissions:
+                  contents: read
+                  packages: write
+                steps:
+                  - name: Checkout repository
+                    uses: actions/checkout@v3
+                  - name: Log into registry ghcr.io
+                    run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+                  - name: Build vreplicaset admission controller image
+                    run: |
+                      docker build -t ghcr.io/${{ env.IMAGE_NAME }}/vreplicaset-admission-controller:latest \
+                        --build-arg APP=vreplicaset_admission \
+                        --build-arg BUILDER_IMAGE=ghcr.io/${{ env.IMAGE_NAME }}/verus:latest \
+                        -f docker/controller/Dockerfile.remote .
+                      docker tag ghcr.io/${{ env.IMAGE_NAME }}/vreplicaset-admission-controller:latest ghcr.io/${{ env.IMAGE_NAME }}/vreplicaset-admission-controller:${{ github.sha }}
+                  - name: Push vreplicaset admission controller image
+                    run: |
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/vreplicaset-admission-controller:latest
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/vreplicaset-admission-controller:${{ github.sha }}
+              build-vstatefulset-admission-controller:
+                runs-on: ubuntu-22.04
+                permissions:
+                  contents: read
+                  packages: write
+                steps:
+                  - name: Checkout repository
+                    uses: actions/checkout@v3
+                  - name: Log into registry ghcr.io
+                    run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+                  - name: Build vstatefulset admission controller image
+                    run: |
+                      docker build -t ghcr.io/${{ env.IMAGE_NAME }}/vstatefulset-admission-controller:latest \
+                        --build-arg APP=vstatefulset_admission \
+                        --build-arg BUILDER_IMAGE=ghcr.io/${{ env.IMAGE_NAME }}/verus:latest \
+                        -f docker/controller/Dockerfile.remote .
+                      docker tag ghcr.io/${{ env.IMAGE_NAME }}/vstatefulset-admission-controller:latest ghcr.io/${{ env.IMAGE_NAME }}/vstatefulset-admission-controller:${{ github.sha }}
+                  - name: Push vstatefulset admission controller image
+                    run: |
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/vstatefulset-admission-controller:latest
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/vstatefulset-admission-controller:${{ github.sha }}
+              build-vdeployment-admission-controller:
+                runs-on: ubuntu-22.04
+                permissions:
+                  contents: read
+                  packages: write
+                steps:
+                  - name: Checkout repository
+                    uses: actions/checkout@v3
+                  - name: Log into registry ghcr.io
+                    run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+                  - name: Build vdeployment admission controller image
+                    run: |
+                      docker build -t ghcr.io/${{ env.IMAGE_NAME }}/vdeployment-admission-controller:latest \
+                        --build-arg APP=vdeployment_admission \
+                        --build-arg BUILDER_IMAGE=ghcr.io/${{ env.IMAGE_NAME }}/verus:latest \
+                        -f docker/controller/Dockerfile.remote .
+                      docker tag ghcr.io/${{ env.IMAGE_NAME }}/vdeployment-admission-controller:latest ghcr.io/${{ env.IMAGE_NAME }}/vdeployment-admission-controller:${{ github.sha }}
+                  - name: Push vdeployment admission controller image
+                    run: |
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/vdeployment-admission-controller:latest
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/vdeployment-admission-controller:${{ github.sha }}
+            ```
+    -   **`verifiable-controllers/.github/workflows/verus-build.yml`**: The GitHub Actions workflow for building and publishing the Verus toolchain image.
+        -   **Path**: `verifiable-controllers/.github/workflows/verus-build.yml`
+        -   **Description**: Defines a manually triggered job to build the Verus toolchain Docker image and push it to the GitHub Container Registry. This pre-built image can accelerate other CI jobs.
+        -   **Content**:
+            ```yaml
+            name: Verus build
+            on:
+              workflow_dispatch:
+            env:
+              IMAGE_NAME: ${{ github.repository }}
+            jobs:
+              build:
+                runs-on: ubuntu-22.04
+                permissions:
+                  contents: read
+                  packages: write
+                steps:
+                  - name: Checkout repository
+                    uses: actions/checkout@v4
+                  - name: Log into registry ghcr.io
+                    run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+                  - name: Build Verus image
+                    run: |
+                      cd docker/verus
+                      docker build -t ghcr.io/${{ env.IMAGE_NAME }}/verus:latest --build-arg VERUS_VER=8bd7c3292aad57d3926ed8024cde13ca53d6e1a7 .
+                      docker tag ghcr.io/${{ env.IMAGE_NAME }}/verus:latest ghcr.io/${{ env.IMAGE_NAME }}/verus:8bd7c3292aad57d3926ed8024cde13ca53d6e1a7
+                  - name: Push Verus image
+                    run: |
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/verus:latest
+                      docker push ghcr.io/${{ env.IMAGE_NAME }}/verus:8bd7c3292aad57d3926ed8024cde13ca53d6e1a7
+            ```
+    -   **`verifiable-controllers/Cargo.toml`**: The root Cargo manifest for the project.
+        -   **Path**: `verifiable-controllers/Cargo.toml`
+        -   **Description**: Defines the Rust project, its dependencies, a core library, and multiple binary targets for the various controllers.
+        -   **Content**:
+            ```toml
+            [package]
+            name = "verifiable-controllers"
+            version = "0.1.0"
+            edition = "2021"
+
+            [dependencies]
+            # Add project dependencies here
+
+            [lib]
+            name = "anvil"
+            path = "src/anvil.rs"
+            crate-type = ["rlib"]
+
+            [[bin]]
+            name = "vreplicaset_controller"
+            path = "src/vreplicaset_controller.rs"
+
+            [[bin]]
+            name = "vdeployment_controller"
+            path = "src/vdeployment_controller.rs"
+
+            [[bin]]
+            name = "vstatefulset_controller"
+            path = "src/vstatefulset_controller.rs"
+
+            [[bin]]
+            name = "vreplicaset_admission_controller"
+            path = "src/vreplicaset_admission_controller.rs"
+            
+            [[bin]]
+            name = "vdeployment_admission_controller"
+            path = "src/vdeployment_admission_controller.rs"
+
+            [[bin]]
+            name = "vstatefulset_admission_controller"
+            path = "src/vstatefulset_admission_controller.rs"
+
+            [[bin]]
+            name = "zookeeper_controller"
+            path = "src/zookeeper_controller.rs"
+
+            [[bin]]
+            name = "rabbitmq_controller"
+            path = "src/rabbitmq_controller.rs"
+
+            [[bin]]
+            name = "fluent_controller"
+            path = "src/fluent_controller.rs"
+            ```
+    -   **`verifiable-controllers/rust-toolchain.toml`**: Specifies the exact Rust toolchain for the project.
+        -   **Path**: `verifiable-controllers/rust-toolchain.toml`
+        -   **Description**: This file instructs `rustup` to use a specific version of the Rust compiler for this project.
+        -   **Content**:
+            ```toml
+            # this should be synchronized with the Verus version, since we need to combine
+            # k8s compiled with rustc and our own code compiled with rust-verify.sh
+            [toolchain]
+            channel = "1.88.0"
+            ```
+    -   **`verifiable-controllers/build.sh`**: The main build and verification script for the project.
+        -   **Path**: `verifiable-controllers/build.sh`
+        -   **Description**: This script compiles dependencies and invokes the Verus verifier with the correct parameters. It requires the `VERUS_DIR` environment variable to be set.
+        -   **Content**:
+            ```bash
+            #!/usr/bin/env bash
+
+            ## Build and verify the controller example.
+            ##
+            ## Requires VERUS_DIR to be set to the path to verus.
+
+            set -eu
+
+            # script dir is root of repo
+            DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2&>1 && pwd)"
+            cd "$DIR/src"
+
+            rv=$VERUS_DIR/source/target-verus/release/verus
+            cd deps_hack
+            cargo build
+            cd ..
+            # TODO: after the lifetime check is fixed in verus, remove the --no-lifetime flag
+            "$rv" -L dependency=deps_hack/target/debug/deps \
+              --extern=deps_hack="deps_hack/target/debug/libdeps_hack.rlib" \
+              --compile \
+              "$@"
+            ```
+    -   **`verifiable-controllers/deploy.sh`**: Script to deploy a controller to a local `kind` Kubernetes cluster.
+        -   **Path**: `verifiable-controllers/deploy.sh`
+        -   **Description**: Automates the creation of a `kind` cluster, loading of the controller's container image, and application of Kubernetes manifests.
+        -   **Content**:
+            ```bash
+            #!/usr/bin/env bash
+
+            ## Deploy the example controller to Kubernetes cluster.
+            ##
+            ## Requires a running Kubernetes cluster and kubectl to be installed.
+
+            set -xu
+
+            YELLOW='\033[1;33m'
+            GREEN='\033[1;32m'
+            RED='\033[0;31m'
+            NC='\033[0m'
+
+            app=$(echo "$1" | tr '_' '-') # should be the controller's name (with words separated by dashes)
+            app_filename=$(echo "$app" | tr '-' '_')
+            cluster_name="${app}-e2e"
+            registry=$2 # should be either remote or local
+
+            kind get clusters | grep $cluster_name > /dev/null 2>&1
+            if [ $? -eq 0 ]; then
+                echo -e "${YELLOW}A kind cluster named \"$cluster_name\" already exists. Deleting...${NC}"
+                kind delete cluster --name $cluster_name
+            fi
+
+            set -xeu
+            # Set up the kind cluster and load the image into the cluster
+            kind create cluster --config deploy/kind.yaml --name $cluster_name
+            kind load docker-image local/$app-controller:v0.1.0 --name $cluster_name
+
+            # for VDeployment, need to deploy VReplicaSet as a dependency
+            if [ "$app" == "vdeployment" ]; then
+                kind load docker-image local/vreplicaset-controller:v0.1.0 --name $cluster_name
+            fi
+
+            # admission controller has a different deployment process
+            if [ $(echo $app | awk -F'-' '{print $NF}') == "admission" ]; then
+                app=${app%-admission}
+                app_filename=${app_filename%_admission}
+                set -o pipefail
+                kubectl create -f deploy/${app_filename}/crd.yaml
+                echo "Creating Webhook Server Certs"
+                mkdir -p certs
+                openssl genrsa -out certs/tls.key 2048
+                openssl req -new -key certs/tls.key -out certs/tls.csr -subj "/CN=admission-server.default.svc"
+                openssl x509 -req -extfile <(printf "subjectAltName=DNS:admission-server.default.svc") -in certs/tls.csr -signkey certs/tls.key -out certs/tls.crt
+
+                echo "Creating Webhook Server TLS Secret"
+                kubectl create secret tls admission-server-tls \
+                    --cert "certs/tls.crt" \
+                    --key "certs/tls.key"
+                echo "Creating Webhook Server Deployment"
+                sed -e 's@${APP}@'"${app}-admission-controller"'@g' <"e2e/manifests/admission_server.yaml" | kubectl create -f -
+                CA_PEM64="$(openssl base64 -A < certs/tls.crt)"
+                echo "Creating K8s Webhooks"
+                sed -e 's@${CA_PEM_B64}@'"$CA_PEM64"'@g' -e 's@${RESOURCE}@'"${app#}"s'@g' <"e2e/manifests/admission_webhooks.yaml" | kubectl create -f -
+                exit 0
+            fi
+
+            if cd deploy/$app_filename && { for crd in $(ls crd*.yaml); do kubectl create -f "$crd"; done } && kubectl apply -f rbac.yaml && kubectl apply -f deploy_$registry.yaml; then
+                echo ""
+                echo -e "${GREEN}The $app controller is deployed in your Kubernetes cluster in namespace \"$app\".${NC}"
+                echo -e "${GREEN}Run \"kubectl get pod -n $app\" to check the controller pod.${NC}"
+                echo -e "${GREEN}Run \"kubectl apply -f deploy/$app_filename/$app_filename.yaml\" to deploy the cluster custom resource(s).${NC}"
+            else
+                echo ""
+                echo -e "${RED}Cannot deploy the controller.${NC}"
+                echo -e "${YELLOW}Please ensure kubectl can connect to a Kubernetes cluster.${NC}"
+                exit 3
+            fi
+            ```
+    -   **`verifiable-controllers/local-test.sh`**: A wrapper script for building and deploying controllers for E2E testing.
+        -   **Path**: `verifiable-controllers/local-test.sh`
+        -   **Description**: This script, used by the CI and for local testing, automates the process of building a controller's Docker image and deploying it using `deploy.sh`. It supports local builds (compiling on the host) and remote builds (compiling inside a Docker builder image).
+        -   **Content**:
+            ```bash
+            #!/usr/bin/env bash
+
+            ## Test the controller locally in a kind cluster.
+            ##
+            ## Requires kind to be installed and the prerequisites of deploy.sh.
+            ## Usage: ./local-test.sh <controller_name> [--no-build]
+
+            set -xeu
+
+            app=$(echo "$1" | tr '_' '-')
+            app_filename=$(echo "$app" | tr '-' '_')
+            build_controller="no"
+            dockerfile_path="docker/controller/Dockerfile.local"
+
+            if [ $# -gt 1 ]; then
+                if  [ "$2" == "--build" ]; then # chain build.sh
+                    if [ ! -f "${VERUS_DIR}/source/target-verus/release/verus" ]; then
+                        echo "Verus not found. Please set VERUS_DIR correct"
+                        exit 1
+                    fi
+                    build_controller="local"
+                elif [ "$2" == "--build-remote" ]; then
+                    build_controller="remote"
+                fi
+            fi
+
+            case "$build_controller" in
+                local)
+                    echo "Building $app controller binary"
+                    shift 2
+                    ./build.sh "${app_filename}_controller.rs" "--no-verify" $@
+                    echo "Building $app controller image"
+                    docker build -f $dockerfile_path -t local/$app-controller:v0.1.0 --build-arg APP=$app_filename .
+                    ;;
+                remote)
+                    echo "Building $app controller image using builder"
+                    dockerfile_path="docker/controller/Dockerfile.remote"
+                    docker build -f $dockerfile_path -t local/$app-controller:v0.1.0 --build-arg APP=$app_filename .
+                    ;;
+                no)
+                    echo "Use existing $app controller image"
+                    ;;
+            esac
+
+            # for VDeployment, need to deploy VReplicaSet as a dependency
+            if [ "$app" == "vdeployment" ]; then
+                case "$build_controller" in
+                    local)
+                        echo "Building vreplicaset controller binary"
+                        ./build.sh "vreplicaset_controller.rs" "--no-verify" $@
+                        echo "Building vreplicaset controller image"
+                        docker build -f $dockerfile_path -t local/vreplicaset-controller:v0.1.0 --build-arg APP=vreplicaset .
+                        ;;
+                    remote)
+                        echo "Building vreplicaset controller image using builder"
+                        dockerfile_path="docker/controller/Dockerfile.remote"
+                        docker build -f $dockerfile_path -t local/vreplicaset-controller:v0.1.0 --build-arg APP=vreplicaset .
+                        ;;
+                    no)
+                        echo "Use existing vreplicaset controller image"
+                        ;;
+                esac
+            fi
+
+            # Setup cluster, deploy the controller as a pod to the kind cluster, using the image just loaded
+            ./deploy.sh $app local
+            ```
+    -   **`verifiable-controllers/reproduce-verification-result.sh`**: Script to run all key verifications and generate a results table.
+        -   **Path**: `verifiable-controllers/reproduce-verification-result.sh`
+        -   **Description**: This script automates the process of verifying the core framework and several controllers, then uses Verus's line counting tool and a Python script to generate a summary table of verification time and code size.
+        -   **Content**:
+            ```bash
+            #!/usr/bin/env bash
+
+            ## Reproduce the verification result of the three controllers,
+            ## also generate the Table 1 in the paper including:
+            ## (1) the time spent on verifying each controller
+            ## (2) the code size breakdown of each controller
+
+            set -xeu
+
+            YELLOW='\033[1;33m'
+            GREEN='\033[1;32m'
+            RED='\033[0;31m'
+            NC='\033[0m'
+
+            PREFIX="${GREEN}"
+
+            CUR_DIR=$(pwd)
+
+            echo -e "${PREFIX}Verifying Anvil framework...${NC}"
+            ./build.sh anvil.rs --crate-type=lib --emit=dep-info --time --time-expanded --output-json --rlimit 50 > anvil.json
+
+            echo -e "${PREFIX}Verifying Fluent controller...${NC}"
+            ./verify-controller-only.sh fluent
+
+            echo -e "${PREFIX}Verifying RabbitMQ controller...${NC}"
+            ./verify-controller-only.sh rabbitmq
+
+            echo -e "${PREFIX}Verifying ZooKeeper controller...${NC}"
+            ./verify-controller-only.sh zookeeper
+
+            echo -e "${PREFIX}Calling Verus line counting tool...${NC}"
+            pushd $VERUS_DIR/source/tools/line_count
+            cargo run --release -- $CUR_DIR/src/anvil.d > anvil_loc_table
+            cargo run --release -- $CUR_DIR/src/fluent_controller.d > fluent_loc_table
+            cargo run --release -- $CUR_DIR/src/rabbitmq_controller.d > rabbitmq_loc_table
+            cargo run --release -- $CUR_DIR/src/zookeeper_controller.d > zookeeper_loc_table
+            popd
+
+            echo -e "${PREFIX}Generating Table 1 to tools/t1.txt${NC}"
+            cp anvil.json tools/anvil.json
+            cp fluent.json tools/fluent.json
+            cp rabbitmq.json tools/rabbitmq.json
+            cp zookeeper.json tools/zookeeper.json
+            pushd tools
+            python3 gen-t1.py > t1.txt
+            popd
+
+            echo -e "${PREFIX}Presenting verification results from Verus. You should see 0 errors for Anvil and the three controllers, which means everything is verified.${NC}"
+            cat anvil.json | grep "errors"
+            cat fluent.json | grep "errors"
+            cat rabbitmq.json | grep "errors"
+            cat zookeeper.json | grep "errors"
+
+            # echo -e "${PREFIX}To check the verification time and code size results, just run cat tools/t1-time.txt and cat tools/t1-loc.txt.${NC}"
+            ```
+    -   **`verifiable-controllers/verify-controller-only.sh`**: A helper script for verifying a single controller.
+        -   **Path**: `verifiable-controllers/verify-controller-only.sh`
+        -   **Description**: This script is a wrapper around `build.sh` to simplify verifying a single controller's main module and capturing the JSON output.
+        -   **Content**:
+            ```bash
+            #!/usr/bin/env bash
+            set -xeu
+            app=$1
+            ./build.sh ${app}_controller.rs --time --time-expanded --output-json --rlimit 50 --verify-module ${app}_controller > ${app}.json
+            ```
+    -   **`verifiable-controllers/tools/gen-t1.py`**: A Python script to generate result tables.
+        -   **Path**: `verifiable-controllers/tools/gen-t1.py`
+        -   **Description**: This script will parse the JSON output from Verus and the line count data to generate a formatted table summarizing verification time and code metrics. The initial content can be a placeholder.
+    -   **`verifiable-controllers/docker/verus/Dockerfile`**: To build a base image with Verus and its dependencies.
+        -   **Path**: `verifiable-controllers/docker/verus/Dockerfile`
+        -   **Description**: This Dockerfile creates a self-contained builder image with a specific version of Verus, Z3, and the correct Rust toolchain.
+        -   **Content**:
+            ```Dockerfile
+            FROM ubuntu:22.04
+
+            ARG VERUS_VER
+            WORKDIR /
+
+            SHELL ["/bin/bash", "-c"]
+
+            RUN apt-get update && apt-get install -y git wget unzip curl gcc
+            RUN git clone https://github.com/verus-lang/verus.git \
+                && cd verus \
+                && git checkout ${VERUS_VER} \
+                && curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused -fsSL "https://sh.rustup.rs" | sh -s -- --default-toolchain none -y \
+                && . "$HOME/.cargo/env" \
+                && rustup toolchain install \
+                && cd source \
+                && ./tools/get-z3.sh \
+                && source ../tools/activate \
+                && vargo build --release
+            ```
+    -   **`verifiable-controllers/docker/controller/Dockerfile.remote`**: To build the controller from source within a container.
+        -   **Path**: `verifiable-controllers/docker/controller/Dockerfile.remote`
+        -   **Description**: This is a multi-stage Dockerfile that first builds the controller binary from source using a builder image (e.g., `verus-toolchain`), then copies the compiled binary into a minimal final image. This is the canonical file for remote/CI builds.
+        -   **Content**:
+            ```Dockerfile
+            ARG BUILDER_IMAGE=verus-toolchain:local
+            FROM ${BUILDER_IMAGE} as builder
+            
+            ARG APP
+            WORKDIR /anvil
+            
+            SHELL ["/bin/bash", "-c"]
+            
+            COPY . .
+            
+            RUN apt-get update && apt-get install -y pkg-config libssl-dev
+            
+            RUN . "$HOME/.cargo/env" && VERUS_DIR=/verus ./build.sh ${APP}_controller.rs --no-verify --time
+            RUN mv /anvil/src/${APP}_controller /anvil/src/controller
+            
+            # =============================================================================
+            
+            FROM ubuntu:22.04
+            
+            COPY --from=builder /anvil/src/controller /usr/local/bin/controller
+            
+            ENTRYPOINT ["/usr/local/bin/controller", "run"]
+            ```
+    -   **`verifiable-controllers/docker/controller/Dockerfile.local`**: To build the controller image from a pre-compiled binary.
+        -   **Path**: `verifiable-controllers/docker/controller/Dockerfile.local`
+        -   **Description**: This Dockerfile is used for local development. It takes a controller binary that has already been compiled on the host machine and packages it into a minimal runtime image.
+        -   **Content**:
+            ```Dockerfile
+            FROM ubuntu:22.04
+
+            ARG APP
+            WORKDIR /
+
+            COPY src/${APP}_controller /usr/local/bin/controller
+
+            ENTRYPOINT ["/usr/local/bin/controller", "run"]
+            ```
+    -   **`verifiable-controllers/deploy/kind.yaml`**: Configuration file for the `kind` Kubernetes cluster.
+        -   **Path**: `verifiable-controllers/deploy/kind.yaml`
+        -   **Description**: Defines the cluster topology and enables specific Kubernetes feature gates for testing.
+        -   **Content**:
+            ```yaml
+            kind: Cluster
+            apiVersion: kind.x-k-s.io/v1alpha4
+            nodes:
+              - role: control-plane
+              - role: worker
+              - role: worker
+              - role: worker
+            featureGates:
+              "StatefulSetAutoDeletePVC": true
+            ```
+    -   **Source files**: Main binary entry points for the controllers.
+        -   **Paths**: `verifiable-controllers/src/anvil.rs`, `verifiable-controllers/src/vreplicaset_controller.rs`, `verifiable-controllers/src/vdeployment_controller.rs`, `verifiable-controllers/src/vstatefulset_controller.rs`, `verifiable-controllers/src/vreplicaset_admission_controller.rs`, `verifiable-controllers/src/vdeployment_admission_controller.rs`, `verifiable-controllers/src/vstatefulset_admission_controller.rs`, `verifiable-controllers/src/zookeeper_controller.rs`, `verifiable-controllers/src/rabbitmq_controller.rs`, `verifiable-controllers/src/fluent_controller.rs`
+        -   **Description**: These files will contain the main Rust source code for the framework library and controller binaries. Initially, they can be left empty.
+    -   **`verifiable-controllers/src/deps_hack/Cargo.toml`**: Cargo manifest for the local `deps_hack` crate.
+        -   **Path**: `verifiable-controllers/src/deps_hack/Cargo.toml`
+        -   **Description**: Defines the `deps_hack` crate to satisfy the path dependency for the Verus build.
+    -   **`verifiable-controllers/e2e/Cargo.toml`**: Cargo manifest for the end-to-end test runner.
+        -   **Path**: `verifiable-controllers/e2e/Cargo.toml`
+        -   **Description**: Defines the E2E test runner project, specifying dependencies for Kubernetes API interaction (`kube`), asynchronous runtime (`tokio`), Zookeeper client (`zookeeper`), and various serialization and utility libraries.
+        -   **Content**:
+            ```toml
+            [package]
+            name = "e2e_test"
+            version = "0.1.0"
+            edition = "2021"
+
+            # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+
+            [features]
+            default = ["openssl-tls", "kubederive", "ws", "latest", "runtime"]
+            kubederive = ["kube/derive"]
+            openssl-tls = ["kube/client", "kube/openssl-tls"]
+            rustls-tls = ["kube/client", "kube/rustls-tls"]
+            runtime = ["kube/runtime"]
+            ws = ["kube/ws"]
+            latest = ["k8s-openapi/v1_30"]
+
+
+            [dependencies]
+            tokio-util = "0.7.0"
+            futures = "0.3.17"
+            kube = { version = "0.91.0", default-features = false, features = ["admission"] }
+            kube-derive = { version = "0.91.0", default-features = false } # only needed to opt out of schema
+            kube-client = { version = "0.91.0", default-features = false }
+            kube-core = { version = "0.91.0", default-features = false }
+            k8s-openapi = { version = "0.22.0", default-features = false }
+            serde = { version = "1.0.130", features = ["derive"] }
+            serde_json = "1.0.68"
+            serde_yaml = "0.9.19"
+            tokio = { version = "1.14.0", features = ["full"] }
+            schemars = "0.8.6"
+            thiserror = "1.0.29"
+            tokio-stream = { version = "0.1.9", features = ["net"] }
+            zookeeper = "0.8"
+            tungstenite = "0.20.1"
+            tracing = "0.1.36"
+            tracing-subscriber = "0.3.17"
+            deps_hack = { path = "../src/deps_hack" }
+            ```
+    -   **`verifiable-controllers/e2e/src/main.rs`**: Entry point for the E2E test runner.
+        -   **Path**: `verifiable-controllers/e2e/src/main.rs`
+        -   **Description**: Contains the Rust code for running E2E tests against a Kubernetes cluster.
+    -   **`verifiable-controllers/e2e/manifests/admission_server.yaml`**: Kubernetes manifest for the admission webhook server deployment.
+        -   **Path**: `verifiable-controllers/e2e/manifests/admission_server.yaml`
+        -   **Description**: A template manifest for deploying the admission controller pod. It contains a placeholder `${APP}` that is replaced by the `deploy.sh` script.
+    -   **`verifiable-controllers/e2e/manifests/admission_webhooks.yaml`**: Kubernetes manifest for the admission webhook configurations.
+        -   **Path**: `verifiable-controllers/e2e/manifests/admission_webhooks.yaml`
+        -   **Description**: A template manifest for creating `ValidatingWebhookConfiguration` or `MutatingWebhookConfiguration`. It contains placeholders `${CA_PEM_B64}` and `${RESOURCE}` that are replaced by the `deploy.sh` script.
+    -   **Placeholder deployment files**: The `deploy.sh` script requires a directory of Kubernetes manifests for each controller.
+        -   **Paths**: `verifiable-controllers/deploy/{controller_name}/crd.yaml`, `verifiable-controllers/deploy/{controller_name}/rbac.yaml`, `verifiable-controllers/deploy/{controller_name}/deploy_local.yaml`, `verifiable-controllers/deploy/{controller_name}/deploy_remote.yaml`, etc.
+        -   **Description**: These files should contain the necessary Kubernetes manifest definitions (Custom Resource Definitions, RBAC rules, Deployments). They can be created as empty files initially.
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    -   **Formal Verification Specs (Verus)**:
+        -   For the core framework (`anvil.rs`), define and prove invariants and function specifications for the foundational logic.
+        -   For the core logic of each controller (e.g., `VReplicaSet`, `Zookeeper`, `RabbitMQ`, `Fluent`), define function specifications with `requires` and `ensures`.
+        -   For state transitions, define and prove `invariant` properties.
+        -   Use `--verify-module` to focus verification on specific, critical modules within a controller.
+        -   **Example**: For `VReplicaSet`, prove that the reconciliation logic always moves the cluster state towards having the specified number of pods.
+    -   **Unit and Integration Tests (cargo test)**:
+        -   Write standard Rust tests for non-verifiable logic, such as Kubernetes API interactions, message parsing, and utility functions.
+        -   Use mock objects or test harnesses to isolate components for unit testing.
+    -   **Kubernetes E2E Tests (e2e test runner)**:
+        -   Use the `e2e` Rust crate to write automated tests that interact with a live `kind` cluster.
+        -   **Test Deployment**: Verify the successful deployment of controller pods.
+        -   **Test CRD Lifecycle**: Write tests that use the Kubernetes API client to create, read, update, and delete the project's Custom Resources (e.g., `VReplicaSet`, `ZookeeperCluster`).
+        -   **Test Reconciliation**: Verify that the controller correctly reconciles the cluster state in response to CR changes (e.g., creating/deleting pods when `replicas` field is changed).
+        -   **Test StatefulSet PVC Cleanup**: For StatefulSet-based controllers, verify that when the custom resource is deleted, the associated PersistentVolumeClaims (PVCs) are also automatically deleted, leveraging the `StatefulSetAutoDeletePVC` feature gate.
+        -   **Test Application-Specific Logic**: For controllers like `ZookeeperCluster`, tests should not only verify resource creation but also connect to the deployed Zookeeper service to confirm it is operational.
+        -   **Test Admission Webhooks**: For admission controllers (`VReplicaSetAdmission`, `VDeploymentAdmission`, etc.), send `create` and `update` requests for custom resources. Verify that valid resources are accepted and invalid resources are rejected with the correct error message.
+
+4.  COMPLETE TODO LIST:
+    1.  **Install System Prerequisites**:
+        -   **Action**: Install Git, a C/C++ compiler toolchain, Go, Docker, openssl, pkg-config, Python, and required development libraries.
+        -   **Linux (Debian/Ubuntu)**: `sudo apt update && sudo apt install build-essential git golang-go docker.io openssl pkg-config libssl-dev python3 python3-pip wget unzip`
+        -   **macOS**: `xcode-select --install`, install Docker Desktop for Mac, and install dependencies via Homebrew: `brew install go openssl pkg-config python wget`.
+        -   **Verification**: Run `git --version`, `gcc --version`, `go version`, `docker --version`, `openssl version`, `pkg-config --version`, `python3 --version`.
+
+    2.  **Install Python Dependencies**:
+        -   **Action**: Use `pip` to install the `tabulate` package.
+        -   **Command**: `pip3 install tabulate`
+        -   **Verification**: Run `pip3 show tabulate`.
+
+    3.  **Install Kubernetes Tools**:
+        -   **Action**: Install `kubectl` and `kind`.
+        -   **Commands (platform-agnostic)**:
+            ```bash
+            # Install kubectl (follow official docs for your OS)
+            # Example for Linux (amd64 architecture):
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+            
+            # Install kind using Go
+            go install sigs.k8s.io/kind@v0.23.0
+            # Ensure your Go bin directory is in your PATH, e.g., export PATH=$(go env GOPATH)/bin:$PATH
+            ```
+        -   **Verification**: Run `kubectl version --client` and `kind version`. The `kind` version should be `0.23.0`.
+
+    4.  **Install Rust using rustup**:
+        -   **Action**: Follow the instructions on https://rustup.rs to install `rustup`.
+        -   **Command**: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
+        -   **Verification**: Open a new terminal and run `rustc --version` and `cargo --version`.
+
+    5.  **Clone, Configure, and Build the Verus Tool**:
+        -   **Action**: In your specified working directory, clone a specific commit of the Verus repository, install Z3, and build the Verus tool.
+        -   **Commands**:
+            ```bash
+            # Navigate to your main working directory.
+            cd /home/cc/EnvGym/data/anvil
+            
+            export VERUS_COMMIT="8bd7c3292aad57d3926ed8024cde13ca53d6e1a7"
+            
+            git clone https://github.com/verus-lang/verus.git
+            cd verus
+            git checkout ${VERUS_COMMIT}
+            
+            # Install the correct Rust toolchain for Verus itself
+            rustup toolchain install $(cat rust-toolchain.toml | grep channel | cut -d '"' -f 2)
+            
+            cd source
+            ./tools/get-z3.sh
+            
+            source ../tools/activate
+            vargo clean
+            vargo build --release
+            ```
+        -   **Verification**: An executable should be at `/home/cc/EnvGym/data/anvil/verus/source/target-verus/release/verus`.
+
+    6.  **Set the VERUS_DIR Environment Variable**:
+        -   **Action**: Set `VERUS_DIR` to point to the root of the cloned `verus` directory. This is required for local builds.
+        -   **Command (for the current session)**: `export VERUS_DIR="/home/cc/EnvGym/data/anvil/verus"`
+        -   **Description**: Add this command to your shell's profile file (e.g., `~/.bashrc`) for permanent setup.
+        -   **Verification**: Run `echo $VERUS_DIR` and confirm it shows the correct absolute path.
+
+    7.  **Configure Project and Dependencies**:
+        -   **Action**: Create the directory structure and files for the `verifiable-controllers` project within your workspace.
+        -   **Commands**:
+            ```bash
+            # Navigate to the root of your workspace
+            cd /home/cc/EnvGym/data/anvil
+            
+            # Create the project directories
+            mkdir -p verifiable-controllers/.github/workflows
+            mkdir -p verifiable-controllers/src/deps_hack/src
+            mkdir -p verifiable-controllers/deploy/{vreplicaset,vdeployment,vstatefulset,zookeeper,rabbitmq,fluent}
+            mkdir -p verifiable-controllers/e2e/src
+            mkdir -p verifiable-controllers/e2e/manifests
+            mkdir -p verifiable-controllers/docker/controller
+            mkdir -p verifiable-controllers/docker/verus
+            mkdir -p verifiable-controllers/tools
+            ```
+        -   **Action**: Create all the files specified in the "FILES TO CREATE" section within the `verifiable-controllers` directory.
+        -   **Action**: Make the scripts executable: `chmod +x /home/cc/EnvGym/data/anvil/verifiable-controllers/{build.sh,deploy.sh,local-test.sh,reproduce-verification-result.sh,verify-controller-only.sh}`
+        -   **Verification**: The directory structure should be complete at `/home/cc/EnvGym/data/anvil/verifiable-controllers`.
+
+    8.  **Set Project Rust Toolchain**:
+        -   **Action**: Navigate into the project directory. `rustup` will automatically use the toolchain defined in `rust-toolchain.toml`.
+        -   **Commands**: `cd /home/cc/EnvGym/data/anvil/verifiable-controllers && rustc --version`
+        -   **Verification**: The command should show Rust version `1.88.0`.
+
+    9.  **Verify a Controller with Verus**:
+        -   **Action**: Run the `build.sh` script to verify a specific controller.
+        -   **Command**: `cd /home/cc/EnvGym/data/anvil/verifiable-controllers && ./build.sh vreplicaset_controller.rs --rlimit 50 --time --verify-module vreplicaset_controller`
+        -   **Verification**: The command should run without errors and output "verification results:: verified: X errors: 0".
+
+    10. **Build Base Verus Toolchain Docker Image (for CI/Remote builds)**:
+        -   **Action**: Build the base Docker image containing the Verus toolchain. This image is used by `local-test.sh --build-remote`.
+        -   **Command**: `cd /home/cc/EnvGym/data/anvil/verifiable-controllers && docker build --build-arg VERUS_VER="8bd7c3292aad57d3926ed8024cde13ca53d6e1a7" -t verus-toolchain:local docker/verus`
+        -   **Verification**: Run `docker images | grep verus-toolchain`.
+
+    11. **Publish Base Verus Toolchain Docker Image (CI)**:
+        -   **Action**: Manually trigger the `Verus build` GitHub Actions workflow to build and publish the Verus toolchain image to the GitHub Container Registry.
+        -   **Description**: This provides a pre-built image that can be used by the `controller-build` CI job to avoid building Verus from source repeatedly. Go to the "Actions" tab in the GitHub repository, select the "Verus build" workflow, and click "Run workflow".
+        -   **Verification**: Check the GitHub Container Registry for the newly published `verus` image.
+
+    12. **Build and Deploy Controller for E2E Testing (Local Development)**:
+        -   **Action**: Use the `local-test.sh` script to compile a controller binary on the host, build a Docker image, and deploy it to a new `kind` cluster.
+        -   **Command**: `cd /home/cc/EnvGym/data/anvil/verifiable-controllers && ./local-test.sh vreplicaset --build`
+        -   **Description**: This script handles compiling the binary using `build.sh`, building the Docker image using `Dockerfile.local`, and then calling `deploy.sh` to set up the cluster and apply manifests. Requires `VERUS_DIR` to be set.
+        -   **Verification**: The script should complete successfully. Run `kubectl get nodes` to see the 1 control-plane and 3 worker nodes. Run `kubectl get pod -n vreplicaset` to see the controller pod.
+
+    13. **Run End-to-End Tests**:
+        -   **Action**: Run the Rust-based E2E test suite against the deployed controller.
+        -   **Command**: `cd /home/cc/EnvGym/data/anvil/verifiable-controllers/e2e && cargo run -- vreplicaset`
+        -   **Description**: The argument should match the controller being tested (e.g., `cargo run -- zookeeper`). The first run will download and compile all Rust dependencies specified in `e2e/Cargo.toml`.
+        -   **Verification**: The test runner should execute and report that all E2E tests have passed.
+
+    14. **Reproduce Verification Results**:
+        -   **Action**: Run the dedicated script to verify the core framework and controllers, and generate a performance and code size summary table.
+        -   **Command**: `cd /home/cc/EnvGym/data/anvil/verifiable-controllers && ./reproduce-verification-result.sh`
+        -   **Description**: This script runs multiple verification jobs, gathers statistics, and uses a Python script to format the output. It requires `VERUS_DIR` to be set.
+        -   **Verification**: The script should complete successfully. The output should show "0 errors" for all verified components. Inspect the generated summary file at `tools/t1.txt`.

@@ -1,0 +1,7 @@
+current progress
+The Dockerfile has successfully automated the initial environment setup according to the plan. This includes installing system prerequisites, cloning the RelTR repository, and creating the `reltr` Conda environment with all specified Python dependencies like CPU-only PyTorch. It also correctly downloads and places the pre-trained models into the `ckpt/` directory and prepares the Visual Genome (VG) annotations. However, the custom operator compilation step is incorrectly implemented, targeting a non-existent `lib/fpn` directory instead of the correct `models/ops` directory specified in the plan. The preparation for the Open Images (OI) dataset and all verification tests are currently missing.
+
+next step
+1.  Correct the helper code compilation step. The `RUN` command should change the directory to `models/ops` and execute `make -j$(nproc)` as specified in the plan's Step 4, instead of the current incorrect command targeting `lib/fpn`.
+2.  Add the data processing steps for the Open Images V6 (OI) dataset. This requires adding `RUN` commands to download the original OI annotations and execute the `python data/process.py` script to generate the necessary `.json` files.
+3.  Implement the verification tests from the plan as part of the Docker build process. Add `RUN` commands to execute the inference test (Step 7) and the Visual Genome evaluation test (Step 8) to ensure the environment is correctly configured and functional upon a successful build.

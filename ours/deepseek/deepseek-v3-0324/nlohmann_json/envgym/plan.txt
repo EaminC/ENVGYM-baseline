@@ -1,0 +1,99 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED (ADJUSTED):
+   - libFuzzer (Clang 6.0+)
+   - afl++ compiler (x86_64 Linux version)
+   - Test data from json_test_data repository
+   - LLVM documentation (http://llvm.org/docs/LibFuzzer.html)
+   - clang compiler with C++20 support (x86_64 Linux version)
+   - CMake (version 3.28+)
+   - pthread library
+   - doctest framework
+   - nlohmann fifo_map repository (https://github.com/nlohmann/fifo_map)
+   - nlohmann_json library (version 3.12.0)
+   - ABI compatibility checker tool
+   - Hedley header-only library
+   - Filesystem library (for JSON_HAS_FILESYSTEM)
+   - Experimental filesystem library (for JSON_HAS_EXPERIMENTAL_FILESYSTEM)
+   - Three-way comparison library
+   - GCC latest version (x86_64 Linux)
+   - clang-tidy (x86_64 Linux version)
+   - clang-format
+   - Bazel (x86_64 Linux version)
+   - rules_cc Bazel rules
+   - rules_license Bazel rules
+   - single_include/nlohmann/json.hpp
+
+2. FILES TO CREATE (ADJUSTED):
+   - tests/fuzzing.md (documentation)
+   - tests/corpus_json/
+   - tests/corpus_bjdata/
+   - tests/corpus_bson/
+   - tests/corpus_cbor/
+   - tests/corpus_msgpack/
+   - tests/corpus_ubjson/
+   - tests/parse_[format]_fuzzer for each format
+   - tests/Makefile (updated with fuzzer targets)
+   - tests/thirdparty/Fuzzer/README.txt
+   - tests/thirdparty/Fuzzer/build.sh
+   - tests/thirdparty/Fuzzer/libFuzzer.a
+   - tests/thirdparty/Fuzzer/CMakeLists.txt
+   - tests/thirdparty/Fuzzer/test/
+   - tests/thirdparty/doctest/doctest_compatibility.h
+   - tests/thirdparty/doctest/doctest.h
+   - tests/thirdparty/fifo_map/fifo_map.hpp
+   - tests/fifo_map_tests.cpp
+   - src/modules/CMakeLists.txt
+   - include/nlohmann/detail/abi_macros.hpp
+   - tests/abi_compatibility_tests.cpp
+   - include/nlohmann/detail/macro_scope.hpp
+   - include/nlohmann/detail/macro_unscope.hpp
+   - tests/macro_scope_tests.cpp
+   - tests/macro_unscope_tests.cpp
+   - tests/derived_type_tests.cpp
+   - tests/serialization_macro_tests.cpp
+   - tests/compiler_compatibility_tests.cpp
+   - tests/macro_cleanup_tests.cpp
+   - tests/hedley_integration_tests.cpp
+   - .clang-tidy
+   - .clang-format
+   - .gitignore
+   - MODULE.bazel
+   - BUILD.bazel
+   - LICENSE.MIT
+   - single_include/nlohmann/json.hpp
+
+3. NECESSARY TEST CASES (ADJUSTED):
+   - Removed all macOS/iOS/Windows-specific tests
+   - Removed GPU-related tests
+   - Removed XCode/Visual Studio specific tests
+   - Focused on x86_64 Linux compatibility tests
+   - Kept all standard C++ and Linux-compatible tests
+   - Maintained all fuzzing and sanitizer tests
+   - Kept all module and standard library feature tests
+   - Maintained all Bazel build system tests
+
+4. COMPLETE TODO LIST (ADJUSTED):
+   - Removed all macOS/Windows-specific installation steps
+   - Removed GPU-related configuration
+   - Removed XCode/Visual Studio setup
+   - Simplified to x86_64 Linux toolchain setup
+   - Focused on standard Linux build tools (CMake, Bazel, GCC, Clang)
+   - Maintained all core functionality testing
+   - Kept all fuzzer and sanitizer setup
+   - Simplified CI pipeline to Linux-only
+   - Removed natvis-related tasks
+   - Removed ARM-specific container tests
+   - Simplified debug visualization to Linux tools
+
+Key adjustments made:
+1. Removed all macOS-specific components (Homebrew LLVM, XCode)
+2. Removed Windows-specific components (Visual Studio, Natvis)
+3. Removed ARM-specific tests and containers
+4. Removed GPU-related components (unavailable)
+5. Simplified to x86_64 Linux toolchain
+6. Maintained all core functionality and standard compliance tests
+7. Kept all fuzzing and sanitizer capabilities
+8. Simplified CI/CD to Linux-only pipeline
+9. Removed platform-specific debug visualization tools
+10. Maintained all standard C++ feature tests and build system tests

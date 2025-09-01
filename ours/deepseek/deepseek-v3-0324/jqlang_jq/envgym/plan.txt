@@ -1,0 +1,65 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - jq prebuilt binary (latest Linux x86_64 version from GitHub releases)
+   - Docker CE for Linux x86_64
+   - libtool, make, automake, autoconf (Debian/Ubuntu packages)
+   - git (Debian/Ubuntu package)
+   - flex, bison (version 3.0 or greater from Debian/Ubuntu repos)
+   - build-essential (Debian package)
+   - debian:12-slim base image (x86_64 architecture)
+   - pipenv (Python package)
+   - oniguruma library (Debian package or builtin)
+   - valgrind (Debian package)
+   - gcov (gcc package)
+   - ASan/UBSan tools (gcc package)
+   - pthread libraries (system default)
+   - od utility (coreutils)
+   - decNumber library (from source)
+   - RPM build tools (rpm-build package)
+   - Python 3.9+ (Debian/Ubuntu package)
+   - Python dependencies (via pipenv)
+   - pkg-config (Debian package)
+   - lz4 compression tools (Debian package)
+   - jq source tarball (x86_64 compatible)
+   - virtualenv (Python package)
+
+2. FILES TO CREATE:
+   - Dockerfile (using debian:12-slim base)
+   - All other files remain unchanged (x86_64 compatible)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - All original tests remain applicable
+   - Focus on x86_64 architecture specific tests
+   - Skip GPU/CUDA related tests
+
+4. COMPLETE TODO LIST:
+   1. Choose installation method:
+      - Option 1: Prebuilt binary (x86_64 version)
+      - Option 2: Docker (x86_64 image)
+      - Option 3: Build from source (x86_64 target)
+        - Update configure flags:
+          ```./configure --host=x86_64-linux-gnu --with-oniguruma=builtin```
+
+   2. Set up build environment:
+      - All steps remain valid for x86_64
+      - For decNumber compilation:
+        ```gcc -m64 -O3 -o example1 example1.c decNumber.c decContext.c```
+
+   3. Set up documentation environment:
+      - Use system Python 3.9+ for x86_64
+      - All other steps remain unchanged
+
+   4-11. All remaining tasks:
+      - No changes needed for x86_64 architecture
+      - Ensure all paths use Linux-style (/home/cc/...)
+      - Use standard Linux tools (no Windows-specific items)
+
+Key Adjustments:
+- Removed Windows-specific components (shlwapi)
+- Confirmed all components available in Debian/Ubuntu repos for x86_64
+- Updated compilation flags for x86_64 architecture
+- Verified Docker compatibility with x86_64 platform
+- Removed GPU-related considerations
+- Confirmed standard Linux paths and tools
+- Kept decNumber compilation with x86_64 optimizations

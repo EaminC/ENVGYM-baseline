@@ -1,0 +1,208 @@
+Based on the provided hardware information, here is the adjusted environment setup plan. The modifications focus on removing GPU-specific requirements, clarifying paths for the specified working directory, and tailoring the steps for a CPU-only Linux environment, likely within a container.
+
+***
+
+### ADJUSTED ENVIRONMENT SETUP PLAN
+
+1.  **DOWNLOADS NEEDED**:
+    *   **Python**: Versions 3.9 to 3.13 are actively tested.
+    *   **Git**: For cloning the source code repositories, including handling submodules.
+    *   **TabPFN Source Code**: From `https://github.com/PriorLabs/TabPFN.git`. Note: This repository contains git submodules that must be initialized.
+    *   **TabPFN Extensions Source Code (Optional)**: From `https://github.com/priorlabs/tabpfn-extensions.git`.
+    *   **TabPFN Model Weights**: Downloaded automatically or manually for offline use.
+        *   Classifier: `https://huggingface.co/Prior-Labs/TabPFN-v2-clf/resolve/main/tabpfn-v2-classifier.ckpt`
+        *   Regressor: `https://huggingface.co/Prior-Labs/TabPFN-v2-reg/resolve/main/tabpfn-v2-regressor.ckpt`
+    *   **Key Dependencies (Installed via `pip`)**: The environment supports a range of dependency versions, from a `minimum` to a `maximum` set. Key packages include:
+        *   `torch` (CPU version will be installed by default)
+        *   `scikit-learn`
+        *   `pandas`
+        *   `pydantic`
+        *   `pydantic-settings`: For structured configuration management from environment variables and `.env` files.
+    *   **Development & CI Tools (Installed via `pip install -e ".[dev]"`)**:
+        *   `uv`: A high-performance alternative to `pip` for package installation, used in CI.
+        *   `pre-commit`: For managing Git hooks that automate code quality checks.
+        *   `ruff`: For linting and formatting (`./src` and `./tests` directories).
+        *   `mypy`: For static type checking. Requires `types-pyyaml` and `types-psutil`.
+        *   `commitizen`: For enforcing Conventional Commit message standards.
+        *   `pytest` & `pytest-xdist`: For running the test suite.
+        *   `pytest-cov`: For measuring code coverage.
+        *   `psutil`: For memory-related tests.
+        *   `onnx`: For ONNX model export tests. **Note**: Not currently available for Python 3.13.
+        *   `mkdocs` suite: For building documentation.
+        *   Other pre-commit tools: Includes helpers for checking large files, YAML/TOML syntax, and GitHub workflow schemas.
+    *   **AI Development Assistant (e.g., Gemini)**: This is likely a GitHub App or IDE extension rather than a local install. Its configuration is managed within the repository.
+
+2.  **FILES TO CREATE**:
+    *   **Virtual Environment Directory (`venv/`)**:
+        *   **Path**: `/home/cc/EnvGym/data/TabPFN/venv/`
+        *   **Description**: An isolated Python environment to manage project-specific dependencies. Created via `python -m venv venv` or `uv venv`. **Note**: This directory should be listed in `.gitignore` and not committed to version control.
+    *   **Environment Configuration File (`.env`) (Optional)**:
+        *   **Path**: `/home/cc/EnvGym/data/TabPFN/.env`
+        *   **Description**: A file to store environment variables for configuring TabPFN's behavior. This file is parsed by `pydantic-settings` based on the schema in `src/tabpfen/settings.py`. It can also be used for settings consumed by external tools like `pytest`. **Note**: This file should be listed in `.gitignore` to prevent committing secrets or local settings.
+        *   **Example Content (CPU-only)**:
+            ```
+            # --- TabPFN Application Settings (parsed by src/tabpfen/settings.py) ---
+
+            # Custom directory for caching downloaded TabPFN models
+            TABPFN_MODEL_CACHE_DIR="./.model_cache"
+
+            # Allow running TabPFN on CPU with datasets >1000 samples (will be slow)
+            TABPFN_ALLOW_CPU_LARGE_DATASET=true
+
+            # Force consistency tests to run even if platform doesn't match a reference
+            FORCE_CONSISTENCY_TESTS=true
+
+            # Indicate if running in a CI environment (modifies some test behaviors)
+            CI=false
+
+            # --- External Tool & Test Harness Settings ---
+
+            # Exclude specific devices from the pytest suite (e.g., mps for macOS)
+            TABPFN_EXCLUDE_DEVICES="mps"
+            ```
+    *   **Verification Script (`verify_install.py`)**:
+        *   **Path**: `/home/cc/EnvGym/data/TabPFN/verify_install.py`
+        *   **Description**: A Python script to run the basic classification and regression examples to confirm the environment and packages are working correctly.
+    *   **Git Ignore File (`.gitignore`)**:
+        *   **Path**: `/home/cc/EnvGym/data/TabPFN/.gitignore`
+        *   **Description**: Specifies intentionally untracked files to ignore. Essential for keeping the repository clean of build artifacts, local configurations, and environment-specific files. This is typically included in the cloned repository.
+    *   **Dependabot Configuration (`.github/dependabot.yml`)**:
+        *   **Path**: `/home/cc/EnvGym/data/TabPFN/.github/dependabot.yml`
+        *   **Description**: Configures GitHub's Dependabot to automatically create pull requests for updating `pip` dependencies and GitHub Actions workflows on a weekly basis. This file is part of the repository and ensures dependencies are kept current.
+    *   **AI Assistant Configuration (`.gemini/config.yaml`)**:
+        *   **Path**: `/home/cc/EnvGym/data/TabPFN/.gemini/config.yaml`
+        *   **Description**: Configures an AI-powered development assistant (e.g., Gemini) for tasks like code review. The current configuration disables automatic summaries on pull request creation. This file is part of the repository and central to the automated PR workflow.
+    *   **Key Repository Directories & Generated Artifacts (Good to be aware of)**:
+        *   **Description**: These files and directories are either part of the repository or created by tools during development and testing. They are typically excluded from version control via `.gitignore` (unless they are part of the core test framework).
+        *   **Git Internal Configuration (`.git/`)**: This directory is created by the `git clone` command and contains all the repository metadata. A key file within it is `.git/config`, which stores settings for the local repository, such as the remote `origin` URL (`https://github.com/PriorLabs/TabPFN`) and branch tracking information for `main`. This directory is managed by Git and should not be manually edited.
+        *   **Reference Predictions (`tests/reference_predictions/`)**: Contains saved model prediction values used by consistency tests. These are platform-specific (OS, CPU architecture, Python version) and are committed to the repository to ensure reproducibility. Your `linux/amd64` platform is a primary target for these tests.
+        *   **Generated Artifacts**: `__pycache__/`, `build/`, `dist/`, `.pytest_cache/`, `htmlcov/`, `site/` (from mkdocs), `.mypy_cache/`.
+
+3.  **NECESSARY TEST CASES IN THE CODEBASE**:
+    *   **Core Dependency Import**: A test to ensure `tabpfen`, `sklearn`, and `torch` can be imported without errors.
+    *   **Configuration Management**: Tests to verify that settings from `src/tabpfen/settings.py` are correctly loaded from environment variables and/or a `.env` file using `pydantic-settings`.
+    *   **Classification Model Execution**: A test case that initializes `TabPFNClassifier`, fits it on a sample dataset, and generates predictions.
+    *   **Regression Model Execution**: A test case that initializes `TabPFNRegressor`, fits it on a sample dataset, and generates predictions.
+    *   **Utility Function Tests**: Tests for various helper and utility functions within the codebase.
+    *   **Model Prediction Consistency**: A critical test suite (`test_consistency.py`) to ensure model predictions remain stable across code changes.
+        *   **Mechanism**: Fits models on fixed datasets with reproducible seeds and compares output predictions against committed reference values stored in `tests/reference_predictions/`.
+        *   **Platform Specificity**: Reference values are specific to the OS (Linux, macOS, Windows), CPU architecture (x86, ARM), and Python version (3.9, 3.13). The `linux/amd64` architecture is a standard reference platform.
+        *   **Forcing Execution**: The `FORCE_CONSISTENCY_TESTS=true` environment variable can be used to run these tests even on a non-matching platform.
+    *   **Cross-Platform Compatibility**: The test suite is designed to pass on Linux, macOS, and Windows environments.
+    *   **Multi-Version Python Compatibility**: Tests must pass for Python versions 3.9 through 3.13.
+    *   **Dependency Set Compatibility**: Tests must pass with both `minimum` and `maximum` supported dependency versions, as defined by `scripts/generate_dependencies.py`.
+    *   **Dependency Update Robustness**: The test suite must be robust enough to validate automated dependency updates submitted by Dependabot. This ensures that new package versions do not introduce breaking changes.
+    *   **GPU Functionality**: **Not applicable.** All GPU-related tests will be skipped in this environment.
+    *   **Device-Specific Test Exclusion**: The ability to exclude devices (e.g., `mps`) from the test suite using the `TABPFN_EXCLUDE_DEVICES` environment variable.
+    *   **ONNX Export**: A test to verify that the model can be exported to ONNX format (skipped on Python 3.13).
+    *   **Internal Memory Tool**: A conditional test (for Windows) using `psutil` to verify internal memory management utilities.
+    *   **Offline Model Loading**: A test that loads a model from a local `.ckpt` file path.
+    *   **Linting and Formatting**: Codebase must conform to `ruff` rules and formatting standards, enforced via a pre-commit hook.
+    *   **Static Type Checking**: Codebase must pass `mypy` static type analysis. **Note**: The pre-commit hook for `mypy` intentionally excludes the `src` directory; this check must be run manually on `src/tabpfen`.
+    *   **Commit Message Convention**: Commit messages must adhere to the Conventional Commits specification, enforced by `commitizen` via a pre-commit hook.
+    *   **Codebase Integrity Checks**: The pre-commit suite automatically checks for: no large binary files, no filename case conflicts, valid configuration file syntax (YAML, TOML, GitHub Workflows), and no leftover debug statements.
+    *   **Workflow Configuration Integrity**: The repository includes configuration files for automated tools like Dependabot (`.github/dependabot.yml`) and AI assistants (`.gemini/config.yaml`). Developers should be aware of these configurations as they affect the automated dependency update and code review workflows.
+    *   **Development Test Suite**: The project's own test suite (`pytest tests/`) must pass completely.
+    *   **Code Coverage Measurement**: Tests should be run with coverage analysis to ensure adequate test coverage of the codebase. The results (e.g., `htmlcov/`) are ignored by Git.
+    *   **Documentation Build Integrity**: The documentation build process using `mkdocs` must complete without errors, ensuring all documentation pages can be generated correctly.
+
+4.  **COMPLETE TODO LIST**:
+    1.  **Install Prerequisites**:
+        *   **Action**: Ensure the base system has Python (version 3.9-3.13) and Git installed. In a Docker context, this would be part of the base image or installed via a package manager (e.g., `apt-get install -y python3 python3-venv git`).
+        *   **Verification**: From within the environment, run `python --version` and `git --version`.
+
+    2.  **Set Up Project Directory**:
+        *   **Action**: The working directory is `/home/cc/EnvGym/data/TabPFN`. Ensure the TabPFN source code is present in this directory (e.g., via `COPY . .` in a Dockerfile). All subsequent commands should be run from this directory.
+        *   **Command**: `cd /home/cc/EnvGym/data/TabPFN`
+        *   **Verification**: `ls -la` shows the project files, including `.git`, `pyproject.toml`, and the `src` directory.
+
+    3.  **Initialize Git Submodules**:
+        *   **Action**: Initialize the necessary git submodules. This step is critical and assumes the `.git` directory is present.
+        *   **Command**: `git submodule update --init --recursive`
+
+    4.  **Create and Activate Python Virtual Environment**:
+        *   **Action**: Create an isolated Python environment within the project directory.
+        *   **Commands**:
+            ```bash
+            python -m venv venv
+            source venv/bin/activate
+            ```
+        *   **Verification**: The terminal prompt should be prefixed with `(venv)`.
+
+    5.  **Install TabPFN with Development Dependencies**:
+        *   **Action**: Install the package in editable mode along with all development dependencies (`ruff`, `mypy`, `pytest`, `commitizen`, `pydantic-settings`, etc.) specified in `pyproject.toml`.
+        *   **Command**: `pip install -e ".[dev]"`
+        *   **Verification**: Run `pip list` and confirm that `tabpfen`, `torch`, `ruff`, `mypy`, `pytest`, `commitizen`, and `pydantic-settings` are listed.
+
+    6.  **Configure Local Environment (Optional)**:
+        *   **Action**: Create a `.env` file in the project root to customize settings for local development and testing. For a CPU-only environment, setting `TABPFN_ALLOW_CPU_LARGE_DATASET=true` is recommended.
+        *   **Verification**: Create the file with content similar to the CPU-only example in "FILES TO CREATE". The application and tests will automatically pick up these settings.
+
+    7.  **Install Pre-commit Hooks (For Interactive Development)**:
+        *   **Action**: Set up pre-commit hooks which will automatically run code quality checks before each commit.
+        *   **Command**: `pre-commit install`
+        *   **Verification**: The command should output `pre-commit installed at .git/hooks/pre-commit`.
+
+    8.  **Make a Test Commit (For Interactive Development)**:
+        *   **Action**: After staging a minor change, use `commitizen` to create a properly formatted commit message, which will trigger the hooks.
+        *   **Commands**: `git add . && cz commit`
+        *   **Verification**: The `commitizen` interactive prompt appears. After completion, the pre-commit hooks run and the commit is created successfully.
+
+    9.  **Clone and Install TabPFN Extensions (Optional)**:
+        *   **Action**: From a directory outside the project, clone and install the extensions repository into the same virtual environment.
+        *   **Commands**:
+            ```bash
+            cd .. # Go to /home/cc/EnvGym/data/
+            git clone https://github.com/priorlabs/tabpfn-extensions.git
+            cd tabpfen-extensions
+            pip install -e .
+            cd ../TabPFN # Return to the main project directory
+            ```
+        *   **Verification**: Run `pip list` and confirm `tabpfen-extensions` is in the list.
+
+    10. **Pre-download Model Weights (Recommended for Offline/Container Builds)**:
+        *   **Action**: Run the provided script to download all model weights to the cache directory.
+        *   **Command**: `python scripts/download_all_models.py`
+        *   **Verification**: Check the default or custom (`TABPFN_MODEL_CACHE_DIR`) cache directory for `.ckpt` files.
+
+    11. **Verify Basic Functionality**:
+        *   **Action**: Create a `verify_install.py` file in the project root with basic usage code and execute it.
+        *   **Command**: Run `python verify_install.py`.
+        *   **Verification**: The script should execute without errors and print performance scores. This also triggers automatic model download if step 10 was skipped.
+
+    12. **Verify Platform Compatibility for Consistency Tests**:
+        *   **Action**: Run the consistency test script with the `--print-platform` flag to check if the local environment matches a CI-compatible platform.
+        *   **Command**: `python tests/test_consistency.py --print-platform`
+        *   **Verification**: The script will output your platform identifier (e.g., `linux_x86_64_3.11`) and confirm it is CI-compatible.
+
+    13. **Run the Full Test Suite with Coverage**:
+        *   **Action**: Run the `pytest` suite. Since no GPU is available, only CPU tests will run. Behavior can be controlled with environment variables.
+        *   **Command**:
+            ```bash
+            # Run standard CPU tests with coverage, excluding macOS-specific (mps) device tests
+            TABPFN_EXCLUDE_DEVICES="mps" pytest --cov=src/tabpfen tests/
+            ```
+        *   **Verification**: The test suite should run, all selected tests should pass, and a coverage report should be printed. A `htmlcov/` directory might be created.
+
+    14. **Run Static Analysis Checks Manually (Optional)**:
+        *   **Action**: Manually run the linter, formatter, and type checker on the codebase.
+        *   **Commands**:
+            ```bash
+            ruff check ./src ./tests
+            ruff format --check ./src ./tests
+            # mypy must be run manually on src, as it's excluded from the pre-commit hook
+            mypy src/tabpfen
+            ```
+        *   **Verification**: The commands should run and report no major errors.
+
+    15. **Build the Documentation (Optional)**:
+        *   **Action**: Use `mkdocs` to build the static documentation site.
+        *   **Command**: `mkdocs build`
+        *   **Verification**: The command completes without errors and a `site/` directory is created.
+
+    16. **Understand the Development Workflow (Recommended)**:
+        *   **Action**: Familiarize yourself with the automated workflows and developer guidelines.
+        *   **Verification**: You understand that:
+            *   **Dependabot** will automatically create pull requests to update project dependencies, configured via `.github/dependabot.yml`.
+            *   An **AI assistant** is configured via `.gemini/config.yaml` to participate in the code review process.
+            *   **Model-altering changes** must be intentional, documented, and ideally improve performance. If they change predictions, the consistency test reference values must be updated.

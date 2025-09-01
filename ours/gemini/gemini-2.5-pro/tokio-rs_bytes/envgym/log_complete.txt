@@ -1,0 +1,77 @@
+=== Docker Execution Log - 20250829_153755 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756481875
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 2.37kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/7] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0
+#4 DONE 0.0s
+
+#5 [2/7] RUN apt-get update && apt-get install -y --no-install-recommends     git     curl     build-essential     procps     && rm -rf /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [internal] load build context
+#6 transferring context: 420.73kB 0.0s done
+#6 DONE 0.0s
+
+#7 [3/7] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable &&     . "$HOME/.cargo/env" &&     rustup toolchain install nightly &&     rustup component add rust-src --toolchain nightly &&     rustup component add miri --toolchain nightly &&     rustup component add clippy &&     rustup target add         thumbv6m-none-eabi         thumbv7m-none-eabi         mips64-unknown-linux-gnuabi64         x86_64-unknown-linux-gnu &&     cargo install cargo-hack
+#7 0.286 curl: (77) error setting certificate file: /etc/ssl/certs/ca-certificates.crt
+#7 0.288 /bin/sh: 1: .: cannot open /root/.cargo/env: No such file
+#7 ERROR: process "/bin/sh -c curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable &&     . \"$HOME/.cargo/env\" &&     rustup toolchain install nightly &&     rustup component add rust-src --toolchain nightly &&     rustup component add miri --toolchain nightly &&     rustup component add clippy &&     rustup target add         thumbv6m-none-eabi         thumbv7m-none-eabi         mips64-unknown-linux-gnuabi64         x86_64-unknown-linux-gnu &&     cargo install cargo-hack" did not complete successfully: exit code: 2
+------
+ > [3/7] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable &&     . "$HOME/.cargo/env" &&     rustup toolchain install nightly &&     rustup component add rust-src --toolchain nightly &&     rustup component add miri --toolchain nightly &&     rustup component add clippy &&     rustup target add         thumbv6m-none-eabi         thumbv7m-none-eabi         mips64-unknown-linux-gnuabi64         x86_64-unknown-linux-gnu &&     cargo install cargo-hack:
+0.286 curl: (77) error setting certificate file: /etc/ssl/certs/ca-certificates.crt
+0.288 /bin/sh: 1: .: cannot open /root/.cargo/env: No such file
+------
+envgym.dockerfile:21
+--------------------
+  20 |     # This ensures that rustup, once installed, is available in the PATH for subsequent commands within the same RUN instruction.
+  21 | >>> RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable && \
+  22 | >>>     # Source the cargo environment to update the PATH for the current RUN instruction
+  23 | >>>     . "$HOME/.cargo/env" && \
+  24 | >>>     # Install the nightly toolchain and its components (Miri, rust-src)
+  25 | >>>     rustup toolchain install nightly && \
+  26 | >>>     rustup component add rust-src --toolchain nightly && \
+  27 | >>>     rustup component add miri --toolchain nightly && \
+  28 | >>>     # Add the clippy component to the stable toolchain
+  29 | >>>     rustup component add clippy && \
+  30 | >>>     # Add cross-compilation targets
+  31 | >>>     rustup target add \
+  32 | >>>         thumbv6m-none-eabi \
+  33 | >>>         thumbv7m-none-eabi \
+  34 | >>>         mips64-unknown-linux-gnuabi64 \
+  35 | >>>         x86_64-unknown-linux-gnu && \
+  36 | >>>     # Install cargo-hack
+  37 | >>>     cargo install cargo-hack
+  38 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable &&     . \"$HOME/.cargo/env\" &&     rustup toolchain install nightly &&     rustup component add rust-src --toolchain nightly &&     rustup component add miri --toolchain nightly &&     rustup component add clippy &&     rustup target add         thumbv6m-none-eabi         thumbv7m-none-eabi         mips64-unknown-linux-gnuabi64         x86_64-unknown-linux-gnu &&     cargo install cargo-hack" did not complete successfully: exit code: 2
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

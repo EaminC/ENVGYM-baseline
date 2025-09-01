@@ -1,0 +1,5 @@
+current progress
+The initial Dockerfile has been implemented, successfully setting up the Ubuntu base image, system dependencies, and the Micromamba installer. The build process fails during the Conda environment creation step (`micromamba create`). The current Dockerfile deviates from the plan by using a single `COPY . .` instruction, which prevents effective use of Docker's layer caching.
+
+next step
+Modify the Dockerfile to align with the more efficient structure outlined in the plan. Split the `COPY` instruction into two parts: first, copy only the Conda environment file (`COPY BCacheSim/install/env_cachelib-py-3.11.yaml .`), then execute the `micromamba create` command. After the environment is successfully created, add a second `COPY . .` instruction to copy the rest of the application code.

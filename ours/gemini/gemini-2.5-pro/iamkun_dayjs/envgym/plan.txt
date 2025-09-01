@@ -1,0 +1,540 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - **Node.js**: Latest LTS version (`lts/*`) is recommended. This includes npm (Node Package Manager). The `x86_64` build will be used, which is compatible with the specified `linux/amd64` architecture.
+   - **Git**: For version control, commit history analysis by `semantic-release`, and to enable pre-commit hook functionality.
+   - **Code Editor with EditorConfig Support**: A modern code editor (e.g., VS Code, WebStorm, Sublime Text) with built-in or plugin support for `.editorconfig` to ensure consistent coding styles across different development environments.
+   - **GitHub Account**: Required for code hosting, pull requests, and interacting with the Continuous Integration (CI) pipeline (GitHub Actions).
+   - **NPM Account**: Required for publishing packages to the npm registry. You will need an `NPM_TOKEN` for the automated release workflow.
+   - **Codecov Account (Optional)**: Required for uploading and tracking code coverage reports. You will need a `CODECOV_TOKEN` to integrate with the CI pipeline.
+   - **Sauce Labs Account (Optional)**: Required only for running cross-browser tests using the `npm run test:sauce` script, both locally and in the CI environment. You will need your Sauce Labs Username and Access Key.
+   - **Project Dependencies**: All necessary npm packages (e.g., Babel, ESLint, Jest for unit testing, Karma/Jasmine for browser testing, Rollup, TypeScript, `semantic-release` and its plugins, `cross-env`) are listed in `package-lock.json` and will be installed automatically via `npm clean-install` or `npm install`. The lock file ensures exact versions are used for a consistent setup.
+
+2. FILES TO CREATE:
+   - **`.gitignore`**: In the project root, to specify intentionally untracked files for version control.
+     - **Content Description**: This file prevents temporary files, local configurations, dependencies, and build artifacts from being committed to version control. It covers OS-specific files, IDE directories, the `node_modules` folder, test coverage reports, and all build outputs like locale files, plugin bundles, ESM modules, and TypeScript declarations.
+     ```
+     # OSX
+     .DS_Store
+
+     # IDE
+     .idea
+     .vscode
+
+     # npm
+     node_modules
+     yarn.lock
+
+     # jest
+     coverage
+
+     # build
+     /locale
+     /plugin
+     /dayjs.min.js
+     /esm
+     /index.d.ts
+     locale.json
+
+     #dev
+     demo.js
+     ```
+   - **`.npmignore`**: In the project root, to specify files to exclude from the published npm package.
+     - **Content Description**: This file ensures the published package is lean and contains only the necessary distribution files. It excludes source code (`src`), tests, development configurations, documentation, and CI/CD files, resulting in a smaller download for end-users.
+     ```
+     # OSX
+     .DS_Store
+
+     # IDE
+     .idea
+
+     # npm
+     node_modules
+     yarn.lock
+     package-lock.json
+
+     # jest
+     coverage
+
+     # dev
+     src
+     test
+     types
+     build
+     babel.config.js
+     prettier.config.js
+     .eslintrc.json
+
+     #doc
+     CONTRIBUTING.md
+     docs
+
+     #other
+     .travis.yml
+     karma.sauce.conf.js
+     .github
+     .releaserc
+     ```
+   - **`.editorconfig`**: In the project root, to enforce consistent coding styles in various editors and IDEs.
+     - **Content Description**: This file helps maintain consistent coding styles for multiple developers working on the same project across various editors. It configures universal settings like character set, line endings, and indentation size.
+     ```
+     root = true
+
+     [*]
+     charset = utf-8
+     end_of_line = lf
+     insert_final_newline = true
+     indent_size = 2
+     ```
+   - **`babel.config.js`**: In the project root, for configuring the Babel transpiler.
+     - **Content Description**: This file defines environment-specific configurations for Babel. The `test` environment uses a standard preset for Jest, while the `build` environment uses a preset optimized for Rollup (`modules: false`) to enable tree-shaking and produces smaller, more efficient code (`loose: true`).
+     ```javascript
+     // babel.config.js
+     module.exports = {
+       env: {
+         test: {
+           presets: [
+             '@babel/preset-env'
+           ]
+         },
+         build: {
+           presets: [
+             [
+               '@babel/preset-env',
+               {
+                 modules: false,
+                 loose: true
+               }
+             ]
+           ]
+         }
+       }
+     }
+     ```
+   - **`.eslintrc.json`**: In the project root, for configuring the ESLint linter.
+     - **Content Description**: This JSON file specifies the linter configuration, extending `airbnb-base` and adding the Jest plugin. It defines global variables like `window` and `dayjs` to prevent "not defined" errors. It also enforces specific code style rules, such as disallowing semicolons and trailing commas, and relaxes others like `no-param-reassign` for flexibility.
+     ```json
+     {
+       "extends": "airbnb-base",
+       "plugins": [
+         "jest"
+       ],
+       "env": {
+         "jest/globals": true
+       },
+       "globals": {
+         "window": true,
+         "dayjs": true
+       },
+       "rules": {
+         "semi": [
+           2,
+           "never"
+         ],
+         "comma-dangle": [
+           "error",
+           "never"
+         ],
+         "no-param-reassign": [
+           0
+         ],
+         "func-names": [
+           0
+         ],
+         "import/no-extraneous-dependencies": [
+           0
+         ],
+         "import/no-unresolved": [
+           2,
+           {
+             "ignore": [
+               "dayjs"
+             ]
+           }
+         ],
+         "import/extensions": [
+           2,
+           "never"
+         ]
+       }
+     }
+     ```
+   - **`prettier.config.js`**: In the project root, for configuring the Prettier code formatter.
+     - **Content Description**: This JavaScript file defines code style rules for consistent formatting. It enforces a maximum line width of 80 characters, the use of single quotes, and disables semicolons and trailing commas to align with the ESLint configuration.
+     ```javascript
+     // prettier.config.js
+     module.exports = {
+       useTabs: false,
+       printWidth: 80,
+       singleQuote: true,
+       trailingComma: 'none',
+       semi: false
+     }
+     ```
+   - **`.releaserc`**: In the project root, for configuring `semantic-release`.
+     - **Content Description**: Configures the automated release process. It defines the sequence of plugins for analyzing commits, generating release notes, creating a `CHANGELOG.md`, publishing to npm, and creating a GitHub release. It is explicitly configured to commit the updated `CHANGELOG.md` file back to the repository during a release.
+     ```json
+     {
+       "branches": ["master"],
+       "plugins": [
+         "@semantic-release/commit-analyzer",
+         "@semantic-release/release-notes-generator",
+         "@semantic-release/changelog",
+         "@semantic-release/npm",
+         [
+           "@semantic-release/git",
+           {
+             "assets": ["CHANGELOG.md", "package.json", "package-lock.json"]
+           }
+         ],
+         "@semantic-release/github"
+       ]
+     }
+     ```
+   - **`jest.config.js`**: In the project root, for configuring the Jest test runner.
+     - **Content Description**: This file configures Jest for Node.js-based unit tests. It is set up to collect code coverage information during test runs and specifies the output format (`lcov`) required by Codecov.
+     ```javascript
+     // Example jest.config.js
+     module.exports = {
+       collectCoverage: true,
+       coverageDirectory: 'coverage',
+       coverageReporters: ['lcov', 'text', 'json']
+     };
+     ```
+   - **`tsconfig.json`**: In the project root, for TypeScript configuration.
+     - **Content Description**: This file configures the TypeScript compiler, primarily to check JavaScript files (`checkJs`) and to generate a TypeScript declaration file (`index.d.ts`) for consumers of the library. It is set to only emit the declaration file, not to transpile JS.
+     ```json
+     // Example tsconfig.json
+     {
+       "compilerOptions": {
+         "target": "es5",
+         "module": "commonjs",
+         "allowJs": true,
+         "checkJs": true,
+         "strict": true,
+         "esModuleInterop": true,
+         "declaration": true,
+         "emitDeclarationOnly": true,
+         "outDir": "./"
+       },
+       "include": ["src/**/*"],
+       "exclude": ["node_modules", "dist"]
+     }
+     ```
+   - **`build/rollup.config.js`**: In the `build` directory, for configuring the Rollup bundler.
+     - **Content Description**: This is a dynamic configuration file for Rollup. It is responsible for bundling the source code into multiple formats, including UMD (`dayjs.min.js`) for browsers and ESM (`/esm`) for modern bundlers. It uses Babel for transpilation and Terser for minification, and is designed to handle external dependencies like `dayjs` for plugin and locale builds.
+     ```javascript
+     const babel = require('rollup-plugin-babel')
+     const { terser } = require('rollup-plugin-terser')
+
+     module.exports = (config) => {
+       const { input, fileName, name } = config
+       return {
+         input: {
+           input,
+           external: [
+             'dayjs'
+           ],
+           plugins: [
+             babel({
+               exclude: 'node_modules/**'
+             }),
+             terser()
+           ]
+         },
+         output: {
+           file: fileName,
+           format: 'umd',
+           name: name || 'dayjs',
+           globals: {
+             dayjs: 'dayjs'
+           },
+           compact: true
+         }
+       }
+     }
+     ```
+   - **`karma.sauce.conf.js` (Optional)**: In the project root, for Sauce Labs integration.
+     - **Content Description**: Configures the Karma test runner and Jasmine framework for cross-browser testing on the Sauce Labs platform. It defines multiple batches of browsers (Chrome, Firefox, Safari, IE, Edge, iOS, Android) and selects one via a command-line argument. This test suite runs against a pre-built UMD file (`dayjs.min.js`) and expects test files to follow a `test/*spec.js` pattern.
+     ```javascript
+     module.exports = function (config) {
+       const batches = [
+         {
+           sl_chrome_26: {
+             base: 'SauceLabs',
+             browserName: 'chrome',
+             version: '26'
+           },
+           sl_chrome: {
+             base: 'SauceLabs',
+             browserName: 'chrome'
+           },
+           sl_firefox_4: {
+             base: 'SauceLabs',
+             browserName: 'firefox',
+             version: '4'
+           },
+           sl_firefox: {
+             base: 'SauceLabs',
+             browserName: 'firefox'
+           },
+           sl_mac_safari_8: {
+             base: 'SauceLabs',
+             browserName: 'safari',
+             version: '8',
+             platform: 'OS X 10.10'
+           },
+           sl_mac_safari: {
+             base: 'SauceLabs',
+             browserName: 'safari',
+             platform: 'macOS 10.13'
+           }
+         },
+         {
+           sl_ie_9: {
+             base: 'SauceLabs',
+             browserName: 'internet explorer',
+             version: '9'
+           },
+           sl_ie: {
+             base: 'SauceLabs',
+             browserName: 'internet explorer'
+           },
+           sl_edge_13: {
+             base: 'SauceLabs',
+             browserName: 'MicrosoftEdge',
+             platform: 'Windows 10',
+             version: '13'
+           },
+           sl_edge: {
+             base: 'SauceLabs',
+             browserName: 'MicrosoftEdge'
+           }
+         },
+         {
+           sl_ios_safari_9: {
+             base: 'SauceLabs',
+             browserName: 'iphone',
+             version: '9.3'
+           },
+           sl_android_4_4: {
+             base: 'SauceLabs',
+             browserName: 'android',
+             version: '4.4'
+           }
+         },
+         {
+           sl_ios_safari: {
+             base: 'SauceLabs',
+             browserName: 'iphone'
+           },
+           sl_android: {
+             base: 'SauceLabs',
+             browserName: 'android'
+           }
+         }
+       ]
+    
+       const batch = batches[process.argv[4] || 0]
+       config.set({
+         basePath: '',
+         frameworks: ['jasmine'],
+         files: [
+           'dayjs.min.js',
+           'test/*spec.js'
+         ],
+         reporters: ['dots', 'saucelabs'],
+         port: 9876,
+         colors: true,
+         logLevel: config.LOG_DEBUG,
+         sauceLabs: {
+           // build: 'Manual',
+           testName: 'Day.js'
+         },
+         captureTimeout: 200000, // try fix ios timeout
+         customLaunchers: batch,
+         browsers: Object.keys(batch),
+         singleRun: true
+       })
+     }
+     ```
+   - **`.github/workflows/check.yml`**: In the `.github/workflows` directory, to define the primary CI trigger.
+     - **Content Description**: This GitHub Actions workflow acts as an entry point for continuous integration. It triggers on pushes to `master` and `dev`, and on pull requests targeting `dev`. It uses a reusable workflow (`lint-test.yml`) to perform the actual linting and testing jobs and passes necessary secrets.
+     ```yaml
+     name: Lint & Unit Test
+     on:
+       push:
+         branches: [master, dev]
+       pull_request:
+         branches: [dev]
+
+     jobs:
+       check:
+         uses: ./.github/workflows/lint-test.yml
+         secrets:
+           inherit
+     ```
+   - **`.github/workflows/lint-test.yml`**: In the `.github/workflows` directory, to define the CI job steps.
+     - **Content Description**: This is a reusable GitHub Actions workflow that defines the steps for linting and testing the codebase. The `runs-on: ubuntu-latest` directive ensures this workflow executes on a `linux/amd64` environment, consistent with the target hardware. It uses `npm clean-install` for reliable dependency installation, runs linters and Jest-based unit tests, and conditionally uploads code coverage reports.
+     ```yaml
+     on:
+       workflow_call:
+         secrets:
+           CODECOV_TOKEN:
+             required: false
+
+     jobs:
+       lint-and-test:
+         runs-on: ubuntu-latest
+         steps:
+           - name: Checkout
+             uses: actions/checkout@v3
+           - name: Setup Node
+             uses: actions/setup-node@v3
+             with:
+               node-version: 'lts/*'
+               cache: 'npm'
+           - name: Install dependencies
+             run: npm clean-install
+           - name: Run Lint
+             run: npm run lint
+           - name: Run tests
+             run: npm test
+           - name: Upload coverage to Codecov
+             env:
+               CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+             if: env.CODECOV_TOKEN != null
+             uses: codecov/codecov-action@v4
+             with:
+               token: ${{ env.CODECOV_TOKEN }}
+     ```
+   - **`.github/workflows/release.yml`**: In the `.github/workflows` directory, to define the release workflow.
+     - **Content Description**: This workflow automates the release process. The `runs-on: ubuntu-latest` directive ensures this workflow executes on a `linux/amd64` environment, consistent with the target hardware. It triggers on pushes to `master`, runs tests, builds the project, and then uses `semantic-release` (run via `npx`) to analyze commits, determine the next version number, publish to npm, and create a GitHub release with a changelog.
+     ```yaml
+     name: Release
+     on:
+       push:
+         branches: [master]
+
+     jobs:
+       lint-and-test:
+         uses: ./.github/workflows/lint-test.yml
+         secrets:
+           inherit
+       release:
+         needs: lint-and-test
+         runs-on: ubuntu-latest
+         permissions:
+           contents: write
+           issues: write
+           pull-requests: write
+           id-token: write
+         steps:
+           - name: Checkout
+             uses: actions/checkout@v3
+             with:
+               fetch-depth: 0
+           - name: Setup Node.js
+             uses: actions/setup-node@v3
+             with:
+               node-version: 'lts/*'
+               cache: 'npm'
+           - name: Install dependencies
+             run: npm clean-install
+           - name: Build
+             env:
+               NODE_OPTIONS: --openssl-legacy-provider
+             run: npm run build && npm run babel
+           - name: Verify provenance
+             run: npm audit signatures
+           - name: Release
+             env:
+               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+               NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+             run: npx semantic-release
+     ```
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - **Core API Tests**: Write Jest tests (`*.test.js`) for all public API functions (parsing, formatting, getting/setting units, etc.) to ensure they behave as expected in a Node.js environment on the `linux/amd64` architecture.
+   - **Immutability Tests**: For every manipulation method (e.g., `.add()`, `.subtract()`, `.startOf()`), verify that it returns a *new* Day.js instance and does not mutate the original instance.
+   - **Timezone Tests**: Create specific tests (under `test/timezone.test.js`) to validate date and time correctness across different timezones (e.g., PST, EST, UTC), especially around daylight saving transitions, using `moment-timezone` for reference.
+   - **Plugin Compatibility Tests**: Write tests to ensure plugins can be loaded correctly and that they extend functionality without breaking the core. Verify that plugin builds correctly treat `dayjs` as an external dependency and do not bundle it.
+   - **Moment.js Comparison Tests**: Since `moment` is a dev dependency and the project is an alternative, create tests that compare outputs of Day.js methods with their Moment.js equivalents to ensure API compatibility.
+   - **Edge Case Tests**: Test handling of invalid dates, leap years, and different date formats to ensure robust parsing and error handling.
+   - **ESM Module Compatibility**: Write tests to ensure the ESM build in the `/esm` directory is tree-shakeable and functions correctly when imported in modern JavaScript environments or by bundlers like Webpack or Vite.
+   - **TypeScript Type Definition Validation**: Create a separate test setup (e.g., a small TypeScript project in a `test/types` directory) that consumes the generated `index.d.ts` file to verify that types are accurate, exported correctly, and provide proper autocompletion for the public API.
+   - **Code Coverage Reporting**: Ensure Jest tests provide adequate coverage of the codebase. The test suite must be configured to generate a coverage report (e.g., in LCOV format) which can be uploaded to services like Codecov to track test quality over time.
+   - **Cross-Browser Tests**: Use the Karma, Jasmine, and Sauce Labs setup (`karma.sauce.conf.js`) to run tests (`*.spec.js`) against a matrix of different browsers to ensure compatibility. This includes various versions of Chrome, Firefox, Safari, Internet Explorer, Edge, and mobile browsers on iOS and Android.
+   - **CI-Readiness Tests**: Ensure all tests are self-contained and can run successfully in a non-interactive, automated environment like GitHub Actions. Avoid tests that rely on local-only resources or user input.
+
+4. COMPLETE TODO LIST:
+   - **Step 1: Install Prerequisites & Create Accounts**
+     - Download and install the latest LTS version of Node.js and Git.
+     - Choose and configure a code editor with EditorConfig support.
+     - Create a GitHub account for code hosting.
+     - Create an NPM account for package publishing.
+     - **Verification**: Run `node -v`, `npm -v`, and `git --version` in a terminal to confirm installation.
+
+   - **Step 2: Set Up Project Directory**
+     - Create a root directory for your project (e.g., `/home/cc/EnvGym/data/iamkun_dayjs` as specified) and navigate into it. All subsequent paths in this plan are relative to this directory.
+     - Initialize a Git repository: `git init`.
+     - **Verification**: A hidden `.git` folder is created.
+
+   - **Step 3: Add Project Files**
+     - Place `package.json` and `package-lock.json` in the project root.
+     - Create `.gitignore`, `.npmignore`, and `.editorconfig` in the project root.
+     - Create all other configuration files listed in "FILES TO CREATE", including `.eslintrc.json`, `prettier.config.js`, `jest.config.js`, `.releaserc`, `karma.sauce.conf.js` and the GitHub Actions workflows in `.github/workflows/`.
+     - **Verification**: Check that all files exist in the correct directories.
+
+   - **Step 4: Install Dependencies**
+     - In the project root, run `npm clean-install` (or `npm ci`). This is recommended for CI and clean setups as it uses `package-lock.json` strictly. For regular development, `npm install` is also acceptable.
+     - **Verification**: A `node_modules` directory is created containing all dependencies.
+
+   - **Step 5: Create Initial Source and Test Structure**
+     - Create the directories: `src`, `test`, `docs`.
+     - Create placeholder files: `src/index.js`, `test/core.test.js` (for Jest unit tests), and `test/browser.spec.js` (for Karma/Sauce Labs browser tests).
+     - **Verification**: The directory structure `src/`, `test/`, `docs/` should exist with placeholder files.
+
+   - **Step 6: Run Linter and Formatter**
+     - Run `npm run lint` and `npm run prettier`.
+     - **Verification**: The commands execute without errors related to missing tools, confirming ESLint and Prettier are set up. Open a file in your editor to confirm it respects the `.editorconfig` settings (e.g., indentation is 2 spaces).
+
+   - **Step 7: Execute a Unit Test Run**
+     - Add a simple test to `test/core.test.js`.
+     - Run `npm test`.
+     - **Verification**: Jest runs the tests and creates a `coverage/` directory with the test coverage report.
+
+   - **Step 8: Execute a Build**
+     - Add ES6 code to `src/index.js`.
+     - Ensure the `build` and `babel` scripts exist in `package.json`. If using Node.js v17 or newer locally, you may need to prefix build-related scripts with `NODE_OPTIONS=--openssl-legacy-provider` to maintain compatibility with legacy crypto dependencies used by the build tools. This is already configured in the `release.yml` workflow for CI.
+     - Run `npm run build` and `npm run babel`.
+     - **Verification**: Check for build artifacts in the root and build directories as specified in `.gitignore`, such as `dayjs.min.js`, `index.d.ts`, and the `esm/`, `plugin/`, and `locale/` directories. The commands should complete without errors. To verify what will be published, run `npm pack --dry-run` and inspect the file list to ensure source code and test files are excluded.
+
+   - **Step 9: Set Up and Verify Git Pre-commit Hook**
+     - Stage your changes: `git add .`
+     - Attempt a commit: `git commit -m "feat: Initial project setup"`. Note the use of a Conventional Commit message.
+     - **Verification**: The `pre-commit` hook triggers `npm run lint`. The commit is aborted if linting fails. Additionally, run `git status` to confirm that ignored files (e.g., `node_modules`, build artifacts) are not staged.
+
+   - **Step 10: Configure Release Automation**
+     - In your GitHub repository, go to `Settings` > `Secrets and variables` > `Actions` and add a new repository secret named `NPM_TOKEN`. The value should be an access token generated from your npm account with "Automation" permissions.
+     - Familiarize your team with the **Conventional Commits** specification (e.g., `feat:`, `fix:`, `chore:`). The `semantic-release` tool relies on these commit messages to automatically determine version bumps.
+     - **Verification**: The secret is saved in GitHub. This will be fully verified when the release workflow runs.
+
+   - **Step 11: (Optional) Configure Codecov for Coverage Reporting**
+     - Sign up for Codecov and link your GitHub repository.
+     - In GitHub repository secrets, add `CODECOV_TOKEN` with the value from your Codecov repository settings.
+     - **Verification**: Verified when the CI pipeline runs and a report appears on Codecov.
+
+   - **Step 12: (Optional) Configure Sauce Labs for Cross-Browser Testing**
+     - Set `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY` as local environment variables or as GitHub repository secrets for CI runs.
+     - Ensure the project has been built first (see Step 8), as this process requires `dayjs.min.js`.
+     - Run `npm run test:sauce`. You can pass a batch number, e.g., `npm run test:sauce -- 1` to run the second batch of browsers.
+     - **Verification**: Test jobs appear and run in your Sauce Labs dashboard.
+
+   - **Step 13: Push Code and Verify CI/CD Workflows**
+     - Create a `dev` branch: `git checkout -b dev`.
+     - Commit and push your setup: `git push -u origin dev`.
+     - Open a pull request from `dev` to `master` on GitHub.
+     - **Verification (PR)**: The "Lint & Unit Test" action triggers on the pull request. The GitHub Actions runner environment (`ubuntu-latest`) is fully compatible with the specified `linux/amd64` hardware. Check the "Actions" tab for a successful run.
+     - After merging the PR, push to `master` (if not done automatically).
+     - **Verification (Release)**: The push to `master` triggers both the "Lint & Unit Test" and "Release" workflows. Check the "Actions" tab. If successful, verify that a new version tag and release have been created on GitHub, the package has been published to npm, and a commit has been pushed to `master` updating `CHANGELOG.md`. The published package on npm should be lean and not contain development files like the `src` or `test` directories.

@@ -1,0 +1,175 @@
+Based on the provided hardware and environment information, here is the adjusted and complete environment setup plan. The plan has been adapted for a scripted, non-interactive build on an `x86_64` Linux system, such as within a Docker container.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+**Preamble:** This plan is adjusted for a scripted, non-interactive environment on an `x86_64` Linux system. All commands assume the current working directory is `/home/cc/EnvGym/data/tokio-rs_bytes` and it already contains the project's source code. The environment can leverage a high core count for faster compilation.
+
+1. DOWNLOADS NEEDED:
+   - **System-Level Dependencies (for Debian/Ubuntu base images):**
+     - `git`: For version control operations (e.g., restoring `Cargo.lock`).
+     - `curl`: Required to download `rustup`.
+     - `build-essential`: Provides the C compiler and linker (`gcc`, `ld`) needed by Rust for linking and for building certain dependencies.
+   - **Git:** For cloning the project repository. (https://git-scm.com/downloads)
+   - **Rust Toolchain Manager (`rustup`):** To install and manage Rust versions. (https://rustup.rs/)
+     - **Stable Rust Toolchain (version >= 1.57):** The minimum supported Rust version (MSRV) for building and testing.
+     - **Nightly Rust Toolchain:** Required for Loom, Miri, sanitizer tests, `panic=abort` tests, building documentation, and checking against minimal dependency versions. The CI workflow pins a specific version (e.g., `nightly-2024-09-15`), but using the latest nightly is generally sufficient.
+     - **`rust-src` component:** Needed for running sanitizer tests (which require recompiling the standard library) and other advanced tooling.
+     - **`miri` component:** Needed for running tests with Miri to detect undefined behavior.
+     - **`clippy` component:** The Rust linter, required for code quality checks.
+   - **Additional Cargo Tools:**
+     - **`cargo-hack`:** Used for comprehensive feature combination testing and managing dev-dependencies for specific checks.
+   - **Cross-compilation Targets:**
+     - **`no_std` targets:** `thumbv6m-none-eabi` and `thumbv7m-none-eabi` are required for `no_std` build verification.
+     - **Other targets:** The CI tests against additional targets like `i686-unknown-linux-gnu`, `armv7-unknown-linux-gnueabihf`, `wasm32-wasip1`, `mips64-unknown-linux-gnuabi64`, and `x86_64-unknown-linux-gnu` (for sanitizer tests). These will be cross-compiled from the `x86_64` host.
+   - **Code Editor/IDE:** Recommended: Visual Studio Code with the `rust-analyzer` extension for an optimal development experience.
+
+2. FILES TO CREATE:
+   - **This is a development setup for an existing project. The project source code is assumed to be present in the working directory.**
+   - **KEY PROJECT FILES TO BE AWARE OF:**
+     - **`/Cargo.toml`:** The project manifest file. Defines project metadata, features, and dependencies.
+     - **`/Cargo.lock`:** This file is generated locally by Cargo on the first build to lock dependency versions for reproducible builds. It is intentionally not checked into version control (as specified in `.gitignore`) to allow downstream users flexibility in their dependency resolution.
+     - **`/.gitignore`:** Specifies intentionally untracked files to be ignored by Git, such as the `/target` build directory and the local `/Cargo.lock`.
+     - **`/clippy.toml`:** Configuration file for the Clippy linter, specifying the MSRV.
+     - **`/src/lib.rs`:** The main library source file.
+     - **`/tests/*.rs`:** Files containing integration tests.
+     - **`/.github/workflows/ci.yml`:** The Continuous Integration workflow file, defining all automated checks and tests.
+     - **`/ci/*.sh`:** Helper scripts used by the CI workflow for running specific test suites (e.g., `tsan.sh`, `miri.sh`, `panic-abort.sh`, `test-stable.sh`).
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - **Code Formatting:** Verifying that all code adheres to the standard Rust format using `rustfmt`.
+   - **Linting with Clippy:** Checking the code for common mistakes and un-idiomatic patterns using `clippy`, with warnings treated as errors.
+   - **MSRV Compliance:** Checking that the crate compiles with its minimum supported Rust version across all feature combinations.
+   - **Feature Combination Tests:** Running tests against various combinations of crate features to ensure compatibility. This includes:
+     - **Per-Feature Tests:** Testing each feature individually.
+     - **All-Features Test:** Testing with all features enabled simultaneously.
+     - **Feature Powerset Tests:** Running tests against all valid combinations of crate features.
+   - **Minimal Dependency Version Check:** On a nightly toolchain, updating dependencies to the minimum allowed versions and verifying that the crate still compiles.
+   - **Benchmark Compilation Check:** Verifying that benchmark code compiles successfully on the nightly toolchain.
+   - **Concurrency Tests with Loom:** Specialized tests that run under `cfg(loom)` to detect concurrency bugs in the underlying data structures.
+   - **Undefined Behavior Tests with Miri:** Running the test suite in the Miri interpreter to detect undefined behavior like memory errors and data races. This includes running with strict provenance checks and on alternate targets like `mips64-unknown-linux-gnuabi64`.
+   - **Sanitizer Tests (ASAN & TSAN):** Running specific integration tests with the Address Sanitizer (ASAN) and Thread Sanitizer (TSAN) enabled to find memory errors and data races at runtime. This requires a nightly toolchain and recompiling the standard library using the `-Zbuild-std` flag.
+   - **`no_std` Compilation Test:** Verifying that the crate compiles successfully for `no_std` targets (`thumbv6m-none-eabi`, `thumbv7m-none-eabi`) with various feature flags.
+   - **Atomic CAS Fallback Test:** Verifying functionality on platforms without native atomic CAS support by building for a target like `thumbv6m-none-eabi` and enabling the `extra-platforms` feature.
+   - **Panic Abort Test:** Ensuring the library's tests pass when compiled with the `panic = "abort"` strategy, which requires a nightly toolchain and the `-Zpanic-abort-tests` flag.
+   - **Cross-platform Tests:** Compiling and running tests on various target architectures, including `i686`, `armv7`, and `wasm32`.
+
+4. COMPLETE TODO LIST:
+   - **0. Install System Dependencies (as root):**
+     - **Action:** On a Debian/Ubuntu base, install necessary tools.
+       ```sh
+       apt-get update && apt-get install -y --no-install-recommends \
+           git \
+           curl \
+           build-essential
+       ```
+     - **Verification:** The installation command completes successfully.
+
+   - **1. Install Rust Toolchain:**
+     - **Action:** Install `rustup` and the stable toolchain non-interactively. Then, configure the environment.
+       ```sh
+       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+       # Add cargo to the PATH for subsequent steps
+       export PATH="/root/.cargo/bin:${PATH}"
+       ```
+     - **Verification:** Run `rustc --version`. Ensure the version is 1.57 or higher. If not, run `rustup update stable`.
+
+   - **2. Install Additional Components & Tools:**
+     - **Action:** Install the nightly toolchain, all required components, and cross-compilation targets in a single step. Then install `cargo-hack`.
+       ```sh
+       rustup toolchain install nightly
+       rustup component add rust-src --toolchain nightly
+       rustup component add miri --toolchain nightly
+       rustup component add clippy
+       rustup target add \
+           thumbv6m-none-eabi \
+           thumbv7m-none-eabi \
+           mips64-unknown-linux-gnuabi64 \
+           x86_64-unknown-linux-gnu
+       cargo install cargo-hack
+       ```
+     - **Verification:** Run `rustup toolchain list`, `rustup component list --toolchain nightly`, `rustup target list`, and `cargo hack --version` to confirm installations.
+
+   - **3. Set Build Optimization:**
+     - **Action (Optional):** To leverage the high core count of the build machine, set the `CARGO_BUILD_JOBS` environment variable. Cargo typically auto-detects this, but explicit setting can be useful.
+       ```sh
+       export CARGO_BUILD_JOBS=$(nproc)
+       echo "Using $(nproc) cores for compilation."
+       ```
+     - **Verification:** Subsequent `cargo` commands will use the specified number of parallel jobs.
+
+   - **4. Run Standard Build and Quality Checks:**
+     - **Action:** Check formatting, run the linter, build the crate, and run the default test suite.
+       ```sh
+       cargo fmt --all --check
+       cargo clippy --all-targets --all-features -- -D warnings
+       cargo build
+       cargo test
+       ```
+     - **Verification:** All commands should complete successfully without errors.
+
+   - **5. Run Comprehensive Feature Tests:**
+     - **Action:** Run tests for each feature individually, with all features, and the full powerset of features.
+       ```sh
+       cargo hack test --each-feature --optional-deps
+       cargo test --all-features
+       cargo hack test --feature-powerset
+       ```
+     - **Verification:** All commands should complete successfully, and all tests should pass.
+
+   - **6. Verify Minimum Rust Version (MSRV) Compliance:**
+     - **Action:** Use `cargo-hack` to check if the crate builds with the MSRV across all features.
+       ```sh
+       cargo hack check --feature-powerset --rust-version
+       ```
+     - **Verification:** The command should complete without any build errors.
+
+   - **7. Test `no_std` Compilation:**
+     - **Action:** Build for `no_std` targets to verify compatibility and fallbacks.
+       ```sh
+       # Build for thumbv7m (with atomic CAS)
+       cargo hack build --target thumbv7m-none-eabi --feature-powerset --skip std,default --optional-deps --no-dev-deps
+       # Build for thumbv6m (no atomic CAS) to test portable-atomic fallback
+       cargo hack build --target thumbv6m-none-eabi --feature-powerset --skip std,default --optional-deps --no-dev-deps --features extra-platforms,extra-platforms/critical-section
+       ```
+     - **Verification:** Both build commands should complete successfully.
+
+   - **8. Run Advanced and Nightly-Only Tests:**
+     - **Action (Benchmark Compile Check):**
+       ```sh
+       cargo +nightly check --benches
+       ```
+     - **Action (Minimal Versions Check):**
+       ```sh
+       # Temporarily remove dev-dependencies
+       cargo hack --remove-dev-deps --workspace
+       # Update Cargo.lock to minimal versions (requires nightly)
+       cargo +nightly update -Z minimal-versions
+       # Check if the project still compiles
+       cargo +nightly check --all-features
+       # IMPORTANT: Revert changes to ensure a clean state for subsequent steps
+       git restore Cargo.toml Cargo.lock
+       ```
+     - **Action (Loom):**
+       ```sh
+       RUSTFLAGS="--cfg loom -Dwarnings" cargo +nightly test --lib
+       ```
+     - **Action (Miri):**
+       ```sh
+       ci/miri.sh
+       ```
+     - **Action (Sanitizers):**
+       ```sh
+       ci/tsan.sh
+       ```
+     - **Action (Panic Abort):**
+       ```sh
+       ci/panic-abort.sh
+       ```
+     - **Verification:** All advanced test suites should complete and report success.
+
+   - **9. Build Project Documentation:**
+     - **Action:** Build the documentation using the nightly toolchain. The `--open` flag is removed as it is not suitable for a non-interactive environment.
+       ```sh
+       RUSTDOCFLAGS="--cfg docsrs" cargo +nightly doc --all-features
+       ```
+     - **Verification:** The command should succeed. The generated documentation will be available in the `/target/doc` directory.

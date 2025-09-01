@@ -1,0 +1,29 @@
+=== Docker Execution Log - 20250829_153755 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756481875
+
+=== Build Log ===
+Build Status: Failed
+Build Error:
+--------------------
+20 |     # This ensures that rustup, once installed, is available in the PATH for subsequent commands within the same RUN instruction.
+21 | >>> RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable && \
+22 | >>>     # Source the cargo environment to update the PATH for the current RUN instruction
+23 | >>>     . "$HOME/.cargo/env" && \
+24 | >>>     # Install the nightly toolchain and its components (Miri, rust-src)
+25 | >>>     rustup toolchain install nightly && \
+26 | >>>     rustup component add rust-src --toolchain nightly && \
+27 | >>>     rustup component add miri --toolchain nightly && \
+28 | >>>     # Add the clippy component to the stable toolchain
+29 | >>>     rustup component add clippy && \
+30 | >>>     # Add cross-compilation targets
+31 | >>>     rustup target add \
+32 | >>>         thumbv6m-none-eabi \
+33 | >>>         thumbv7m-none-eabi \
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Error:
+
+
+=== Execution End ===

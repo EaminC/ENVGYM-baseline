@@ -1,0 +1,376 @@
+This plan has been reviewed and adjusted based on the provided hardware information.
+
+**Key Adjustments:**
+*   **Architecture Compatibility:** The plan is fully compatible with the specified `x86_64` (`linux/amd64`) architecture. All required software and Docker images are readily available for this platform.
+*   **Path Customization:** All generic directory placeholders have been updated to use the specified working directory: `/home/cc/EnvGym/data/elastic_logstash`.
+*   **Memory Advisory:** A note has been added to highlight the significant memory requirement (up to 10GB RAM) for certain test cases.
+*   **Docker Build Context:** Instructions involving Docker builds have been clarified to emphasize that they must be run from the specified working directory, which serves as the build context root.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    -   **Git:** For cloning the source code repository. Any recent version will suffice.
+    -   **Java Development Kit (JDK):** Version 21 is required. The build is configured to compile and run with Adoptium JDK 21. The specific version (e.g., `21.0.8`) is defined in `versions.yml`, and the CI environment's Java version is formally specified in `.ci/java-versions.properties`. Ensure the `JAVA_HOME` environment variable is set correctly to your JDK 21 installation. The build scripts will use `JAVA_HOME` if set, otherwise they will search for `java` in the system `PATH`.
+    -   **Ruby Version Manager (e.g., rbenv, RVM):** Recommended for managing the JRuby version. The project specifies the required JRuby version in the `.ruby-version` file.
+    -   **JRuby:** Version **9.4.13.0** is required. This can be installed via a Ruby version manager using the `.ruby-version` file. While the Gradle `bootstrap` task can also download a version of JRuby (controlled by `versions.yml`), using a version manager is the recommended approach for local development consistency.
+    -   **Bundler:** A Ruby dependency manager. It is used to install and manage the gems required for development and testing. It should be installed as a gem into the JRuby environment (`gem install bundler`).
+    -   **Go Toolchain:** Version 1.23 is required. Individual Go modules within the project, such as `env2yaml`, may specify their own minimum versions (e.g., Go 1.21), which must be compatible with the installed toolchain. This is used to build helper utilities used in the Docker image creation process.
+    -   **Python and pip:** Required for running pre-commit hooks and health report tests. Any recent version of Python 3 should suffice.
+    -   **pre-commit:** A framework for managing and maintaining multi-language pre-commit hooks. Installable via pip (`pip install pre-commit`).
+    -   **Docker Engine:** Version 28.1.1 or newer is required for building, testing, and running the official Logstash Docker images, especially for replicating CI environments and FIPS mode tests. Also useful for testing `.deb`/`.rpm` package installations.
+    -   **Docker Compose:** Required for orchestrating containers during specific test scenarios, such as the Observability SRE smoke and acceptance tests.
+    -   **POSIX-compliant Shell and Utilities:** A standard POSIX-compliant shell environment (e.g., bash, ksh) is required to run the build scripts. Core utilities like `xargs`, `sed`, and `ulimit` are expected to be available.
+    -   **Gradle:** The project uses the Gradle Wrapper (`gradlew`). You do not need to install Gradle manually. The wrapper will automatically download and use the correct version (**Gradle 8.7**) as specified in `gradle/wrapper/gradle-wrapper.properties`.
+    -   **Rake:** A Ruby build utility. It is not a separate installation. It will be made available through the JRuby environment.
+    -   **Build-time Downloads (handled automatically by Gradle/Rake/pre-commit/pip tasks):**
+        *   **Elasticsearch Snapshot:** A snapshot build of Elasticsearch will be downloaded for integration tests. The version is determined dynamically based on the project version. For FIPS acceptance tests, a specific FIPS-compliant Docker image is used (`docker.elastic.co/cloud-release/elasticsearch-cloud-ess-fips`).
+        *   **Filebeat Snapshot:** A snapshot build of Filebeat will be downloaded for integration tests. For FIPS acceptance tests, the FIPS-compliant Filebeat bundled within the `elasticsearch-cloud-ess-fips` Docker image is used.
+        *   **Maven Dependencies:** All required Java libraries will be downloaded from Maven Central. Key libraries include:
+            *   **logstash-core-plugin-api:** Version 2.1.16 is used for the plugin API.
+            *   **Log4j 2:** Version 2.17.2 is used for all logging.
+            *   **Jackson:** Core data-binding library, with version **2.16.2** for `jackson-core`, `jackson-databind`, etc., controlled by `versions.yml`.
+            *   **JUnit:** Version 4.13.2 is used for writing and running Java tests.
+            *   **AssertJ:** Version 3.8.0 is used for assertions in Java tests.
+            *   Other libraries like `guava`, `snakeyaml`, `httpclient`, etc.
+        *   **Ruby Gems:** Required Ruby libraries (gems) will be downloaded from `rubygems.org` and installed into a local `vendor` directory using Bundler. Key gems are defined in files like `logstash-core.gemspec` and `qa/integration/Gemfile` and include:
+            *   **Core Functionality:** `stud`, `clamp`, `concurrent-ruby`, `i18n`, `jrjackson` (v0.4.20).
+            *   **Web API:** `rack`, `sinatra`, `puma`.
+            *   **Elasticsearch Integration:** `elasticsearch` (Ruby client), `manticore`.
+            *   **Testing & Development:** `rspec`, `pry`.
+            *   **Packaging & Utilities:** `rubocop`, `fpm`, `minitar`, `rubyzip`.
+            *   **Plugin Dependencies:** `logstash-filter-geoip`, `down`.
+            *   **FIPS Validation Plugin:** A specialized gem is built on-the-fly by the `buildFipsValidationGem` task for use in integration tests.
+        *   **Python Dependencies:** Required Python packages for CI health report tests will be downloaded by pip. The dependencies are defined in `.buildkite/scripts/health-report-tests/requirements.txt` and include:
+            *   `requests` (v2.32.3)
+            *   `pyyaml` (v6.0.2)
+        *   **Go Dependencies:** Go modules for helper utilities will be downloaded during the Docker build process. Key dependencies include `gopkg.in/yaml.v2`.
+        *   **Gradle Plugins:** Plugins like `jacoco` for code coverage and `org.sonarqube` (v4.3.0.3225) for SonarQube integration will be downloaded by Gradle.
+        *   **GeoIP Databases:** For features and tests related to the GeoIP filter, a specific version of the GeoLite2 databases (e.g., `org.elasticsearch:geolite2-databases:20191119`) will be downloaded by Gradle for X-Pack tests.
+        *   **Pre-commit Hook Repositories:** The `pre-commit` framework will automatically download and manage the tools defined in its configuration file (`.pre-commit-config.yaml`), such as the `pre-commit/pre-commit-hooks` repository (v4.6.0).
+    -   **CI/CD Environment Tools:**
+        *   **Buildkite Agent:** Used for executing CI/CD pipelines. Not required for local development, but essential for the project's automated build and test infrastructure.
+        *   **GitHub Actions Runner:** Used for executing workflows defined in `.github/workflows`, such as the pre-commit checks and documentation builds. The actions `elastic/oblt-actions/pre-commit@v1` and `elastic/docs-builder` are used.
+        *   **Mergify:** A GitHub App used to automate Pull Request workflows, such as backporting merged changes to maintenance branches. Configuration is managed in `.mergify.yml`.
+        *   **Dependabot:** A GitHub-native tool used to automate dependency updates. It is configured via `.github/dependabot.yml` to create pull requests for outdated GitHub Actions, ensuring CI/CD tooling stays current.
+        *   **CI Docker Images:** The CI environment uses specific Docker images for running builds and tests. All required images are available for the `linux/amd64` platform. Key images include:
+            *   `docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-logstash-ci`
+            *   `docker.elastic.co/cloud-ci/sonarqube/buildkite-scanner:latest`
+            *   `docker.elastic.co/logstash/logstash-observability-sre` (for SRE acceptance tests)
+            *   `docker.elastic.co/cloud-release/elasticsearch-cloud-ess-fips` (for FIPS Elasticsearch and Filebeat in SRE acceptance tests)
+        *   **SonarQube Scanner:** Used in CI for continuous code inspection. Not required for a standard local build. It is configured via the `sonar-project.properties` file and connects to the `https://sonar.elastic.dev` server.
+
+2.  FILES TO CREATE:
+    -   **`versions.yml`**: This file is critical for the build process to determine the correct versions of components. It must be created in the root directory of the project.
+        -   **Path:** `/home/cc/EnvGym/data/elastic_logstash/versions.yml`
+        -   **Content Description:** A YAML file specifying versions for various components. The build scripts parse this file to configure dependencies like the bundled JDK, JRuby, and Jackson libraries. It is also used during the gem build process to create a copy for inclusion in the gem.
+        -   **Required Content:**
+            ```yaml
+            # alpha and beta qualifiers are now added via VERSION_QUALIFIER environment var
+            logstash: 9.2.0
+            logstash-core: 9.2.0
+            logstash-core-plugin-api: 2.1.16
+
+            bundled_jdk:
+              # for AdoptOpenJDK/OpenJDK jdk-14.0.1+7.1, the revision is 14.0.1 while the build is 7.1
+              vendor: "adoptium"
+              revision: 21.0.8
+              build: 9
+
+            # jruby must reference a *released* version of jruby which can be downloaded from the official download url
+            # *and* for which jars artifacts are published for compile-time
+            jruby:
+              version: 9.4.13.0
+              sha256: 226d9c3a2e332f8f249838f96c20e87e0df2b9a464a11477b47be6dafb66412c
+            # jruby-runtime-override, if specified, will override the jruby version installed in vendor/jruby
+            #jruby-runtime-override:
+            #  url: https://oss.sonatype.org/content/repositories/snapshots/org/jruby/jruby-dist/9.3.0.0-SNAPSHOT/jruby-dist-9.3.0.0-20210723.214927-259-bin.tar.gz
+            #  version: 9.3.0.0-SNAPSHOT
+            #  sha256: IGNORE
+
+            # Note: this file is copied to the root of logstash-core because its gemspec needs it when
+            #       bundler evaluates the gemspec via bin/logstash
+            # Ensure Jackson version here is kept in sync with version used by jrjackson gem
+            jrjackson: 0.4.20
+            jackson: 2.16.2
+            jackson-databind: 2.16.2
+            ```
+    -   **Key Application Configuration Files (pre-existing in the repository):**
+        -   `.ci/java-versions.properties`: Defines the specific Java versions (e.g., `adoptiumjdk_21`) to be used for the build (`LS_BUILD_JAVA`) and runtime (`LS_RUNTIME_JAVA`) environments, primarily for CI automation.
+        -   `.ruby-version`: Specifies the required JRuby version (`jruby-9.4.13.0`) for local development, intended for use with Ruby version managers.
+        -   `.rubocop.yml`: The configuration file for RuboCop, the Ruby static code analyzer. It defines the specific linting and formatting rules enforced across the project's Ruby codebase.
+        -   `sonar-project.properties`: The configuration file for SonarQube analysis. It defines the project key, server URL, source/test directories, exclusions (e.g., `vendor/**`, `qa/**`), and paths to code coverage reports for both Java (`**/jacocoTestReport.xml`) and Ruby (`coverage/coverage.json`).
+        -   `gradlew`, `gradlew.bat`: The Gradle Wrapper scripts, which are the primary entry points for building and testing the project.
+        -   `gradle/wrapper/gradle-wrapper.properties`: The Gradle Wrapper configuration file, which specifies the Gradle version (8.7) to be used.
+        -   `config/logstash.yml`: The main settings file for a Logstash instance. The packaged version is installed to `/etc/logstash`.
+        -   `config/jvm.options`: Defines the Java Virtual Machine (JVM) settings for Logstash.
+        -   `config/log4j2.properties`: The Log4j 2 configuration file that controls all logging behavior.
+        -   `logstash-core/logstash-core.gemspec`: The Ruby Gem specification for the `logstash-core` gem, defining its metadata, files, and dependencies.
+        -   `.pre-commit-config.yaml`: Defines the hooks to be run by the `pre-commit` framework. Specifically, it configures the `check-merge-conflict` hook from the `pre-commit/pre-commit-hooks` repository (v4.6.0) to prevent merge conflict markers from being committed.
+        -   `qa/integration/Gemfile`: Defines the Ruby gem dependencies for the integration test suite using Bundler.
+        -   `qa/integration/suite.yml`: A configuration file for the integration test suite. It allows setting options like `verbose_mode` and consumes environment variables like `FEATURE_FLAG` to enable or disable specific test scenarios.
+        -   `docker/templates/Dockerfile.erb`: The ERB template for generating various Dockerfile flavors.
+        -   `.dockerignore`: Excludes specified files and directories (e.g., `.git`, `build`, `logs`) from the Docker build context to optimize build speed and reduce image size.
+        -   `pkg/service_templates/systemd/lib/systemd/system/logstash.service`: The template for the `systemd` service unit file, used when creating `.deb` and `.rpm` packages.
+        -   `/etc/default/logstash` or `/etc/sysconfig/logstash`: (Not in repo) Environment variable files used by the `systemd` service on installed systems to configure settings like `LS_JAVA_OPTS`.
+        -   `x-pack/distributions/internal/observabilitySRE/docker/Dockerfile`: A specific Dockerfile used for building the FIPS-compliant/Fedramp High mode test runner and distribution.
+        -   `x-pack/distributions/internal/observabilitySRE/qa/`: Directory containing smoke and acceptance tests that use `docker-compose`.
+        -   `x-pack/distributions/internal/observabilitySRE/qa/acceptance/docker/docker-compose.yml`: Docker Compose file orchestrating FIPS-compliant Logstash, Elasticsearch, and Filebeat containers for acceptance tests.
+        -   `x-pack/distributions/internal/observabilitySRE/qa/acceptance/docker/logstash/config/logstash-fips.yml`: FIPS-specific Logstash configuration for acceptance tests.
+        -   `x-pack/distributions/internal/observabilitySRE/qa/smoke/docker/certs/generate.sh`: Script used to generate temporary certificates for SRE tests.
+        -   `x-pack/spec/`: Directory containing X-Pack specific Ruby unit tests.
+        -   `x-pack/qa/`: Directory containing X-Pack specific Ruby integration tests.
+        -   `config/pipelines.yml`: Defines multiple pipeline configurations.
+        -   `bin/docker-entrypoint`: The entrypoint script used in the Docker images.
+        -   `env2yaml/`: Directory containing Go source code for the `env2yaml` utility.
+        -   `docker/data/logstash/env2yaml/go.mod`: Go module file for the `env2yaml` utility, specifying the minimum required Go version (1.21) and its dependencies.
+        -   `docs/`: Directory containing the source files for the project's official documentation.
+        -   `.buildkite/scripts/health-report-tests/requirements.txt`: A pip requirements file specifying Python dependencies (`requests`, `pyyaml`) for the CI health report tests.
+    -   **Key Generated Files (created during the build process):**
+        -   `logstash-core/versions-gem-copy.yml`: A copy of the root `versions.yml` file, created when the `logstash-core` gem is built. It is included within the gem package.
+        -   `lib/logstash-core/logstash-core.jar`: A Java Archive (JAR) containing the compiled Java code, which is bundled inside the `logstash-core` gem.
+        -   `x-pack/spec/filters/geoip/vendor/`: Directory where GeoLite2 database files are unzipped during the build for use in tests.
+        -   `qa/integration/Gemfile.lock`: Generated by Bundler to lock the exact versions of gems used in the integration test suite, ensuring reproducible test runs.
+        -   `coverage/coverage.json`: Generated by Ruby test runs to provide code coverage data for SonarQube analysis.
+        -   `build/reports/jacoco/test/jacocoTestReport.xml`: Generated by Java test runs to provide code coverage data via JaCoCo for SonarQube analysis.
+    -   **Key CI/CD Configuration Files (pre-existing in the repository):**
+        -   `.github/workflows/pre-commit.yml`: Defines the GitHub Actions workflow that runs pre-commit checks on pull requests and pushes.
+        -   `.github/workflows/docs-build.yml`: Defines the GitHub Actions workflow that builds a preview of the documentation.
+        -   `.github/dependabot.yml`: Configures the Dependabot service to automatically check for and create pull requests for updates to GitHub Actions used in the project's workflows.
+        -   `.mergify.yml`: Configures the Mergify GitHub App to automate pull request workflows. It defines rules for automatically backporting merged pull requests to maintenance branches based on labels (e.g., `backport-8.19`), and for notifying authors about the backport policy.
+        -   `.buildkite/pull_request_pipeline.yml`: Defines the main CI pipeline for pull requests, including license checks, unit tests (standard and FIPS), integration tests (standard, FIPS, and persistent queue), SonarQube analysis, and smoke tests.
+        -   `.buildkite/trigger_pipelines.yml`: Buildkite pipeline configuration for dynamically triggering downstream build jobs.
+        -   `.buildkite/scripts/`: Directory containing shell scripts executed by the Buildkite CI/CD pipelines.
+        -   `ci/`: Directory containing primary CI scripts like `license_check.sh`, `unit_tests.sh`, `integration_tests.sh`, and `observabilitySREsmoke_tests.sh`.
+        -   `x-pack/ci/`: Directory containing CI scripts specific to X-Pack features.
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    -   **License Header Checks:** The CI process runs automated checks (`ci/license_check.sh`) to ensure all source files contain the correct license headers. This is also run in a FIPS-compliant environment.
+    -   **Pre-commit Hooks:** The CI process runs a suite of pre-commit hooks via GitHub Actions, as configured in `.pre-commit-config.yaml`. These hooks perform various automated checks, such as ensuring no merge conflict markers are present in source files, linting, formatting, validating file types, and scanning for secrets. Passing these checks is required.
+    -   **Pull Request Workflow Compliance:** The project uses Mergify and Dependabot to enforce and automate its workflows.
+        *   Pull requests targeting the `main` branch must be labeled appropriately for backporting.
+        *   Add a `backport-X.Y` label for each maintenance branch the change should be applied to.
+        *   If no backport is necessary, add the `backport-skip` label.
+        *   The Mergify bot will comment on pull requests that are missing a backport label, requiring action from the author.
+        *   **Dependabot Pull Request Validation:** Pull requests automatically generated by Dependabot (e.g., for updating GitHub Actions) must pass the full suite of CI checks. This ensures that updates to CI/CD components do not introduce regressions.
+    -   **Java Unit Tests:** Write JUnit tests for all Java classes.
+        *   These tests are executed by the `javaTests` Gradle task.
+        *   They are run in both standard and FIPS-compliant environments.
+        *   **Hardware Advisory:** Some tests require a large heap size. Ensure at least 10GB of RAM is available to the build environment to prevent failures.
+    -   **Ruby Unit Tests:** Write RSpec tests for the Ruby components, which are executed via a Java test runner. The build is split into a default (X-Pack) mode and an an OSS mode.
+        *   **Core Tests:** Executed by the `:logstash-core:rubyTests` Gradle task or `test:core` Rake task. These are run in both standard and FIPS-compliant environments.
+        *   **X-Pack Tests:** Executed by the `:x-pack:rubyTests` Gradle task. These tests run by default but are skipped if `OSS=true` is set. These are also run in both standard and FIPS-compliant environments. Some tests require GeoLite2 databases, which are downloaded and unzipped automatically by the build.
+    -   **Ruby Static Code Analysis:** The codebase must adhere to the Ruby style guide enforced by `rubocop`. The specific rules are defined in the `.rubocop.yml` configuration file. Run `gradlew rubocop` or `rake lint:report` to check for compliance.
+    -   **SonarQube Analysis:** The CI pipeline runs a SonarQube scan to perform continuous code inspection. The scan is configured via `sonar-project.properties`. It consumes code coverage reports for both Java (JaCoCo XML reports from `**/jacocoTestReport.xml`) and Ruby (`coverage/coverage.json`). The configuration explicitly excludes directories like `vendor/**`, `qa/**`, and `**/spec/**` from the analysis.
+    -   **Java/Ruby Integration Tests:** Write integration tests that validate the interaction between Logstash, Elasticsearch, and Filebeat. These are executed by tasks like `runIntegrationTests` and `:x-pack:rubyIntegrationTests` and are run in parallel across multiple CI jobs. The Ruby test environment is managed by Bundler via `qa/integration/Gemfile`, ensuring consistent dependencies. The behavior of these tests can be controlled by environment variables (e.g., `FEATURE_FLAG`), which are processed via configuration files like `qa/integration/suite.yml`.
+        *   **Standard Integration Tests:** The main suite of integration tests.
+        *   **FIPS Mode Integration Tests:** The entire integration test suite is run within a FIPS-compliant Docker environment to ensure compatibility.
+        *   **Persistent Queue Integration Tests:** A dedicated run of the integration test suite with the `FEATURE_FLAG=persistent_queues` environment variable set to specifically validate persistent queue functionality.
+    -   **Observability SRE Tests (Smoke and Acceptance):** Specialized tests run via RSpec with `docker-compose` orchestration to validate the Observability SRE distribution.
+        *   These tests are executed by the `observabilitySREsmokeTests` and `observabilitySREacceptanceTests` Gradle tasks.
+        *   The acceptance tests use `docker-compose.yml` to orchestrate a multi-container environment with FIPS-compliant versions of Logstash, Elasticsearch, and Filebeat. The Filebeat version used is the one bundled within the Elasticsearch FIPS Docker image.
+        *   They automatically generate and clean up temporary certificates needed for the test environment.
+        *   These tests validate the end-to-end behavior in a containerized, FIPS-compliant environment.
+    -   **Health Report Tests:** Python-based tests executed as part of the CI pipeline to perform health checks.
+        *   These tests are located in `.buildkite/scripts/health-report-tests/`.
+        *   They require Python dependencies specified in `requirements.txt`, such as `requests` and `pyyaml`.
+    -   **Runtime Feature Tests:** Specific integration tests should exist to validate key runtime features configurable in `logstash.yml`, `pipelines.yml`, `jvm.options`, and `log4j2.properties`:
+        *   **Multiple Pipelines:** Tests to verify that Logstash can correctly load and run multiple, independent pipelines.
+        *   **Pipeline Settings:** Tests for pipeline-specific settings like `pipeline.workers`, `pipeline.batch.size`, etc.
+        *   **Configuration Reloading:** Tests to verify automatic pipeline reloading.
+        *   **API Functionality:** Tests for the HTTP API (built with Sinatra/Puma), including security features.
+        *   **Queueing Mechanisms:** Tests to validate both `memory` and `persisted` queue types, with a dedicated CI run for `persisted` queues.
+        *   **Dead-Letter Queue (DLQ):** Tests to confirm that failed events are correctly sent to the DLQ.
+        *   **ECS Compatibility:** Tests to ensure event processing behaves as expected for different `pipeline.ecs_compatibility` modes.
+        *   **JVM Options:** Tests to validate that settings in `config/jvm.options` are applied correctly, including heap size and system properties. The specific Java version used in CI is defined in `.ci/java-versions.properties`.
+        *   **Service Environment Variables:** Tests to validate that environment variables (e.g., `LS_JAVA_OPTS`) set in `/etc/default/logstash` or `/etc/sysconfig/logstash` are correctly interpreted by a service-managed Logstash instance.
+        *   **System Limits:** Tests to verify that system-level configurations, such as the open file descriptor limit (`LimitNOFILE`), are applied correctly when running as a service.
+        *   **Logging Configuration:** Tests to validate logging behavior, including log level, JSON format, file rotation, pipeline-specific logs, slowlog, and deprecation logs.
+    -   **Distribution Packaging Tests:** Add tests to verify the contents and structure of the final packaged distributions (`.tar.gz`, `.zip`, `.rpm`, `.deb`).
+        *   **Gem Verification:** Tests should validate the contents of the built `logstash-core` gem, ensuring it includes the `logstash-core.jar` and the `versions-gem-copy.yml` file.
+        *   **Package Contents:** Verify that packages install files to the correct locations (e.g., `/usr/share/logstash`, `/etc/logstash`).
+        *   **User/Group Creation:** Verify that `.deb` and `.rpm` packages correctly create the `logstash` user and group.
+        *   **File Ownership:** Verify that all installed files and directories have the correct ownership (`logstash:logstash`).
+        *   **Service File Installation:** Verify that the `logstash.service` file is correctly installed and enabled for `systemd`.
+    -   **Docker Image Tests:** Add tests to validate the built Docker images.
+        *   **Build Verification:** Ensure all image flavors (`full`, `oss`, `wolfi`, `observability-sre`) can be built successfully.
+        *   **Runtime Verification:** Tests should start a container from each image flavor and verify that the Logstash process runs correctly.
+        *   **Content Verification:** Tests should inspect the container's filesystem to ensure correct file ownership and permissions, and to verify that directories excluded by `.dockerignore` (such as `.git`, `build`, and `logs`) are not present in the final image.
+        *   **Helper Utility Verification:** Ensure that Go-based helper utilities like `env2yaml` (used during the image build) function correctly and produce the expected output.
+        *   **FIPS Mode / Observability SRE Smoke Test:** A dedicated smoke test (`ci/observabilitySREsmoke_tests.sh`) exists to validate the runtime behavior of the FIPS-compliant container.
+    -   **Documentation Build Verification:** The CI pipeline includes a GitHub Action that automatically builds a preview of the documentation for any changes made within the `docs/` directory. This build must pass for pull requests to be merged.
+    -   **Benchmark Tests:** The project includes subprojects like `logstash-core-benchmarks` and `benchmark-cli` for performance testing.
+    -   **CI/CD Pipeline Logic Tests:** Add tests for scripts within the `.buildkite/` directory to ensure the CI logic is sound.
+
+4.  COMPLETE TODO LIST:
+    1.  **Install Prerequisites:**
+        -   Install Git on your system.
+        -   Install an Adoptium Java Development Kit (JDK) version 21. Standard `x86_64` installers are appropriate. Verify with `java -version`.
+        -   Set the `JAVA_HOME` environment variable to point to the JDK 21 installation directory.
+        -   Install a Ruby version manager (e.g., `rbenv`, `RVM`).
+        -   Install the Go toolchain, version 1.23. Verify with `go version`. Note that individual Go modules within the project, such as `env2yaml`, specify their own minimum versions (e.g., Go 1.21).
+        -   Install Python and pip. Verify with `python --version` and `pip --version`.
+        -   Install the pre-commit framework: `pip install pre-commit`. Verify with `pre-commit --version`.
+        -   Install Docker Engine. Verify with `docker --version`.
+        -   Install Docker Compose. Verify with `docker-compose --version`.
+
+    2.  **Clone the Repository:**
+        -   Open a terminal or command prompt.
+        -   Clone the project repository into the specified working directory: `git clone <repository_url> /home/cc/EnvGym/data/elastic_logstash`
+        -   Navigate into the project directory: `cd /home/cc/EnvGym/data/elastic_logstash`
+
+    3.  **Install JRuby and Bundler:**
+        -   Use your Ruby version manager to install the JRuby version specified in the `.ruby-version` file.
+        -   **Example with rbenv:** `rbenv install` (this command reads the `.ruby-version` file automatically).
+        -   **Verification:** Run `ruby -v` and ensure the output shows `jruby 9.4.13.0`.
+        -   Install the Bundler gem: `gem install bundler`.
+        -   **Verification:** Run `bundle -v`.
+
+    4.  **Configure Build Mode (Optional):**
+        -   The build supports multiple modes. These are typically controlled by environment variables or Gradle properties.
+        -   **OSS Mode:** To build the pure Open Source Software version, set `export OSS=true`. If not set, the build defaults to including X-Pack.
+        -   **Version Qualifier:** To build a pre-release version (e.g., beta, rc), set `export VERSION_QUALIFIER=beta1`.
+        -   **FIPS/Fedramp High Mode:** For running tests in a FIPS-compliant environment, you will typically build a specific Docker image and pass a property or environment variable. For example: `docker run -e FEDRAMP_HIGH_MODE=true ...` or `./gradlew ... -PfedrampHighMode=true`.
+        -   **Build JVM Options:** To pass custom JVM options to the Gradle build process itself, use the `GRADLE_OPTS` or `JAVA_OPTS` environment variables. For example: `export GRADLE_OPTS="-Xmx2g"`.
+
+    5.  **Create Configuration File:**
+        -   In the root of the project directory, create the `versions.yml` file with the content specified in the "FILES TO CREATE" section. The exact path will be `/home/cc/EnvGym/data/elastic_logstash/versions.yml`.
+
+    6.  **Bootstrap the Project:**
+        -   Run the primary bootstrap task. This will download JRuby (if not already managed), compile all Java code, and prepare the project structure. The first time this command is run, the Gradle Wrapper will automatically download Gradle 8.7.
+        -   **Command:** `./gradlew bootstrap` or `rake bootstrap`.
+        -   **Verification:** The command should complete with a "BUILD SUCCESSFUL" message.
+
+    7.  **Install Ruby Dependencies (Gems):**
+        -   Run the tasks to install the default and development gems. These Gradle tasks invoke Bundler to install the gems defined in the project's various `gemspec` and `Gemfile` files into a local `vendor/bundle` directory.
+        -   **Commands:** `./gradlew installDefaultGems && ./gradlew installDevelopmentGems`
+        -   **Verification:** Check for the existence of a `vendor/bundle` directory.
+
+    8.  **Install Python Dependencies:**
+        -   Install the required Python packages for the health report tests.
+        -   **Command:** `pip install -r .buildkite/scripts/health-report-tests/requirements.txt`
+        -   **Verification:** Run `pip list` and check that `requests` and `pyyaml` are installed.
+
+    9.  **Run Code Quality Checks and Unit Tests:**
+        -   Execute static analysis and all unit tests for the standard environment.
+        -   **Hardware Advisory:** Ensure your system has sufficient memory available (at least 10GB of RAM is recommended) as some Java tests are memory-intensive.
+        -   **Commands:**
+            ```bash
+            # Install git hooks and initialize the pre-commit environment
+            pre-commit install
+            # Run pre-commit hooks on all files
+            pre-commit run --all-files
+            # Run RuboCop for Ruby static analysis
+            ./gradlew rubocop
+            # Run all Java and Ruby unit tests (including core and X-Pack)
+            ./gradlew test
+            # (Optional) Run SonarQube analysis locally (requires server token)
+            # ./gradlew sonarqube
+            # Alternatively, run them separately:
+            # ./gradlew javaTests
+            # ./gradlew :logstash-core:rubyTests
+            # ./gradlew :x-pack:rubyTests
+            ```
+        -   **Verification:** All checks and tests should pass. The `pre-commit run` command will use the `.pre-commit-config.yaml` to execute its checks, including the merge conflict validation.
+
+    10. **Run FIPS Mode Unit Tests (Optional, Advanced):**
+        -   To replicate the CI FIPS tests, you must first build the FIPS test runner image and then execute the tests inside it.
+        -   **Note:** These commands must be run from `/home/cc/EnvGym/data/elastic_logstash` as it is the Docker build context.
+        -   **Commands:**
+            ```bash
+            # Build the test runner image from the specific Dockerfile
+            docker build -t test-runner-image -f x-pack/distributions/internal/observabilitySRE/docker/Dockerfile .
+            # Run Java tests in FIPS mode
+            docker run test-runner-image ./gradlew --info --stacktrace -PfedrampHighMode=true javaTests
+            # Run Ruby tests in FIPS mode
+            docker run test-runner-image ./gradlew --info --stacktrace -PfedrampHighMode=true rubyTests
+            ```
+        -   **Verification:** The tests should pass inside the container.
+
+    11. **Build a Distributable Artifact:**
+        -   Assemble a full distribution package (`.tar.gz`, `.rpm`, etc.). This process includes building intermediate artifacts like the `logstash-core` gem.
+        -   **Command for tarball:** `./gradlew assembleTarDistribution` or `rake artifact:tar`
+        -   **Command for RPM/DEB:** `./gradlew assembleDebDistribution` and `./gradlew assembleRpmDistribution`
+        -   **Command for core gem only:** `rake artifact:gems` or `rake artifact:build-logstash-core`
+        -   **Verification:** Distributable files will be created in the `build/distributions/` directory.
+
+    12. **Test Packaged Service on Linux (Optional, Advanced):**
+        -   This step validates the `.deb` or `.rpm` package installation and the `systemd` service. It requires a Linux VM or a Docker container that can run systemd (e.g., `docker.io/centos:7`).
+        -   **Commands (example on a CentOS/RPM system, run from project root):**
+            ```bash
+            # Copy the RPM to the test machine
+            # scp build/distributions/logstash-*.rpm user@host:
+            
+            # On the test machine:
+            # Install the package
+            sudo yum install -y logstash-*.rpm
+            
+            # Create/edit the environment file
+            echo 'LS_JAVA_OPTS="-Xmx512m -Xms512m"' | sudo tee /etc/sysconfig/logstash
+            
+            # Reload systemd, enable and start the service
+            sudo systemctl daemon-reload
+            sudo systemctl enable logstash.service
+            sudo systemctl start logstash.service
+            
+            # Check the status
+            sudo systemctl status logstash.service
+            
+            # Check the logs
+            journalctl -u logstash.service
+            ```
+        -   **Verification:** The service should start successfully. The logs should show Logstash running, and the status command should report `active (running)`. Verify that the JVM options from `/etc/sysconfig/logstash` were applied.
+
+    13. **Build Docker Images:**
+        -   Build the standard Docker images using the generated artifacts. The `.dockerignore` file will automatically prevent files like `.git` and local `build` artifacts from being included in the build context.
+        -   **Note:** These commands must be run from `/home/cc/EnvGym/data/elastic_logstash` as it is the Docker build context.
+        -   **Command:** `rake docker:build`
+        -   To build the specialized Observability SRE/FIPS image, use the specific Dockerfile: `docker build -f x-pack/distributions/internal/observabilitySRE/docker/Dockerfile .`
+        -   **Verification:** Run `docker images` and verify that the new logstash images are listed. You can inspect the image contents by running a shell inside a temporary container (`docker run --rm -it <image_name> bash`) and confirming that excluded directories like `.git` and `build` are not present.
+
+    14. **Run Integration and Other Tests:**
+        -   These tasks validate end-to-end functionality. Test behavior can be controlled via environment variables, which are consumed by configuration files like `qa/integration/suite.yml`.
+        -   **Standard Run:** `./gradlew runIntegrationTests`
+        -   **X-Pack Run:** `./gradlew :x-pack:rubyIntegrationTests`
+        -   **Persistent Queue Run:** `export FEATURE_FLAG=persistent_queues; ./gradlew runIntegrationTests`
+        -   **FIPS Mode Run (Advanced):** Similar to unit tests, this requires the specialized Docker container. `docker run -e FEDRAMP_HIGH_MODE=true test-runner-image ci/integration_tests.sh`
+        -   **Health Report Tests:** These are typically run in CI. To run them locally, you would invoke the Python scripts directly.
+        -   **Verification:** The tasks should complete successfully with all tests passing.
+
+    15. **Run Observability SRE Tests (Optional, Advanced):**
+        -   These tests use Docker Compose to validate the SRE distribution in a FIPS-compliant environment. The Gradle tasks will automatically handle pulling the necessary Docker images and orchestrating the containers.
+        -   **Commands:**
+            ```bash
+            # Run smoke tests
+            ./gradlew observabilitySREsmokeTests
+            # Run acceptance tests
+            ./gradlew observabilitySREacceptanceTests
+            ```
+        -   **Verification:** The tasks should complete successfully. Observe the output to see Docker Compose starting FIPS-compliant Logstash, Elasticsearch, and Filebeat containers. All RSpec tests running against this environment should pass.
+
+    16. **Run Local Instance for Manual Testing (Optional):**
+        -   Unpack the distributable from the `build/distributions/` directory.
+        -   Modify configuration files in the `config/` directory (`logstash.yml`, `pipelines.yml`, `jvm.options`) to suit your testing needs.
+        -   Start Logstash: `bin/logstash`
+        -   **Verification:** Observe logs in the `logs/` directory to confirm correct startup and behavior based on your configuration.
+
+    17. **Contribute Code (Pull Request Workflow):**
+        -   After completing your changes and passing all local tests, create a pull request (PR).
+        -   The project uses automation tools like Mergify (for backports) and Dependabot (for dependency updates). Be aware of PRs generated by these bots.
+        -   **For changes that need backporting:** Add a `backport-X.Y` label for each maintenance branch you want to target (e.g., `backport-8.19`, `backport-9.0`).
+        -   **For changes that do not need backporting:** Add the `backport-skip` label.
+        -   **Verification:** Mergify will post a status check on your PR. If labels are missing, it will comment on the PR asking you to add them. Once your PR is merged to `main`, Mergify will automatically create the backport PRs for the branches you specified.
+
+    18. **Generate IDE Project Files (Optional):**
+        -   For IntelliJ IDEA: `./gradlew idea`
+        -   **Verification:** `.ipr`, `.iml`, and `.iws` files will be created.
+
+    19. **Clean the Project:**
+        -   To remove all generated files: `./gradlew clean`
+        -   To clean built Docker images, use `docker rmi`.
+        -   **Verification:** The `build`, `vendor`, `.bundle`, and other generated directories will be deleted.
+
+    20. **Understand and Test CI/CD Configuration (Optional):**
+        -   Familiarize yourself with the CI/CD setup in the `.buildkite/`, `.github/workflows/`, `.mergify.yml`, `.github/dependabot.yml`, and `.ci/java-versions.properties` files. This includes workflows for pre-commit checks, documentation builds, automated backporting, and dependency updates.
+        -   To test changes to CI scripts, execute them locally in a shell that mimics the CI environment, setting any necessary environment variables.
+        -   **Example Command:** `PIPELINES_TO_TRIGGER="pipeline1,pipeline2" ./.buildkite/scripts/common/trigger-pipeline-generate-steps.sh`
+        -   **Verification:** Observe the output generated by the script to ensure it matches the expected behavior.

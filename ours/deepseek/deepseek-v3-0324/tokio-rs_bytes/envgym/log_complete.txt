@@ -1,0 +1,382 @@
+=== Docker Execution Log - 20250828_181346 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756404817
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.03kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/rust:1.57
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/19] FROM docker.io/library/rust:1.57@sha256:d83bf5ea7b4c3d18c2f46d5f3d288bfca085c3e7ac57822e3b8e5a1ad22ccc1a
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 138.81kB 0.0s done
+#5 DONE 0.0s
+
+#6 [ 9/19] COPY ci/test-stable.sh ci/test-stable.sh
+#6 CACHED
+
+#7 [ 4/19] RUN rustup component add rust-src --toolchain nightly-2024-09-15 &&     rustup component add clippy --toolchain nightly-2024-09-15 &&     rustup component add miri --toolchain nightly-2024-09-15 || true
+#7 CACHED
+
+#8 [ 3/19] RUN rustup install nightly-2024-09-15 --profile minimal &&     rustup default nightly-2024-09-15
+#8 CACHED
+
+#9 [ 6/19] RUN cargo install cargo-hack ||     cargo install --git https://github.com/taiki-e/cargo-hack cargo-hack || true
+#9 CACHED
+
+#10 [11/19] COPY ci/tsan.sh ci/tsan.sh
+#10 CACHED
+
+#11 [12/19] COPY ci/miri.sh ci/miri.sh
+#11 CACHED
+
+#12 [ 8/19] COPY src/lib.rs src/lib.rs
+#12 CACHED
+
+#13 [ 2/19] WORKDIR /home/cc/EnvGym/data/tokio-rs_bytes
+#13 CACHED
+
+#14 [ 5/19] RUN rustup target add x86_64-unknown-linux-gnu &&     rustup default stable
+#14 CACHED
+
+#15 [10/19] COPY ci/panic-abort.sh ci/panic-abort.sh
+#15 CACHED
+
+#16 [ 7/19] COPY Cargo.toml .
+#16 CACHED
+
+#17 [13/19] COPY clippy.toml .
+#17 CACHED
+
+#18 [14/19] RUN mkdir -p .github/workflows &&     chmod +x ci/*.sh
+#18 DONE 0.3s
+
+#19 [15/19] RUN cargo build || true
+#19 0.408     Updating crates.io index
+#19 0.623      Locking 52 packages to latest compatible versions
+#19 0.664    Compiling bytes v1.10.1 (/home/cc/EnvGym/data/tokio-rs_bytes)
+#19 0.700 error[E0583]: file not found for module `buf`
+#19 0.700   --> src/lib.rs:79:1
+#19 0.700    |
+#19 0.700 79 | pub mod buf;
+#19 0.700    | ^^^^^^^^^^^^
+#19 0.700    |
+#19 0.700    = help: to create the module `buf`, create file "src/buf.rs" or "src/buf/mod.rs"
+#19 0.700    = note: if there is a `mod buf` elsewhere in the crate already, import it with `use crate::...` instead
+#19 0.700 
+#19 0.700 error[E0583]: file not found for module `bytes`
+#19 0.700   --> src/lib.rs:82:1
+#19 0.700    |
+#19 0.700 82 | mod bytes;
+#19 0.700    | ^^^^^^^^^^
+#19 0.700    |
+#19 0.700    = help: to create the module `bytes`, create file "src/bytes.rs" or "src/bytes/mod.rs"
+#19 0.700    = note: if there is a `mod bytes` elsewhere in the crate already, import it with `use crate::...` instead
+#19 0.700 
+#19 0.700 error[E0583]: file not found for module `bytes_mut`
+#19 0.700   --> src/lib.rs:83:1
+#19 0.700    |
+#19 0.700 83 | mod bytes_mut;
+#19 0.700    | ^^^^^^^^^^^^^^
+#19 0.700    |
+#19 0.700    = help: to create the module `bytes_mut`, create file "src/bytes_mut.rs" or "src/bytes_mut/mod.rs"
+#19 0.700    = note: if there is a `mod bytes_mut` elsewhere in the crate already, import it with `use crate::...` instead
+#19 0.700 
+#19 0.700 error[E0583]: file not found for module `fmt`
+#19 0.700   --> src/lib.rs:84:1
+#19 0.700    |
+#19 0.700 84 | mod fmt;
+#19 0.700    | ^^^^^^^^
+#19 0.700    |
+#19 0.700    = help: to create the module `fmt`, create file "src/fmt.rs" or "src/fmt/mod.rs"
+#19 0.700    = note: if there is a `mod fmt` elsewhere in the crate already, import it with `use crate::...` instead
+#19 0.700 
+#19 0.700 error[E0583]: file not found for module `loom`
+#19 0.700   --> src/lib.rs:85:1
+#19 0.700    |
+#19 0.700 85 | mod loom;
+#19 0.700    | ^^^^^^^^^
+#19 0.700    |
+#19 0.700    = help: to create the module `loom`, create file "src/loom.rs" or "src/loom/mod.rs"
+#19 0.700    = note: if there is a `mod loom` elsewhere in the crate already, import it with `use crate::...` instead
+#19 0.700 
+#19 0.721 warning: unused extern crate
+#19 0.721   --> src/lib.rs:74:1
+#19 0.721    |
+#19 0.721 74 | extern crate alloc;
+#19 0.721    | ^^^^^^^^^^^^^^^^^^^ unused
+#19 0.721    |
+#19 0.721 note: the lint level is defined here
+#19 0.721   --> src/lib.rs:1:54
+#19 0.721    |
+#19 0.721 1  | #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
+#19 0.721    |                                                      ^^^^^^^^^^^^^^^^
+#19 0.721    = note: `#[warn(unused_extern_crates)]` implied by `#[warn(rust_2018_idioms)]`
+#19 0.721 help: remove the unused `extern crate`
+#19 0.721    |
+#19 0.721 74 - extern crate alloc;
+#19 0.721    |
+#19 0.721 
+#19 0.739 For more information about this error, try `rustc --explain E0583`.
+#19 0.746 warning: `bytes` (lib) generated 1 warning
+#19 0.746 error: could not compile `bytes` (lib) due to 5 previous errors; 1 warning emitted
+#19 DONE 0.8s
+
+#20 [16/19] RUN cargo build --no-default-features || true
+#20 0.384    Compiling bytes v1.10.1 (/home/cc/EnvGym/data/tokio-rs_bytes)
+#20 0.416 error[E0583]: file not found for module `buf`
+#20 0.416   --> src/lib.rs:79:1
+#20 0.416    |
+#20 0.416 79 | pub mod buf;
+#20 0.416    | ^^^^^^^^^^^^
+#20 0.416    |
+#20 0.416    = help: to create the module `buf`, create file "src/buf.rs" or "src/buf/mod.rs"
+#20 0.416    = note: if there is a `mod buf` elsewhere in the crate already, import it with `use crate::...` instead
+#20 0.416 
+#20 0.416 error[E0583]: file not found for module `bytes`
+#20 0.416   --> src/lib.rs:82:1
+#20 0.416    |
+#20 0.416 82 | mod bytes;
+#20 0.416    | ^^^^^^^^^^
+#20 0.416    |
+#20 0.416    = help: to create the module `bytes`, create file "src/bytes.rs" or "src/bytes/mod.rs"
+#20 0.416    = note: if there is a `mod bytes` elsewhere in the crate already, import it with `use crate::...` instead
+#20 0.416 
+#20 0.416 error[E0583]: file not found for module `bytes_mut`
+#20 0.416   --> src/lib.rs:83:1
+#20 0.416    |
+#20 0.416 83 | mod bytes_mut;
+#20 0.416    | ^^^^^^^^^^^^^^
+#20 0.416    |
+#20 0.416    = help: to create the module `bytes_mut`, create file "src/bytes_mut.rs" or "src/bytes_mut/mod.rs"
+#20 0.416    = note: if there is a `mod bytes_mut` elsewhere in the crate already, import it with `use crate::...` instead
+#20 0.416 
+#20 0.416 error[E0583]: file not found for module `fmt`
+#20 0.416   --> src/lib.rs:84:1
+#20 0.416    |
+#20 0.416 84 | mod fmt;
+#20 0.416    | ^^^^^^^^
+#20 0.416    |
+#20 0.416    = help: to create the module `fmt`, create file "src/fmt.rs" or "src/fmt/mod.rs"
+#20 0.416    = note: if there is a `mod fmt` elsewhere in the crate already, import it with `use crate::...` instead
+#20 0.416 
+#20 0.417 error[E0583]: file not found for module `loom`
+#20 0.417   --> src/lib.rs:85:1
+#20 0.417    |
+#20 0.417 85 | mod loom;
+#20 0.417    | ^^^^^^^^^
+#20 0.417    |
+#20 0.417    = help: to create the module `loom`, create file "src/loom.rs" or "src/loom/mod.rs"
+#20 0.417    = note: if there is a `mod loom` elsewhere in the crate already, import it with `use crate::...` instead
+#20 0.417 
+#20 0.433 warning: unused extern crate
+#20 0.433   --> src/lib.rs:74:1
+#20 0.433    |
+#20 0.433 74 | extern crate alloc;
+#20 0.433    | ^^^^^^^^^^^^^^^^^^^ unused
+#20 0.433    |
+#20 0.433 note: the lint level is defined here
+#20 0.433   --> src/lib.rs:1:54
+#20 0.433    |
+#20 0.433 1  | #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
+#20 0.433    |                                                      ^^^^^^^^^^^^^^^^
+#20 0.433    = note: `#[warn(unused_extern_crates)]` implied by `#[warn(rust_2018_idioms)]`
+#20 0.433 help: remove the unused `extern crate`
+#20 0.433    |
+#20 0.433 74 - extern crate alloc;
+#20 0.433    |
+#20 0.433 
+#20 0.443 For more information about this error, try `rustc --explain E0583`.
+#20 0.449 warning: `bytes` (lib) generated 1 warning
+#20 0.449 error: could not compile `bytes` (lib) due to 5 previous errors; 1 warning emitted
+#20 DONE 0.5s
+
+#21 [17/19] RUN cargo build --features serde || true
+#21 0.466    Compiling serde v1.0.219
+#21 2.325    Compiling bytes v1.10.1 (/home/cc/EnvGym/data/tokio-rs_bytes)
+#21 2.358 error[E0583]: file not found for module `buf`
+#21 2.358   --> src/lib.rs:79:1
+#21 2.358    |
+#21 2.358 79 | pub mod buf;
+#21 2.358    | ^^^^^^^^^^^^
+#21 2.358    |
+#21 2.358    = help: to create the module `buf`, create file "src/buf.rs" or "src/buf/mod.rs"
+#21 2.358    = note: if there is a `mod buf` elsewhere in the crate already, import it with `use crate::...` instead
+#21 2.358 
+#21 2.358 error[E0583]: file not found for module `bytes`
+#21 2.358   --> src/lib.rs:82:1
+#21 2.358    |
+#21 2.358 82 | mod bytes;
+#21 2.358    | ^^^^^^^^^^
+#21 2.358    |
+#21 2.358    = help: to create the module `bytes`, create file "src/bytes.rs" or "src/bytes/mod.rs"
+#21 2.358    = note: if there is a `mod bytes` elsewhere in the crate already, import it with `use crate::...` instead
+#21 2.358 
+#21 2.358 error[E0583]: file not found for module `bytes_mut`
+#21 2.358   --> src/lib.rs:83:1
+#21 2.358    |
+#21 2.358 83 | mod bytes_mut;
+#21 2.358    | ^^^^^^^^^^^^^^
+#21 2.358    |
+#21 2.358    = help: to create the module `bytes_mut`, create file "src/bytes_mut.rs" or "src/bytes_mut/mod.rs"
+#21 2.358    = note: if there is a `mod bytes_mut` elsewhere in the crate already, import it with `use crate::...` instead
+#21 2.358 
+#21 2.358 error[E0583]: file not found for module `fmt`
+#21 2.358   --> src/lib.rs:84:1
+#21 2.358    |
+#21 2.358 84 | mod fmt;
+#21 2.358    | ^^^^^^^^
+#21 2.358    |
+#21 2.358    = help: to create the module `fmt`, create file "src/fmt.rs" or "src/fmt/mod.rs"
+#21 2.358    = note: if there is a `mod fmt` elsewhere in the crate already, import it with `use crate::...` instead
+#21 2.358 
+#21 2.358 error[E0583]: file not found for module `loom`
+#21 2.358   --> src/lib.rs:85:1
+#21 2.358    |
+#21 2.358 85 | mod loom;
+#21 2.358    | ^^^^^^^^^
+#21 2.358    |
+#21 2.358    = help: to create the module `loom`, create file "src/loom.rs" or "src/loom/mod.rs"
+#21 2.358    = note: if there is a `mod loom` elsewhere in the crate already, import it with `use crate::...` instead
+#21 2.358 
+#21 2.358 error[E0583]: file not found for module `serde`
+#21 2.358   --> src/lib.rs:91:1
+#21 2.358    |
+#21 2.358 91 | mod serde;
+#21 2.358    | ^^^^^^^^^^
+#21 2.358    |
+#21 2.358    = help: to create the module `serde`, create file "src/serde.rs" or "src/serde/mod.rs"
+#21 2.358    = note: if there is a `mod serde` elsewhere in the crate already, import it with `use crate::...` instead
+#21 2.358 
+#21 2.380 warning: unused extern crate
+#21 2.380   --> src/lib.rs:74:1
+#21 2.380    |
+#21 2.380 74 | extern crate alloc;
+#21 2.380    | ^^^^^^^^^^^^^^^^^^^ unused
+#21 2.380    |
+#21 2.380 note: the lint level is defined here
+#21 2.380   --> src/lib.rs:1:54
+#21 2.380    |
+#21 2.380 1  | #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
+#21 2.380    |                                                      ^^^^^^^^^^^^^^^^
+#21 2.380    = note: `#[warn(unused_extern_crates)]` implied by `#[warn(rust_2018_idioms)]`
+#21 2.380 help: remove the unused `extern crate`
+#21 2.380    |
+#21 2.380 74 - extern crate alloc;
+#21 2.380    |
+#21 2.380 
+#21 2.399 For more information about this error, try `rustc --explain E0583`.
+#21 2.406 warning: `bytes` (lib) generated 1 warning
+#21 2.406 error: could not compile `bytes` (lib) due to 6 previous errors; 1 warning emitted
+#21 DONE 2.5s
+
+#22 [18/19] RUN cargo test || true
+#22 0.416  Downloading crates ...
+#22 0.464   Downloaded serde_test v1.0.177
+#22 0.475    Compiling serde v1.0.219
+#22 0.475    Compiling bytes v1.10.1 (/home/cc/EnvGym/data/tokio-rs_bytes)
+#22 0.512 error[E0583]: file not found for module `buf`
+#22 0.512   --> src/lib.rs:79:1
+#22 0.512    |
+#22 0.512 79 | pub mod buf;
+#22 0.512    | ^^^^^^^^^^^^
+#22 0.512    |
+#22 0.512    = help: to create the module `buf`, create file "src/buf.rs" or "src/buf/mod.rs"
+#22 0.512    = note: if there is a `mod buf` elsewhere in the crate already, import it with `use crate::...` instead
+#22 0.512 
+#22 0.512 error[E0583]: file not found for module `bytes`
+#22 0.512   --> src/lib.rs:82:1
+#22 0.512    |
+#22 0.512 82 | mod bytes;
+#22 0.512    | ^^^^^^^^^^
+#22 0.512    |
+#22 0.512    = help: to create the module `bytes`, create file "src/bytes.rs" or "src/bytes/mod.rs"
+#22 0.512    = note: if there is a `mod bytes` elsewhere in the crate already, import it with `use crate::...` instead
+#22 0.512 
+#22 0.512 error[E0583]: file not found for module `bytes_mut`
+#22 0.512   --> src/lib.rs:83:1
+#22 0.512    |
+#22 0.512 83 | mod bytes_mut;
+#22 0.512    | ^^^^^^^^^^^^^^
+#22 0.512    |
+#22 0.512    = help: to create the module `bytes_mut`, create file "src/bytes_mut.rs" or "src/bytes_mut/mod.rs"
+#22 0.512    = note: if there is a `mod bytes_mut` elsewhere in the crate already, import it with `use crate::...` instead
+#22 0.512 
+#22 0.512 error[E0583]: file not found for module `fmt`
+#22 0.512   --> src/lib.rs:84:1
+#22 0.512    |
+#22 0.512 84 | mod fmt;
+#22 0.512    | ^^^^^^^^
+#22 0.512    |
+#22 0.512    = help: to create the module `fmt`, create file "src/fmt.rs" or "src/fmt/mod.rs"
+#22 0.513    = note: if there is a `mod fmt` elsewhere in the crate already, import it with `use crate::...` instead
+#22 0.513 
+#22 0.513 error[E0583]: file not found for module `loom`
+#22 0.513   --> src/lib.rs:85:1
+#22 0.513    |
+#22 0.513 85 | mod loom;
+#22 0.513    | ^^^^^^^^^
+#22 0.513    |
+#22 0.513    = help: to create the module `loom`, create file "src/loom.rs" or "src/loom/mod.rs"
+#22 0.513    = note: if there is a `mod loom` elsewhere in the crate already, import it with `use crate::...` instead
+#22 0.513 
+#22 0.534 warning: unused extern crate
+#22 0.534   --> src/lib.rs:74:1
+#22 0.534    |
+#22 0.534 74 | extern crate alloc;
+#22 0.534    | ^^^^^^^^^^^^^^^^^^^ unused
+#22 0.534    |
+#22 0.534 note: the lint level is defined here
+#22 0.534   --> src/lib.rs:1:54
+#22 0.534    |
+#22 0.534 1  | #![warn(missing_docs, missing_debug_implementations, rust_2018_idioms)]
+#22 0.534    |                                                      ^^^^^^^^^^^^^^^^
+#22 0.534    = note: `#[warn(unused_extern_crates)]` implied by `#[warn(rust_2018_idioms)]`
+#22 0.534 help: remove the unused `extern crate`
+#22 0.534    |
+#22 0.534 74 - extern crate alloc;
+#22 0.534    |
+#22 0.534 
+#22 0.552 For more information about this error, try `rustc --explain E0583`.
+#22 0.558 warning: `bytes` (lib) generated 1 warning
+#22 0.558 error: could not compile `bytes` (lib) due to 5 previous errors; 1 warning emitted
+#22 0.558 warning: build failed, waiting for other jobs to finish...
+#22 DONE 0.8s
+
+#23 [19/19] COPY . .
+#23 DONE 0.0s
+
+#24 exporting to image
+#24 exporting layers
+#24 exporting layers 2.7s done
+#24 writing image sha256:17ee177671dcd89d05c84c213d351c72c16a91ad9df71d30eb2ffaefcfa4c6da done
+#24 naming to docker.io/library/envgym_test_1756404817 done
+#24 DONE 2.7s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

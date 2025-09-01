@@ -1,0 +1,367 @@
+This is the adjusted plan based on your hardware information:
+=== ENVIRONMENT SETUP PLAN (ADJUSTED) ===
+
+1. DOWNLOADS NEEDED:
+   - **OPTION A: For Native Building from Source**
+     - **Rust Toolchain (via `rustup`)**: The project uses a `rust-toolchain.toml` file to pin the exact required version for standard development. `rustup` will automatically download and use this version. Note: The project uses the Rust 2024 edition, which requires a recent version of the Rust compiler. The project is also periodically tested against the `beta` toolchain in CI to catch potential regressions in the Rust compiler. A `nightly` toolchain is required for fuzz testing.
+     - **Git**: For cloning the source code repository. Required not only for cloning but also during the build process, as build scripts directly execute the `git` command-line tool to embed version information (e.g., commit hash) into the binary.
+     - **C/C++ Compiler Toolchain**:
+       - **Linux (Debian/Ubuntu)**: `build-essential` and `devscripts` packages. `devscripts` is needed for building Debian packages. It is recommended to use Ubuntu 22.04 to avoid potential glibc compatibility issues when distributing the binary to older Linux distributions. Building on Ubuntu 20.04 is possible but may result in a less portable binary.
+     - **Development Libraries**: Many features rely on native system libraries.
+       - **`pkg-config`**: A tool to help find compiler and linker flags for other libraries.
+       - **OpenSSL**: Required unless using the `static-link-openssl` feature (which is not the default). The default build uses `rustls`, but some features or configurations may still rely on the native TLS backend.
+       - **zlib**: A compression library required by dependencies like `curl` and `git2`.
+       - **libclang**: Required for `bindgen` to generate bindings for some native libraries.
+       - **SQLite3**: Required for the interactive shell's persistent command history backend (`reedline`) and for some standard library (`nu-std`) functionality enabled by the `sqlite` feature.
+       - **libssh2**: Required for the `gstat` plugin's Git functionality (via the `git2` crate).
+       - **zstd**: A compression library required by the Polars data analysis features.
+       - **X11/XCB Clipboard Libraries**: Required for system clipboard integration in the interactive shell.
+     - **Installation Commands for Development Libraries**:
+       - **Linux (Debian/Ubuntu)**: `sudo apt-get install pkg-config libssl-dev zlib1g-dev libclang-dev libsqlite3-dev libssh2-1-dev libzstd-dev devscripts libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev`
+     - **Mold (Optional, Recommended)**: A high-performance linker that can significantly speed up build times, which is highly beneficial on a multi-core system.
+       - **Linux (Debian/Ubuntu)**: `sudo apt-get install mold`
+       - *Note: To use `mold`, you must uncomment the relevant sections in the `.cargo/config.toml` file.*
+     - **Perl (Optional)**: Required only if you intend to build with the `static-link-openssl` feature, as it is needed to compile the vendored OpenSSL source.
+     - **Python 3.10+ and `virtualenv` (Optional)**: Required for running Python virtual environment integration tests.
+       - Install Python from your system's package manager.
+       - Install `virtualenv` via `pip install virtualenv`.
+     - **Nushell (Optional)**: A recent version of the `nu` binary is required to run certain project scripts, such as the release packaging script.
+     - **pre-commit (Optional)**: A framework for managing git pre-commit hooks, used to enforce code style and quality. Install via `pip install pre-commit` or your system package manager.
+     - **typos-cli (Optional)**: A source code spell checker used to find and correct typos. Install via `cargo install typos-cli`.
+     - **direnv (Optional)**: A tool to load and unload environment variables depending on the current directory. Can be used to manage project-specific environment setup.
+     - **cargo-audit (Optional)**: A tool for auditing `Cargo.lock` for security vulnerabilities. Install via `cargo install cargo-audit`.
+     - **cargo-tarpaulin (Optional)**: A tool for generating code coverage reports. Install via `cargo install cargo-tarpaulin`.
+     - **cargo-tango (Optional)**: A benchmarking harness. Install via `cargo install cargo-tango`.
+     - **cargo-fuzz (Optional)**: A tool for fuzz testing Rust code. Requires a nightly toolchain. Install via `cargo install cargo-fuzz`.
+     - **GitHub CLI (`gh`) (Optional)**: Required to replicate parts of the automated release process, such as downloading artifacts for checksum generation or uploading artifacts to an existing release.
+     - **curl (Optional)**: Required to replicate parts of the automated release process, such as API calls for cleaning up old releases.
+     - **Repository Secrets (For Maintainers)**:
+       - **`NUSHELL_PAT`**: A GitHub Personal Access Token with `contents: write`, `packages: write`, and `pull-requests: write` permissions. This is required for the automated submission to the Windows Package Manager (winget) repository. It must be configured in the GitHub repository's secrets.
+
+   - **OPTION B: For Running with Docker**
+     - **Docker**: Docker Engine or Docker Desktop for your operating system.
+     - **Git**: For cloning the source code repository to access the Dockerfiles.
+     - **wget (for Debian Docker build)**: The Debian Dockerfile requires `wget` to download the release binary. This is installed inside the container during the build process, not on the host.
+
+   - **OPTION C: For Cross-Compiling from Source**
+     - **All dependencies from OPTION A** (Rust Toolchain, Git).
+     - **`cross-rs`**: A tool for cross-compiling Rust projects. Install via `cargo install cross`.
+     - **Docker**: Docker Engine or Docker Desktop. `cross-rs` uses containers to manage the cross-compilation environment and toolchains for various targets, including `aarch64-unknown-linux-gnu`, `aarch64-unknown-linux-musl`, `armv7-unknown-linux-gnueabihf`, `armv7-unknown-linux-musleabihf`, `riscv64gc-unknown-linux-gnu`, `loongarch64-unknown-linux-gnu`, and `loongarch64-unknown-linux-musl`.
+
+   - **OPTION D: For Building to WebAssembly (WASM)**
+     - **All dependencies from OPTION A**.
+     - **`wasm32-unknown-unknown` Rust target**: Install via `rustup target add wasm32-unknown-unknown`.
+
+2. FILES TO CREATE:
+   - **Build & Runtime Configuration (Project-Provided)**: No user-specific configuration files need to be created to build or run the project. The process is managed by project-provided files:
+     - `Cargo.toml`: The main workspace manifest defining project crates, dependencies, and custom build profiles (such as the `ci` profile used for optimized CI builds).
+     - **Crate Manifests**: Individual `Cargo.toml` files define crate-specific dependencies and features. Key manifests include:
+       - `crates/nu-cli/Cargo.toml`: Defines the main executable binary.
+       - `crates/nu-cmd-extra/Cargo.toml`: Contains commands that are not part of the core API standard.
+       - `crates/nu-color-config/Cargo.toml`: A crate dedicated to parsing and managing color configurations from the user's `config.nu` file, providing color styles to UI components.
+       - `crates/nu-command/Cargo.toml`: Defines the dependencies and features for the vast majority of Nushell's built-in commands (e.g., file system operations, networking, data manipulation).
+       - `crates/nu-derive-value/Cargo.toml`: A procedural macro crate that implements the `#[derive(FromValue, IntoValue)]` macros, which are essential for converting between native Rust types and Nushell's internal value system.
+       - `crates/nu-engine/Cargo.toml`: Defines the core engine of the shell, responsible for parsing and evaluating code.
+       - `crates/nu-explore/Cargo.toml`: Defines the interactive table pager (`explore` command), which provides a terminal user interface (TUI) for navigating data, using dependencies like `ratatui` and `crossterm`.
+       - `crates/nu-experimental/Cargo.toml`: Defines experimental features and options for Nushell.
+       - `crates/nu-glob/Cargo.toml`: A utility crate, forked from the `glob` crate, that provides support for matching file paths against Unix-style shell patterns.
+       - `crates/nu-json/Cargo.toml`: A forked and adapted library for handling JSON and Hjson, with a default feature (`preserve_order`) to maintain the order of keys in objects during parsing.
+       - `crates/nu-lsp/Cargo.toml`: Defines the Language Server Protocol (LSP) server binary, which provides IDE features like diagnostics, completions, and hover information.
+       - `crates/nuon/Cargo.toml`: Defines a library for handling the NUON (Nushell Object Notation) data format.
+       - `crates/nu-parser/Cargo.toml`: Defines Nushell's parser. It depends on `nu-engine` and `nu-protocol` and opts into workspace-level linting rules. It also excludes fuzzing targets from packaging.
+       - `crates/nu-path/Cargo.toml`: Defines a path handling library with platform-specific dependencies (e.g., `pwd` on Unix) to correctly manage file paths.
+       - `crates/nu-plugin/Cargo.toml`: Defines the functionality for *building* Nushell plugins. It is used by developers creating new plugins for Nushell.
+       - `crates/nu-plugin-core/Cargo.toml`: Provides shared internal functionality for plugins. It uses the `interprocess` crate to manage cross-platform inter-process communication (IPC) via local sockets, which is enabled by default.
+       - `crates/nu-plugin-custom-values/Cargo.toml`: Defines a plugin binary that demonstrates custom value handling within the Nushell plugin system.
+       - `crates/nu-plugin-engine/Cargo.toml`: Defines the core logic for running Nushell plugins from within the main engine. It coordinates between the shell and the plugin protocol, managing plugin processes.
+       - `crates/nu_plugin_inc/Cargo.toml`: Defines a version incrementer plugin for Nushell.
+       - `crates/nu_plugin_formats/Cargo.toml`: Defines a plugin binary that provides I/O support for various file formats, such as `.eml`, `.ics`, `.ini`, and `.plist`.
+       - `crates/nu_plugin_gstat/Cargo.toml`: Defines a plugin for git status, using the `git2` crate which links against `libgit2`.
+       - `crates/nu_plugin_polars/Cargo.toml`: Defines a plugin that provides high-performance dataframe commands based on the Polars library, including support for various file formats (e.g., Parquet, Avro) and cloud storage (e.g., AWS S3).
+       - `crates/nu_plugin_query/Cargo.toml`: Defines a plugin for querying structured data, including JSON, XML, and HTML from web pages.
+       - `crates/nu_plugin_stress_internals/Cargo.toml`: Defines a test plugin for stressing internal aspects of the Nushell plugin system. It intentionally avoids using standard plugin crates to test assumptions about the underlying serialization and communication protocol.
+       - `crates/nu-plugin-protocol/Cargo.toml`: Defines the core data structures and serialization format (MessagePack via `rmp-serde`) for the communication protocol between the Nushell engine and external plugins.
+       - `crates/nu-plugin-test-support/Cargo.toml`: Provides a testing framework and utilities for developers creating Nushell plugins.
+       - `crates/nu-pretty-hex/Cargo.toml`: A utility crate for creating pretty hex dumps of byte slices, used for commands that display binary data.
+       - `crates/nu-protocol/Cargo.toml`: Defines Nushell's core data structures, including its value system, abstract syntax tree (AST), and type system. It specifies dependencies for handling fundamental data types (e.g., `chrono` for dates, `indexmap` for ordered tables), path manipulation (`nu-path`), and glob patterns (`nu-glob`). It also includes optional dependencies like `rmp-serde` and `brotli` which are activated by the `plugin` feature for serializing data for inter-process communication with plugins.
+       - `crates/nu-std/Cargo.toml`: Defines the Nushell standard library, which provides a collection of utility commands and modules written in Nushell itself. It has an optional `sqlite` feature for database-related functionality.
+       - `crates/nu-system/Cargo.toml`: Defines the functionality for querying system information (e.g., processes, memory), with platform-specific implementations for Linux and macOS.
+       - `crates/nu-table/Cargo.toml`: Defines the functionality for rendering tables, a core part of the shell's user interface. It depends on `tabled` for the core rendering logic and `nu-color-config` to apply user-defined color themes.
+       - `crates/nu-term-grid/Cargo.toml`: Defines the functionality for rendering multi-column grid layouts in the terminal, used for compact views of data like file listings. It depends on `unicode-width` for correct character alignment.
+       - `crates/nu-test-support/Cargo.toml`: A utility crate providing shared helper functions and fixtures for writing Nushell tests.
+       - `crates/nu-utils/Cargo.toml`: A utility crate providing shared helper functions and data structures used across various other Nushell crates, and also defines a utility executable.
+     - `rust-toolchain.toml`: Manages the required Rust toolchain version. Build scripts may temporarily modify this file to add compilation targets.
+     - **Build Scripts (`build.rs`)**: Various crates, such as `nu-cmd-lang`, use a `build.rs` script. For example, the `nu-cmd-lang` build script directly executes the `git` command to efficiently retrieve the commit hash. This hash is then embedded into the final binary alongside other build-time information from dependencies like `shadow-rs`.
+     - `.cargo/config.toml`: Manages target-specific compiler and linker flags. This file is used to configure the `mold` linker.
+     - `Cross.toml`: Manages dependencies and pre-build steps for cross-compilation targets via `cross-rs`.
+     - `docker/Dockerfile` and `docker/debian.Dockerfile`: Provided in the repository for building Docker images.
+   - **Project Maintenance & CI/CD Configuration (Project-Provided)**:
+     - `.github/workflows/audit.yml`: Configures a GitHub Actions workflow to run a security audit on Rust dependencies using `rustsec/audit-check`.
+     - `.github/workflows/beta-test.yml`: Configures a daily GitHub Actions workflow to test the project against the Rust beta toolchain, ensuring forward compatibility.
+     - `.github/workflows/nightly-build.yml`: Configures the automated nightly build, packaging, and release process. It handles version bumping, building for a matrix of targets, and publishing a pre-release.
+     - `.github/workflows/release-pkg.nu`: A Nushell script used by the `nightly-build.yml` workflow to build all release packages.
+     - `.github/labeler.yml`: Configures the `actions/labeler` bot to automatically apply labels to pull requests based on the paths of modified files.
+     - `.github/AUTO_ISSUE_TEMPLATE/nightly-build-fail.md`: A template used by the nightly build workflow to create an issue upon failure.
+     - `.github/dependabot.yml`: Configures GitHub Dependabot to automatically create pull requests for updating `cargo` and `github-actions` dependencies.
+     - `.gitattributes`: Configures Git attributes, such as telling GitHub's Linguist to correctly classify `.nu` files as the Nushell language for syntax highlighting and repository statistics.
+     - `.gitignore`: Specifies intentionally untracked files to ignore, such as build artifacts, IDE configurations, and temporary files.
+     - `.mailmap`: Maps contributor names and email addresses for `git` history consistency.
+     - `.pre-commit-config.yaml`: Configures the hooks to be run by the `pre-commit` framework.
+     - `typos.toml`: Configures the `typos-cli` spell checker, defining words to ignore and files to exclude.
+     - `clippy/wasm/clippy.toml`: Defines target-specific linter rules for WebAssembly builds, such as disallowing APIs that cause panics in that environment (e.g., `std::time::Instant`).
+   - **User Configuration Files (Generated on First Run)**: When Nushell is run for the first time, it automatically creates default configuration files in `~/.config/nushell/`.
+     - `config.nu`: The main configuration file, populated with default settings, including color themes.
+     - `env.nu`: A file for setting environment variables, populated with a default prompt configuration.
+     - `history.sqlite`: An SQLite database file used by `reedline` to store persistent command history.
+   - **User-Generated (and Ignored by Git)**: These files can be created by the user for their local development environment and are ignored by Git.
+     - **IDE Configuration**: `.idea/`, `.vscode/`, `.fleet/`, `.helix/` directories for various IDEs like JetBrains, VS Code, Fleet, and Helix.
+     - **direnv Configuration**: `.envrc` file to automatically manage environment variables for the project.
+   - **Generated by Build & Release Processes**:
+     - **Build Artifacts**: The `/target` directory contains all compiled outputs, including the `nu`, `nu-lsp`, `utils`, `nu_plugin_custom_values`, `nu_plugin_inc`, `nu_plugin_formats`, `nu_plugin_gstat`, `nu_plugin_polars`, `nu_plugin_query`, and `nu_plugin_stress_internals` executables.
+     - **Debian Package Artifacts**: The `debian/` directory will contain build artifacts like `.debhelper/`, `files`, and `nu.substvars` during packaging.
+     - **Modified Manifests (CI only)**: During automated nightly builds, `Cargo.toml` files are temporarily modified to include a nightly version suffix.
+     - **Archives & Installers**: `.zip`, `.tar.gz`, and `.deb` files containing the distributable application. These packages will contain the `nu`, `nu-lsp`, `utils`, `nu_plugin_custom_values`, `nu_plugin_inc`, `nu_plugin_formats`, `nu_plugin_gstat`, `nu_plugin_polars`, `nu_plugin_query`, and `nu_plugin_stress_internals` executables.
+     - **Checksums**: A `SHA256SUMS` file containing checksums for all generated artifacts.
+     - **Code Coverage Reports**: `lcov.info` or `tarpaulin-report.html` files generated by coverage tools.
+     - **Benchmark Reports**: The `/tango` directory containing benchmarking results.
+     - **Fuzzing Artifacts**: The `/fuzz` directory within certain crates (e.g., `crates/nu-parser/fuzz`) contains fuzzing targets and will generate artifacts in a `target/fuzz` directory when run.
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - **For Native Source Builds**:
+     - **Code Formatting & Quality Checks**:
+       - **Format Check**: `cargo fmt --all -- --check` must pass.
+       - **Linter Check (Clippy)**: `cargo clippy --workspace --exclude nu_plugin_*` and `cargo clippy --package nu_plugin_*` must pass with the project's enforced linting rules.
+       - **Linter Check (Tests & Benches)**: `cargo clippy --tests --workspace` and `cargo clippy --benches --workspace` must pass.
+       - **Typo Check**: `typos` must pass, ensuring no spelling errors are found based on the `typos.toml` configuration.
+       - **Security Audit**: `cargo audit` must run successfully. Any reported vulnerabilities should be reviewed.
+     - **Pre-Commit Hook Verification**:
+       - `pre-commit run --all-files` must pass, ensuring all configured static analysis and formatting checks are successful.
+     - **Core Build Verification**:
+       - Successfully compile the project with default features (`cargo build`). The default features enable `rustls` for TLS and OS-specific integrations.
+       - Successfully compile the project in release mode (`cargo build --release`).
+     - **Build Artifact Verification**:
+       - **Executables Presence**: The `nu`, `nu-lsp`, `utils`, `nu_plugin_custom_values`, `nu_plugin_inc`, `nu_plugin_formats`, `nu_plugin_gstat`, `nu_plugin_polars`, `nu_plugin_query`, and `nu_plugin_stress_internals` executables should be present in the `target/{debug|release}` directory after a successful build.
+     - **Unit and Integration Tests**:
+       - Execute the core workspace test suite: `cargo test --workspace --exclude nu_plugin_*`. This includes standard unit tests and property-based tests (using `quickcheck`).
+       - Execute the plugin test suite: `cargo test --package nu_plugin_*`.
+       - Execute the inc plugin test suite: `cargo test --package nu_plugin_inc`.
+       - Execute the formats plugin test suite: `cargo test --package nu_plugin_formats`.
+       - Execute the gstat plugin test suite: `cargo test --package nu_plugin_gstat`.
+       - Execute the polars plugin test suite: `cargo test --package nu_plugin_polars`.
+       - Execute the query plugin test suite: `cargo test --package nu_plugin_query`.
+       - Execute the stress internals plugin test suite: `cargo test --package nu_plugin_stress_internals`.
+       - Execute the plugin test support crate's tests: `cargo test --package nu-plugin-test-support`.
+       - Execute the general test support crate's tests: `cargo test --package nu-test-support`.
+       - Execute the NUON format support test suite: `cargo test --package nuon`.
+       - Execute the LSP test suite specifically: `cargo test --package nu-lsp`.
+       - Execute tests for specific crate features, such as the `sqlite` feature in the standard library: `cargo test --package nu-std --features sqlite`.
+     - **Scripted & Integration Tests**:
+       - **Standard Library Tests**: Run `nu -c 'use crates/nu-std/testing.nu; testing run-tests --path crates/nu-std'` after installing the `nu` binary.
+       - **Python Virtualenv Test**: Run `nu scripts/test_virtualenv.nu` to verify Python integration.
+       - **MSRV Check**: Run `nu .github/workflows/check-msrv.nu` to ensure version consistency.
+     - **Code Coverage Analysis (Optional)**:
+       - `cargo tarpaulin --workspace` should run successfully and generate a coverage report.
+     - **Benchmark Execution (Optional)**:
+       - `cargo bench` or tests using the `tango` harness should complete successfully.
+     - **Fuzz Testing (Optional)**:
+       - Fuzz targets should be runnable using `cargo-fuzz`. For example: `cargo +nightly fuzz run <fuzz_target_name>`.
+     - **Executable Functionality Test**:
+       - Run the compiled `nu` binary.
+       - Execute core commands and verify their output: `ls`, `ps`, `sys`, `cd`, `help commands`, `plugin list`. The `plugin list` command should show registered plugins, including `custom_values`, `inc`, `formats`, `gstat`, `polars`, `query`, and `stress_internals`.
+       - Verify table rendering: Run `ls` and check that the output is a correctly formatted, aligned, and colored table. Verify that headers, data rows, and separators are rendered as expected based on the default theme.
+       - Verify grid rendering: Run a command that produces grid output (e.g., a compact file listing view) and check that the output is a correctly formatted, multi-column grid with items properly aligned based on terminal width.
+       - Execute path manipulation commands: `path expand ~` should correctly expand to the user's home directory. `cd ~` should also change to the home directory.
+       - Execute networking commands: `http get https://www.nushell.sh | length` should return a non-zero value.
+       - Execute file format commands: Create and open a simple `.toml` or `.csv` file.
+       - Verify file format plugin functionality: `echo '[user]\nname=test' | from ini` should parse the INI data into a table.
+       - Verify `gstat` plugin functionality: navigate to a git repository and run `gstat`, confirming it outputs status information.
+       - Verify `polars` plugin functionality: `[[a b]; [1 2] [3 4]] | dfr into-df | dfr describe` should produce a summary statistics dataframe.
+       - Verify `query` plugin functionality: `echo '{"foo": {"bar": "baz"}}' | from json | query json foo.bar` should return the string "baz".
+       - Verify JSON parsing with order preservation: `echo '{ "z": 1, "a": 2 }' | from json` should output a table with columns `z` and `a` in that order, demonstrating the `preserve_order` feature.
+       - Verify binary data formatting: A command that uses the hex-dump functionality (e.g., `echo "hello" | hex dump`) should produce a correctly formatted and colored hexadecimal view of the input bytes.
+       - Execute the interactive table explorer (`explore`): run a command like `ls | explore`, verify that a TUI pager interface launches, that it's possible to navigate with arrow keys, and that it can be closed (e.g., with the `q` key).
+       - Verify the `version` command displays detailed build information. Specifically, the git commit hash must be present and match the `HEAD` of the repository when building from a clone.
+       - Verify clipboard integration (copy/paste) works correctly within the interactive shell.
+       - Verify that modifying color settings in the user `config.nu` file correctly changes the appearance of UI elements (e.g., table headers, prompt colors) after a restart.
+     - **Language Server (LSP) Functionality Test (Manual/Optional)**:
+       - Run the compiled `nu-lsp` binary.
+       - Configure a code editor (e.g., VS Code, Neovim) with an LSP client to use the locally built `target/debug/nu-lsp` executable.
+       - Open a `.nu` script file in the editor.
+       - Verify core LSP features:
+         - **Diagnostics**: Syntax errors should be underlined with descriptive messages.
+         - **Completions**: Typing built-in command names should trigger completion suggestions.
+         - **Hover**: Hovering the mouse over a command or variable should show type information or documentation.
+     - **Default Configuration Test**:
+       - Run `nu` in an environment with no pre-existing user configuration.
+       - Verify that default `config.nu`, `env.nu`, and `history.sqlite` files are created.
+       - Verify the shell starts and the dynamic prompt (with time and exit code on failure) functions correctly.
+       - Verify that default color schemes are applied correctly to UI elements like the prompt, command output (e.g., `ls` tables), and syntax highlighting.
+       - Verify that command history is persisted between sessions by running a command, exiting, restarting, and using the up-arrow key.
+     - **Repository State Check**: The git repository should be clean after running builds and tests.
+
+   - **For CI/CD and Automated Releases**:
+     - **Rust Beta Toolchain Compatibility**:
+       - A scheduled CI job runs `cargo +beta test --workspace --profile ci --exclude nu_plugin_*`.
+       - This test is informational and intended to catch regressions in the Rust beta compiler, not the project itself. Failures are non-blocking.
+     - **Nightly Build Workflow Verification**:
+       - The entire `nightly-build.yml` workflow must complete successfully.
+       - **Version Generation**: The script for generating the nightly tag (`<version>-nightly.<build>+<hash>`) must correctly parse the previous tag and increment the build number.
+       - **Artifact Generation**: All artifacts for the specified matrix of targets must be built and uploaded correctly. This includes `nu`, `nu-lsp`, `utils`, `nu_plugin_custom_values`, `nu_plugin_inc`, `nu_plugin_formats`, `nu_plugin_gstat`, `nu_plugin_polars`, `nu_plugin_query`, and `stress_internals` binaries.
+       - **Checksum Generation**: The `SHA256SUMS` file must be created and contain valid checksums for all downloaded artifacts.
+       - **Release Creation**: A pre-release must be successfully created on GitHub with the correct tag and artifacts.
+       - **Failure Reporting**: If a build fails, an issue should be automatically created using the `nightly-build-fail.md` template.
+       - **Release Cleanup**: The cleanup job must successfully remove old releases beyond the defined retention count.
+     - **Pull Request Labeling Verification**:
+       - When a pull request is opened, the `actions/labeler` workflow should run successfully.
+       - The pull request should be automatically assigned labels (e.g., `parser`, `ci`, `std-library`) based on the paths of the changed files as defined in `.github/labeler.yml`.
+
+   - **For Docker Container**:
+     - **Image Build Verification**: The `docker build` command must complete successfully.
+     - **Container Runtime Verification**:
+       - Start an interactive container and verify the Nushell prompt appears and basic commands (`version`, `whoami`, `plugin list`) work as expected.
+
+   - **For Cross-Compilation Builds**:
+     - **Build Verification**: `cross build` must complete successfully for various targets like `aarch64-unknown-linux-gnu`, `aarch64-unknown-linux-musl`, etc.
+     - **Artifact Verification**: Confirm executables exist in their respective target directories.
+
+   - **For WebAssembly (WASM) Builds**:
+     - **Build Verification**: `cargo build --target wasm32-unknown-unknown` must complete successfully.
+     - **Linter Check**: `cargo clippy --target wasm32-unknown-unknown` must pass. This check enforces WASM-specific rules defined in `clippy/wasm/clippy.toml`, such as the prohibition of `std::time::Instant` to prevent runtime panics.
+     - **Artifact Verification**: Confirm `.wasm` files are created.
+
+   - **For Release Packaging**:
+     - **Script Execution**: The release packaging script (`.github/workflows/release-pkg.nu`) must run successfully.
+     - **Debian Package Build**: The `dpkg-buildpackage -us -uc` command should complete successfully and create a `.deb` file.
+     - **Artifact Verification**: Confirm creation of `.zip`, `.tar.gz`, and `.deb` files. The packages should contain the `nu`, `nu-lsp`, `utils`, `nu_plugin_custom_values`, `nu_plugin_inc`, `nu_plugin_formats`, `nu_plugin_gstat`, `nu_plugin_polars`, `nu_plugin_query`, and `nu_plugin_stress_internals` executables.
+     - **Checksum Verification**: A `SHA256SUMS` file should be generated and be valid.
+
+   - **For Dependency Updates (e.g., via Dependabot)**:
+     - **CI Verification**: All existing CI checks (including the security audit) must pass on pull requests generated by automated tools.
+
+4. COMPLETE TODO LIST:
+   - **PART A: SETUP FOR NATIVE BUILDING FROM SOURCE**
+     - **Step 1: Install `rustup`**
+       - 1.1. Download and install `rustup` from rust-lang.org.
+       - 1.2. Verification: Open a new terminal and run `rustup --version` and `cargo --version`.
+
+     - **Step 2: Install System Dependencies**
+       - 2.1. Install Git.
+       - 2.2. Install the C/C++ compiler toolchain and required development libraries:
+         `sudo apt-get update && sudo apt-get install build-essential git pkg-config libssl-dev zlib1g-dev libclang-dev libsqlite3-dev libssh2-1-dev libzstd-dev devscripts libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev`
+         *Note: The project recommends Ubuntu 22.04 for best compatibility. Building on older distributions like 20.04 is possible but may create a less portable binary due to glibc version differences.*
+       - 2.3. (Optional, Recommended) For faster builds on your multi-core system, install `mold`: `sudo apt-get install mold`. Then, uncomment its configuration in the `.cargo/config.toml` file after cloning.
+       - 2.4. (Optional) Install Python 3.10+, `virtualenv`, and `pre-commit`.
+       - 2.5. (Optional) Install `typos-cli` for spell checking: `cargo install typos-cli`.
+       - 2.6. (Optional) Install `cargo-audit` for security checks: `cargo install cargo-audit`.
+       - 2.7. (Optional) For fuzz testing, install `cargo-fuzz` (`cargo install cargo-fuzz`) and the `nightly` toolchain (`rustup update nightly`).
+       - 2.8. (Optional) Install `direnv`, `gh` (GitHub CLI), and `curl` for advanced development and release process replication.
+       - 2.9. (For Maintainers) Configure a `NUSHELL_PAT` secret in the GitHub repository settings to enable automated winget submissions.
+       - 2.10. Verification: Check that `git`, `gcc`, `pkg-config`, `python`, `pre-commit`, etc., are available.
+
+     - **Step 3: Clone the Source Code**
+       - 3.1. `git clone https://github.com/nushell/nushell.git /home/cc/EnvGym/data/nushell_nushell`
+       - 3.2. `cd /home/cc/EnvGym/data/nushell_nushell`
+
+     - **Step 4: Verify Rust Toolchain Installation**
+       - 4.1. Run `rustc --version` inside the project directory.
+       - 4.2. Verification: The output should show the version specified in `rust-toolchain.toml`.
+
+     - **Step 5: Build the Project**
+       - 5.1. **To leverage your high CPU core count, set the number of parallel build jobs.**
+         `export CARGO_BUILD_JOBS=96`
+       - 5.2. Build with default features: `cargo build` (Note: This must be run from within the git repository for version information to be embedded correctly).
+       - 5.3. (Optional) For an optimized build: `cargo build --release`
+       - 5.4. Verification: The build should complete without errors. Find the executables at `target/debug/nu`, `target/debug/nu-lsp`, `target/debug/utils`, `target/debug/nu_plugin_custom_values`, `target/debug/nu_plugin_inc`, `target/debug/nu_plugin_formats`, `target/debug/nu_plugin_gstat`, `target/debug/nu_plugin_polars`, `target/debug/nu_plugin_query`, and `target/debug/nu_plugin_stress_internals` (or `target/release/` for a release build).
+
+     - **Step 6: Run Automated Checks and Tests**
+       - 6.1. **Code Formatting**: `cargo fmt --all -- --check`
+       - 6.2. **Code Linting**: `cargo clippy --workspace --exclude nu_plugin_* -- -D warnings -D clippy::unwrap_used`
+       - 6.3. **Typo Checking**: `typos`
+       - 6.4. **Security Audit**: `cargo audit`
+       - 6.5. **Pre-Commit Hooks**: (Requires `pre-commit install` to be run once) `pre-commit run --all-files`
+       - 6.6. **Unit/Integration Tests**: `CARGO_BUILD_JOBS=96 cargo test --workspace` (This will run all tests, including the polars, query, and stress_internals plugin tests). For specific packages, use `cargo test --package <package_name>`.
+       - 6.7. **(Optional) Feature-Specific Tests**: `cargo test --package nu-std --features sqlite`, `cargo test --package nuon`.
+       - 6.8. Verification: All the above commands should pass successfully.
+
+     - **Step 7: Perform Manual Verification**
+       - 7.1. Run the compiled binary for the first time: `./target/debug/nu`
+       - 7.2. Verification: The shell should start, create default configuration files in `~/.config/nushell/` (`config.nu`, `env.nu`, `history.sqlite`), and display a colored, dynamic prompt. Run `ls` and verify that the output is a correctly formatted and colored table, with headers and data aligned, according to the default theme defined in `config.nu`.
+       - 7.3. Inside the shell, run `version`, `ps`, `plugin list`, and `help commands`. Verification: The `version` command should output detailed build information, including the current git commit hash (it should not be empty). The `plugin list` command should show registered plugins, including `custom_values`, `inc`, `formats`, `gstat`, `polars`, `query`, and `stress_internals`.
+       - 7.4. Test path handling: `path expand ~`. Verification: This should expand to your home directory path. Also test `cd ~` and verify you are in your home directory.
+       - 7.5. Test a networking command: `http get https://www.nushell.sh -f | length`. Verification: This should succeed and return a non-zero number.
+       - 7.6. Test JSON parsing with order preservation: Run `echo '{ "z": 1, "a": 2 }' | from json | columns`. Verification: The output should be `[z, a]`, confirming that the key order is preserved.
+       - 7.7. Test file format plugin: `echo '[section]\nkey=value' | from ini`. Verification: This should parse the INI data and output a structured table.
+       - 7.8. Test the `gstat` plugin. `cd` into the cloned repository directory (`/home/cc/EnvGym/data/nushell_nushell`) and run `gstat`. Verification: The command should run without errors and output the current git status of the repository.
+       - 7.9. Test the `polars` plugin. Run `[[a b]; [1 2] [3 4]] | dfr into-df | dfr describe`. Verification: The command should run without errors and output a summary statistics table for the dataframe.
+       - 7.10. Test the `query` plugin. Run `echo '{"foo": {"bar": "baz"}}' | from json | query json foo.bar`. Verification: The command should run without errors and output the string "baz".
+       - 7.11. Test binary data formatting: Run a command like `echo "hello" | hex dump`. Verification: The command should produce a formatted and colored hexadecimal view of the input bytes.
+       - 7.12. Test the interactive data explorer: run `ls | explore`. Verification: A full-screen TUI should launch, displaying the table from `ls`. You should be able to scroll with arrow keys and exit by pressing 'q'.
+       - 7.13. Test grid rendering: Run a command that produces a grid layout. Verification: The output should be a multi-column grid, correctly aligned and responsive to the terminal's width.
+       - 7.14. Test the dynamic prompt by running a failing command and observing the exit code.
+       - 7.15. Test command history: type `echo "hello"`, press Enter. Exit with `exit`. Relaunch `./target/debug/nu` and press the up arrow. Verification: `echo "hello"` should appear.
+       - 7.16. Test clipboard: Type a command, select it with the mouse or keyboard, copy it (e.g., Ctrl+Shift+C), and then paste it (e.g., right-click). Verification: The command should be pasted correctly.
+       - 7.17. (Optional) Test custom color configuration. Find your `config.nu` file (`~/.config/nushell/config.nu`), edit a color setting (e.g., `$env.config.shape_string`), restart `nu`, and verify the change is applied to the UI.
+       - 7.18. (Optional) Test the Language Server Protocol (LSP) server. Configure your code editor to use the `./target/debug/nu-lsp` binary for `.nu` files. Open a `.nu` file and check for features like syntax error highlighting, command completions, and hover documentation.
+       - 7.19. Exit the shell with `exit`.
+
+     - **Step 8: (Optional) Run Full Suite of Scripted Tests**
+       - 8.1. Install the development binary: `cargo install --path . --locked --force`
+       - 8.2. Run standard library tests: `nu -c 'use crates/nu-std/testing.nu; testing run-tests --path crates/nu-std'`
+       - 8.3. Run Python integration tests: `nu scripts/test_virtualenv.nu`
+       - 8.4. Verification: All scripted tests should complete without errors.
+
+   - **PART B: SETUP FOR RUNNING WITH DOCKER**
+     - (Steps remain unchanged from original plan)
+
+   - **PART C: SETUP FOR CROSS-COMPILING**
+     - (Steps remain unchanged from original plan)
+
+   - **PART D: SETUP FOR BUILDING TO WEBASSEMBLY (WASM)**
+     - (Steps remain unchanged from original plan)
+
+   - **PART E: SETUP FOR REPLICATING A RELEASE BUILD**
+     - **Step 1: Complete Native Build Setup**
+       - 1.1. Follow all steps in PART A (1 through 4) to set up the basic build environment.
+
+     - **Step 2: Install Release-Specific Dependencies**
+       - 2.1. Install a recent version of Nushell (e.g., via `cargo install nu`).
+       - 2.2. Ensure `devscripts` is installed (`sudo apt install devscripts`).
+       - 2.3. (Optional) Install `gh` and `curl` to replicate checksumming and cleanup steps.
+
+     - **Step 3: Run the Release Packaging Process (Choose one)**
+       - **3.1. Individual Package Build (Nightly Style)**:
+         - Set environment variables for the target, e.g., `$env:TARGET="x86_64-unknown-linux-gnu"; $env:OS="ubuntu-latest"; $env:REF="refs/tags/0.0.0"; $env:NU_RELEASE_VERSION="0.0.0"`
+         - Run the packaging script: `nu .github/workflows/release-pkg.nu`
+       - **3.2. Debian Packaging**:
+         - Run `dpkg-buildpackage -us -uc` from the repository root.
+
+     - **Step 4: Verify Artifacts**
+       - 4.1. Check the output directory (e.g., `dist`, `release`, or the parent directory for `.deb` files).
+       - 4.2. Verification: Confirm the presence of `.zip`, `.tar.gz`, or `.deb` files appropriate for the target platform. These packages should contain the `nu`, `nu-lsp`, `utils`, `nu_plugin_custom_values`, `nu_plugin_inc`, `nu_plugin_formats`, `nu_plugin_gstat`, `nu_plugin_polars`, `nu_plugin_query`, and `nu_plugin_stress_internals` executables.
+
+   - **PART F: (OPTIONAL) ADVANCED DEVELOPER TASKS**
+     - **Step 1: Setup Contributor Hooks**
+       - 1.1. Install `pre-commit` (see PART A, Step 2.4).
+       - 1.2. Run `pre-commit install` in the repository root to set up the git hooks.
+       - 1.3. Verification: Subsequent `git commit` actions will automatically run the configured checks.
+
+     - **Step 2: Run Code Coverage**
+       - 2.1. Install `cargo-tarpaulin`: `cargo install cargo-tarpaulin`.
+       - 2.2. Run coverage analysis: `cargo tarpaulin --workspace --out Html`
+       - 2.3. Verification: Open the generated `tarpaulin-report.html` in a browser to view the coverage report.
+
+     - **Step 3: Run Benchmarks**
+       - 3.1. Run the standard benchmark suite: `cargo bench`
+       - 3.2. (If applicable) Run benchmarks using the Tango harness.
+       - 3.3. Verification: Benchmarks complete and report performance metrics.
+     
+     - **Step 4: Run Fuzz Tests**
+       - 4.1. Ensure `cargo-fuzz` and the `nightly` toolchain are installed (see PART A, Step 2.7).
+       - 4.2. List available fuzz targets: `cargo +nightly fuzz list`
+       - 4.3. Run a specific fuzz target: `cargo +nightly fuzz run <fuzz_target_name>`
+       - 4.4. Verification: The fuzzer should start running and report any crashes or hangs it discovers.
+
+     - **Step 5: Run Tests with Beta Toolchain**
+       - 5.1. Install the beta toolchain: `rustup update beta`
+       - 5.2. Run the test suite using the beta toolchain and the `ci` build profile: `cargo +beta test --workspace --profile ci --exclude nu_plugin_*`
+       - 5.3. Verification: The test suite should complete. Note that failures may indicate an issue in the beta toolchain itself rather than a regression in the project.

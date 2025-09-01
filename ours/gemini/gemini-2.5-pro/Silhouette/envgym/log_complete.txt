@@ -1,0 +1,106 @@
+=== Docker Execution Log - 20250828_071233 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756365149
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 6.47kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/24] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [ 2/24] RUN apt-get update &&     apt-get install -y --no-install-recommends     software-properties-common     wget     gnupg     curl     git     ca-certificates
+#5 CACHED
+
+#6 [ 3/24] RUN add-apt-repository -y ppa:deadsnakes/ppa &&     mkdir -p /etc/apt/keyrings &&     wget -qO /tmp/llvm-snapshot.gpg.key https://apt.llvm.org/llvm-snapshot.gpg.key &&     gpg --dearmor -o /etc/apt/keyrings/llvm-archive-keyring.gpg /tmp/llvm-snapshot.gpg.key &&     rm /tmp/llvm-snapshot.gpg.key &&     echo "deb [signed-by=/etc/apt/keyrings/llvm-archive-keyring.gpg] http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main" > /etc/apt/sources.list.d/llvm.list
+#6 CACHED
+
+#7 [ 4/24] RUN echo 'exit 101' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d &&     apt-get update &&     apt-get install -y --no-install-recommends     python3.10     python3.10-dev     python3.10-distutils     llvm-15-dev     clang-15     build-essential     libssl-dev     zlib1g-dev     patch     qemu-system-x86     memcached     truncate     sshpass &&     wget http://security.ubuntu.com/ubuntu/pool/main/l/linux/linux-headers-5.4.0-150_5.4.0-150.167_all.deb &&     wget http://security.ubuntu.com/ubuntu/pool/main/l/linux/linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb &&     dpkg -i linux-headers-5.4.0-150_5.4.0-150.167_all.deb linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb &&     rm linux-headers-5.4.0-150_5.4.0-150.167_all.deb linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb &&     rm /usr/sbin/policy-rc.d &&     curl https://bootstrap.pypa.io/get-pip.py | python3.10 &&     rm -rf /var/lib/apt/lists/*
+#7 0.369 Hit:2 http://security.ubuntu.com/ubuntu focal-security InRelease
+#7 0.386 Hit:3 http://archive.ubuntu.com/ubuntu focal InRelease
+#7 0.389 Get:1 https://apt.llvm.org/focal llvm-toolchain-focal-15 InRelease [6833 B]
+#7 0.406 Hit:4 http://archive.ubuntu.com/ubuntu focal-updates InRelease
+#7 0.427 Hit:5 http://archive.ubuntu.com/ubuntu focal-backports InRelease
+#7 0.488 Hit:6 http://ppa.launchpad.net/deadsnakes/ppa/ubuntu focal InRelease
+#7 0.798 Get:7 https://apt.llvm.org/focal llvm-toolchain-focal-15/main amd64 Packages [12.4 kB]
+#7 1.269 Fetched 19.3 kB in 1s (19.6 kB/s)
+#7 1.269 Reading package lists...
+#7 2.198 Reading package lists...
+#7 3.081 Building dependency tree...
+#7 3.224 Reading state information...
+#7 3.242 E: Unable to locate package truncate
+#7 ERROR: process "/bin/sh -c echo 'exit 101' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d &&     apt-get update &&     apt-get install -y --no-install-recommends     python3.10     python3.10-dev     python3.10-distutils     llvm-15-dev     clang-15     build-essential     libssl-dev     zlib1g-dev     patch     qemu-system-x86     memcached     truncate     sshpass &&     wget http://security.ubuntu.com/ubuntu/pool/main/l/linux/linux-headers-5.4.0-150_5.4.0-150.167_all.deb &&     wget http://security.ubuntu.com/ubuntu/pool/main/l/linux/linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb &&     dpkg -i linux-headers-5.4.0-150_5.4.0-150.167_all.deb linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb &&     rm linux-headers-5.4.0-150_5.4.0-150.167_all.deb linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb &&     rm /usr/sbin/policy-rc.d &&     curl https://bootstrap.pypa.io/get-pip.py | python3.10 &&     rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
+------
+ > [ 4/24] RUN echo 'exit 101' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d &&     apt-get update &&     apt-get install -y --no-install-recommends     python3.10     python3.10-dev     python3.10-distutils     llvm-15-dev     clang-15     build-essential     libssl-dev     zlib1g-dev     patch     qemu-system-x86     memcached     truncate     sshpass &&     wget http://security.ubuntu.com/ubuntu/pool/main/l/linux/linux-headers-5.4.0-150_5.4.0-150.167_all.deb &&     wget http://security.ubuntu.com/ubuntu/pool/main/l/linux/linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb &&     dpkg -i linux-headers-5.4.0-150_5.4.0-150.167_all.deb linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb &&     rm linux-headers-5.4.0-150_5.4.0-150.167_all.deb linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb &&     rm /usr/sbin/policy-rc.d &&     curl https://bootstrap.pypa.io/get-pip.py | python3.10 &&     rm -rf /var/lib/apt/lists/*:
+0.389 Get:1 https://apt.llvm.org/focal llvm-toolchain-focal-15 InRelease [6833 B]
+0.406 Hit:4 http://archive.ubuntu.com/ubuntu focal-updates InRelease
+0.427 Hit:5 http://archive.ubuntu.com/ubuntu focal-backports InRelease
+0.488 Hit:6 http://ppa.launchpad.net/deadsnakes/ppa/ubuntu focal InRelease
+0.798 Get:7 https://apt.llvm.org/focal llvm-toolchain-focal-15/main amd64 Packages [12.4 kB]
+
+
+3.081 Building dependency tree...
+3.224 Reading state information...
+3.242 E: Unable to locate package truncate
+------
+envgym.dockerfile:34
+--------------------
+  33 |     # Prevent services like memcached from starting during build.
+  34 | >>> RUN echo 'exit 101' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d && \
+  35 | >>>     apt-get update && \
+  36 | >>>     apt-get install -y --no-install-recommends \
+  37 | >>>     python3.10 \
+  38 | >>>     python3.10-dev \
+  39 | >>>     python3.10-distutils \
+  40 | >>>     llvm-15-dev \
+  41 | >>>     clang-15 \
+  42 | >>>     build-essential \
+  43 | >>>     libssl-dev \
+  44 | >>>     zlib1g-dev \
+  45 | >>>     patch \
+  46 | >>>     qemu-system-x86 \
+  47 | >>>     memcached \
+  48 | >>>     truncate \
+  49 | >>>     sshpass && \
+  50 | >>>     # NOTE: The kernel header version is hardcoded. This is a deliberate choice
+  51 | >>>     # based on the assumption that it matches the kernel version inside the guest VM image.
+  52 | >>>     # A mismatch may cause kernel module compilation to succeed but fail at runtime.
+  53 | >>>     wget http://security.ubuntu.com/ubuntu/pool/main/l/linux/linux-headers-5.4.0-150_5.4.0-150.167_all.deb && \
+  54 | >>>     wget http://security.ubuntu.com/ubuntu/pool/main/l/linux/linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb && \
+  55 | >>>     dpkg -i linux-headers-5.4.0-150_5.4.0-150.167_all.deb linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb && \
+  56 | >>>     rm linux-headers-5.4.0-150_5.4.0-150.167_all.deb linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb && \
+  57 | >>>     rm /usr/sbin/policy-rc.d && \
+  58 | >>>     # Install pip for the correct Python version.
+  59 | >>>     curl https://bootstrap.pypa.io/get-pip.py | python3.10 && \
+  60 | >>>     # Clean up apt cache to reduce image size.
+  61 | >>>     rm -rf /var/lib/apt/lists/*
+  62 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c echo 'exit 101' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d &&     apt-get update &&     apt-get install -y --no-install-recommends     python3.10     python3.10-dev     python3.10-distutils     llvm-15-dev     clang-15     build-essential     libssl-dev     zlib1g-dev     patch     qemu-system-x86     memcached     truncate     sshpass &&     wget http://security.ubuntu.com/ubuntu/pool/main/l/linux/linux-headers-5.4.0-150_5.4.0-150.167_all.deb &&     wget http://security.ubuntu.com/ubuntu/pool/main/l/linux/linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb &&     dpkg -i linux-headers-5.4.0-150_5.4.0-150.167_all.deb linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb &&     rm linux-headers-5.4.0-150_5.4.0-150.167_all.deb linux-headers-5.4.0-150-generic_5.4.0-150.167_amd64.deb &&     rm /usr/sbin/policy-rc.d &&     curl https://bootstrap.pypa.io/get-pip.py | python3.10 &&     rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

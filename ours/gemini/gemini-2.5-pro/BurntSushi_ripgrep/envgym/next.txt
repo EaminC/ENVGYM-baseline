@@ -1,0 +1,5 @@
+current progress
+The environment setup has successfully installed the base operating system and all required system-level dependencies, including `build-essential`, `git`, and `libpcre2-dev`. The process failed during the installation of the Rust toolchain. The `rustup` installer script was executed, but the subsequent command to add the `rustfmt` component failed with an 'exit code: 127' (command not found) because the shell's `PATH` was not updated within the same Docker `RUN` instruction.
+
+next step
+Modify the Dockerfile to correct the Rust installation step. The `RUN` command installing `rustup` must be updated to source the Cargo environment script before attempting to add the `rustfmt` component. This will update the `PATH` in the current shell session, allowing the `rustup` command to be found. The failing line should be changed to: `RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable && . "$CARGO_HOME/env" && rustup component add rustfmt`

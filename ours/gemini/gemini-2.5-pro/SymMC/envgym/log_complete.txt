@@ -1,0 +1,271 @@
+=== Docker Execution Log - 20250828_072550 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756365935
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.83kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/9] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 613.33kB 0.1s done
+#5 DONE 0.1s
+
+#6 [2/9] RUN apt-get update &&     apt-get install -y --no-install-recommends software-properties-common &&     add-apt-repository universe &&     apt-get update &&     apt-get install -y --no-install-recommends     openjdk-8-jdk     ant     build-essential     cmake     libgmp-dev     zlib1g-dev     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [3/9] WORKDIR /home/cc/EnvGym/data/SymMC
+#7 CACHED
+
+#8 [4/9] COPY . .
+#8 DONE 1.0s
+
+#9 [5/9] WORKDIR /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod
+#9 DONE 0.0s
+
+#10 [6/9] RUN chmod +x build.sh run.sh && ant
+#10 0.382 Buildfile: /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/build.xml
+#10 0.516 
+#10 0.516 BUILD SUCCESSFUL
+#10 0.516 Total time: 0 seconds
+#10 DONE 0.6s
+
+#11 [7/9] WORKDIR /home/cc/EnvGym/data/SymMC/Enumerator_Estimator
+#11 DONE 0.0s
+
+#12 [8/9] RUN mkdir -p cmake-build-release &&     cd cmake-build-release &&     cmake .. &&     make -j$(nproc)
+#12 0.382 -- The C compiler identification is GNU 9.4.0
+#12 0.466 -- The CXX compiler identification is GNU 9.4.0
+#12 0.473 -- Check for working C compiler: /usr/bin/cc
+#12 0.591 -- Check for working C compiler: /usr/bin/cc -- works
+#12 0.593 -- Detecting C compiler ABI info
+#12 0.716 -- Detecting C compiler ABI info - done
+#12 0.738 -- Detecting C compile features
+#12 0.738 -- Detecting C compile features - done
+#12 0.741 -- Check for working CXX compiler: /usr/bin/c++
+#12 0.859 -- Check for working CXX compiler: /usr/bin/c++ -- works
+#12 0.861 -- Detecting CXX compiler ABI info
+#12 0.991 -- Detecting CXX compiler ABI info - done
+#12 1.014 -- Detecting CXX compile features
+#12 1.014 -- Detecting CXX compile features - done
+#12 1.022 -- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.2.11") 
+#12 1.023 -- Configuring done
+#12 1.030 -- Generating done
+#12 1.031 -- Build files have been written to: /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/cmake-build-release
+#12 1.090 Scanning dependencies of target minisat-lib-static
+#12 1.093 Scanning dependencies of target minisat-lib-shared
+#12 1.106 [  5%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/utils/System.cc.o
+#12 1.108 [ 10%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/utils/System.cc.o
+#12 1.108 [ 20%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/utils/Options.cc.o
+#12 1.108 [ 20%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/core/Solver.cc.o
+#12 1.109 [ 25%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/perm/BasicPermPair.cpp.o
+#12 1.110 [ 30%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/simp/SimpSolver.cc.o
+#12 1.112 [ 40%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/perm/MCSampler.cpp.o
+#12 1.112 [ 40%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/perm/PermPair.cpp.o
+#12 1.113 [ 50%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/core/Solver.cc.o
+#12 1.113 [ 50%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/simp/SimpSolver.cc.o
+#12 1.114 [ 55%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/utils/Options.cc.o
+#12 1.114 [ 60%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/perm/BasicPermPair.cpp.o
+#12 1.115 [ 65%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/perm/PermPair.cpp.o
+#12 1.117 [ 70%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/perm/MCSampler.cpp.o
+#12 1.158 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.h:28,
+#12 1.158                  from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:26:
+#12 1.158 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.158   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#12 1.158       |                             ^
+#12 1.158 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.158   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#12 1.158       |                             ^
+#12 1.158 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.158   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#12 1.158       |                         ^
+#12 1.161 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:995:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.161   995 |     printf("restarts              : %"PRIu64"\n", starts);
+#12 1.161       |            ^
+#12 1.161 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:996:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.161   996 |     printf("conflicts             : %-12"PRIu64"   (%.0f /sec)\n", conflicts   , conflicts   /cpu_time);
+#12 1.161       |            ^
+#12 1.161 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:997:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.161   997 |     printf("decisions             : %-12"PRIu64"   (%4.2f %% random) (%.0f /sec)\n", decisions, (float)rnd_decisions*100 / (float)decisions, decisions   /cpu_time);
+#12 1.161       |            ^
+#12 1.161 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:998:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.161   998 |     printf("propagations          : %-12"PRIu64"   (%.0f /sec)\n", propagations, propagations/cpu_time);
+#12 1.161       |            ^
+#12 1.161 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:999:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.161   999 |     printf("conflict literals     : %-12"PRIu64"   (%4.2f %% deleted)\n", tot_literals, (max_literals - tot_literals)*100 / (double)max_literals);
+#12 1.161       |            ^
+#12 1.162 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.cc:21:
+#12 1.162 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.162   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#12 1.162       |                             ^
+#12 1.162 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.162   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#12 1.162       |                             ^
+#12 1.162 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.162   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#12 1.162       |                         ^
+#12 1.165 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.h:28,
+#12 1.165                  from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:26:
+#12 1.165 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.165   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#12 1.165       |                             ^
+#12 1.165 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.165   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#12 1.165       |                             ^
+#12 1.165 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.165   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#12 1.165       |                         ^
+#12 1.165 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.h:28,
+#12 1.165                  from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/SimpSolver.h:25,
+#12 1.165                  from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/SimpSolver.cc:22:
+#12 1.165 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.165   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#12 1.165       |                             ^
+#12 1.165 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.165   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#12 1.165       |                             ^
+#12 1.165 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.165   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#12 1.165       |                         ^
+#12 1.165 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.h:28,
+#12 1.165                  from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/SimpSolver.h:25,
+#12 1.165                  from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/SimpSolver.cc:22:
+#12 1.165 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.165   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#12 1.165       |                             ^
+#12 1.165 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.165   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#12 1.165       |                             ^
+#12 1.165 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.165   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#12 1.165       |                         ^
+#12 1.166 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.cc:21:
+#12 1.166 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.166   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#12 1.166       |                             ^
+#12 1.166 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.166   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#12 1.166       |                             ^
+#12 1.166 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.166   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#12 1.166       |                         ^
+#12 1.168 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:995:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.168   995 |     printf("restarts              : %"PRIu64"\n", starts);
+#12 1.168       |            ^
+#12 1.168 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:996:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.168   996 |     printf("conflicts             : %-12"PRIu64"   (%.0f /sec)\n", conflicts   , conflicts   /cpu_time);
+#12 1.168       |            ^
+#12 1.168 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:997:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.168   997 |     printf("decisions             : %-12"PRIu64"   (%4.2f %% random) (%.0f /sec)\n", decisions, (float)rnd_decisions*100 / (float)decisions, decisions   /cpu_time);
+#12 1.168       |            ^
+#12 1.168 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:998:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.168   998 |     printf("propagations          : %-12"PRIu64"   (%.0f /sec)\n", propagations, propagations/cpu_time);
+#12 1.168       |            ^
+#12 1.168 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:999:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 1.168   999 |     printf("conflict literals     : %-12"PRIu64"   (%4.2f %% deleted)\n", tot_literals, (max_literals - tot_literals)*100 / (double)max_literals);
+#12 1.168       |            ^
+#12 3.106 [ 75%] Linking CXX shared library libminisat.so
+#12 3.133 [ 80%] Linking CXX static library libminisat.a
+#12 3.181 [ 80%] Built target minisat-lib-static
+#12 3.199 Scanning dependencies of target minisat_simp
+#12 3.203 Scanning dependencies of target minisat_core
+#12 3.214 [ 85%] Building CXX object CMakeFiles/minisat_simp.dir/minisat/simp/Main.cc.o
+#12 3.220 [ 90%] Building CXX object CMakeFiles/minisat_core.dir/minisat/core/Main.cc.o
+#12 3.226 [ 90%] Built target minisat-lib-shared
+#12 3.264 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/Main.cc:26:
+#12 3.264 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.264   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#12 3.264       |                             ^
+#12 3.264 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.264   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#12 3.264       |                             ^
+#12 3.264 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.264   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#12 3.264       |                         ^
+#12 3.264 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:27:
+#12 3.264 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.264   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#12 3.264       |                             ^
+#12 3.264 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.264   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#12 3.264       |                             ^
+#12 3.264 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.264   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#12 3.264       |                         ^
+#12 3.266 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:82:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.266    82 |     printf("restarts              : %"PRIu64"\n", solver.starts);
+#12 3.266       |            ^
+#12 3.266 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:83:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.266    83 |     printf("conflicts             : %-12"PRIu64"   (%.0f /sec)\n", solver.conflicts   , solver.conflicts   /cpu_time);
+#12 3.266       |            ^
+#12 3.266 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:84:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.266    84 |     printf("decisions             : %-12"PRIu64"   (%4.2f %% random) (%.0f /sec)\n", solver.decisions, (float)solver.rnd_decisions*100 / (float)solver.decisions, solver.decisions   /cpu_time);
+#12 3.266       |            ^
+#12 3.266 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:85:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.266    85 |     printf("propagations          : %-12"PRIu64"   (%.0f /sec)\n", solver.propagations, solver.propagations/cpu_time);
+#12 3.266       |            ^
+#12 3.266 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:86:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.266    86 |     printf("conflict literals     : %-12"PRIu64"   (%4.2f %% deleted)\n", solver.tot_literals, (solver.max_literals - solver.tot_literals)*100 / (double)solver.max_literals);
+#12 3.266       |            ^
+#12 3.266 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:158:16: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.266   158 |         printf("%"PRIu64", %g\n", num, cpuTime()-initial_time);
+#12 3.266       |                ^
+#12 3.342 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/Main.cc:65:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.342    65 |     printf("restarts              : %"PRIu64"\n", solver.starts);
+#12 3.342       |            ^
+#12 3.342 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/Main.cc:66:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.342    66 |     printf("conflicts             : %-12"PRIu64"   (%.0f /sec)\n", solver.conflicts   , solver.conflicts   /cpu_time);
+#12 3.342       |            ^
+#12 3.342 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/Main.cc:67:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.342    67 |     printf("decisions             : %-12"PRIu64"   (%4.2f %% random) (%.0f /sec)\n", solver.decisions, (float)solver.rnd_decisions*100 / (float)solver.decisions, solver.decisions   /cpu_time);
+#12 3.342       |            ^
+#12 3.342 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/Main.cc:68:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.342    68 |     printf("propagations          : %-12"PRIu64"   (%.0f /sec)\n", solver.propagations, solver.propagations/cpu_time);
+#12 3.342       |            ^
+#12 3.342 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/Main.cc:69:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#12 3.342    69 |     printf("conflict literals     : %-12"PRIu64"   (%4.2f %% deleted)\n", solver.tot_literals, (solver.max_literals - solver.tot_literals)*100 / (double)solver.max_literals);
+#12 3.342       |            ^
+#12 3.554 [ 95%] Linking CXX executable minisat_core
+#12 3.654 [ 95%] Built target minisat_core
+#12 4.958 [100%] Linking CXX executable minisat
+#12 5.058 [100%] Built target minisat_simp
+#12 DONE 5.1s
+
+#13 [9/9] WORKDIR /home/cc/EnvGym/data/SymMC
+#13 DONE 0.0s
+
+#14 exporting to image
+#14 exporting layers
+#14 exporting layers 7.3s done
+#14 writing image sha256:a197214ff28da72a2f420713a440ed0c3b49fb8a7c67a2a6e845b95d2c3ff23c done
+#14 naming to docker.io/library/envgym_test_1756365935 done
+#14 DONE 7.3s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

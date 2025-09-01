@@ -1,0 +1,5 @@
+current progress
+The Dockerfile has been successfully updated to a single-stage build. It now correctly installs all necessary build and runtime dependencies, clones the source code, and compiles the `fuse-t` binary. The resulting image is a functional development environment containing the application and its full build toolchain.
+
+next step
+Refactor the current Dockerfile into a multi-stage build as specified in the plan. Create a lean final stage that installs only the runtime dependencies (`libcurl4`, `libssl1.1`, `libfuse2`, `ca-certificates`). Use `COPY --from=builder` to transfer the compiled `fuse-t` binary to the final image and set the `ENTRYPOINT` to make the container directly executable.

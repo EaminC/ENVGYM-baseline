@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250828_121128",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756383087",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 1.16kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/debian:bookworm\n#2 DONE 0.2s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/17] FROM docker.io/library/debian:bookworm@sha256:731dd1380d6a8d170a695dbeb17fe0eade0e1c29f654cf0a3a07f372191c3f4b\n#4 DONE 0.0s\n\n#5 [ 2/17] RUN apt-get update && apt-get install -y     wget     git     openssl     libssl-dev     perl     sqlite3     libsqlite3-dev     clang     dpkg     bash     coreutils     less     build-essential     pkg-config     cmake     && rm -rf /var/lib/apt/lists/*\n#5 CACHED\n\n#6 [ 3/17] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable\n#6 CACHED\n\n#7 [internal] load build context\n#7 transferring context: 306.56kB 0.1s done\n#7 DONE 0.1s\n\n#8 [ 4/17] RUN mkdir -p /usr/local/cargo && chmod -R a+w /usr/local/cargo\n#8 DONE 0.3s\n\n#9 [ 5/17] RUN rustc --version && cargo --version\n#9 0.308 /bin/sh: 1: rustc: not found\n#9 ERROR: process \"/bin/sh -c rustc --version && cargo --version\" did not complete successfully: exit code: 127\n------\n > [ 5/17] RUN rustc --version && cargo --version:\n0.308 /bin/sh: 1: rustc: not found\n------\nenvgym.dockerfile:27\n--------------------\n  25 |     RUN mkdir -p $CARGO_HOME && chmod -R a+w $CARGO_HOME\n  26 |     \n  27 | >>> RUN rustc --version && cargo --version\n  28 |     \n  29 |     RUN cargo install --version 0.106.2 nushell\n--------------------\nERROR: failed to solve: process \"/bin/sh -c rustc --version && cargo --version\" did not complete successfully: exit code: 127\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

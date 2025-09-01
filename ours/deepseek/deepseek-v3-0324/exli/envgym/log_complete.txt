@@ -1,0 +1,119 @@
+=== Docker Execution Log - 20250828_070100 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756364457
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 2.22kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/11] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0
+#4 DONE 0.0s
+
+#5 [ 2/11] RUN useradd -m itdocker &&     mkdir -p /home/itdocker/EnvGym &&     chown -R itdocker:itdocker /home/itdocker
+#5 CACHED
+
+#6 [ 3/11] RUN apt-get update &&     apt-get install -y --no-install-recommends     wget     curl     git     build-essential     ca-certificates     zip     unzip     vim     libgtk-3-0     libdbus-glib-1-2     libxt6     libx11-xcb1     libdrm2     libgbm1     libasound2     libxshmfence1     bzip2 &&     rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [ 4/11] WORKDIR /home/itdocker
+#7 CACHED
+
+#8 [ 5/11] RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh &&     bash miniconda.sh -b -p /home/itdocker/miniconda &&     rm miniconda.sh
+#8 CACHED
+
+#9 [ 6/11] RUN /home/itdocker/miniconda/bin/conda init bash &&     /home/itdocker/miniconda/bin/conda config --set auto_activate_base false &&     /home/itdocker/miniconda/bin/conda create -y -n envgym python=3.9 &&     /home/itdocker/miniconda/bin/conda install -n envgym -y     pip     xmltodict     tqdm     flake8     black     ipykernel     seaborn     unidiff     gensim     pandas     matplotlib     scipy     beautifulsoup4 &&     /home/itdocker/miniconda/bin/conda clean -ya
+#9 0.624 no change     /home/itdocker/miniconda/condabin/conda
+#9 0.624 no change     /home/itdocker/miniconda/bin/conda
+#9 0.624 no change     /home/itdocker/miniconda/bin/conda-env
+#9 0.624 no change     /home/itdocker/miniconda/bin/activate
+#9 0.624 no change     /home/itdocker/miniconda/bin/deactivate
+#9 0.624 no change     /home/itdocker/miniconda/etc/profile.d/conda.sh
+#9 0.624 no change     /home/itdocker/miniconda/etc/fish/conf.d/conda.fish
+#9 0.624 no change     /home/itdocker/miniconda/shell/condabin/Conda.psm1
+#9 0.624 no change     /home/itdocker/miniconda/shell/condabin/conda-hook.ps1
+#9 0.624 no change     /home/itdocker/miniconda/lib/python3.13/site-packages/xontrib/conda.xsh
+#9 0.624 no change     /home/itdocker/miniconda/etc/profile.d/conda.csh
+#9 0.624 modified      /home/itdocker/.bashrc
+#9 0.624 
+#9 0.624 ==> For changes to take effect, close and re-open your current shell. <==
+#9 0.624 
+#9 1.056 WARNING conda.cli.main_config:_set_key(451): Key auto_activate_base is an alias of auto_activate; setting value with latter
+#9 2.016 
+#9 2.016 CondaToSNonInteractiveError: Terms of Service have not been accepted for the following channels. Please accept or remove them before proceeding:
+#9 2.016     - https://repo.anaconda.com/pkgs/main
+#9 2.016     - https://repo.anaconda.com/pkgs/r
+#9 2.016 
+#9 2.016 To accept these channels' Terms of Service, run the following commands:
+#9 2.016     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+#9 2.016     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+#9 2.016 
+#9 2.016 For information on safely removing channels from your conda configuration,
+#9 2.016 please see the official documentation:
+#9 2.016 
+#9 2.016     https://www.anaconda.com/docs/tools/working-with-conda/channels
+#9 2.016 
+#9 ERROR: process "/bin/sh -c /home/itdocker/miniconda/bin/conda init bash &&     /home/itdocker/miniconda/bin/conda config --set auto_activate_base false &&     /home/itdocker/miniconda/bin/conda create -y -n envgym python=3.9 &&     /home/itdocker/miniconda/bin/conda install -n envgym -y     pip     xmltodict     tqdm     flake8     black     ipykernel     seaborn     unidiff     gensim     pandas     matplotlib     scipy     beautifulsoup4 &&     /home/itdocker/miniconda/bin/conda clean -ya" did not complete successfully: exit code: 1
+------
+ > [ 6/11] RUN /home/itdocker/miniconda/bin/conda init bash &&     /home/itdocker/miniconda/bin/conda config --set auto_activate_base false &&     /home/itdocker/miniconda/bin/conda create -y -n envgym python=3.9 &&     /home/itdocker/miniconda/bin/conda install -n envgym -y     pip     xmltodict     tqdm     flake8     black     ipykernel     seaborn     unidiff     gensim     pandas     matplotlib     scipy     beautifulsoup4 &&     /home/itdocker/miniconda/bin/conda clean -ya:
+2.016 
+2.016 To accept these channels' Terms of Service, run the following commands:
+2.016     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+2.016     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+2.016 
+2.016 For information on safely removing channels from your conda configuration,
+2.016 please see the official documentation:
+2.016 
+2.016     https://www.anaconda.com/docs/tools/working-with-conda/channels
+2.016 
+------
+envgym.dockerfile:38
+--------------------
+  37 |     
+  38 | >>> RUN /home/itdocker/miniconda/bin/conda init bash && \
+  39 | >>>     /home/itdocker/miniconda/bin/conda config --set auto_activate_base false && \
+  40 | >>>     /home/itdocker/miniconda/bin/conda create -y -n envgym python=3.9 && \
+  41 | >>>     /home/itdocker/miniconda/bin/conda install -n envgym -y \
+  42 | >>>     pip \
+  43 | >>>     xmltodict \
+  44 | >>>     tqdm \
+  45 | >>>     flake8 \
+  46 | >>>     black \
+  47 | >>>     ipykernel \
+  48 | >>>     seaborn \
+  49 | >>>     unidiff \
+  50 | >>>     gensim \
+  51 | >>>     pandas \
+  52 | >>>     matplotlib \
+  53 | >>>     scipy \
+  54 | >>>     beautifulsoup4 && \
+  55 | >>>     /home/itdocker/miniconda/bin/conda clean -ya
+  56 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c /home/itdocker/miniconda/bin/conda init bash &&     /home/itdocker/miniconda/bin/conda config --set auto_activate_base false &&     /home/itdocker/miniconda/bin/conda create -y -n envgym python=3.9 &&     /home/itdocker/miniconda/bin/conda install -n envgym -y     pip     xmltodict     tqdm     flake8     black     ipykernel     seaborn     unidiff     gensim     pandas     matplotlib     scipy     beautifulsoup4 &&     /home/itdocker/miniconda/bin/conda clean -ya" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

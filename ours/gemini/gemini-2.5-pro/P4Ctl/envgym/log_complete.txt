@@ -1,0 +1,216 @@
+=== Docker Execution Log - 20250828_022150 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756347687
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 2.76kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [base 1/7] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0
+#4 DONE 0.0s
+
+#5 [base 2/7] RUN apt-get update &&     apt-get install -y --no-install-recommends     software-properties-common     ca-certificates     gnupg     git     curl     nmap     iproute2     build-essential     bison     flex     libfl-dev     && add-apt-repository -y ppa:deadsnakes/ppa     && apt-get update     && apt-get install -y --no-install-recommends         python3.7         python3.7-distutils         python3.7-dev     && apt-get clean     && rm -rf /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [internal] load build context
+#6 transferring context: 675.90kB 0.0s done
+#6 DONE 0.0s
+
+#7 [base 3/7] RUN curl https://bootstrap.pypa.io/pip/3.7/get-pip.py -o get-pip.py &&     python3.7 get-pip.py &&     rm get-pip.py
+#7 0.223   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+#7 0.223                                  Dload  Upload   Total   Spent    Left  Speed
+#7 0.223 
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+ 62 2574k   62 1598k    0     0  7792k      0 --:--:-- --:--:-- --:--:-- 7760k
+100 2574k  100 2574k    0     0  8585k      0 --:--:-- --:--:-- --:--:-- 8580k
+#7 2.072 Collecting pip<24.1
+#7 2.160   Downloading pip-24.0-py3-none-any.whl.metadata (3.6 kB)
+#7 2.387 Collecting setuptools
+#7 2.396   Downloading setuptools-68.0.0-py3-none-any.whl.metadata (6.4 kB)
+#7 2.437 Collecting wheel
+#7 2.442   Downloading wheel-0.42.0-py3-none-any.whl.metadata (2.2 kB)
+#7 2.486 Downloading pip-24.0-py3-none-any.whl (2.1 MB)
+#7 2.682    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 10.9 MB/s eta 0:00:00
+#7 2.688 Downloading setuptools-68.0.0-py3-none-any.whl (804 kB)
+#7 2.781    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 804.0/804.0 kB 8.8 MB/s eta 0:00:00
+#7 2.789 Downloading wheel-0.42.0-py3-none-any.whl (65 kB)
+#7 2.798    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 65.4/65.4 kB 9.5 MB/s eta 0:00:00
+#7 2.897 Installing collected packages: wheel, setuptools, pip
+#7 3.948 Successfully installed pip-24.0 setuptools-68.0.0 wheel-0.42.0
+#7 3.949 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#7 DONE 4.3s
+
+#8 [base 4/7] RUN python3.7 -m pip install --no-cache-dir scapy==2.4.5
+#8 0.699 Collecting scapy==2.4.5
+#8 0.784   Downloading scapy-2.4.5.tar.gz (1.1 MB)
+#8 0.903      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.1/1.1 MB 9.8 MB/s eta 0:00:00
+#8 1.013   Preparing metadata (setup.py): started
+#8 1.174   Preparing metadata (setup.py): finished with status 'done'
+#8 1.189 Building wheels for collected packages: scapy
+#8 1.190   Building wheel for scapy (setup.py): started
+#8 1.609   Building wheel for scapy (setup.py): finished with status 'done'
+#8 1.621   Created wheel for scapy: filename=scapy-2.4.5-py2.py3-none-any.whl size=1261536 sha256=8b0355c5ca95c603987b193299bf0d426a05491860d636ec79a246d747769ba5
+#8 1.621   Stored in directory: /tmp/pip-ephem-wheel-cache-u48lr9a5/wheels/b9/6e/c0/0157e466a5e02d3ff28fc7587dff329b4a967a23b3f9b11385
+#8 1.625 Successfully built scapy
+#8 1.709 Installing collected packages: scapy
+#8 2.304 Successfully installed scapy-2.4.5
+#8 2.304 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#8 DONE 2.6s
+
+#9 [base 5/7] WORKDIR /app
+#9 DONE 0.0s
+
+#10 [base 6/7] COPY . .
+#10 DONE 0.0s
+
+#11 [base 7/7] RUN cd compiler && make netcl
+#11 0.320 bison -d netcl.y
+#11 0.367 flex netcl.l
+#11 0.378 g++ netcl.tab.c lex.yy.c -ll -o ./netcl-compile --std=c++0x
+#11 DONE 2.3s
+
+#12 [host 1/2] RUN apt-get update &&     apt-get install -y --no-install-recommends     bpfcc-tools     libbpfcc-dev     && apt-get clean &&     rm -rf /var/lib/apt/lists/*
+#12 0.574 Get:1 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
+#12 0.583 Get:2 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+#12 0.922 Get:3 https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy InRelease [18.1 kB]
+#12 1.047 Get:4 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+#12 1.108 Get:5 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [48.5 kB]
+#12 1.161 Get:6 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+#12 1.230 Get:7 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1271 kB]
+#12 1.251 Get:8 https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy/main amd64 Packages [33.2 kB]
+#12 1.375 Get:9 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
+#12 1.534 Get:10 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [5235 kB]
+#12 1.724 Get:11 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+#12 1.735 Get:12 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [3253 kB]
+#12 2.264 Get:13 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+#12 2.267 Get:14 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+#12 2.273 Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1576 kB]
+#12 2.293 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [75.9 kB]
+#12 2.294 Get:17 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [3606 kB]
+#12 2.417 Get:18 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [5519 kB]
+#12 2.567 Get:19 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [83.2 kB]
+#12 2.569 Get:20 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [35.2 kB]
+#12 3.369 Fetched 41.1 MB in 3s (13.9 MB/s)
+#12 3.369 Reading package lists...
+#12 4.215 Reading package lists...
+#12 5.026 Building dependency tree...
+#12 5.176 Reading state information...
+#12 5.315 The following additional packages will be installed:
+#12 5.316   ieee-data libbpfcc libclang-cpp11 libedit2 libllvm11 python3-bpfcc
+#12 5.316   python3-netaddr
+#12 5.317 Suggested packages:
+#12 5.317   ipython3 python-netaddr-docs
+#12 5.384 The following NEW packages will be installed:
+#12 5.384   bpfcc-tools ieee-data libbpfcc libbpfcc-dev libclang-cpp11 libedit2
+#12 5.385   libllvm11 python3-bpfcc python3-netaddr
+#12 5.591 0 upgraded, 9 newly installed, 0 to remove and 0 not upgraded.
+#12 5.591 Need to get 34.0 MB of archives.
+#12 5.591 After this operation, 152 MB of additional disk space will be used.
+#12 5.591 Get:1 http://archive.ubuntu.com/ubuntu jammy/main amd64 libedit2 amd64 3.1-20210910-1build1 [96.8 kB]
+#12 5.946 Get:2 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libllvm11 amd64 1:11.1.0-6 [19.6 MB]
+#12 6.934 Get:3 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libclang-cpp11 amd64 1:11.1.0-6 [10.5 MB]
+#12 7.225 Get:4 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libbpfcc amd64 0.18.0+ds-2 [661 kB]
+#12 7.243 Get:5 http://archive.ubuntu.com/ubuntu jammy/universe amd64 python3-bpfcc all 0.18.0+ds-2 [34.6 kB]
+#12 7.243 Get:6 http://archive.ubuntu.com/ubuntu jammy/main amd64 ieee-data all 20210605.1 [1887 kB]
+#12 7.296 Get:7 http://archive.ubuntu.com/ubuntu jammy/main amd64 python3-netaddr all 0.8.0-2 [309 kB]
+#12 7.305 Get:8 http://archive.ubuntu.com/ubuntu jammy/universe amd64 bpfcc-tools all 0.18.0+ds-2 [627 kB]
+#12 7.322 Get:9 http://archive.ubuntu.com/ubuntu jammy/universe amd64 libbpfcc-dev amd64 0.18.0+ds-2 [334 kB]
+#12 7.443 debconf: delaying package configuration, since apt-utils is not installed
+#12 7.474 Fetched 34.0 MB in 2s (17.5 MB/s)
+#12 7.498 Selecting previously unselected package libedit2:amd64.
+#12 7.498 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 18224 files and directories currently installed.)
+#12 7.510 Preparing to unpack .../0-libedit2_3.1-20210910-1build1_amd64.deb ...
+#12 7.512 Unpacking libedit2:amd64 (3.1-20210910-1build1) ...
+#12 7.531 Selecting previously unselected package libllvm11:amd64.
+#12 7.533 Preparing to unpack .../1-libllvm11_1%3a11.1.0-6_amd64.deb ...
+#12 7.534 Unpacking libllvm11:amd64 (1:11.1.0-6) ...
+#12 7.791 Selecting previously unselected package libclang-cpp11.
+#12 7.793 Preparing to unpack .../2-libclang-cpp11_1%3a11.1.0-6_amd64.deb ...
+#12 7.793 Unpacking libclang-cpp11 (1:11.1.0-6) ...
+#12 7.942 Selecting previously unselected package libbpfcc.
+#12 7.944 Preparing to unpack .../3-libbpfcc_0.18.0+ds-2_amd64.deb ...
+#12 7.945 Unpacking libbpfcc (0.18.0+ds-2) ...
+#12 8.018 Selecting previously unselected package python3-bpfcc.
+#12 8.021 Preparing to unpack .../4-python3-bpfcc_0.18.0+ds-2_all.deb ...
+#12 8.021 Unpacking python3-bpfcc (0.18.0+ds-2) ...
+#12 8.046 Selecting previously unselected package ieee-data.
+#12 8.048 Preparing to unpack .../5-ieee-data_20210605.1_all.deb ...
+#12 8.056 Unpacking ieee-data (20210605.1) ...
+#12 8.207 Selecting previously unselected package python3-netaddr.
+#12 8.208 Preparing to unpack .../6-python3-netaddr_0.8.0-2_all.deb ...
+#12 8.209 Unpacking python3-netaddr (0.8.0-2) ...
+#12 8.239 Selecting previously unselected package bpfcc-tools.
+#12 8.241 Preparing to unpack .../7-bpfcc-tools_0.18.0+ds-2_all.deb ...
+#12 8.242 Unpacking bpfcc-tools (0.18.0+ds-2) ...
+#12 8.313 Selecting previously unselected package libbpfcc-dev.
+#12 8.315 Preparing to unpack .../8-libbpfcc-dev_0.18.0+ds-2_amd64.deb ...
+#12 8.315 Unpacking libbpfcc-dev (0.18.0+ds-2) ...
+#12 8.375 Setting up libedit2:amd64 (3.1-20210910-1build1) ...
+#12 8.378 Setting up libllvm11:amd64 (1:11.1.0-6) ...
+#12 8.380 Setting up ieee-data (20210605.1) ...
+#12 8.389 Setting up libclang-cpp11 (1:11.1.0-6) ...
+#12 8.392 Setting up python3-netaddr (0.8.0-2) ...
+#12 8.556 Setting up libbpfcc (0.18.0+ds-2) ...
+#12 8.559 Setting up python3-bpfcc (0.18.0+ds-2) ...
+#12 8.707 Setting up bpfcc-tools (0.18.0+ds-2) ...
+#12 8.710 Setting up libbpfcc-dev (0.18.0+ds-2) ...
+#12 8.713 Processing triggers for libc-bin (2.35-0ubuntu3.10) ...
+#12 DONE 9.2s
+
+#13 [host 2/2] WORKDIR /app
+#13 DONE 0.0s
+
+#14 exporting to image
+#14 exporting layers
+#14 exporting layers 3.3s done
+#14 writing image sha256:d98f27ce9171ba8610f64208f4c9501d4754a3a50b782eace5d9601e010ba446 done
+#14 naming to docker.io/library/envgym_test_1756347687 done
+#14 DONE 3.3s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

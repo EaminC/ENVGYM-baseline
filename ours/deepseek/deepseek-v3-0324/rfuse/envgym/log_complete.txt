@@ -1,0 +1,82 @@
+=== Docker Execution Log - 20250828_145628 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756392987
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.29kB done
+#1 WARN: FromAsCasing: 'as' and 'FROM' keywords' casing do not match (line 2)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [builder 1/5] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0
+#4 CACHED
+
+#5 [builder 2/5] WORKDIR /home/cc/EnvGym/data/rfuse
+#5 CACHED
+
+#6 [internal] load build context
+#6 transferring context: 2B done
+#6 DONE 0.0s
+
+#7 [stage-1 2/7] COPY --from=builder /home/cc/EnvGym/data/rfuse /home/cc/EnvGym/data/rfuse
+#7 CACHED
+
+#8 [stage-1 3/7] WORKDIR /home/cc/EnvGym/data/rfuse
+#8 CACHED
+
+#9 [builder 4/5] RUN git clone https://github.com/your-repository-url.git .
+#9 CACHED
+
+#10 [builder 5/5] RUN mkdir build && cd build &&     cmake .. &&     make &&     make install
+#10 CACHED
+
+#11 [stage-1 4/7] RUN apt-get update &&     apt-get install -y     python3     python3-pip     && rm -rf /var/lib/apt/lists/*
+#11 CACHED
+
+#12 [stage-1 5/7] COPY requirements.txt .
+#12 ERROR: failed to calculate checksum of ref c15302f4-694d-41bc-81e2-a6ac2297ecef::xq2cvx55x4fxwisz1h0u0htic: "/requirements.txt": not found
+
+#13 [builder 3/5] RUN apt-get update &&     apt-get install -y     build-essential     cmake     git     wget     && rm -rf /var/lib/apt/lists/*
+#13 0.348 runc run failed: container process is already dead
+#13 CANCELED
+------
+ > [stage-1 5/7] COPY requirements.txt .:
+------
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - FromAsCasing: 'as' and 'FROM' keywords' casing do not match (line 2)
+envgym.dockerfile:45
+--------------------
+  43 |     
+  44 |     # Install Python dependencies if needed
+  45 | >>> COPY requirements.txt .
+  46 |     RUN pip install -r requirements.txt
+  47 |     
+--------------------
+ERROR: failed to solve: failed to compute cache key: failed to calculate checksum of ref c15302f4-694d-41bc-81e2-a6ac2297ecef::xq2cvx55x4fxwisz1h0u0htic: "/requirements.txt": not found
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

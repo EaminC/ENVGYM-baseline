@@ -1,0 +1,737 @@
+This is the adjusted plan based on your hardware and environment information.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+**Hardware & Environment Context:**
+*   **Architecture:** `x86_64` (`linux/amd64`). This architecture is fully supported by all required tools and container images.
+*   **GPU:** Not available. This is acceptable as the setup does not require a GPU.
+*   **Project Directory:** The project source code is located at `/home/cc/EnvGym/data/acto`. All commands and relative paths in this guide assume this as the current working directory unless specified otherwise.
+*   **Docker Version:** `28.1.1` with BuildKit. This version is suitable for the project.
+
+---
+
+1.  DOWNLOADS NEEDED:
+    *   **Git:** For cloning project repositories.
+    *   **Docker:** Latest stable version. Your provided version `28.1.1` is fully compatible. Required to run Kubernetes clusters locally or on provisioned nodes.
+    *   **Golang:** Version `1.20.5` or compatible (the CI environment uses `1.20.5`). Note: The project includes multiple Go modules with different version requirements (e.g., a submodule at `acto/k8s_util/lib` specifies `go 1.17`, a utility at `scripts/field_count` specifies `go 1.18`, and the new module at `ssa/` specifies `go 1.18`). The `1.20.5` toolchain is fully backward compatible and can build all of them.
+    *   **Python:** Version `3.10` or higher (the CI environment uses `3.10`). Note: If your system's default Python version is older (e.g., Python 3.8 on Ubuntu 20.04), you will need to install a newer version manually before proceeding with the environment setup.
+    *   **Build Toolchain:** `make` and a C/C++ compiler (e.g., GCC or Clang) are required for building native code components, specifically for compiling Go code into a C-style shared library (`.so`) and linking it.
+    *   **Acto Project Source Code:** Assumed to be present at `/home/cc/EnvGym/data/acto`.
+    *   **[CloudLab Setup] Acto CloudLab Ansible Scripts:** Cloned from the GitHub repository (`https://github.com/xlab-uiuc/acto-cloudlab.git`). Required for manual CloudLab environment configuration.
+    *   **Kubernetes `kind`:** Version `v0.20.0`. To be installed via `go install`. This tool can provision local Kubernetes clusters of different versions (e.g., `v1.26.3`, `v1.23.0`, `v1.28.0`, or `v1.29.1`) by pulling the corresponding node images.
+    *   **Kubernetes `minikube`:** Latest stable version. An alternative to `kind` for local Kubernetes clusters, required for the `kubernetes_engine` test suite.
+    *   **`kubectl`:** Latest stable version. The Kubernetes command-line tool.
+    *   **Python Dependencies:** All dependencies are managed via `pyproject.toml` and compiled into `requirements-dev.txt` using `pip-tools`. This file contains the exact versions for all runtime and development packages.
+        *   **Runtime Dependencies:** Include `kubernetes==31.0.0`, `pydantic==2.5.2`, `docker==6.1.3`, etc., as listed in `requirements-dev.txt`. This also covers the project's internal modules like `acto` and `chactos`.
+        *   **Development Tools:** Include `pytest==7.4.3`, `pre-commit==3.6.0`, `pip-tools==7.3.0`, `black==24.10.0`, `isort==5.13.2`, `pylint==3.0.3`, `mypy==1.7.1`, `flake8`, `codespell`, and `coverage`, as listed in `requirements-dev.txt`. These tools are used to enforce code style and quality.
+    *   **[CloudLab Setup] Ansible:** Latest stable version, required for provisioning CloudLab nodes.
+        *   **Ansible Collections:** `ansible.posix` and `community.general` are also required.
+    *   **[CloudLab Setup] CloudLab-specific tools:** `xmlstarlet` and `geni-utils` (for `geni-get`) are installed on CloudLab nodes by the setup scripts to aid in automation.
+    *   **[Optional] Helm:** Latest stable version. While Acto primarily uses plain YAML files for deployment, you can use tools like Helm (`helm template`) or Kustomize (`kubectl kustomize build`, included with `kubectl`) to generate these YAMLs from charts or Kustomize bases.
+    *   **Kubernetes Operator Artifacts:** For testing an operator, you will need its deployment manifests (YAMLs), a sample Custom Resource (CR) file, and potentially the operator's source code for advanced "whitebox" analysis. Note: Some operators have dependencies on other Kubernetes components. For example, `actions-runner-controller`, `argocd-operator`, `cass-operator`, or `k8ssandra_cass-operator` depend on `cert-manager`. The `clickhouse-operator` depends on a `zookeeper` instance. The necessary deployment manifests for these dependencies must also be included in the project's `data/` directory, such as `data/argoproj-labs_argocd-operator/cert-manager.yaml`, `data/cass-operator/v1-22/cert-manager.yaml`, `data/k8ssandra_cass-operator/k8ssandra_cert-manager.yaml` or `data/clickhouse-operator/zookeeper.yaml`. The `zookeeper.yaml` manifest, for instance, creates its own namespace (`zoo3ns`) and deploys a `StatefulSet` and associated services within it. The `k8ssandra_cert-manager.yaml` file deploys `cert-manager` version `v1.12.2` into its own `cert-manager` namespace and also defines a `StorageClass` named `server-storage`. The operator's own artifacts reside in a separate subdirectory. For example, the `anvil-zookeeper-operator` artifacts are in `data/anvil-zookeeper-operator/` and include `operator.yaml`, `operator-crash.yaml`, and `cr.yaml`. Similarly, the `apache_rocketmq-operator` requires multiple files: `configmap.yaml`, `nameservice.yaml`, `operator.yaml`, and `rocketmq-cr.yaml`. The `cockroach-operator` artifacts are in `data/cockroach-operator/` and include `operator.yaml`, `cr.yaml`, and an `examples/` directory. For the `elastic-cloud-on-k8s-operator`, the artifacts include a manifest defining its many CRDs (`crds.yaml`), the operator's deployment manifest (`operator.yaml`), and a sample CR (`es.yaml`) that defines an `Elasticsearch` cluster with a specific version (e.g., `8.12.0`) and node set configuration. For the `grafana-operator`, the artifacts include a comprehensive deployment manifest (`kustomize-cluster_scoped.yaml`) and a sample CR (`grafanas-cr.yaml`). Some operators may package all their required resources (Namespace, CRDs, RBAC, Deployment, etc.) into a single comprehensive file, such as `data/cass-operator/v1-10-3/bundle.yaml`, the newer `data/cass-operator/v1-22/bundle.yaml`, `data/clickhouse-operator/operator.yaml`, `data/cloudnative-pg_cloudnative_pg/cnpg-1.22.1.yaml`, `data/cockroach-operator/operator.yaml`, or `data/grafana_grafana-operator/kustomize-cluster_scoped.yaml`. The `clickhouse-operator/operator.yaml` file defines three CRDs along with the necessary RBAC and Deployment. The `cnpg-1.22.1.yaml` file for CloudNative PG defines its own namespace (`cnpg-system`), three CRDs (`backups`, `clusters`, `poolers`, `scheduledbackups`), RBAC roles, and the controller `Deployment`. The `cockroach-operator/operator.yaml` file is similar, creating its own namespace (`cockroach-operator-system`), a CRD (`crdbclusters`), and all necessary RBAC and Deployment resources. The `elastic-cloud-on-k8s-operator/operator.yaml` manifest creates the `elastic-system` namespace along with all the RBAC roles, the main controller `StatefulSet`, and a `ValidatingWebhookConfiguration`. Its corresponding `crds.yaml` file defines multiple CRDs, including `elasticsearches.elasticsearch.k8s.elastic.co`, `kibanas.kibana.k8s.elastic.co`, and `beats.beat.k8s.elastic.co`. The `grafana_grafana-operator/kustomize-cluster_scoped.yaml` file creates the `grafana` namespace and defines multiple CRDs (`grafanadashboards`, `grafanadatasources`, `grafanafolders`, `grafanas`) along with the operator `Deployment` and all required RBAC resources. Some operators may also require an initialization manifest, like `data/cass-operator/v1-10-3/init.yaml`, or auxiliary resources like `data/cass-operator/v1-22/aux-examples.yaml`. For advanced testing of operators that manage complex applications, an application configuration schema file may also be included, such as `data/cass-operator/v1-22/cass-config.json`, which defines valid fields and values for the Cassandra application itself.
+    *   **Custom Oracle Module:** For advanced, operator-specific bug detection, you may need a Python module containing custom oracle logic. This module is referenced in the operator's configuration file (e.g., the `anvil-zookeeper-operator` config specifies `"custom_oracle": "data.zookeeper-operator.oracle"`, and the `cass-operator` config specifies `"custom_oracle": "data.cass-operator.v1-22.oracle"`).
+    *   **Custom Mapping Module:** For advanced analysis, you may need a Python module containing custom mapping logic. This module is referenced in the operator's configuration file (e.g., the `cass-operator` config specifies `"custom_module": "data.cass-operator.v1-22.custom_mapping"`, and the `cockroach-operator` config specifies `"custom_module": "data.cockroach-operator.custom_mapping"`).
+    *   **Container Images:** The test environment must have network access to pull container images required by the operators and their dependencies. The Acto "learn" phase identifies these images. For environments with restricted network access, these images should be pre-pulled. All listed images are compatible with the `linux/amd64` architecture.
+        *   Example images for `actions-runner-controller`:
+            *   `quay.io/brancz/kube-rbac-proxy:v0.10.0`
+            *   `quay.io/jetstack/cert-manager-controller:v1.8.2`
+            *   `quay.io/jetstack/cert-manager-cainjector:v1.8.2`
+            *   `docker.io/summerwind/actions-runner-controller:v0.22.0`
+            *   `quay.io/jetstack/cert-manager-webhook:v1.8.2`
+        *   Example images for `anvil-zookeeper-operator`:
+            *   `docker.io/pravega/zookeeper:0.2.14`
+            *   `ghcr.io/vmware-research/verifiable-controllers/zookeeper-controller:latest`
+            *   `ghcr.io/vmware-research/verifiable-controllers/zookeeper-controller:f926600a79ae139364f5b80c10c22f83dba4d365` (used in `operator.yaml` and for crash tests)
+        *   Example images for `apache_rocketmq-operator`:
+            *   `docker.io/apacherocketmq/rocketmq-broker:4.5.0-alpine-operator-0.3.0`
+            *   `docker.io/apacherocketmq/rocketmq-nameserver:4.5.0-alpine-operator-0.3.0`
+            *   `docker.io/apache/rocketmq-operator:latest`
+        *   Example images for `argocd-operator`:
+            *   `quay.io/argoprojlabs/argocd-operator:v0.8.0`
+            *   `quay.io/argoproj/argocd:v2.10.4`
+            *   `redis:7.0.12-alpine`
+            *   `quay.io/jetstack/cert-manager-cainjector:v1.14.1` (dependency)
+            *   `quay.io/jetstack/cert-manager-controller:v1.14.1` (dependency)
+            *   `quay.io/jetstack/cert-manager-webhook:v1.14.1` (dependency)
+            *   `quay.io/jetstack/cert-manager-acmesolver:v1.14.1` (dependency)
+        *   Example images for `cass-operator` (v1.22.1):
+            *   `docker.io/k8ssandra/cass-operator:v1.22.1`
+            *   `docker.io/k8ssandra/system-logger:v1.22.1`
+            *   `docker.io/datastax/cass-config-builder:1.0-ubi8`
+            *   `docker.io/k8ssandra/cass-management-api:4.1.2-ubi8` (example application image)
+            *   `quay.io/jetstack/cert-manager-cainjector:v1.12.2` (dependency)
+            *   `quay.io/jetstack/cert-manager-controller:v1.12.2` (dependency)
+            *   `quay.io/jetstack/cert-manager-webhook:v1.12.2` (dependency)
+            *   `quay.io/jetstack/cert-manager-acmesolver:v1.12.2` (dependency)
+        *   Example images for `k8ssandra_cass-operator` (v1.19.0):
+            *   `cr.k8ssandra.io/k8ssandra/cass-operator:v1.19.0`
+            *   `cr.k8ssandra.io/k8ssandra/system-logger:v1.19.0`
+            *   `cr.dtsx.io/datastax/cass-config-builder:1.0-ubi8`
+            *   `cr.k8ssandra.io/k8ssandra/cass-management-api:4.0.1`
+            *   `quay.io/jetstack/cert-manager-cainjector:v1.12.2` (dependency)
+            *   `quay.io/jetstack/cert-manager-controller:v1.12.2` (dependency)
+            *   `quay.io/jetstack/cert-manager-webhook:v1.12.2` (dependency)
+        *   Example images for `clickhouse-operator`:
+            *   `docker.io/altinity/clickhouse-operator:0.22.2`
+            *   `docker.io/zookeeper:3.8.1` (dependency)
+            *   `docker.io/altinity/metrics-exporter:0.22.2`
+            *   `docker.io/clickhouse/clickhouse-server:22.3`
+        *   Example images for `cloudnative-pg`:
+            *   `ghcr.io/cloudnative-pg/cloudnative-pg:1.22.1` (operator controller image)
+            *   `ghcr.io/cloudnative-pg/postgresql:16.1` (application image)
+        *   Example images for `cockroach-operator`:
+            *   `docker.io/cockroachdb/cockroach-operator:v2.7.0` (operator controller image)
+            *   `docker.io/cockroachdb/cockroach:v21.2.10` (application image, specified in `cr.yaml`)
+        *   Example images for `elastic-cloud-on-k8s-operator`:
+            *   `docker.elastic.co/eck/eck-operator:2.11.1` (operator controller image)
+            *   `docker.elastic.co/elasticsearch/elasticsearch:8.12.0` (application image, specified in `es.yaml`)
+        *   Example images for `grafana-operator`:
+            *   `ghcr.io/grafana/grafana-operator:v5.6.3` (operator controller image)
+            *   `docker.io/grafana/grafana:9.1.6` (application image)
+    *   **[Advanced] `gocovmerge`:** A Go tool for merging code coverage profiles. Required for the advanced workflow of measuring E2E code coverage of Go-based operators. To be installed via `go install`.
+
+2.  FILES TO CREATE:
+    *   **Python Virtual Environment:**
+        *   **Path:** `/home/cc/EnvGym/data/acto/venv/`
+        *   **Description:** An isolated Python environment to manage project-specific dependencies. Created using `python3 -m venv venv` (where `python3` points to version 3.10+) inside the project root.
+    *   **Profile Data Directory:**
+        *   **Path:** `/home/cc/EnvGym/data/acto/profile/data/`
+        *   **Description:** A directory required for profiling data during test runs. It must have write permissions for the user and potentially containerized processes. This directory is also used as the target for Go operator code coverage reports in the advanced coverage workflow.
+    *   **Operator Configuration Files (for testing a new operator):**
+        *   **Path:** A new directory under `/home/cc/EnvGym/data/acto/data/`, e.g., `data/my-operator/`, `data/anvil-zookeeper-operator/`, `data/k8ssandra_cass-operator/`, `data/cass-operator/v1-22/`, `data/argoproj-labs_argocd-operator/`, `data/clickhouse-operator/`, `data/cloudnative-pg_cloudnative_pg/`, `data/cockroach-operator/`, `data/elastic-cloud-on-k8s-operator/`, or `data/grafana_grafana-operator/`.
+        *   **Description:** Contains all necessary files to test a new operator.
+            *   **Configuration JSON (e.g., `config.json`, `config-only.json`, `rocketmq-config.json`, `argocd-config.json`, `postgresql-config.json`):** A JSON file that tells Acto how to test an operator. It specifies deployment steps, the CRD to test, the seed CR, and other settings. Key configuration options include:
+                *   `deploy`: An object containing a `steps` array. Each element in the array defines a deployment action, including applying manifests for prerequisites (e.g., `init.yaml`, `ConfigMap`s, other CRs like a `NameService` CR, or full dependency deployments like `cert-manager` or `zookeeper`), the operator itself, and auxiliary resources (e.g., `aux-examples.yaml`), and waiting for a specified duration. A step can also specify a `namespace` for applying a manifest. Note that if a manifest file contains hardcoded namespaces for its resources (e.g., `data/clickhouse-operator/zookeeper.yaml` creates and uses the `zoo3ns` namespace, `data/cloudnative-pg_cloudnative_pg/cnpg-1.22.1.yaml` creates and uses `cnpg-system`, `data/cockroach-operator/operator.yaml` creates and uses `cockroach-operator-system`, `data/elastic-cloud-on-k8s-operator/operator.yaml` creates and uses `elastic-system`, or `data/grafana_grafana-operator/kustomize-cluster_scoped.yaml` creates and uses the `grafana` namespace), those will take precedence over the `namespace` key in the deploy step. The `namespace` key is used for resources within the manifest that do *not* have a namespace explicitly set.
+                *   `crd_name`: Specifies the target CRD for testing (e.g., `zookeeperclusters.anvil.dev`, `cassandradatacenter.cassandra.datastax.com`, `argocds.argoproj.io`, `cassandratasks.control.k8ssandra.io`, `clickhouseinstallations.clickhouse.altinity.com`, `clusters.postgresql.cnpg.io`, `elasticsearches.elasticsearch.k8s.elastic.co`, `grafanas.grafana.integreatly.org`). Can be `null` if the operator has only one CRD, which Acto will auto-detect (e.g., for `cockroach-operator`, whose CRD is `crdbclusters.crdb.cockroachlabs.com`).
+                *   `seed_custom_resource`: Path to the initial CR file that Acto will mutate during testing (e.g., `data/argoproj-labs_argocd-operator/argocd-basic-cr.yaml`, `data/clickhouse-operator/cr.yaml`, `data/cloudnative-pg_cloudnative_pg/postgresql-cr.yaml`, `data/cockroach-operator/cr.yaml`, `data/elastic-cloud-on-k8s-operator/es.yaml`, `data/grafana_grafana-operator/grafanas-cr.yaml`).
+                *   `custom_test_generator`: Path to a Python file with custom test case generation logic.
+                *   `custom_oracle`: Path to a Python module with custom bug detection logic (e.g., `data.cass-operator.v1-22.oracle`).
+                *   `custom_module`: Path to a Python module with custom mapping logic (e.g., `data.cass-operator.v1-22.custom_mapping`, `data.cockroach-operator.custom_mapping`).
+                *   `kubernetes_version`: Specifies a particular Kubernetes version for the test cluster (e.g., `v1.26.3`, `v1.23.0`, `v1.28.0`, `v1.29.1`).
+                *   `example_dir`: Path to a directory containing additional example CR files for analysis (e.g., `data/cockroach-operator/examples`).
+                *   `diff_ignore_fields`: A list of regex patterns for fields to ignore during state comparison.
+                *   `focus_fields`: A list of field paths (represented as lists of strings) to focus on during testing, narrowing the scope of mutations (e.g., `[["spec", "config"]]`).
+                *   `kubernetes_engine`: A section for provider-specific settings, such as enabling `feature_gates` (e.g., `StatefulSetAutoDeletePVC: true`) in a `kind` cluster.
+                *   `analysis`: An object containing metadata about the operator's source code, like `github_link`, `commit`, `entrypoint`, `type` (e.g., `CrdbCluster`), and `package` for advanced analysis.
+            *   **Deployment YAMLs:** One or more YAML files containing the Kubernetes resources needed to deploy the operator and its dependencies. This can include initialization manifests (e.g., `init.yaml`), manifests for CRDs (e.g., `crds.yaml`), the main operator manifest (e.g., `operator.yaml`), prerequisite resources like `ConfigMap`s, prerequisite Custom Resources, full dependency manifests (e.g., `data/argoproj-labs_argocd-operator/cert-manager.yaml`, `data/cass-operator/v1-22/cert-manager.yaml`, `data/k8ssandra_cass-operator/k8ssandra_cert-manager.yaml`, `data/clickhouse-operator/zookeeper.yaml`), and auxiliary resources (e.g., `data/cass-operator/v1-22/aux-examples.yaml`). An operator may have multiple manifests for different test scenarios, e.g., `operator-crash.yaml`. A single manifest file, often named `bundle.yaml` or `operator.yaml`, can contain all necessary Kubernetes resources, such as the CRDs, RBAC rules, and the operator Deployment, as seen in `data/cass-operator/v1-22/bundle.yaml`, `data/clickhouse-operator/operator.yaml`, `data/cloudnative-pg_cloudnative_pg/cnpg-1.22.1.yaml`, `data/cockroach-operator/operator.yaml` (which creates the `cockroach-operator-system` namespace), and `data/grafana_grafana-operator/kustomize-cluster_scoped.yaml`. The `elastic-cloud-on-k8s-operator` uses a dedicated `crds.yaml` file that must be applied before `operator.yaml`, which in turn creates the `elastic-system` namespace and deploys the controller as a `StatefulSet`.
+            *   **Seed CR YAML:** A sample Custom Resource file used as the starting point for tests. For example, `data/anvil-zookeeper-operator/cr.yaml` is the seed CR for the Zookeeper operator. The file `data/apache_rocketmq-operator/rocketmq-cr.yaml` is the seed for the RocketMQ operator; it defines a resource of `kind: Broker`. The file `data/argoproj-labs_argocd-operator/argocd-basic-cr.yaml` is a seed for the ArgoCD operator, defining a resource of `kind: ArgoCD`. For the Cassandra operator, `data/cass-operator/v1-22/cr.yaml` is the seed CR, defining a `kind: CassandraDatacenter` resource named `test-cluster`. This file specifies critical configuration details such as the Cassandra `serverVersion` ("4.1.2"), the number of nodes (`size: 3`), `storageConfig` with PVC templates, and even application-level settings within a nested `config` block (e.g., `cassandra-yaml` settings like `num_tokens` and `authenticator`). The file `data/clickhouse-operator/cr.yaml` is a seed for the ClickHouse operator, defining a `kind: ClickHouseInstallation` named `test-cluster` which specifies a dependency on a Zookeeper instance. A seed CR for the CloudNative PG operator, like `data/cloudnative-pg_cloudnative_pg/postgresql-cr.yaml`, would define a `kind: Cluster` and specify the number of `instances` and the `storage` configuration. A seed CR for the CockroachDB operator, `data/cockroach-operator/cr.yaml`, defines a `kind: CrdbCluster` with `apiVersion: crdb.cockroachlabs.com/v1alpha1`. It specifies the number of `nodes` (3), the application container `image` (`cockroachdb/cockroach:v21.2.10`), and storage settings via a `dataStore` field with a `pvc` spec. The seed CR for the Elastic operator, `data/elastic-cloud-on-k8s-operator/es.yaml`, defines a resource of `kind: Elasticsearch` named `test-cluster`. It specifies the application `version` ("8.12.0") and a `nodeSets` array to configure the topology, including the `count` of nodes in each set. The seed CR for the Grafana operator, `data/grafana_grafana-operator/grafanas-cr.yaml`, defines a resource of `kind: Grafana` with `apiVersion: grafana.integreatly.org/v1beta1`. Its `spec` contains a `config` block with application-specific settings for security (e.g., `admin_user`, `admin_password`), logging, and authentication.
+            *   **Application Configuration Schema (Optional):** For operators managing complex applications, a JSON file defining the schema of the application's configuration may be included. For example, `data/cass-operator/v1-22/cass-config.json` provides a detailed schema for Cassandra's `cassandra.yaml` settings. This file can be used by Acto to generate valid and meaningful test inputs for the application-specific configuration fields within the operator's CR.
+            *   **Example CRs Directory:** For some operators, a directory of additional example CR files may be required for analysis, specified by the `example_dir` key in the configuration file (e.g., `data/cockroach-operator/examples`).
+    *   **Custom Test Generator Files (for advanced operator testing):**
+        *   **Path:** A new Python file (e.g., `data/my-operator/generators.py`).
+        *   **Description:** A Python file containing custom test generator functions, annotated with the `@test_generator` decorator. These functions allow for the creation of semantic, operator-specific test cases to supplement or override Acto's default test generation logic for specific CRD fields. This is an advanced feature for improving test coverage and precision.
+    *   **Custom Oracle Files (for advanced operator testing):**
+        *   **Path:** A Python module (e.g., a file or directory) referenced by its import path (e.g., `data.cass-operator.v1-22.oracle`).
+        *   **Description:** A Python file containing custom oracle functions that implement domain-specific checks to detect bugs that generic oracles might miss. This allows for more precise and powerful bug detection tailored to an operator's logic.
+    *   **Custom Mapping Files (for advanced analysis):**
+        *   **Path:** A Python module (e.g., a file or directory) referenced by its import path (e.g., `data.cass-operator.v1-22.custom_mapping`, `data.cockroach-operator.custom_mapping`).
+        *   **Description:** A Python file containing custom logic for advanced analysis workflows, specified via the `custom_module` key in the configuration file.
+    *   **Acto Context File:**
+        *   **Path:** `context.json` (created in the same directory as the seed CR, e.g., `data/anvil-zookeeper-operator/context.json`, `data/k8ssandra_cass-operator/context.json`, `data/cass-operator/v1-22/context.json`, `data/argoproj-labs_argocd-operator/context.json`, `data/clickhouse-operator/context.json`, `data/cloudnative-pg_cloudnative_pg/context.json`, `data/cockroach-operator/context.json`, `data/elastic-cloud-on-k8s-operator/context.json`, or `data/grafana_grafana-operator/context.json`).
+        *   **Description:** An auto-generated file created by Acto's "learn" phase (`acto --learn`). It stores pre-flight information to optimize and inform the main test campaign. Key contents include the full CRD schema under the `crd` key, detailed static analysis results under the `analysis_result` key, and a list of required container images under the `preload_images` key that must be available for the operator's controllers and application pods to become ready. Examples include `["docker.io/pravega/zookeeper:0.2.14", "ghcr.io/.../zookeeper-controller:f926600a79ae..."]` for Zookeeper, `["quay.io/jetstack/cert-manager-controller:v1.12.2", "quay.io/jetstack/cert-manager-cainjector:v1.12.2", "docker.io/k8ssandra/cass-operator:v1.22.1", ...]` for Cassandra v1.22, `["cr.k8ssandra.io/k8ssandra/cass-operator:v1.19.0", "quay.io/jetstack/cert-manager-controller:v1.12.2", "cr.dtsx.io/datastax/cass-config-builder:1.0-ubi8", ...]` for k8ssandra-operator v1.19, `["quay.io/argoprojlabs/argocd-operator:v0.8.0", "quay.io/jetstack/cert-manager-webhook:v1.14.1", ...]` for ArgoCD, `["docker.io/altinity/clickhouse-operator:0.22.2", "docker.io/zookeeper:3.8.1", ...]` for ClickHouse, `["ghcr.io/cloudnative-pg/cloudnative-pg:1.22.1", "ghcr.io/cloudnative-pg/postgresql:16.1"]` for CloudNative PG, `["docker.io/cockroachdb/cockroach-operator:v2.7.0", "docker.io/cockroachdb/cockroach:v21.2.10"]` for CockroachDB, `["docker.elastic.co/eck/eck-operator:2.11.1", "docker.elastic.co/elasticsearch/elasticsearch:8.12.0"]` for Elastic, or `["ghcr.io/grafana/grafana-operator:v5.6.3", "docker.io/grafana/grafana:9.1.6"]` for Grafana. This file should be committed to the repository for a new operator port.
+    *   **[CloudLab Setup] Ansible Inventory File:**
+        *   **Path:** `/tmp/acto-cloudlab/scripts/ansible/ansible_hosts` (during manual setup).
+        *   **Description:** A file that lists the CloudLab machine(s) to be configured by Ansible. It contains the server address and connection details.
+    *   **[Advanced: Code Coverage] Modified Operator Source and Build Files:**
+        *   **Description:** When measuring code coverage for a Go-based operator, several files within the operator's source code repository must be created or modified.
+            *   **`main_test.go`:** A new Go test file created alongside the operator's `main.go` file. It contains a single test that calls the `main()` function, allowing the E2E run to be captured as a test with coverage.
+            *   **Operator `Dockerfile`:** Modified to build a test binary (`go test -c ...`) instead of a standard binary (`go build ...`), including coverage flags.
+            *   **Entrypoint Shell Script:** A new script that becomes the Docker image's entrypoint. It executes the compiled test binary with the `-test.coverprofile` flag to write coverage data to a file.
+    *   **Custom `kind` Cluster Configuration:**
+        *   **Description:** A YAML file used to create a `kind` cluster with custom settings. This is necessary to persist coverage files using `extraMounts` or to enable Kubernetes `featureGates` like `StatefulSetAutoDeletePVC`. The configuration can specify multiple node roles and their specific settings.
+    *   **[Advanced: Code Coverage] Modified Operator Deployment YAML:**
+        *   **Description:** The operator's deployment manifest (e.g., `actions-runner-controller.yaml`) must be modified to mount the path from the `kind` node into the operator's pod using `volumeMounts` and a `hostPath` volume. This allows the operator's entrypoint script to write coverage files out to the host machine's `profile/data` directory.
+    *   **Note on Build Artifacts:** The `make` command will generate a crucial C-style shared library at `acto/k8s_util/lib/k8sutil.so`. This file is compiled from Go source code and is essential for the project's operation.
+    *   **Note on SSA Module Build Artifacts:** Building the Go module in `ssa/` using the provided Makefile will generate a C-style shared library at `ssa/libanalysis.so`. This build process will also download dependencies and may generate a `go.sum` file.
+    *   **Note on Utility Build Artifacts:** The `scripts/field_count` directory contains multiple Go utilities. Building the utility from its entrypoint at `cmd/actoFieldCount/actoFieldCount.go` will generate an executable binary (`actoFieldCount`) and a `go.sum` file. Another utility at `cmd/compareFields.go/compareFields.go` is designed to be run directly with `go run`.
+    *   **Note on Requirement Files:** The `requirements.txt` and `requirements-dev.txt` files are generated from `pyproject.toml` using the `pip-compile` pre-commit hook. They should not be edited manually.
+    *   **Note on `bugs.md`:** The `bugs.md` file in the root directory is automatically updated by a GitHub Actions workflow (`.github/workflows/counter.yml`) to reflect the current bug count. It should not be edited manually.
+    *   **Note on Ansible Configuration:** The file `scripts/ansible/ansible.cfg` is part of the repository and configures Ansible's behavior. Specifically, it disables SSH host key checking to allow for non-interactive connections in automated scripts. It should not be modified unless you need to change this behavior.
+    *   **Note on Fault Injection Configuration:** The `chactos/` directory contains JSON files (e.g., `cass-operator.json`, `mariadb-operator.json`, `minio-operator.json`, `percona-mongodb-operator.json`, `rabbitmq-operator.json`, `strimzi-kafka-operator.json`, `strimzi-kafka-operator-zk.json`, `tidb-operator.json`, `zookeeper-operator.json`) that configure fault injection scenarios for the `chactos` tool. These are part of the repository.
+    *   **Note on Teardown Script:** The script `scripts/teardown.sh` is provided to automate the deletion of all local Kubernetes `kind` clusters. It is a convenient utility for cleaning up the environment after running tests.
+    *   **Note on Analysis Script Prerequisites:** The scripts in `scripts/field_count/` (`count_acto.sh`, `run.sh`) require a directory containing Acto test run data to function. Additionally, `run.sh` requires local clones of the corresponding operator source code. Both scripts contain hardcoded paths that must be updated by the user. **You must edit these scripts to replace placeholder paths (e.g., `/home/tyler/acto-data/...`, `~/rabbitmq-operator/`) with the correct locations for your environment, such as `/home/cc/EnvGym/data/acto/testrun-results/` and `/home/cc/EnvGym/data/rabbitmq-operator-src/`, before execution.**
+    *   **Note on GitHub Workflow Files:** The repository includes GitHub-specific files like issue templates (e.g., `.github/ISSUE_TEMPLATE/alarm-inspection-report.yaml`) that define contribution and reporting workflows. These are part of the repository and do not require manual creation, but are essential for project collaboration.
+    *   **Note on Test Artifacts:** Test runs will generate output directories like `testrun-*`. Inside, you will find `trial-XX-YYYY` subdirectories for each test run, containing detailed artifacts:
+        *   `testplan.json`: The overall plan for the test campaign.
+        *   `mutated-*.yaml`: The sequence of CRs applied during the test.
+        *   `system-state-*.json`: Snapshots of the Kubernetes system state after each step.
+        *   `operator-*.log`, `cli-output-*.log`, `events-*.log`: Logs collected during the test.
+        *   `generation-*-runtime.json`: The results from Acto's oracles (checkers).
+        *   `delta-*.log`: A diff view of input and system state changes.
+        *   `coverage-*.out`: [Advanced] Go coverage profile files generated when running a coverage-instrumented operator.
+        *   A final CSV report can be generated using the `collect_test_result.py` script.
+        *   Other temporary files like `.coverage.*` and `pytest.xml` may also be created.
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    *   **Unit Test Suite (CI Unit Test):**
+        *   **Description:** Run fast, isolated tests for the core `acto` library functions. This suite verifies the correctness of individual components without external dependencies like Kubernetes.
+        *   **Key Functionality Points to Test:**
+            *   Core logic within the `acto/` directory, including Python modules and Go utilities.
+    *   **Integration Test Suite (CI Integration Test):**
+        *   **Description:** Run tests that verify interactions between different components of Acto. These tests are more complex than unit tests but do not require a full end-to-end environment with a Kubernetes cluster.
+        *   **Key Functionality Points to Test:**
+            *   Component interactions within the `test/integration_tests/` directory.
+    *   **Pull Request Bug Reproduction Suite (PR CI E2E Test):**
+        *   **Description:** Run a focused suite of end-to-end tests marked for single bug reproduction. This is the primary verification method used in the pull request CI pipeline to ensure the environment is correctly configured for E2E testing.
+        *   **Key Functionality Points to Test:**
+            *   Successful build of all Acto components via `make`, specifically the compilation of the Go helper library into `acto/k8s_util/lib/k8sutil.so`.
+            *   Ability of Acto to create and manage local Kubernetes `kind` clusters.
+            *   Successful deployment and testing of various operators (e.g., `cass-operator` v1.22, `k8ssandra_cass-operator` v1.19, `actions-runner-controller`, `apache_rocketmq-operator`, `argocd-operator`, `clickhouse-operator`, `cloudnative-pg`, `cockroach-operator`, `elastic-cloud-on-k8s-operator`, `grafana-operator`). This includes handling multi-step deployments with prerequisites (like deploying `cert-manager` for `argocd-operator`, `cass-operator`, or `k8ssandra_cass-operator` or applying `crds.yaml` before `operator.yaml` for `elastic-cloud-on-k8s-operator`), handling comprehensive single-file deployments that create their own namespace (like `cloudnative-pg` creating `cnpg-system`, `cockroach-operator` creating `cockroach-operator-system`, `elastic-cloud-on-k8s-operator` creating `elastic-system`, or `grafana-operator` creating `grafana`), applying auxiliary resources, and applying a seed CR to create a resource. This also includes testing secondary CRDs introduced by operators, such as `CassandraTask`.
+    *   **Full Bug Reproduction Suite (Comprehensive E2E Test):**
+        *   **Description:** Run the full suite of end-to-end tests marked for bug reproduction using `pytest`. This is a more comprehensive verification method.
+        *   **Key Functionality Points to Test:**
+            *   All points from the PR test, but across a wider range of scenarios and operators.
+    *   **Specific Bug Reproduction via Script (CloudLab Method):**
+        *   **Description:** Run a single, specific bug reproduction using the `reproduce_bugs.py` script. This is the recommended verification method for a newly provisioned CloudLab environment.
+        *   **Key Functionality Points to Test:**
+            *   Successful execution of the `reproduce_bugs.py` script with a valid bug ID (e.g., `rdoptwo-287`).
+            *   Verifies the complete end-to-end setup on the target machine.
+    *   **Acto Learn Phase Verification (New Operator Workflow):**
+        *   **Description:** Run Acto's pre-flight "learn" phase for a configured operator. This validates the operator's deployment configuration and collects initial data.
+        *   **Key Functionality Points to Test:**
+            *   Successful execution of the `python3 -m acto --config [path/to/config.json] --learn` command.
+            *   Creation of the `context.json` file in the operator's data directory, and verification that it contains expected data like a `preload_images` list (e.g., `["quay.io/jetstack/cert-manager-controller:v1.12.2", ..., "docker.io/k8ssandra/cass-operator:v1.22.1", ...]` for `cass-operator` v1.22, `["cr.k8ssandra.io/k8ssandra/cass-operator:v1.19.0", "quay.io/jetstack/cert-manager-controller:v1.12.2", ...]` for `k8ssandra_cass-operator` v1.19, `["quay.io/argoprojlabs/argocd-operator:v0.8.0", ...]` for ArgoCD, `["docker.io/altinity/clickhouse-operator:0.22.2", ...]` for ClickHouse, `["ghcr.io/cloudnative-pg/cloudnative-pg:1.22.1", ...]` for CloudNative PG, `["docker.io/cockroachdb/cockroach-operator:v2.7.0", ...]` for CockroachDB, `["docker.elastic.co/eck/eck-operator:2.11.1", ...]` for Elastic, or `["ghcr.io/grafana/grafana-operator:v5.6.3", ...]` for Grafana).
+            *   Successful operator deployment and health checks within the temporary learn cluster. This includes the successful deployment of any prerequisite components (like `cert-manager` for `cass-operator` and `k8ssandra_cass-operator`) or the successful deployment from a comprehensive manifest that creates its own namespace (like `cnpg-system` for `cloudnative-pg`, `cockroach-operator-system` for `cockroach-operator`, or `elastic-system` for `elastic-cloud-on-k8s-operator`) and the main operator controller.
+    *   **Custom Test Generator Verification (New Operator Workflow):**
+        *   **Description:** Verify that Acto can correctly discover, prioritize, and apply custom test generators provided for a specific operator.
+        *   **Key Functionality Points to Test:**
+            *   A custom test generator function is correctly matched to its target schema based on constraints like `property_name`, `property_type`, or `paths`.
+            *   The test cases returned by the custom generator are included in the final test plan.
+            *   The priority system (`Priority.CUSTOM`, `Priority.SEMANTIC`, etc.) correctly resolves conflicts when multiple generators match a schema.
+            *   The ability to extend built-in generators (e.g., `replicas_tests`) via function composition works as expected.
+    *   **Custom Oracle Verification (New Operator Workflow):**
+        *   **Description:** Verify that Acto can correctly load and execute custom, domain-specific oracles specified in an operator's configuration file.
+        *   **Key Functionality Points to Test:**
+            *   Acto successfully imports the Python module specified by the `custom_oracle` key (e.g., `data.cass-operator.v1-22.oracle`).
+            *   The custom oracle logic is executed during the test run and can correctly identify operator-specific bugs.
+    *   **Custom Mapping Module Verification (New Operator Workflow):**
+        *   **Description:** Verify that Acto can correctly load and utilize custom mapping modules specified in an operator's configuration file for advanced analysis.
+        *   **Key Functionality Points to Test:**
+            *   Acto successfully imports the Python module specified by the `custom_module` key (e.g., `data.cass-operator.v1-22.custom_mapping`, `data.cockroach-operator.custom_mapping`).
+            *   The custom mapping logic is correctly applied during the relevant analysis phase.
+    *   **Full Operator Test Campaign (New Operator Workflow):**
+        *   **Description:** Launch a full, multi-worker test campaign against a newly ported operator using its configuration file. This is the primary method for testing a new operator from scratch.
+        *   **Key Functionality Points to Test:**
+            *   Successful execution of `python3 -m acto --config [path/to/config.json]`.
+            *   Creation of `testrun-*` and `trial-*` directories with complete test artifacts.
+            *   Acto runs to completion without crashing.
+            *   Correctly applying and testing complex, nested application configurations passed through the Custom Resource, such as the `spec.config` block in the `cass-operator`'s CR which is validated against the schema from `cass-config.json`.
+            *   Correctly narrowing the test scope if `focus_fields` is specified in the configuration.
+    *   **Operator Crash Resilience Test:**
+        *   **Description:** Verify that Acto can detect when an operator's controller pod crashes and correctly report this as a potential issue.
+        *   **Key Functionality Points to Test:**
+            *   Deploy an operator using a manifest designed to cause a crash (e.g., using an image with a `crash` command like in `operator-crash.yaml`).
+            *   Verify that Acto's system state snapshotting and logging mechanisms capture the pod's `CrashLoopBackOff` status.
+            *   Check if Acto's built-in oracles flag this condition as an "Operator Crash" alarm.
+    *   **Test Result Collection Verification (New Operator Workflow):**
+        *   **Description:** After a test campaign, run the post-processing script to aggregate all findings into a single CSV file.
+        *   **Key Functionality Points to Test:**
+            *   Successful execution of `python3 -m acto.post_process.collect_test_result --config ... --testrun-dir ...`.
+            *   Creation of a `.csv` file in the specified test run directory.
+    *   **Alarm Triage and Reporting Verification:**
+        *   **Description:** After a test run identifies an "alarm" (a potential bug), verify the user can use the generated artifacts to perform a root cause analysis and file a structured bug report.
+        *   **Key Functionality Points to Test:**
+            *   The test artifacts (logs, system states, etc.) in the `trial-*` directory are sufficient to understand the sequence of events leading to the alarm.
+            *   The user can locate the relevant operator source code to identify the root cause of the behavior.
+            *   The user can successfully create a new GitHub issue using the "Alarm Inspection Report" template, filling in the required sections based on their analysis.
+    *   **Kubernetes Engine Test Suite:**
+        *   **Description:** Run a targeted suite of tests for the `acto/kubernetes_engine` component. This verifies the system's ability to interact with different local Kubernetes providers and configurations.
+        *   **Key Functionality Points to Test:**
+            *   Successful creation and teardown of Kubernetes clusters using both `kind` and `minikube`.
+            *   Successful creation of a `kind` cluster with a specific Kubernetes version (e.g., `v1.26.3`, `v1.23.0`, `v1.28.0`, `v1.29.1`) as specified in the configuration file.
+            *   Successful creation of a `kind` cluster with specific `featureGates` enabled (e.g., `StatefulSetAutoDeletePVC: true`).
+            *   Correct interaction with the cluster's API server.
+    *   **Environment Verification Test Case (Quick E2E Demo):**
+        *   **Description:** Run a pre-packaged demo that reproduces a known bug (`cassop-330`) to quickly verify the end-to-end functionality of Acto.
+        *   **Key Functionality Points to Test:**
+            *   Successful deployment of the `cass-operator`. Note that newer versions of this operator may require prerequisites like `cert-manager`.
+            *   Acto's capability to apply a sequence of Custom Resource (CR) changes.
+            *   Verification that Acto's oracles can detect the specific state inconsistency bug.
+    *   **Development Environment Verification (Code Quality Checks):**
+        *   **Description:** Run the full suite of pre-commit hooks across the codebase to ensure that linting, formatting, type checking, and dependency checks are configured correctly.
+        *   **Key Functionality Points to Test:**
+            *   `pre-commit` is installed and the git hooks are active.
+            *   Code formatters (`black`, `isort`), linters (`pylint`, `flake8`), spell checkers (`codespell`), and type checkers (`mypy`) run successfully.
+            *   Dependency compilation hooks (`pip-compile`) are functional.
+    *   **Multi-Worker Test Suite:**
+        *   **Description:** Run an end-to-end test using multiple parallel workers (e.g., by specifying `--num-workers`). This verifies the system's capacity to handle multiple simultaneous `kind` cluster creations.
+        *   **Key Functionality Points to Test:**
+            *   Correct configuration of system resources, specifically `inotify` limits, to prevent "too many open files" errors.
+            *   Acto's ability to orchestrate and manage multiple concurrent test runs.
+    *   **SSA Go Module Verification:**
+        *   **Description:** Build the Go shared library located at `ssa/` to ensure the Go toolchain can correctly compile Go code into a C-style shared library.
+        *   **Key Functionality Points to Test:**
+            *   The `make analysis` command in the `ssa/` directory completes successfully.
+            *   The shared library `libanalysis.so` is created in the `ssa/` directory.
+    *   **Utility Script Verification (Acto Field Counter):**
+        *   **Description:** Build and run the Go utility script located at `scripts/field_count` to ensure it can correctly process Acto test run outputs.
+        *   **Key Functionality Points to Test:**
+            *   Go dependencies for the `field_count` module can be successfully downloaded.
+            *   The script at `cmd/actoFieldCount/actoFieldCount.go` compiles into an executable binary without errors.
+            *   The `scripts/field_count/count_acto.sh` script can be executed (requires pre-existing test data and path modification).
+    *   **Utility Script Verification (Field Comparison):**
+        *   **Description:** Run the Go utility script `cmd/compareFields.go/compareFields.go` via its wrapper `scripts/field_count/run.sh` to ensure it can perform advanced analysis on operator fields.
+        *   **Key Functionality Points to Test:**
+            *   The `go run` command executes the `compareFields.go` script without compilation errors.
+            *   The `scripts/field_count/run.sh` script can be executed (requires pre-existing Acto test data, operator source code, and path modification).
+    *   **Ansible Script Verification:**
+        *   **Description:** Verify that Ansible is correctly installed and configured within the Python virtual environment, ready to execute automation playbooks.
+        *   **Key Functionality Points to Test:**
+            *   The `ansible` command-line tool is executable and reports the correct version.
+            *   The tool recognizes the local `ansible.cfg` file for project-specific settings.
+    *   **CI Script Verification (Bug Counter):**
+        *   **Description:** Manually run the `bug_counter.py` script to ensure it correctly processes the `bugs.md` file. This verifies a key piece of repository automation.
+        *   **Key Functionality Points to Test:**
+            *   The script executes without errors using the project's Python environment.
+            *   It correctly updates the bug count within the `bugs.md` file.
+    *   **Comprehensive Operator Test Suite (from `run.sh`):**
+        *   **Description:** Execute the provided `scripts/run.sh` script to run a full suite of tests against multiple operators (e.g., Percona MongoDB, Cassandra, TiDB, MariaDB, MinIO, RabbitMQ, Strimzi Kafka). This is a comprehensive end-to-end verification that tests the full workflow, including fault injection.
+        *   **Key Functionality Points to Test:**
+            *   Successful execution of the `acto` tool with both `func-only` and `config-only` configurations.
+            *   Successful execution of the `chactos` tool to perform fault injection analysis based on the `acto` run results.
+            *   Correct handling of operator-specific configurations from the `data/` directory (including `config-only.json` files) and fault injection configurations from the `chactos/` directory. For example, verifying that `chactos` can parse its configuration files (e.g., `chactos/cass-operator.json`, `chactos/percona-mongodb-operator.json`, `chactos/rabbitmq-operator.json`, `chactos/strimzi-kafka-operator.json`, `chactos/strimzi-kafka-operator-zk.json`, `chactos/tidb-operator.json`, `chactos/zookeeper-operator.json`) to correctly identify operator and application pods via their label selectors, and then inject the specified fault (e.g., `pod_failure`).
+            *   Creation of detailed output in `testrun-*` directories for each test run.
+    *   **Environment Teardown Verification:**
+        *   **Description:** Verify that the provided teardown script correctly removes all `kind` clusters created during testing.
+        *   **Key Functionality Points to Test:**
+            *   Execution of the `scripts/teardown.sh` script completes without errors.
+            *   The `kind get clusters` command returns an empty list after the script has run.
+    *   **[Advanced] Go Operator Code Coverage Measurement:**
+        *   **Description:** Verify the end-to-end workflow for measuring code coverage of a Go-based operator.
+        *   **Key Functionality Points to Test:**
+            *   A custom-built, coverage-instrumented operator Docker image can be deployed successfully.
+            *   Acto tests run against this operator generate `.out` coverage files in the host's `profile/data` directory.
+            *   The `gocovmerge` tool can successfully merge the generated coverage files.
+            *   The `go tool cover` command can process the merged file to produce a final coverage report.
+
+4.  COMPLETE TODO LIST:
+    This guide provides two primary setup paths: **Part A for a Local Development Environment** and **Part B for a Remote CloudLab Experiment Environment**. A third part, **Part C**, details the workflow for testing a new operator, and a fourth, **Part D**, describes an advanced workflow for measuring code coverage.
+
+    ---
+    ### **Part A: Local Development Setup**
+    ---
+    **Note:** All commands in this section should be executed from the project's root directory: `/home/cc/EnvGym/data/acto`.
+
+    - **Step 1: Install Core System Dependencies**
+        *   1.1. **Install Docker:** Download and install Docker Engine for Linux. Your version `28.1.1` is compatible.
+        *   1.2. **Start Docker Service:** Ensure the Docker daemon is running.
+        *   1.3. **Verification:** Open a terminal and run `docker --version`.
+        *   1.4. **Network Access Note:** Ensure your environment has internet access to pull container images from public registries like `docker.io`, `quay.io`, `ghcr.io`, `docker.elastic.co`, `cr.k8ssandra.io`, and `cr.dtsx.io`. If you are in a firewalled environment, you will need to pre-pull required images to a local registry. Examples include `docker.io/zookeeper:3.8.1`, `quay.io/jetstack/cert-manager-controller:v1.14.1`, `ghcr.io/cloudnative-pg/cloudnative-pg:1.22.1`, `docker.io/cockroachdb/cockroach-operator:v2.7.0`, `docker.elastic.co/eck/eck-operator:2.11.1`, `docker.elastic.co/elasticsearch/elasticsearch:8.12.0`, `ghcr.io/grafana/grafana-operator:v5.6.3`, and the full set for `k8ssandra_cass-operator` v1.19: `cr.k8ssandra.io/k8ssandra/cass-operator:v1.19.0`, `cr.k8ssandra.io/k8ssandra/system-logger:v1.19.0`, `cr.dtsx.io/datastax/cass-config-builder:1.0-ubi8`, `cr.k8ssandra.io/k8ssandra/cass-management-api:4.0.1`, `quay.io/jetstack/cert-manager-cainjector:v1.12.2`, `quay.io/jetstack/cert-manager-controller:v1.12.2`, `quay.io/jetstack/cert-manager-webhook:v1.12.2`.
+        *   1.5. **Install Golang:** Download and install Go version `1.20.5`. The project's CI uses this version, and it is compatible with submodules that require older versions (e.g., `go 1.17`, `go 1.18`). Follow the instructions to set up your `GOPATH`.
+        *   1.6. **Verification:** Open a new terminal and run `go version`. Ensure it reports `go1.20.5` or a compatible version.
+        *   1.7. **Install Python:** Install Python version `3.10` or newer. If your operating system's default Python is older (e.g., Python 3.8 on Ubuntu 20.04), you must install a newer version before proceeding.
+        *   1.8. **Verification:** Run `python3 --version`. Ensure the reported version is 3.10 or higher.
+        *   1.9. **Install Build Tools:** Install `make` and a C/C++ compiler.
+            *   On Ubuntu/Debian: `sudo apt install build-essential`
+            *   On CentOS/RHEL: `sudo yum groupinstall "Development Tools"`
+        *   1.10. **Verification:** Run `make --version` and `gcc --version` (or `clang --version`).
+
+    - **Step 2: [Optional but Recommended] Configure System for Multi-Cluster Testing**
+        *   2.1. **Problem:** Running multiple concurrent tests (using `--num-workers`) can exhaust the system's `inotify` resource limits, causing `kind` cluster creation to fail with "too many open files" errors.
+        *   2.2. **Increase Limits:** Run the following commands to increase the limits.
+            ```shell
+            sudo sysctl fs.inotify.max_user_watches=524288
+            sudo sysctl fs.inotify.max_user_instances=512
+            ```
+        *   2.3. **Make Changes Persistent (Optional):** To ensure these settings survive a reboot, add them to `/etc/sysctl.conf`:
+            ```shell
+            echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
+            echo fs.inotify.max_user_instances=512 | sudo tee -a /etc/sysctl.conf
+            ```
+        *   2.4. **Verification:** Run `sysctl fs.inotify.max_user_watches` and `sysctl fs.inotify.max_user_instances` to confirm the new values are active.
+
+    - **Step 3: Navigate to the Acto Project Directory**
+        *   3.1. **Navigate to Directory:** The project is located at `/home/cc/EnvGym/data/acto`. Change into this directory for all subsequent steps.
+            ```shell
+            cd /home/cc/EnvGym/data/acto
+            ```
+
+    - **Step 4: Set Up Python Environment**
+        *   4.1. **Create Virtual Environment:** In the project root, run `python3 -m venv venv`. Ensure the `python3` command used here corresponds to your Python 3.10+ installation. For example, you might need to run `python3.10 -m venv venv`.
+        *   4.2. **Activate Virtual Environment:**
+            *   `source venv/bin/activate`
+        *   4.3. **Verification:** Your terminal prompt should now be prefixed with `(venv)`.
+        *   4.4. **Upgrade Packaging Tools:** Run `python3 -m pip install --upgrade pip setuptools wheel`.
+        *   4.5. **Install Dependencies:** Run `python3 -m pip install -r requirements-dev.txt` to install all runtime and development dependencies.
+        *   4.6. **Verification:** Run `python3 -m pip freeze`. Check that packages like `kubernetes`, `pydantic`, `pytest`, `black`, `pylint`, `ansible-core`, `mypy`, `flake8`, and `codespell` are installed with the versions specified in the requirements file.
+
+    - **Step 5: Set Up and Verify Pre-Commit Hooks**
+        *   5.1. **Install Git Hooks:** In the project root, run `pre-commit install`. This will set up the git hooks, which enforce coding style using tools like `black`, `isort`, and `pylint`, to run automatically before each commit.
+        *   5.2. **Verification:** Manually run the hooks on all files to ensure they are working correctly: `pre-commit run --all-files`. The command should complete with all checks passing, including formatters (`black`, `isort`), linters (`pylint`, `flake8`), spell checkers (`codespell`), and type checkers (`mypy`).
+
+    - **Step 6: Install Kubernetes Tooling**
+        *   6.1. **Install `kind`:** Run the command `go install sigs.k8s.io/kind@v0.20.0`.
+        *   6.2. **Verification:** Ensure your Go binary path (`$GOPATH/bin` or `~/go/bin`) is in your system's `PATH`. Run `kind --version`. It should output `kind version 0.20.0`. `kind` can create clusters with different Kubernetes versions, e.g., v1.23.0, v1.26.3, v1.28.0, or v1.29.1.
+        *   6.3. **Install `kubectl`:** Follow the official Kubernetes documentation to install `kubectl` for your operating system.
+        *   6.4. **Verification:** Run `kubectl version --client`.
+        *   6.5. **Install `minikube`:** Follow the official `minikube` documentation to install the latest stable version.
+        *   6.6. **Verification:** Run `minikube version`.
+
+    - **Step 7: [Optional] Install Additional Tools**
+        *   7.1. **Install Helm:** Follow the official Helm documentation to install it.
+        *   7.2. **Verification:** Run `helm version`.
+        *   7.3. **Install `gocovmerge` (for advanced coverage workflow):** Run `go install github.com/wadey/gocovmerge@latest`.
+        *   7.4. **Verification:** Run `gocovmerge -h`.
+        *   7.5. **Note on Usage:** Remember that Acto requires plain YAML files for deployment. If your operator uses Helm or Kustomize, you can use `helm template my-chart` or `kubectl kustomize build .` to generate the necessary YAML files to be referenced in your Acto configuration.
+
+    - **Step 8: Build Acto Project Core Components**
+        *   8.1. **Run Build Command:** In the project's root directory (`/home/cc/EnvGym/data/acto`), execute `make`. This will compile all core components, including the Go helper library.
+        *   8.2. **Verification:** The command should complete without errors. Verify that the shared library was created by running `ls acto/k8s_util/lib/k8sutil.so`. The command should list the file without a "No such file or directory" error.
+
+    - **Step 9: Build and Verify SSA Go Module**
+        *   9.1. **Navigate to Module Directory:** Run `cd ssa`.
+        *   9.2. **Download Dependencies:** Run `go mod tidy` to ensure all dependencies are present.
+        *   9.3. **Build Shared Library:** Run `make analysis` to compile the Go code into a shared library.
+        *   9.4. **Verification:** The command should complete without errors. Verify the shared library was created by running `ls libanalysis.so`. The command should list the file.
+        *   9.5. **Return to Project Root:** Run `cd ..`.
+
+    - **Step 10: Build and Verify Go Utility Scripts**
+        *   10.1. **Navigate to Script Directory:** Run `cd scripts/field_count`.
+        *   10.2. **Download Dependencies:** Run `go mod tidy` to download necessary dependencies for the utilities in this directory.
+        *   10.3. **Build `actoFieldCount` Script:** Run `go build ./cmd/actoFieldCount/` to compile the script.
+        *   10.4. **Verification:** Check that an executable named `actoFieldCount` has been created by running `ls actoFieldCount`.
+        *   10.5. **Note on `compareFields`:** The `cmd/compareFields.go/compareFields.go` utility is run directly via `go run` in the `run.sh` script and does not require a separate build step.
+        *   10.6. **Return to Project Root:** Run `cd ../..`.
+
+    - **Step 11: Create Profile Directory**
+        *   11.1. **Create Directory:** In the project root, run `mkdir -m 777 -p profile/data`.
+        *   11.2. **Verification:** Run `ls -ld profile/data` and confirm the directory exists and has permissive write access.
+
+    - **Step 12: Verify Ansible Environment**
+        *   12.1. **Check Ansible Installation:** Run `ansible --version`.
+        *   12.2. **Verification:** The command should execute successfully and show the installed `ansible-core` version. It should also list the path to the configuration file being used. If you are inside the `scripts/ansible` directory, it should pick up the local `ansible.cfg`.
+
+    - **Step 13: Execute Tests to Verify Full Setup**
+        *   13.1. **Run Unit Tests (Quick Check):**
+            ```sh
+            python3 -m pytest acto
+            ```
+        *   13.2. **Run Integration Tests:**
+            ```sh
+            python3 -m pytest test/integration_tests
+            ```
+        *   13.3. **Run End-to-End Test (Standard Verification):** Execute the main test suite used by the Pull Request CI pipeline. This is the recommended way to ensure your E2E setup is functional. To also verify multi-worker capability (if you configured sysctl in Step 2), you can add a parallel worker flag, e.g., `--num-workers=2`.
+            ```sh
+            python3 -m pytest test/e2e_tests -m "single_bug_reproduction" -s
+            ```
+        *   13.4. **[Alternative] Run Full End-to-End Test (Comprehensive Suite):** To run a more extensive set of E2E tests.
+            ```sh
+            python3 -m pytest test/e2e_tests -m "all_bug_reproduction" -s
+            ```
+        *   13.5. **[Alternative] Run Quick End-to-End Test (Single Demo):** For a faster, less comprehensive E2E check, run the `cassop-330` demo.
+            ```sh
+            python3 -m acto.reproduce --reproduce-dir test/e2e_tests/test_data/cassop-330/trial-demo --config data/cass-operator/config.json
+            ```
+        *   13.6. **[Component Test] Run Kubernetes Engine Verification:** Run the targeted test suite for the Kubernetes engine component. This will test interactions with `kind` and `minikube`, and may include tests for specific K8s versions (e.g., `v1.29.1`) or feature gates.
+            ```sh
+            python3 -m pytest -m "kubernetes_engine"
+            ```
+        *   13.7. **[Advanced] Run Comprehensive Operator Test Suite:** For a full system verification including fault injection, execute the main run script. This script tests multiple operators (e.g., Percona MongoDB, Cassandra, TiDB, MariaDB, MinIO, RabbitMQ, Strimzi Kafka, ZooKeeper). Note: This is a long-running process that will consume significant system resources (CPU, memory, disk space).
+            ```sh
+            bash scripts/run.sh
+            ```
+            *   **Verification:** Monitor the output for successful completion of each stage. Verify that `testrun-*` directories are created in the project root (`/home/cc/EnvGym/data/acto`).
+        *   13.8. **[Optional] Run Field Count Utility Script:**
+            *   13.8.1. **Prerequisite:** Ensure you have Acto test run data available from a previous step (e.g., Step 13.7).
+            *   13.8.2. **Update Script:** Edit `scripts/field_count/count_acto.sh` and replace the hardcoded paths (e.g., `/home/tyler/acto-data/...`) with the correct path to your test run data (e.g., `/home/cc/EnvGym/data/acto/testrun-mongodb/`).
+            *   13.8.3. **Execute:** `bash scripts/field_count/count_acto.sh`
+            *   **Verification:** The script should complete without Go compilation errors and output analysis data.
+        *   13.9. **[Optional] Run Field Comparison Utility Script:**
+            *   13.9.1. **Prerequisites:** Ensure you have Acto test run data (e.g., from Step 13.7) AND local clones of the relevant Kubernetes operator source code repositories.
+            *   13.9.2. **Update Script:** Edit `scripts/field_count/run.sh` and replace all hardcoded paths (e.g., `/home/tyler/acto-data/...`, `~/rabbitmq-operator/`) with the correct paths to your test data and operator source code directories (e.g., `/home/cc/EnvGym/data/acto/testrun-rabbitmq/` and `/home/cc/EnvGym/data/rabbitmq-operator-src/`).
+            *   13.9.3. **Execute:** `bash scripts/field_count/run.sh`
+            *   **Verification:** The script should execute the `go run` commands without compilation errors.
+        *   13.10. **Monitor Execution:** For `pytest` based tests, observe the terminal output for logs indicating cluster creation, operator deployment, and test execution.
+        *   13.11. **Final Verification:** A successful setup is confirmed if the chosen test suite(s) run to completion without environment-related errors.
+        *   13.12. **Cleanup:** After E2E verification, clean up the created resources.
+            *   13.12.1. Run the teardown script to delete all `kind` clusters: `bash scripts/teardown.sh`.
+            *   13.12.2. Verify `kind` cleanup by running `kind get clusters`. The command should return no clusters.
+            *   13.12.3. If `minikube` was used for the `kubernetes_engine` test, delete the cluster manually: `minikube delete`.
+            *   13.12.4. The temporary `testrun-*` directories can also be removed: `rm -rf testrun-*`.
+
+    - **Step 14: [Optional] Verify CI Automation Scripts**
+        *   14.1. **Run Bug Counter Script:** Execute the command `python3 .github/workflows/bug_counter.py`.
+        *   14.2. **Verification:** Use `git diff bugs.md` to check that the script has updated the file as expected. You can revert the changes with `git checkout bugs.md` after verification.
+
+    ---
+    ### **Part B: CloudLab Experiment Setup**
+    ---
+    **Note:** This section describes setting up a separate, remote environment on CloudLab. It is independent of the local environment specified at `/home/cc/EnvGym/data/acto` and is included for completeness.
+
+    - **Step 1: Fulfill CloudLab Prerequisites**
+        *   1.1. **Request Account:** Submit an account request at https://www.cloudlab.us/.
+        *   1.2. **Join Project:** When requesting, select "Join Existing Project" and enter `Sieve-Acto`.
+        *   1.3. **Wait for Approval:** Wait for administrator approval to access the CloudLab dashboard.
+
+    - **Step 2: Provision CloudLab Environment (Choose One Method)**
+
+        *   **Method 2.A: Automatic Setup (Recommended)**
+            *   2.A.1. **Launch Experiment from Profile:** Open the following link in your browser: https://www.cloudlab.us/p/Sieve-Acto/acto-cloudlab?refspec=refs/heads/main
+            *   2.A.2. **Confirm and Name:** Click "Next", give your experiment a name, click "Next" again, and then "Finish".
+            *   2.A.3. **Wait for Provisioning:** Wait for the process to complete. In the CloudLab dashboard's "List View", the "Status" must be `ready` and the "Startup" status must be `Finished`.
+            *   2.A.4. **Identify Server Address:** Note the server address provided, which will be in the format `<node>.<cluster>.cloudlab.us`.
+
+        *   **Method 2.B: Manual Setup using Ansible**
+            *   2.B.1. **Launch a Base Experiment:**
+                *   In the CloudLab dashboard, go to "Experiments" -> "Start Experiment".
+                *   Select the `small-lan` profile.
+                *   Set "Select OS image" to `UBUNTU 20.04`.
+                *   Set "Optional physical node type" to `c6420`.
+                *   Finish creating the experiment and wait for it to provision. Note the server address.
+            *   2.B.2. **Prepare a Controller Node:** This can be your local machine or the CloudLab node itself.
+            *   2.B.3. **Install Ansible on Controller:**
+                ```sh
+                sudo apt update
+                sudo apt -y install software-properties-common
+                sudo add-apt-repository --yes --update ppa:ansible/ansible
+                sudo apt -y install ansible
+                ansible-galaxy collection install ansible.posix
+                ansible-galaxy collection install community.general
+                ```
+            *   2.B.4. **Clone Ansible Scripts:**
+                ```sh
+                git clone https://github.com/xlab-uiuc/acto-cloudlab.git /tmp/acto-cloudlab
+                ```
+            *   2.B.5. **Create Ansible Inventory File:** Create the `ansible_hosts` file, replacing placeholders with your CloudLab node's domain and your username.
+                ```sh
+                domain="<your_node.cluster.cloudlab.us>"
+                user="<your_username>"
+                cd /tmp/acto-cloudlab/scripts/ansible/
+                echo "$domain ansible_connection=ssh ansible_user=$user ansible_port=22" > ansible_hosts
+                ```
+                *   *Note:* If the controller is the CloudLab machine itself, you can use `127.0.0.1` as the domain. You may also need to set up key-based SSH to localhost:
+                    ```sh
+                    ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N "" && cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+                    ```
+            *   2.B.6. **Run Ansible Playbook:** Execute the script to configure the CloudLab node.
+                ```sh
+                ansible-playbook -i ansible_hosts configure.yaml
+                ```
+            *   2.B.7. **Re-login:** If you ran the setup on the CloudLab node itself, log out and log back in to ensure all environment changes take effect.
+
+    - **Step 3: Run Acto and Verify Setup on CloudLab**
+        *   3.1. **Log in to the CloudLab Machine:** Use SSH to connect to the server address from Step 2.A.4 or 2.B.1.
+        *   3.2. **[Optional but Recommended] Configure System for Multi-Cluster Testing:**
+            *   3.2.1. **Check Limits:** The default `inotify` limits on the CloudLab nodes may be too low for running multiple concurrent Acto tests. Check the current limits:
+                ```sh
+                sysctl fs.inotify.max_user_watches
+                sysctl fs.inotify.max_user_instances
+                ```
+            *   3.2.2. **Increase Limits (if needed):** If the values are low (e.g., 8192 and 128), increase them to support parallel `kind` cluster creation.
+                ```sh
+                sudo sysctl fs.inotify.max_user_watches=524288
+                sudo sysctl fs.inotify.max_user_instances=512
+                ```
+            *   3.2.3. **Note:** These settings will reset on reboot. For persistence, add them to `/etc/sysctl.conf`.
+        *   3.3. **Navigate to Project Directory:** The setup scripts clone Acto into the `workdir` directory.
+            ```sh
+            cd ~/workdir/acto
+            ```
+        *   3.4. **Build Acto Components:**
+            ```sh
+            make
+            ```
+            *   **Verification:** The command should complete successfully, and the file `acto/k8s_util/lib/k8sutil.so` should exist.
+        *   3.5. **Run Verification Test:** Execute a specific bug reproduction case to confirm the end-to-end setup is working.
+            ```sh
+            python3 reproduce_bugs.py --bug-id rdoptwo-287
+            ```
+            *   **Verification:** The script should run to completion without setup-related errors, indicating that the CloudLab environment is correctly configured to run Acto experiments.
+            *   **Advanced Verification:** To test with multiple workers, add the `--num-workers` flag: `python3 reproduce_bugs.py --bug-id rdoptwo-287 --num-workers 2`. This will only succeed if the `inotify` limits were increased in the previous step.
+
+    ---
+    ### **Part C: [Workflow] Porting and Testing a New Operator**
+    ---
+    This section outlines the steps to test a new Kubernetes operator with Acto, assuming the environment from Part A is already set up and you are operating from within `/home/cc/EnvGym/data/acto`. For additional context, you can consult the project's resource trackers:
+    - **Operator Porting Tracker:** https://docs.google.com/spreadsheets/d/1qeMk4m8D8fgJdI61QJ67mBHZ9m3gCD-axcJB567z5FM/edit#gid=0
+    - **List of Operators in the Wild:** https://docs.google.com/spreadsheets/d/1_3-SlBRJO0Gtj6gt2Go1cOi4iRHdeBquoV-04Yel74A/edit?usp=sharing
+    - **Shared Resources:** https://drive.google.com/drive/folders/12XY6WmReuhvX2Du6KqB4xiFC3YEzRqMM
+
+    - **Step 1: Prepare Operator Artifacts**
+        *   1.1. **Create a Directory:** Inside the `data/` directory, create a new folder for your operator (e.g., `data/k8ssandra_cass-operator/`, `data/cass-operator/v1-22/`, `data/clickhouse-operator/`, `data/cloudnative-pg_cloudnative_pg/`, `data/cockroach-operator/`, `data/elastic-cloud-on-k8s-operator/`, or `data/grafana_grafana-operator/`).
+        *   1.2. **Add Deployment Files:** Copy the operator's deployment YAML manifest(s) into this new directory. This can be a single file containing multiple Kubernetes resources (like CRDs, RBAC rules, and the operator Deployment), often called `bundle.yaml` or similar (e.g., `data/cloudnative-pg_cloudnative_pg/cnpg-1.22.1.yaml`, `data/cockroach-operator/operator.yaml`, or `data/grafana_grafana-operator/kustomize-cluster_scoped.yaml`). Sometimes CRDs are in a separate file (e.g., `data/elastic-cloud-on-k8s-operator/crds.yaml`, which must be applied before the main `operator.yaml` that creates the `elastic-system` namespace and controller). It also includes any other required resources like `init.yaml`, `ConfigMap`s, prerequisite Custom Resources, and auxiliary YAMLs (e.g., `aux-examples.yaml`).
+        *   1.3. **Add Seed CR:** Copy the operator's seed Custom Resource (CR) into the new directory. This is the initial CR that Acto will mutate. The `metadata.name` in this file should be a valid name for the resource. For example, the `data/cockroach-operator/cr.yaml` file defines a `CrdbCluster` resource and includes:
+            *   **API Version and Kind:** `apiVersion: crdb.cockroachlabs.com/v1alpha1`, `kind: CrdbCluster`.
+            *   **Metadata:** A resource name, e.g., `name: test-cluster`.
+            *   **Core Operator Spec:** Fields that control the operator's direct actions, such as the number of `nodes` (e.g., 3), the application container `image` (e.g., `cockroachdb/cockroach:v21.2.10`), and `dataStore` for storage configuration.
+            Another example is `data/cass-operator/v1-22/cr.yaml`, which defines a `CassandraDatacenter` named `test-cluster` and specifies `serverVersion`, `size`, `storageConfig`, and a nested `config` block for application-specific settings. A third example, `data/elastic-cloud-on-k8s-operator/es.yaml`, defines an `Elasticsearch` resource with `apiVersion: elasticsearch.k8s.elastic.co/v1` and `kind: Elasticsearch`. Its `spec` defines the application `version` (e.g., "8.12.0") and a list of `nodeSets`, where each set has a `name` and a `count` to configure the cluster topology. A fourth example, `data/grafana_grafana-operator/grafanas-cr.yaml`, defines a `Grafana` resource with `apiVersion: grafana.integreatly.org/v1beta1` and `kind: Grafana`. Its `spec` contains a `config` block with application-specific settings for security (e.g., `admin_user`, `admin_password`), logging, and authentication.
+        *   1.4. **Identify and Add Dependency Manifests:** Determine if the operator has prerequisites. For example, `cass-operator` and `k8ssandra_cass-operator` depend on `cert-manager`, and `clickhouse-operator` depends on `zookeeper`. If so, add their deployment YAMLs to the directory (e.g., `data/cass-operator/v1-22/cert-manager.yaml`, `data/k8ssandra_cass-operator/k8ssandra_cert-manager.yaml`, or `data/clickhouse-operator/zookeeper.yaml`). Some operators like CloudNative PG, CockroachDB, Elastic Cloud on Kubernetes, or Grafana package everything into their own files and have no external dependencies.
+        *   1.5. **[Optional] Add Application Configuration Schemas:** For operators that manage applications with complex configurations (e.g., Cassandra), include a JSON schema file that defines valid fields and values. For example, `data/cass-operator/v1-22/cass-config.json` provides a schema for Cassandra settings. This allows Acto to perform more intelligent, schema-aware fuzzing on the application configuration part of the operator's CR.
+        *   1.6. **[Optional] Add Example CRs:** If the operator has a suite of example CRs that are useful for analysis, copy them into a subdirectory (e.g., `data/cockroach-operator/examples/`).
+
+    - **Step 2: Create the Acto Configuration File**
+        *   2.1. **Create File:** In your operator's directory (e.g., `data/grafana_grafana-operator/`), create a JSON file for the configuration (e.g., `config.json`).
+        *   2.2. **Configure Core Settings:** Specify the deployment steps, seed CR, and target CRD.
+            *   **Deployment:** Define a `deploy` section as an object containing a `steps` array. Each element in the array is an object defining a step. For an operator with an external dependency, you must apply the manifests in the correct order. For a self-contained operator that bundles all its resources (including namespace creation) into a single file, the deployment is a single step.
+                *   *Example 1: `grafana-operator` with a single manifest:*
+                ```json
+                "deploy": {
+                    "steps": [
+                        {
+                            "apply": {
+                                "file": "data/grafana_grafana-operator/kustomize-cluster_scoped.yaml",
+                                "operator": true
+                            }
+                        }
+                    ]
+                },
+                "crd_name": "grafanas.grafana.integreatly.org",
+                "seed_custom_resource": "data/grafana_grafana-operator/grafanas-cr.yaml"
+                ```
+                *   *Example 2: `elastic-cloud-on-k8s-operator` with separate CRDs and operator manifests:*
+                ```json
+                "deploy": {
+                    "steps": [
+                        { "apply": { "file": "data/elastic-cloud-on-k8s-operator/crds.yaml" } },
+                        { "wait": { "duration": 10 } },
+                        { "apply": { "file": "data/elastic-cloud-on-k8s-operator/operator.yaml", "operator": true } }
+                    ]
+                },
+                "crd_name": "elasticsearches.elasticsearch.k8s.elastic.co",
+                "seed_custom_resource": "data/elastic-cloud-on-k8s-operator/es.yaml"
+                ```
+                *   *Example 3: `k8ssandra_cass-operator` with `cert-manager` dependency:*
+                ```json
+                "deploy": {
+                    "steps": [
+                        { "apply": { "file": "data/k8ssandra_cass-operator/k8ssandra_cert-manager.yaml" } },
+                        { "wait": { "duration": 10 } },
+                        { "apply": { "file": "data/k8ssandra_cass-operator/operator.yaml", "operator": true } }
+                    ]
+                }
+                ```
+                *Note*: In the `elastic-cloud-on-k8s-operator` example, the `operator.yaml` file creates the `elastic-system` namespace. The `grafana-operator`'s `kustomize-cluster_scoped.yaml` creates the `grafana` namespace. The `k8ssandra_cert-manager.yaml` file creates the `cert-manager` namespace.
+            *   **Seed CR:** Point to the seed CR file that Acto will test using the `seed_custom_resource` key (e.g., `"seed_custom_resource": "data/grafana_grafana-operator/grafanas-cr.yaml"`).
+            *   **CRD Name:** If multiple CRDs exist, specify the target for testing with `crd_name` (e.g., `"crd_name": "grafanas.grafana.integreatly.org"`). If only one CRD is present, you can set this to `null`.
+        *   2.3. **Configure Advanced Test Parameters (as needed):**
+            *   **Kubernetes Version:** To use a specific version, add `"kubernetes_version": "v1.29.1"`.
+            *   **Feature Gates:** To enable a feature gate, add a `kubernetes_engine` section: `"kubernetes_engine": { "feature_gates": { "StatefulSetAutoDeletePVC": true } }`.
+            *   **Custom Oracle:** To use a custom bug checker, add `"custom_oracle": "data.cass-operator.v1-22.oracle"`.
+            *   **Custom Module:** To use a custom mapping module, add `"custom_module": "data.cockroach-operator.custom_mapping"`.
+            *   **Example Directory:** To point to a directory of example CRs, add `"example_dir": "data/cockroach-operator/examples"`.
+            *   **Field Exclusions:** To ignore certain fields during state diffing, add a `diff_ignore_fields` list with regex patterns.
+            *   **Focus Fields:** To narrow the testing scope, add `focus_fields` with a list of field paths, e.g., `"focus_fields": [["spec", "config"]]`.
+            *   **Analysis Metadata:** Add an `analysis` block with source code information: `"analysis": { "github_link": "...", "commit": "...", "type": "CrdbCluster" }`.
+        *   2.4. **Review Examples:** Refer to existing configurations in the `data/` directory for more examples.
+
+    - **Step 3: [Optional] Create Custom Logic for Advanced Testing**
+
+        *   **Step 3.A: Create Custom Test Generators for Semantic Testing**
+            *   3.A.1. **Purpose:** To improve test quality, you can write custom Python functions that generate specific, meaningful test cases for your operator's CRD fields.
+            *   3.A.2. **Create a Python File:** In your operator's directory (e.g., `data/my-operator/`), create a Python file (e.g., `generators.py`).
+            *   3.A.3. **Implement Generator Functions:** Inside this file, define functions decorated with `@test_generator`. Use constraints to target specific fields.
+            *   3.A.4. **Update Configuration:** Add a key to your configuration JSON to point to the new generator file (e.g., `"custom_test_generator": "data/my-operator/generators.py"`).
+
+        *   **Step 3.B: Create Custom Oracles for Domain-Specific Checks**
+            *   3.B.1. **Purpose:** To detect complex, operator-specific bugs that generic checks would miss.
+            *   3.B.2. **Create a Python Module:** Create a Python file (e.g., `data/cass-operator/v1-22/oracle.py`) containing your custom checking logic.
+            *   3.B.3. **Implement Oracle Functions:** Write functions that take system state as input and return `True` if a bug is detected.
+            *   3.B.4. **Update Configuration:** Add the `custom_oracle` key, pointing to the importable path of your module (e.g., `"custom_oracle": "data.cass-operator.v1-22.oracle"`).
+
+        *   **Step 3.C: Create Custom Mapping Modules for Advanced Analysis**
+            *   3.C.1. **Purpose:** To provide custom logic for advanced analysis workflows.
+            *   3.C.2. **Create a Python Module:** Create a Python file (e.g., `data/cockroach-operator/custom_mapping.py`) containing your custom logic.
+            *   3.C.3. **Implement Functions:** Write the necessary functions for the analysis.
+            *   3.C.4. **Update Configuration:** Add the `custom_module` key, pointing to the importable path of your module (e.g., `"custom_module": "data.cockroach-operator.custom_mapping"`).
+
+    - **Step 4: Run the Acto "Learn" Phase**
+        *   4.1. **Execute Command:** Run the learn command, pointing to your new configuration file. This performs pre-flight checks and gathers information about the operator.
+            ```sh
+            python3 -m acto --config data/grafana_grafana-operator/config.json --learn
+            ```
+        *   4.2. **Verification:** The command should complete without errors. A new file named `context.json` will be created in your operator's directory. Verify that it contains pre-flight information, such as a list of required container images under the `preload_images` key. For example, after running the learn phase for the `k8ssandra_cass-operator`, the generated `context.json` will contain a `preload_images` list with images like: `["cr.k8ssandra.io/k8ssandra/cass-operator:v1.19.0", "quay.io/jetstack/cert-manager-controller:v1.12.2", ...]`. Check the logs to ensure all deployment steps from your configuration file completed successfully. This file should be committed to the repository along with your other configuration files.
+
+    - **Step 5: Launch a Full Test Campaign**
+        *   5.1. **Execute Command:** Start the main test campaign. Specify the number of parallel workers and a directory for the results.
+            ```sh
+            python3 -m acto --config data/grafana_grafana-operator/config.json --num-workers 4 --workdir testrun-grafana
+            ```
+        *   5.2. **Monitor Progress:** Testing can take hours. It is recommended to monitor the main log file (`testrun-grafana/test.log`) for any `CRITICAL` errors, especially at the beginning, to ensure the tests have started correctly.
+
+    - **Step 6: Collect and Analyze Results**
+        *   6.1. **Aggregate Findings:** Once the test campaign is complete, use the post-processing script to collect all results into a single CSV file.
+            ```sh
+            python3 -m acto.post_process.collect_test_result --config data/grafana_grafana-operator/config.json --testrun-dir testrun-grafana
+            ```
+        *   6.2. **Verification:** A CSV file will be generated inside the `testrun-grafana` directory, summarizing all detected issues.
+        *   6.3. **Detailed Analysis:** For each reported issue, inspect the corresponding `trial-*/` subdirectory to find detailed logs, system state snapshots, and input files to understand the root cause.
+
+    - **Step 7: Report Findings**
+        *   7.1. **Analyze Alarms:** For each issue reported in the final CSV, use the detailed logs and state snapshots in the corresponding `trial-*/` directory to understand the root cause.
+        *   7.2. **Consult Operator Source Code:** Investigate the operator's source code to determine if the behavior is a bug in the operator or a false positive from Acto.
+        *   7.3. **File a Report on GitHub:** Create a new issue in the project's GitHub repository. Use the "Alarm Inspection Report" issue template to provide a structured analysis, including what happened, the root cause in the code, and a proposed fix.
+
+    ---
+    ### **Part D: [Advanced Workflow] Measuring Go Operator Code Coverage**
+    ---
+    This section details the steps to measure the E2E code coverage of a Go-based operator during an Acto test run. This involves building a custom, instrumented version of the operator and configuring the test environment to extract the coverage data.
+
+    - **Step 1: Compile the Operator for Code Coverage**
+        *   *Prerequisite: You need a local clone of the operator's source code.*
+        *   1.1. **Create `main_test.go`:** In the same directory as the operator's `main.go` file, create a new file named `main_test.go`. This file should contain a single unit test that simply calls the `main()` function. This tricks the Go toolchain into running the entire operator as a test, which can be measured for coverage.
+        *   1.2. **Modify the `Dockerfile`:**
+            *   Find the `go build ...` command in the operator's Dockerfile.
+            *   Replace it with a `go test -c ...` command to compile the test binary instead of a regular binary.
+            *   Add coverage flags to the command, e.g., `go test -c -coverpkg=./... -cover -o /manager .`.
+        *   1.3. **Create an Entrypoint Script:**
+            *   Create a new shell script that will be the entrypoint for the Docker image.
+            *   This script should execute the compiled test binary and pass the `-test.coverprofile` flag to redirect coverage output to a file in a mounted volume (e.g., `/tmp/profile/operator-coverage-$(date +%s%N).out`).
+            *   Example: `exec /manager -test.coverprofile=/tmp/profile/cass-operator-$(date +%s%N).out`
+            *   Update the `Dockerfile` to use this script as the `ENTRYPOINT`.
+        *   1.4. **Build and Push the Image:** Build the new Docker image and push it to a registry accessible by your test environment. Update the operator's deployment YAML to use this new image tag.
+
+    - **Step 2: Configure Kubernetes for Coverage File Passthrough**
+        *   2.1. **Create a Custom `kind` Configuration:** Acto needs to create the test cluster with custom settings. Create a YAML file (e.g., `kind-config.yaml`) with the following structure. This example enables a feature gate and mounts the local `./profile/data` directory into each kind worker node for coverage file collection. **Note:** The `hostPath` is relative to the directory where you run the `kind create cluster` command, which should be the project root `/home/cc/EnvGym/data/acto`.
+            ```yaml
+            apiVersion: kind.x-k8s.io/v1alpha4
+            kind: Cluster
+            featureGates:
+              StatefulSetAutoDeletePVC: true
+            nodes:
+            - role: control-plane
+            - role: worker
+              extraMounts:
+              - hostPath: profile/data
+                containerPath: /tmp/profile
+            ```
+        *   2.2. **Modify the Operator's Deployment YAML:**
+            *   In the operator's deployment manifest, add a `volume` and `volumeMount` to the operator's pod definition.
+            *   This will mount the `/tmp/profile` directory from the kind node into the operator's container at `/tmp/profile`.
+            *   Ensure the operator has the necessary permissions to write to this directory.
+            ```yaml
+            # In the Pod spec's template:
+            spec:
+              containers:
+              - name: manager
+                volumeMounts:
+                - name: profile-dir
+                  mountPath: /tmp/profile
+              volumes:
+              - name: profile-dir
+                hostPath:
+                  path: /tmp/profile
+                  type: Directory
+            ```
+        *   2.3. **Update Acto Configuration File:** Tell Acto to use your custom `kind` configuration file by adding the `kind_config` key.
+            ```json
+            "kubernetes_engine": {
+              "kind_config": "path/to/your/kind-config.yaml"
+            }
+            ```
+
+    - **Step 3: Run Tests and Process Coverage Data**
+        *   3.1. **Run Acto:** Launch the Acto test campaign as usual using the modified configuration.
+            ```sh
+            python3 -m acto --config data/my-operator/config.json
+            ```
+        *   3.2. **Verify Coverage Files:** As the tests run, `.out` coverage files from the operator should appear in your local `profile/data` directory (`/home/cc/EnvGym/data/acto/profile/data`).
+        *   3.3. **Merge Coverage Files:** After the test run completes, use `gocovmerge` to combine all the individual coverage files into a single report.
+            ```sh
+            gocovmerge profile/data/*.out > coverage.all
+            ```
+        *   3.4. **Generate Report:** Use Go's built-in tools to view the final coverage report. You may want to filter out auto-generated code.
+            ```sh
+            go tool cover -func=coverage.all
+            # For an HTML report:
+            go tool cover -html=coverage.all -o coverage.html
+            ```

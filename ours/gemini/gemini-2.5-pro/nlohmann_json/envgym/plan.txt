@@ -1,0 +1,469 @@
+Here is the complete environment setup plan, adjusted for your specified hardware and containerized Linux environment.
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1.  DOWNLOADS NEEDED:
+    *   **C++ Compiler**: A compiler with C++11 support or newer, to be installed via the system's package manager.
+        *   Examples: GCC 4.8+, Clang 3.4+.
+        *   **Specific C++ Standard Requirements**:
+            *   **C++17 Support**: Requires GCC 7.0+, Clang 5.0+.
+            *   **C++20 Support**: Requires GCC 9.0+, Clang 9.0+.
+        *   Note: The CI system tests an extensive range of versions, including GCC up to 15 and Clang up to 20.
+    *   **Build System**: At least one of the following is required.
+        *   **CMake**: Version **3.13 or newer**.
+            *   Note: The latest version is used in CI and is recommended.
+            *   Note: Version 3.28+ is required to enable the optional C++ Modules feature (`NLOHMANN_JSON_BUILD_MODULES`).
+        *   **Meson**: Version 0.50 or newer.
+        *   **Bazel**: Version 6.0+ is recommended for modern Bzlmod support. `bazelisk` is the recommended installer.
+    *   **Build System Generator**: A tool to build the configured project.
+        *   Examples: Make, Ninja (recommended for some Makefile targets and as the default for Meson and some CI jobs).
+    *   **nlohmann/json Source Code**: The complete source code for the library, version 3.12.0. It will be located in the working directory `/home/cc/EnvGym/data/nlohmann_json`.
+    *   **Git (Recommended)**: For cloning the source code repository.
+    *   **Standard Unix Tools**: `wget`, `tar`, `unzip`, `locales`. May be required for downloading dependencies or setting up the environment. Usually pre-installed or available via package manager.
+    *   **pkg-config**: Required for library discovery by build systems like Meson after installation. The CMake installation process generates the necessary `nlohmann_json.pc` file for this tool.
+    *   **Python 3 and pip (Developer)**: Required for various development and tooling scripts. It is highly recommended to use a virtual environment (`venv`) to manage Python dependencies.
+        *   Used for: Code formatting, documentation generation (`mkdocs`), REUSE compliance, local development server, static analysis tooling, and other helper scripts.
+    *   **Docker (Developer, Recommended)**: For replicating the CI environment using containers like `gcc:latest`, `silkeh/clang:dev`, or `ghcr.io/nlohmann/json-ci:*`.
+    *   **Recommended IDEs/Editors (Developer)**: While not required, a properly configured editor enhances productivity.
+        *   **Visual Studio Code**: With extensions like `ms-vscode.cpptools`, `ms-vscode.cmake-tools`, and `llvm-vs-code-extensions.vscode-clangd`.
+        *   **CLion**: Natively supports CMake projects.
+    *   **Specialized Tools (Optional, for Advanced Testing/Development)**:
+        *   **afl-clang++**: For running fuzz tests.
+        *   **Valgrind**: For running memory-checking tests. The test execution is controlled by the `JSON_Valgrind=ON` CMake option.
+        *   **lcov**: For generating code coverage reports (`ci_test_coverage`).
+        *   **Static Analysis & Formatting Tools**: `cppcheck`, `cpplint`, `clang-tidy`, `clang-format`, `iwyu` (Include What You Use), `infer`, **Artistic Style (AStyle)**.
+            *   Note: `clang-tidy` is strictly configured via the `.clang-tidy` file in the repository root, where all warnings are treated as errors.
+            *   Note: **AStyle** is used for code formatting, configured via the `.astylerc` file. It can be installed as a native executable or as a Python package (`astyle==3.4.13`) as specified in `tools/astyle/requirements.txt` for tooling scripts.
+            *   Note: The `cppcheck` CI integration relies on a specific Python dependency specified in `cmake/requirements/requirements-cppcheck.txt`.
+            *   Note: The `cpplint` CI integration relies on a specific Python dependency specified in `cmake/requirements/requirements-cpplint.txt`.
+        *   **LLVM Toolchain (Developer)**: Recommended for developers to obtain tools like `clang-tidy` and `clangd`. Can be installed via the system package manager.
+        *   **clangd**: A language server for C++ providing code completion, navigation, and diagnostics, often used with VS Code.
+        *   **CodeQL CLI**: For running deep static analysis and security scans, replicating the `codeql-analysis.yml` GitHub Actions workflow.
+        *   **Intel oneAPI Base Toolkit**: For building with the Intel C++ Compiler (`icpc`).
+        *   **Emscripten SDK**: For compiling to WebAssembly.
+        *   **github_changelog_generator**: For generating the ChangeLog file.
+        *   **pipx**: For running REUSE compliance tools.
+    *   **Python Packages**: Various packages specified in `requirements.txt` files within the repository. Key dependencies include:
+        *   For documentation (`docs/mkdocs/requirements.txt`):
+            *   `mkdocs==1.6.1`
+            *   `mkdocs-material==9.6.18`
+            *   `mkdocs-git-revision-date-localized-plugin==1.4.7`
+            *   `mkdocs-material-extensions==1.3.1`
+            *   `mkdocs-minify-plugin==0.8.0`
+            *   `mkdocs-redirects==1.2.2`
+            *   `mkdocs-htmlproofer-plugin==1.3.0`
+            *   `PyYAML==6.0.2`
+            *   `pymdown-extensions` (implied by `mkdocs.yml`)
+        *   For development tooling (`tools/astyle/requirements.txt`):
+            *   `astyle==3.4.13`
+        *   For development tooling (`tools/generate_natvis/requirements.txt`):
+            *   `jinja2==3.1.6`
+        *   For development tooling (`tools/serve_header/requirements.txt`):
+            *   `PyYAML==6.0.2`
+            *   `watchdog==6.0.0`
+        *   For static analysis tooling (`cmake/requirements/requirements-cppcheck.txt`):
+            *   `cppcheck==1.5.0`
+        *   For static analysis tooling (`cmake/requirements/requirements-cpplint.txt`):
+            *   `cpplint==2.0.2`
+        *   For license compliance tooling (`cmake/requirements/requirements-reuse.txt`):
+            *   `reuse==5.0.2`
+
+2.  FILES TO CREATE:
+    ---
+    ### **Key Provided Configuration and Tooling Files**
+    ---
+    -   **Key Repository Configuration File `.clang-tidy`**: This file must be present in the root of the cloned source code repository (`/home/cc/EnvGym/data/nlohmann_json`). It configures the `clang-tidy` static analysis tool.
+        *   Path: `/home/cc/EnvGym/data/nlohmann_json/.clang-tidy`
+        *   Content Description: Defines the enabled checks, options, and header filters for `clang-tidy`. Crucially, it sets `WarningsAsErrors: '*'`, making all static analysis warnings build-breaking errors.
+            ```yaml
+            # ... content of .clang-tidy ...
+            ```
+    -   **Code Formatter Configuration `.astylerc`**: This file configures the Artistic Style (AStyle) code formatter.
+        *   Path: `/home/cc/EnvGym/data/nlohmann_json/tools/astyle/.astylerc`
+        *   Content Description: Defines the project's C++ coding style, including brace style (Allman), indentation (4 spaces), operator padding, and other formatting rules. This file ensures consistent code formatting across all contributions.
+            ```
+            # ... content of .astylerc ...
+            ```
+    -   **AStyle Python Dependency File `requirements.txt`**: This file specifies the version of the Python-based AStyle wrapper.
+        *   Path: `/home/cc/EnvGym/data/nlohmann_json/tools/astyle/requirements.txt`
+        *   Content: `astyle==3.4.13`
+    -   **cppcheck Python Dependency File `requirements-cppcheck.txt`**: This file specifies the version of the Python-based cppcheck tooling dependency.
+        *   Path: `/home/cc/EnvGym/data/nlohmann_json/cmake/requirements/requirements-cppcheck.txt`
+        *   Content: `cppcheck==1.5.0`
+    -   **cpplint Python Dependency File `requirements-cpplint.txt`**: This file specifies the version of the Python-based cpplint tooling dependency.
+        *   Path: `/home/cc/EnvGym/data/nlohmann_json/cmake/requirements/requirements-cpplint.txt`
+        *   Content: `cpplint==2.0.2`
+    -   **REUSE Compliance Python Dependency File `requirements-reuse.txt`**: This file specifies the version of the Python-based REUSE tool.
+        *   Path: `/home/cc/EnvGym/data/nlohmann_json/cmake/requirements/requirements-reuse.txt`
+        *   Content: `reuse==5.0.2`
+    -   **Natvis Generator Python Dependency File `requirements.txt`**: This file specifies the version of the Jinja2 templating engine.
+        *   Path: `/home/cc/EnvGym/data/nlohmann_json/tools/generate_natvis/requirements.txt`
+        *   Content: `jinja2==3.1.6`
+    -   **Header Server Python Dependency File `requirements.txt`**: This file specifies Python dependencies for a local development server tool.
+        *   Path: `/home/cc/EnvGym/data/nlohmann_json/tools/serve_header/requirements.txt`
+        *   Content:
+            ```
+            PyYAML==6.0.2
+            watchdog==6.0.0
+            ```
+    ---
+    ### **User-Created Verification Project Files**
+    ---
+    -   **(Optional) Verification Project `main.cpp`**: To test the library after installation. This file is shared by all verification projects.
+        *   Path: `~/json-verification-project/main.cpp` (CMake), `~/json-verification-project-meson/main.cpp` (Meson), `~/json-verification-project-bazel-bzlmod/main.cpp` (Bazel Bzlmod), `~/json-verification-project-bazel-workspace/main.cpp` (Bazel WORKSPACE).
+        *   Content Description: A simple C++ program that includes `<nlohmann/json.hpp>`, creates a JSON object, and prints it to the console.
+            ```cpp
+            #include <iostream>
+            #include <nlohmann/json.hpp>
+
+            int main() {
+                nlohmann::json j;
+                j["pi"] = 3.141;
+                j["happy"] = true;
+                j["name"] = "Niels";
+                j["nothing"] = nullptr;
+                j["answer"]["everything"] = 42;
+                j["list"] = { 1, 0, 2 };
+                j["object"] = { {"currency", "USD"}, {"value", 42.99} };
+                std::cout << j.dump(4) << std::endl;
+                return 0;
+            }
+            ```
+    -   **(Optional) CMake Verification Project `CMakeLists.txt`**: To build the verification program using CMake.
+        *   Path: `~/json-verification-project/CMakeLists.txt`
+        *   Content Description: A CMake script that finds the installed `nlohmann_json` package and links it to the executable.
+            ```cmake
+            cmake_minimum_required(VERSION 3.5)
+            project(json_verification CXX)
+            set(CMAKE_CXX_STANDARD 11)
+            set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+            find_package(nlohmann_json 3.12.0 REQUIRED)
+
+            add_executable(verify_json main.cpp)
+            target_link_libraries(verify_json PRIVATE nlohmann_json::nlohmann_json)
+            ```
+    -   **(Optional) Meson Verification Project `meson.build`**: To build the verification program using Meson.
+        *   Path: `~/json-verification-project-meson/meson.build`
+        *   Content Description: A Meson script that finds the installed `nlohmann_json` dependency via pkg-config and builds the executable.
+            ```meson
+            project('json_verification', 'cpp')
+            
+            nlohmann_json_dep = dependency('nlohmann_json', version : '>=3.12.0')
+            
+            executable('verify_json', 'main.cpp',
+                cpp_args : '-std=c++11',
+                dependencies : nlohmann_json_dep
+            )
+            ```
+    -   **(Optional) Bazel Verification Project (Modern Bzlmod Method) `MODULE.bazel`**: To define the dependency on nlohmann/json using Bzlmod.
+        *   Path: `~/json-verification-project-bazel-bzlmod/MODULE.bazel`
+        *   Content Description: Defines the project as a Bazel module and declares a dependency on `nlohmann_json`, using a local override to point to the source code in the working directory.
+            ```bazel
+            module(name = "json_verification_bzlmod")
+            
+            bazel_dep(name = "nlohmann_json", version = "3.12.0")
+            
+            # To use the local checkout of the library instead of fetching from a registry:
+            local_path_override(
+                module_name = "nlohmann_json",
+                path = "/home/cc/EnvGym/data/nlohmann_json",
+            )
+            ```
+    -   **(Optional) Bazel Verification Project (Modern Bzlmod Method) `WORKSPACE`**: An empty file required by Bazel.
+        *   Path: `~/json-verification-project-bazel-bzlmod/WORKSPACE`
+        *   Content: `# This file can be empty when using Bzlmod.`
+    -   **(Optional) Bazel Verification Project `BUILD.bazel`**: To build the verification program using Bazel. This file is shared by both Bzlmod and WORKSPACE methods.
+        *   Path: `~/json-verification-project-bazel-bzlmod/BUILD.bazel` or `~/json-verification-project-bazel-workspace/BUILD.bazel`
+        *   Content:
+            ```bazel
+            cc_binary(
+                name = "verify_json",
+                srcs = ["main.cpp"],
+                deps = ["@nlohmann_json//:json"],
+                cpp_opts = ["-std=c++11"],
+            )
+            ```
+    -   **(Optional) Bazel Verification Project (Legacy WORKSPACE Method) `WORKSPACE`**: To define the external repository for the nlohmann/json library.
+        *   Path: `~/json-verification-project-bazel-workspace/WORKSPACE`
+        *   Content:
+            ```bazel
+            workspace(name = "json_verification_workspace")
+
+            local_repository(
+                name = "nlohmann_json",
+                path = "/home/cc/EnvGym/data/nlohmann_json",
+            )
+            ```
+    ---
+    ### **Key Generated Files (Post-Installation)**
+    ---
+    -   **`nlohmann_json.pc`**: This file is generated by CMake during the installation process.
+        *   Path: `<install-prefix>/lib/pkgconfig/nlohmann_json.pc` (or similar, e.g., `share/pkgconfig/`)
+        *   Content Description: A file generated from the `pkg-config.pc.in` template. It allows the `pkg-config` tool to provide compiler flags for locating the library's header files. This is the primary mechanism for build systems like Meson to find the library after it has been installed.
+        *   Example Content (after generation):
+            ```
+            prefix=/usr/local
+            includedir=${prefix}/include
+
+            Name: nlohmann_json
+            Description: JSON for Modern C++
+            Version: 3.12.0
+            Cflags: -I${includedir}
+            ```
+
+3.  NECESSARY TEST CASES IN THE CODEBASE:
+    *   The project includes a comprehensive, CI-driven test suite. Contributors should run relevant parts of this suite to verify changes.
+    *   **Compiler and C++ Standard Conformance**:
+        *   Tests are run against a matrix of GCC (4.8+) and Clang (3.4+) versions.
+        *   Tests are run for each C++ standard: C++11, C++14, C++17, C++20, C++23, and C++26. This is controlled via the `JSON_TestStandards` CMake variable (e.g., `-DJSON_TestStandards="17;20"`).
+        *   **Specific compiler versions are required for newer standards**:
+            *   C++17: GCC 7.0+, Clang 5.0+.
+            *   C++20: GCC 9.0+, Clang 9.0+.
+        *   Clang tests are run with both `libstdc++` and `libc++`.
+    *   **Static and Dynamic Analysis**:
+        *   **Memory Safety**: `ci_test_valgrind` runs the test suite under Valgrind. This can be enabled locally with the `-DJSON_Valgrind=ON` CMake flag.
+        *   **Address/Undefined Behavior Sanitizers**: `ci_test_clang_sanitizer` builds and runs tests with Clang's sanitizers enabled.
+        *   **Fuzz Testing**: `ci_fuzz` builds fuzzer executables (e.g., `parse_cbor_fuzzer`) using `afl-clang++`. Running these generates test inputs in `corpus_*` directories to find parsing vulnerabilities.
+        *   **Static Analysis**: A suite of targets run various static analysis tools: `ci_cppcheck`, `ci_cpplint`, `ci_clang_tidy`, `ci_clang_analyze`, `ci_infer`. The `ci_clang_tidy` target is a critical quality gate, as it uses the project's `.clang-tidy` configuration file which treats all reported warnings as build-breaking errors. The `ci_cppcheck` and `ci_cpplint` targets rely on specific Python tooling dependencies specified in `cmake/requirements/requirements-cppcheck.txt` and `cmake/requirements/requirements-cpplint.txt`, respectively.
+        *   **Code Formatting Conformance**: A dedicated CI target (`ci_astyle`) runs the Artistic Style formatter to check if the codebase adheres to the style defined in `tools/astyle/.astylerc`. This is a critical quality gate to ensure consistent formatting.
+        *   **CodeQL Analysis**: A dedicated GitHub Actions workflow (`codeql-analysis.yml`) runs CodeQL to perform deep static analysis and security vulnerability scanning on every push and pull request.
+    *   **Build Configuration and Feature Variants**:
+        *   **CMake Flags**: `ci_cmake_flags` tests various CMake configuration options. Advanced CI replication can use the `JSON_FORCED_GLOBAL_COMPILE_OPTIONS` and `JSON_FORCED_GLOBAL_LINK_OPTIONS` environment variables to inject flags.
+        *   **Exception Handling**: `ci_test_noexceptions` verifies that the library compiles and runs correctly with exceptions disabled (using `JSON_NOEXCEPTION` and compiler flags like `-fno-exceptions`).
+        *   **Implicit Conversions**: `ci_test_noimplicitconversions` tests with implicit conversions disabled.
+        *   **Fast Tests**: `JSON_FastTests=ON` can be used to skip expensive tests (e.g., the Unicode tests, which have a 3000-second timeout in CI) and speed up build/test cycles.
+        *   **Other Variants**: `test-comparison_legacy` (controlled by `JSON_USE_LEGACY_DISCARDED_VALUE_COMPARISON=1`), `ci_test_noglobaludls`, `ci_test_diagnostics`, `ci_test_diagnostic_positions` test other specific library features and configurations.
+    *   **Packaging and Distribution**:
+        *   **Amalgamation**: `ci_test_amalgamation` tests the process of combining all source files into a single header.
+        *   **Single-Header Usage**: `ci_test_single_header` verifies the amalgamated single header file can be used correctly.
+        *   **Reproducibility**: `ci_reproducible_tests` ensures builds are reproducible.
+        *   **License Compliance**: `ci_reuse_compliance` checks for REUSE compliance. This check relies on the Python tooling dependency specified in `cmake/requirements/requirements-reuse.txt`.
+        *   **SBOM Generation**: A CI step may generate a Software Bill of Materials in SPDX format (`nlohmann_json.spdx`).
+        *   **`pkg-config` Integration**: The installation process is tested to ensure it correctly generates a `nlohmann_json.pc` file. This is implicitly verified by downstream build tests, such as building a Meson project that depends on the installed library, which relies on `pkg-config` for discovery.
+    *   **Specialized Environment Builds**:
+        *   **C++20 Modules**: `ci_module_cpp20` tests the experimental C++ Modules support with GCC and Clang.
+        *   **Intel Compiler**: `ci_icpc` verifies compilation with the Intel C++ Compiler, using flags like `-diag-disable=2196`.
+        *   **Emscripten**: Builds the library using the Emscripten toolchain for WebAssembly.
+    *   **Documentation and Developer Tooling**:
+        *   **Build Documentation**: `ci_test_build_documentation` ensures the documentation can be built successfully using the Python packages specified in `docs/mkdocs/requirements.txt` and the configuration in `docs/mkdocs/mkdocs.yml`. The final output is generated in `docs/mkdocs/site/`.
+        *   **Test Examples**: `ci_test_examples` compiles and runs all example code snippets.
+        *   **Local Header Server**: A tool (`tools/serve_header`) is available for local development, which likely serves the single-header file and rebuilds it on changes. Its functionality can be manually verified by running it and observing its behavior.
+
+4.  COMPLETE TODO LIST:
+
+    This plan is tailored for a Linux (Debian/Ubuntu-based) x86_64 containerized environment, leveraging a high core count for parallel operations. The working directory containing the source code is `/home/cc/EnvGym/data/nlohmann_json`.
+
+    ---
+    ### **Part A: Core Environment Setup and Library Installation**
+    ---
+
+    -   **Step 1: Install System Prerequisites**
+        *   **Action (Debian/Ubuntu):** Install a comprehensive set of tools required for building, testing, and development.
+            ```bash
+            # Ensure package lists are up-to-date
+            apt-get update
+            
+            # Install build tools, compilers, and developer utilities
+            apt-get install -y build-essential g++ clang cmake git ninja-build python3-pip python3-venv \
+                               valgrind lcov clang-tools cppcheck pkg-config astyle
+            ```
+        *   **Verification:** Open a new terminal and run `cmake --version` (must be 3.13+), `g++ --version`, `clang --version`, `git --version`, and `pkg-config --version`.
+
+    -   **Step 2: Set Up Source Code Directory**
+        *   **Action:** The source code is expected to be present in the working directory. Navigate into it and check out the specific version tag for a stable installation.
+            ```bash
+            cd /home/cc/EnvGym/data/nlohmann_json
+            # For stable installation, check out the specific version tag.
+            git checkout v3.12.0
+            ```
+        *   **Verification:** The current directory is `/home/cc/EnvGym/data/nlohmann_json` and it contains `CMakeLists.txt`, `tools/astyle/.astylerc`, etc.
+
+    -   **Step 3: Configure the Project with CMake**
+        *   **Action:** Create a build directory and run CMake to generate the build files. Enable tests for verification.
+            ```bash
+            mkdir build-cmake
+            cd build-cmake
+            # -DJSON_BuildTests=ON enables the test suite
+            # -DJSON_FastTests=ON can be added to skip slow tests
+            cmake .. -DJSON_BuildTests=ON -G Ninja
+            ```
+        *   **Verification:** The `build-cmake` directory is populated with project files (e.g., `build.ninja`). No errors are reported.
+
+    -   **Step 4: Build the Project**
+        *   **Action:** Compile the project (specifically the tests) using the high core count available.
+            ```bash
+            cmake --build . --parallel 96
+            ```
+        *   **Verification:** The build process completes without errors. Test executables are created.
+
+    -   **Step 5: Run the Test Suite**
+        *   **Action:** Execute the tests in parallel using CTest.
+            ```bash
+            ctest -j96
+            ```
+        *   **Verification:** The output shows that 100% of tests passed.
+
+    -   **Step 6: Install the Library**
+        *   **Action:** Run the install target.
+            ```bash
+            # To install to a custom local directory (recommended)
+            cmake --install . --prefix "/usr/local/nlohmann_json_3.12.0"
+            
+            # To install to the system default (e.g., /usr/local)
+            cmake --install .
+            ```
+        *   **Verification:** Check the installation directory for `include/nlohmann/` and `share/cmake/nlohmann_json/`. Also check for the `pkg-config` file (e.g., `lib/pkgconfig/nlohmann_json.pc`). You can verify with `pkg-config`:
+            ```bash
+            # If using a custom prefix, set the PKG_CONFIG_PATH
+            export PKG_CONFIG_PATH="/usr/local/nlohmann_json_3.12.0/lib/pkgconfig:$PKG_CONFIG_PATH"
+            pkg-config --modversion nlohmann_json # Should print 3.12.0
+            pkg-config --cflags nlohmann_json     # Should print -I/usr/local/nlohmann_json_3.12.0/include
+            ```
+
+    -   **Step 7: Verify Installation with a Sample Project (Optional)**
+        *   **Action (CMake):** Create and build the CMake verification project from "2. FILES TO CREATE".
+            ```bash
+            mkdir -p ~/json-verification-project/build && cd ~/json-verification-project
+            # Create main.cpp and CMakeLists.txt with the content from section 2
+            cd build
+            # If you installed to a custom prefix in Step 6, point CMake to it
+            cmake .. -DCMAKE_PREFIX_PATH="/usr/local/nlohmann_json_3.12.0"
+            cmake --build . && ./verify_json
+            ```
+        *   **Verification (CMake):** The program compiles and runs, printing a formatted JSON object.
+        *   **Action (Meson):** Create and build the Meson verification project from "2. FILES TO CREATE". This demonstrates consumption via `pkg-config`.
+            ```bash
+            # If you installed to a custom prefix in Step 6, set the PKG_CONFIG_PATH
+            export PKG_CONFIG_PATH="/usr/local/nlohmann_json_3.12.0/lib/pkgconfig:$PKG_CONFIG_PATH"
+            
+            mkdir -p ~/json-verification-project-meson && cd ~/json-verification-project-meson
+            # Create main.cpp and meson.build with the content from section 2
+            meson setup builddir
+            cd builddir
+            meson compile
+            ./verify_json
+            ```
+        *   **Verification (Meson):** The program compiles and runs, printing a formatted JSON object. This confirms that the `pkg-config` file generated by the CMake install is working correctly.
+
+    ---
+    ### **Part B: Advanced CI & Developer Workflows**
+    ---
+    These tasks are for contributors replicating CI builds.
+
+    -   **Step 8: Contributor Source Code Setup**
+        *   **Action:** For development, all work should be based on the `develop` branch.
+            ```bash
+            cd /home/cc/EnvGym/data/nlohmann_json
+            # The default branch should be 'develop'. Verify this.
+            git branch
+            
+            # If you are on a different branch (e.g., 'master' or a tag), switch to 'develop'.
+            # git checkout develop
+            ```
+        *   **Verification:** The `git branch` command shows `* develop`.
+
+    -   **Step 9: Install Python Dependencies**
+        *   **Action:** Create a Python virtual environment and install all required packages for tooling and documentation.
+            ```bash
+            cd /home/cc/EnvGym/data/nlohmann_json
+            python3 -m venv venv
+            source venv/bin/activate
+            # Install Python dependencies for documentation and tooling
+            pip install -r docs/mkdocs/requirements.txt
+            pip install -r tools/astyle/requirements.txt
+            pip install -r tools/generate_natvis/requirements.txt
+            pip install -r tools/serve_header/requirements.txt
+            pip install -r cmake/requirements/requirements-cppcheck.txt
+            pip install -r cmake/requirements/requirements-cpplint.txt
+            pip install -r cmake/requirements/requirements-reuse.txt
+            ```
+        *   **Verification:** The shell prompt indicates you are in a `(venv)`. Running `pip list` shows packages like `mkdocs==1.6.1`, `astyle==3.4.13`, `jinja2==3.1.6`, `watchdog==6.0.0`, `cppcheck==1.5.0`, `cpplint==2.0.2`, and `reuse==5.0.2` are installed.
+
+    -   **Step 10: Configure for CI Builds**
+        *   **Action:** Configure the project using the special `JSON_CI` flag, which enables all CI-specific build targets.
+            ```bash
+            cd /home/cc/EnvGym/data/nlohmann_json
+            mkdir build
+            cd build
+            cmake .. -DJSON_CI=On -G Ninja
+            ```
+        *   **Verification:** The configuration completes successfully.
+
+    -   **Step 11: Run Static Analysis and Formatting Checks**
+        *   **Action:** Build the specific targets for each static analysis and formatting tool.
+            ```bash
+            # Run from the 'build' directory
+            cmake --build . --target ci_astyle
+            cmake --build . --target ci_cppcheck
+            cmake --build . --target ci_cpplint
+            cmake --build . --target ci_clang_tidy
+            cmake --build . --target ci_clang_analyze
+            ```
+        *   **Verification:** Each build command completes without errors. If `ci_astyle` fails, it indicates code needs reformatting. If `ci_clang_tidy` fails, it indicates that `clang-tidy` found issues that must be fixed.
+
+    -   **Step 12: Run Packaging, Compliance, and Distribution Checks**
+        *   **Action:** Build targets related to packaging and license compliance.
+            ```bash
+            # Run from the 'build' directory
+            cmake --build . --target ci_reuse_compliance
+            cmake --build . --target ci_test_amalgamation
+            cmake --build . --target ci_test_single_header
+            ```
+        *   **Verification:** Each build command completes successfully.
+
+    -   **Step 13: Run CodeQL Static Analysis (Advanced)**
+        *   **Action:** Use the CodeQL CLI to create a database from the build, then analyze it.
+            ```bash
+            # Assumes CodeQL CLI is installed and in PATH
+            # Run from the root of the repository, after configuring the build (Step 10)
+            # 1. Create the CodeQL database by tracing the build process
+            codeql database create --language=cpp --source-root=. \
+              --command="cmake --build build --parallel 96" \
+              codeql-db
+
+            # 2. Analyze the database using the default C++ query suite
+            codeql database analyze codeql-db --format=sarif-latest \
+              --output=scan-results.sarif cpp-code-scanning.qls
+            ```
+        *   **Verification:** The commands complete successfully. A `codeql-db` directory and `scan-results.sarif` file are created.
+
+    -   **Step 14: Run Memory Safety Checks**
+        *   **Action:** Run Valgrind tests by re-configuring the build.
+            ```bash
+            # Run from the 'build' directory
+            cmake .. -DJSON_Valgrind=ON -G Ninja # Re-configure
+            ctest -j96
+            ```
+        *   **Verification:** The commands complete, and test logs show no memory errors reported by Valgrind.
+
+    -   **Step 15: Test with a Specific C++ Standard**
+        *   **Action:** Re-configure the build with the `JSON_TestStandards` variable to test one or more specific standards.
+            ```bash
+            # Run from the 'build' directory
+            cmake .. -DJSON_TestStandards=17 -G Ninja
+            cmake --build . --parallel 96
+            ctest -j96
+            ```
+        *   **Verification:** The build completes successfully, confirming compatibility with C++17.
+
+    -   **Step 16: Build Documentation Locally**
+        *   **Action:** After installing Python dependencies (Step 9), build the documentation.
+            ```bash
+            # Run from the repository root (/home/cc/EnvGym/data/nlohmann_json)
+            # Ensure the python venv is active
+            mkdocs build --config-file docs/mkdocs/mkdocs.yml --clean
+            ```
+        *   **Verification:** The `build` command completes successfully and creates a `site` directory inside `docs/mkdocs/`.
+
+    ---
+    ### **Part C: Workspace Cleanup (Optional)**
+    ---
+    -   **Step 17: Clean Generated Files**
+        *   **Action:** To get a clean working directory, you can remove all files and folders ignored by Git.
+            ```bash
+            cd /home/cc/EnvGym/data/nlohmann_json
+            # WARNING: This will permanently delete all untracked files.
+            git clean -fdx
+            ```
+        *   **Verification:** Running `git status` shows a clean working tree with no untracked files. All build directories and generated artifacts are removed.

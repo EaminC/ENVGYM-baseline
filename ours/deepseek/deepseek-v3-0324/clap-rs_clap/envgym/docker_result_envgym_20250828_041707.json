@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250828_041707",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756354625",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 1.39kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/rust:1.74-slim-bullseye\n#2 DONE 0.2s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/13] FROM docker.io/library/rust:1.74-slim-bullseye@sha256:94a9c74bd893356500a12cfc022fe8574fdbb9f980dbe7c546be5f51abc10fec\n#4 DONE 0.0s\n\n#5 [internal] load build context\n#5 transferring context: 324.00kB 0.0s done\n#5 DONE 0.0s\n\n#6 [ 2/13] RUN apt-get update && apt-get install -y     git     build-essential     curl     pkg-config     libssl-dev     && rm -rf /var/lib/apt/lists/*\n#6 CACHED\n\n#7 [ 3/13] RUN rustup toolchain install stable-x86_64-unknown-linux-gnu &&     rustup default stable-x86_64-unknown-linux-gnu &&     rustup component add rustfmt &&     rustup target add wasm32-unknown-unknown --toolchain stable-x86_64-unknown-linux-gnu\n#7 CACHED\n\n#8 [ 4/13] WORKDIR /clap-rs_clap\n#8 CACHED\n\n#9 [ 5/13] COPY . .\n#9 DONE 0.1s\n\n#10 [ 6/13] RUN mkdir -p .cargo &&     echo '[target.x86_64-unknown-linux-gnu]\\nlinker = \"cc\"' > .cargo/config.toml\n#10 DONE 0.3s\n\n#11 [ 7/13] RUN cargo generate-lockfile\n#11 0.329     Updating crates.io index\n#11 1.353      Locking 485 packages to latest compatible versions\n#11 1.363       Adding clap-cargo v0.15.2 (available: v0.17.0)\n#11 DONE 1.5s\n\n#12 [ 8/13] RUN cargo update -p clap --verbose\n#12 0.332 error: There are multiple `clap` packages in your project, and the specification `clap` is ambiguous.\n#12 0.332 Please re-run this command with one of the following specifications:\n#12 0.332   path+file:///clap-rs_clap#clap@4.5.46\n#12 0.332   registry+https://github.com/rust-lang/crates.io-index#clap@4.5.46\n#12 ERROR: process \"/bin/sh -c cargo update -p clap --verbose\" did not complete successfully: exit code: 101\n------\n > [ 8/13] RUN cargo update -p clap --verbose:\n0.332 error: There are multiple `clap` packages in your project, and the specification `clap` is ambiguous.\n0.332 Please re-run this command with one of the following specifications:\n0.332   path+file:///clap-rs_clap#clap@4.5.46\n0.332   registry+https://github.com/rust-lang/crates.io-index#clap@4.5.46\n------\nenvgym.dockerfile:31\n--------------------\n  29 |     \n  30 |     RUN cargo generate-lockfile\n  31 | >>> RUN cargo update -p clap --verbose\n  32 |     RUN cargo fetch --verbose\n  33 |     RUN cargo check --verbose || (echo \"Dependency check failed:\" && RUST_BACKTRACE=full cargo check --verbose && exit 1)\n--------------------\nERROR: failed to solve: process \"/bin/sh -c cargo update -p clap --verbose\" did not complete successfully: exit code: 101\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

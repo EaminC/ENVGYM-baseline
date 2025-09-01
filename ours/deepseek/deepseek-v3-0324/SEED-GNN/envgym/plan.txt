@@ -1,0 +1,65 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN (CPU-ONLY VERSION) ===
+
+1. DOWNLOADS NEEDED: 
+   - Python 3.8+
+   - pip 20.0+
+   - PyTorch 2.0.0 (CPU version)
+   - torch-scatter 2.1.1 (CPU version)
+   - torch-cluster 1.6.1 (CPU version)
+   - torch-spline-conv 1.2.2 (CPU version)
+   - torch-sparse 0.6.17 (CPU version)
+   - torch-geometric 2.3.1 (CPU version)
+   - torchvision 0.15.1 (CPU version)
+   - torchaudio 2.0.1 (CPU version)
+   - numpy 1.24.4
+   - pandas 2.0.3
+   - ogb 1.3.6
+   - Git (for cloning repository)
+
+2. FILES TO CREATE: 
+   - requirements.txt (with specified CPU-compatible versions)
+   - config/pipeline_config/seed_gnn/gcn/cora.json (for GCN pipeline configuration)
+   - config/eval_config/edit_gnn/cora.json (for evaluation configuration)
+   - scripts/pretrain/seed_gnn/cora.sh (for baseline model training)
+   - scripts/edit/seed_gnn/gcn/cora.sh (for editing script)
+
+3. NECESSARY TEST CASES IN THE CODEBASE: 
+   - GNN model loading and initialization (CPU mode)
+   - Editing pipeline execution (CPU mode)
+   - Accuracy calculation pre- and post-edit
+   - Success rate verification
+   - Test drawdown calculation
+   - Config file parsing and validation
+   - Dataset loading and preprocessing
+   - Torch geometric compatibility tests (CPU)
+   - OGB dataset integration tests
+
+4. COMPLETE TODO LIST: 
+   - Install Python 3.8+ and verify with python --version
+   - Install pip and verify with pip --version
+   - Install PyTorch 2.0.0 CPU version: pip install torch==2.0.0+cpu --index-url https://download.pytorch.org/whl/cpu
+   - Install PyTorch Geometric CPU dependencies:
+     pip install torch-scatter==2.1.1+cpu torch-cluster==1.6.1+cpu torch-spline-conv==1.2.2+cpu torch-sparse==0.6.17+cpu -f https://data.pyg.org/whl/torch-2.0.0+cpu.html
+   - Install remaining dependencies from requirements.txt:
+     pip install torch-geometric==2.3.1 torchvision==0.15.1+cpu torchaudio==2.0.1+cpu numpy==1.24.4 pandas==2.0.3 ogb==1.3.6
+   - Clone repository and navigate to project directory: /home/cc/EnvGym/data/SEED-GNN
+   - Create config directories: mkdir -p config/pipeline_config/seed_gnn/gcn
+   - Create evaluation config directory: mkdir -p config/eval_config/edit_gnn
+   - Create scripts directories: mkdir -p scripts/pretrain/seed_gnn scripts/edit/seed_gnn/gcn
+   - Download dataset and place in specified directory
+   - Run baseline training (CPU): bash scripts/pretrain/seed_gnn/cora.sh <output_dir> <dataset_dir>
+   - Verify baseline model checkpoints are created
+   - Run editing script (CPU): bash scripts/edit/seed_gnn/gcn/cora.sh <output_dir> <dataset_dir>
+   - Verify output files are generated in specified directory
+   - Check exp.log for errors and completion status
+   - Validate results in output_config.json against expected metrics
+   - Verify OGB dataset integration
+   - Test torchvision and torchaudio compatibility (CPU)
+
+Key Changes Made:
+- Removed all CUDA-related components
+- Specified CPU versions for all PyTorch-related packages
+- Updated installation commands for CPU-only versions
+- Confirmed path compatibility with x86_64 architecture
+- Removed GPU-specific verification steps
+- Maintained all directory paths as specified in hardware info

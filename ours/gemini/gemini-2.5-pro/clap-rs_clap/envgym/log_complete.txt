@@ -1,0 +1,104 @@
+=== Docker Execution Log - 20250828_193021 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756409415
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 4.26kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/10] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0
+#4 CACHED
+
+#5 [ 2/10] RUN apt-get update &&     apt-get install -y     build-essential     git     make     python3     python3-pip     curl     ca-certificates     pkg-config     libssl-dev     ripgrep     fish     zsh     elvish     nushell     &&     rm -rf /var/lib/apt/lists/*
+#5 0.438 Get:1 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
+#5 0.441 Get:2 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+#5 0.927 Get:3 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+#5 0.951 Get:4 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [48.5 kB]
+#5 1.046 Get:5 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+#5 1.071 Get:6 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1272 kB]
+#5 1.166 Get:7 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+#5 1.373 Get:8 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [3297 kB]
+#5 1.525 Get:9 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [5340 kB]
+#5 1.931 Get:10 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+#5 1.937 Get:11 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
+#5 1.971 Get:12 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+#5 2.024 Get:13 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [5526 kB]
+#5 2.170 Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1576 kB]
+#5 2.222 Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [75.9 kB]
+#5 2.224 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [3608 kB]
+#5 2.323 Get:17 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [83.2 kB]
+#5 2.324 Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [35.2 kB]
+#5 3.096 Fetched 41.2 MB in 3s (14.5 MB/s)
+#5 3.096 Reading package lists...
+#5 3.936 Reading package lists...
+#5 4.752 Building dependency tree...
+#5 4.889 Reading state information...
+#5 4.902 E: Unable to locate package nushell
+#5 ERROR: process "/bin/sh -c apt-get update &&     apt-get install -y     build-essential     git     make     python3     python3-pip     curl     ca-certificates     pkg-config     libssl-dev     ripgrep     fish     zsh     elvish     nushell     &&     rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
+------
+ > [ 2/10] RUN apt-get update &&     apt-get install -y     build-essential     git     make     python3     python3-pip     curl     ca-certificates     pkg-config     libssl-dev     ripgrep     fish     zsh     elvish     nushell     &&     rm -rf /var/lib/apt/lists/*:
+2.170 Get:14 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1576 kB]
+2.222 Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [75.9 kB]
+2.224 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [3608 kB]
+2.323 Get:17 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [83.2 kB]
+2.324 Get:18 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [35.2 kB]
+
+
+4.752 Building dependency tree...
+4.889 Reading state information...
+4.902 E: Unable to locate package nushell
+------
+envgym.dockerfile:11
+--------------------
+  10 |     # ca-certificates is required for secure downloads (e.g., with curl).
+  11 | >>> RUN apt-get update && \
+  12 | >>>     apt-get install -y \
+  13 | >>>     build-essential \
+  14 | >>>     git \
+  15 | >>>     make \
+  16 | >>>     python3 \
+  17 | >>>     python3-pip \
+  18 | >>>     curl \
+  19 | >>>     ca-certificates \
+  20 | >>>     pkg-config \
+  21 | >>>     libssl-dev \
+  22 | >>>     # Recommended tools
+  23 | >>>     ripgrep \
+  24 | >>>     # Shells for integration tests
+  25 | >>>     fish \
+  26 | >>>     zsh \
+  27 | >>>     elvish \
+  28 | >>>     nushell \
+  29 | >>>     && \
+  30 | >>>     # Clean up apt cache to reduce final image size.
+  31 | >>>     rm -rf /var/lib/apt/lists/*
+  32 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c apt-get update &&     apt-get install -y     build-essential     git     make     python3     python3-pip     curl     ca-certificates     pkg-config     libssl-dev     ripgrep     fish     zsh     elvish     nushell     &&     rm -rf /var/lib/apt/lists/*" did not complete successfully: exit code: 100
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

@@ -1,0 +1,5 @@
+current progress
+The current Dockerfile successfully prepares a comprehensive development environment. It installs all required system dependencies for various build scenarios (native, cross-compile, documentation, static analysis, debugging), clones the source code repository, initializes the necessary submodules, installs Python dependencies, and generates the initial build system configuration scripts. The image provides a user with an interactive shell inside the prepared source tree, ready to manually execute any of the build and test methods outlined in the plan.
+
+next step
+Transition the Dockerfile from a general-purpose development environment to an automated, multi-stage build process as described in the plan's `Dockerfile.build` example. This involves adding `RUN` instructions to execute the `./configure`, `make`, and `make check` commands within a builder stage. Then, create a minimal final stage (`FROM scratch`) and use a `COPY --from=builder` instruction to copy only the compiled static `jq` binary and license files into the final image, setting an appropriate `ENTRYPOINT`.

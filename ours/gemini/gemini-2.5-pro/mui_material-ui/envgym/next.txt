@@ -1,0 +1,5 @@
+current progress
+The initial build attempt failed because the `COPY` command could not find the `yarn.lock` file in the project's root directory. The current Dockerfile has been simplified to a single-stage build, diverging from the original two-stage plan that included a production NGINX server. This modified Dockerfile still contains the failing `COPY` instruction and has not addressed the root cause of the error.
+
+next step
+Revert to the original two-stage Dockerfile. In the `builder` stage, correct the error by modifying two lines: first, change `COPY package.json yarn.lock ./` to `COPY package.json ./` to copy only the available file. Second, change `RUN yarn install --frozen-lockfile --ignore-scripts` to `RUN yarn install --ignore-scripts` to allow `yarn` to generate a lockfile during the build process. The `production` stage should be restored exactly as it was in the plan.

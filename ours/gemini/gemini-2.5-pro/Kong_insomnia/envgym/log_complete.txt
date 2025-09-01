@@ -1,0 +1,77 @@
+=== Docker Execution Log - 20250828_010131 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756342890
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.31kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:18-bookworm-slim
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 99B done
+#3 DONE 0.0s
+
+#4 [1/7] FROM docker.io/library/node:18-bookworm-slim@sha256:f9ab18e354e6855ae56ef2b290dd225c1e51a564f87584b9bd21dd651838830e
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 593.59kB 0.1s done
+#5 DONE 0.1s
+
+#6 [2/7] RUN apt-get update &&     apt-get install -y --no-install-recommends     git     libfontconfig-dev     libcurl4-openssl-dev     && apt-get clean && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [3/7] WORKDIR /app
+#7 CACHED
+
+#8 [4/7] COPY . .
+#8 DONE 0.1s
+
+#9 [5/7] RUN if [ -z "$NODE_AUTH_TOKEN" ]; then       echo "Error: Build-time variable NODE_AUTH_TOKEN is not set." >&2;       echo "Please provide it using the --build-arg NODE_AUTH_TOKEN=<your_token> flag." >&2;       exit 1;     fi &&     echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" > .npmrc &&     npm ci &&     rm .npmrc
+#9 0.236 Error: Build-time variable NODE_AUTH_TOKEN is not set.
+#9 0.236 Please provide it using the --build-arg NODE_AUTH_TOKEN=<your_token> flag.
+#9 ERROR: process "/bin/sh -c if [ -z \"$NODE_AUTH_TOKEN\" ]; then       echo \"Error: Build-time variable NODE_AUTH_TOKEN is not set.\" >&2;       echo \"Please provide it using the --build-arg NODE_AUTH_TOKEN=<your_token> flag.\" >&2;       exit 1;     fi &&     echo \"//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}\" > .npmrc &&     npm ci &&     rm .npmrc" did not complete successfully: exit code: 1
+------
+ > [5/7] RUN if [ -z "$NODE_AUTH_TOKEN" ]; then       echo "Error: Build-time variable NODE_AUTH_TOKEN is not set." >&2;       echo "Please provide it using the --build-arg NODE_AUTH_TOKEN=<your_token> flag." >&2;       exit 1;     fi &&     echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" > .npmrc &&     npm ci &&     rm .npmrc:
+0.236 Error: Build-time variable NODE_AUTH_TOKEN is not set.
+0.236 Please provide it using the --build-arg NODE_AUTH_TOKEN=<your_token> flag.
+------
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "NODE_AUTH_TOKEN") (line 3)
+envgym.dockerfile:23
+--------------------
+  22 |     # Check for NODE_AUTH_TOKEN, create .npmrc, install dependencies, and clean up .npmrc
+  23 | >>> RUN if [ -z "$NODE_AUTH_TOKEN" ]; then \
+  24 | >>>       echo "Error: Build-time variable NODE_AUTH_TOKEN is not set." >&2; \
+  25 | >>>       echo "Please provide it using the --build-arg NODE_AUTH_TOKEN=<your_token> flag." >&2; \
+  26 | >>>       exit 1; \
+  27 | >>>     fi && \
+  28 | >>>     echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" > .npmrc && \
+  29 | >>>     npm ci && \
+  30 | >>>     rm .npmrc
+  31 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c if [ -z \"$NODE_AUTH_TOKEN\" ]; then       echo \"Error: Build-time variable NODE_AUTH_TOKEN is not set.\" >&2;       echo \"Please provide it using the --build-arg NODE_AUTH_TOKEN=<your_token> flag.\" >&2;       exit 1;     fi &&     echo \"//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}\" > .npmrc &&     npm ci &&     rm .npmrc" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

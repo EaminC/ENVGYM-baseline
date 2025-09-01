@@ -1,0 +1,1370 @@
+=== Docker Execution Log - 20250829_032237 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756437594
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 3.67kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/14] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0
+#4 DONE 0.0s
+
+#5 [ 8/14] RUN sdkmanager --install "system-images;android-33;default;x86_64"
+#5 CACHED
+
+#6 [ 9/14] RUN sdkmanager --install "system-images;android-26;default;x86_64"
+#6 CACHED
+
+#7 [ 6/14] RUN sdkmanager --install "platforms;android-33"
+#7 CACHED
+
+#8 [ 4/14] RUN yes | sdkmanager --licenses
+#8 CACHED
+
+#9 [10/14] RUN useradd -ms /bin/bash -u 1000 cc &&     chown -R cc:cc /opt/android-sdk
+#9 CACHED
+
+#10 [11/14] WORKDIR /home/cc/EnvGym/data/mockito_mockito
+#10 CACHED
+
+#11 [ 3/14] RUN mkdir -p /opt/android-sdk/cmdline-tools &&     wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/android-tools.zip &&     unzip /tmp/android-tools.zip -d /tmp/android-tools-unzipped &&     mv /tmp/android-tools-unzipped/cmdline-tools /opt/android-sdk/cmdline-tools/latest &&     rm -rf /tmp/android-tools.zip /tmp/android-tools-unzipped
+#11 CACHED
+
+#12 [ 7/14] RUN sdkmanager --install "emulator"
+#12 CACHED
+
+#13 [ 2/14] RUN apt-get update && apt-get install -y     git     wget     unzip     ca-certificates     software-properties-common     libncurses5     libpulse0     libglu1-mesa     libqt5widgets5     qemu-kvm     openjdk-21-jdk     && apt-get clean && rm -rf /var/lib/apt/lists/*
+#13 CACHED
+
+#14 [ 5/14] RUN sdkmanager --install "platform-tools"
+#14 CACHED
+
+#15 [12/14] RUN git clone https://github.com/mockito/mockito.git .
+#15 CACHED
+
+#16 [13/14] RUN ./gradlew build --stacktrace -Dorg.gradle.jvmargs="-Xmx2048m"
+#16 0.318 Downloading https://services.gradle.org/distributions/gradle-8.14.2-bin.zip
+#16 0.805 .............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%..............100%
+#16 13.09 
+#16 13.09 Welcome to Gradle 8.14.2!
+#16 13.09 
+#16 13.09 Here are the highlights of this release:
+#16 13.09  - Java 24 support
+#16 13.09  - GraalVM Native Image toolchain selection
+#16 13.09  - Enhancements to test reporting
+#16 13.09  - Build Authoring improvements
+#16 13.09 
+#16 13.09 For more details see https://docs.gradle.org/8.14.2/release-notes.html
+#16 13.09 
+#16 13.19 Starting a Gradle Daemon (subsequent builds will be faster)
+#16 55.10 > Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+#16 58.09 > Task :buildSrc:generateExternalPluginSpecBuilders
+#16 58.09 > Task :buildSrc:extractPrecompiledScriptPluginPlugins
+#16 62.79 > Task :buildSrc:generateScriptPluginAdapters
+#16 62.79 > Task :buildSrc:pluginDescriptors
+#16 62.89 > Task :buildSrc:processResources
+#16 65.79 
+#16 65.79 > Task :buildSrc:compilePluginsBlocks
+#16 65.79 e: The daemon has terminated unexpectedly on startup attempt #1 with error code: 0. The daemon process output:
+#16 65.79     1. Kotlin compile daemon is ready
+#16 75.29 
+#16 75.29 > Task :buildSrc:generatePrecompiledScriptPluginAccessors
+#16 75.29 Building version '5.19.1-SNAPSHOT'
+#16 75.29   - reason: shipkit-auto-version deduced snapshot based on tag: 'v5.19.0'
+#16 88.89 
+#16 88.89 > Task :buildSrc:compileKotlin
+#16 88.89 > Task :buildSrc:compileJava NO-SOURCE
+#16 88.89 > Task :buildSrc:compileGroovy NO-SOURCE
+#16 88.89 > Task :buildSrc:classes
+#16 89.09 > Task :buildSrc:jar
+#16 105.0 
+#16 105.0 > Configure project :
+#16 105.0 Building version '5.19.1-SNAPSHOT'
+#16 105.0   - reason: shipkit-auto-version deduced snapshot based on tag: 'v5.19.0'
+#16 117.8 
+#16 117.8 > Configure project :mockito-integration-tests:android-tests
+#16 117.8 w: file:///home/cc/EnvGym/data/mockito_mockito/mockito-integration-tests/android-tests/build.gradle.kts:59:9: 'jvmTarget: String' is deprecated. Please migrate to the compilerOptions DSL. More details are here: https://kotl.in/u1r8ln
+#16 126.0 Checking the license for package Android SDK Build-Tools 30.0.3 in /opt/android-sdk/licenses
+#16 126.0 License for package Android SDK Build-Tools 30.0.3 accepted.
+#16 126.0 Preparing "Install Android SDK Build-Tools 30.0.3 (revision: 30.0.3)".
+#16 127.6 "Install Android SDK Build-Tools 30.0.3 (revision: 30.0.3)" ready.
+#16 127.6 Installing Android SDK Build-Tools 30.0.3 in /opt/android-sdk/build-tools/30.0.3
+#16 127.6 "Install Android SDK Build-Tools 30.0.3 (revision: 30.0.3)" complete.
+#16 127.7 "Install Android SDK Build-Tools 30.0.3 (revision: 30.0.3)" finished.
+#16 128.6 
+#16 128.6 > Task :mockito-integration-tests:extensions-tests:compileJava NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:groovy-tests:compileJava NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:programmatic-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:kotlin-tests:checkKotlinGradlePluginConfigurationErrors SKIPPED
+#16 128.6 > Task :mockito-integration-tests:kotlin-release-coroutines-tests:checkKotlinGradlePluginConfigurationErrors SKIPPED
+#16 128.6 > Task :mockito-integration-tests:module-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:osgi-tests:compileJava NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:graalvm-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:compileJava NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:inline-mocks-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:java-21-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:compileJava NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:junit-jupiter-extension-tests:compileJava NO-SOURCE
+#16 128.6 > Task :mockito-extensions:mockito-errorprone:processResources NO-SOURCE
+#16 128.6 > Task :mockito-bom:assemble UP-TO-DATE
+#16 128.6 > Task :mockito-integration-tests:memory-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:groovy-inline-tests:compileJava NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:module-named-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-extensions:mockito-junit-jupiter:processResources NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:groovy-inline-tests:compileGroovy NO-SOURCE
+#16 128.6 > Task :mockito-extensions:mockito-android:processResources
+#16 128.6 > Task :mockito-extensions:mockito-proxy:processResources
+#16 128.6 > Task :mockito-extensions:mockito-subclass:processResources
+#16 128.6 > Task :mockito-integration-tests:groovy-inline-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:groovy-inline-tests:classes UP-TO-DATE
+#16 128.6 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:extensions-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:groovy-tests:compileGroovy NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:graalvm-tests:licenseMain NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:java-21-tests:licenseMain NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:module-tests:licenseMain NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:osgi-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-bom:check UP-TO-DATE
+#16 128.6 > Task :mockito-integration-tests:junit-jupiter-extension-tests:processResources NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:module-named-tests:licenseMain NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:memory-tests:licenseMain NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:inline-mocks-tests:licenseMain NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:groovy-inline-tests:jar
+#16 128.6 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:classes UP-TO-DATE
+#16 128.6 > Task :mockito-integration-tests:programmatic-tests:licenseMain NO-SOURCE
+#16 128.6 > Task :mockito-integration-tests:extensions-tests:classes UP-TO-DATE
+#16 128.6 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:classes UP-TO-DATE
+#16 128.7 > Task :mockito-bom:build UP-TO-DATE
+#16 128.7 > Task :mockito-integration-tests:osgi-tests:classes UP-TO-DATE
+#16 128.7 > Task :mockito-integration-tests:groovy-tests:processResources NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:kotlin-release-coroutines-tests:compileKotlin NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:kotlin-tests:compileKotlin NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:junit-jupiter-extension-tests:classes UP-TO-DATE
+#16 128.7 > Task :mockito-extensions:mockito-subclass:sourcesJar
+#16 128.7 > Task :mockito-extensions:mockito-subclass:processTestResources NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:extensions-tests:jar
+#16 128.7 > Task :mockito-integration-tests:groovy-inline-tests:assemble
+#16 128.7 > Task :mockito-integration-tests:groovy-inline-tests:licenseMain NO-SOURCE
+#16 128.7 > Task :mockito-extensions:mockito-errorprone:sourcesJar
+#16 128.7 > Task :mockito-integration-tests:groovy-tests:classes UP-TO-DATE
+#16 128.7 > Task :mockito-extensions:mockito-proxy:sourcesJar
+#16 128.7 > Task :mockito-integration-tests:kotlin-release-coroutines-tests:compileJava NO-SOURCE
+#16 128.7 > Task :mockito-extensions:mockito-android:sourcesJar
+#16 128.7 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:jar
+#16 128.7 > Task :mockito-integration-tests:junit-jupiter-extension-tests:jar
+#16 128.7 > Task :mockito-integration-tests:kotlin-tests:compileJava NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:assemble
+#16 128.7 > Task :mockito-extensions:mockito-junit-jupiter:sourcesJar
+#16 128.7 > Task :mockito-extensions:mockito-proxy:processTestResources NO-SOURCE
+#16 128.7 > Task :mockito-extensions:mockito-junit-jupiter:processTestResources NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:extensions-tests:assemble
+#16 128.7 > Task :mockito-extensions:mockito-errorprone:processTestResources NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:junit-jupiter-extension-tests:assemble
+#16 128.7 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:licenseMain NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:kotlin-release-coroutines-tests:processResources NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:jar
+#16 128.7 > Task :mockito-integration-tests:kotlin-release-coroutines-tests:classes UP-TO-DATE
+#16 128.7 > Task :mockito-integration-tests:kotlin-tests:processResources NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:kotlin-tests:classes UP-TO-DATE
+#16 128.7 > Task :mockito-integration-tests:groovy-tests:jar
+#16 128.7 > Task :mockito-integration-tests:groovy-tests:assemble
+#16 128.7 > Task :mockito-integration-tests:extensions-tests:licenseMain NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:junit-jupiter-extension-tests:licenseMain NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:assemble
+#16 128.7 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:licenseMain NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:groovy-tests:licenseMain NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:kotlin-tests:jar
+#16 128.7 > Task :mockito-integration-tests:kotlin-tests:assemble
+#16 128.7 > Task :mockito-integration-tests:kotlin-tests:licenseMain NO-SOURCE
+#16 128.7 > Task :mockito-integration-tests:kotlin-release-coroutines-tests:jar
+#16 128.7 > Task :mockito-integration-tests:kotlin-release-coroutines-tests:assemble
+#16 128.7 > Task :mockito-integration-tests:kotlin-release-coroutines-tests:licenseMain NO-SOURCE
+#16 128.8 > Task :mockito-extensions:mockito-proxy:licenseMain UP-TO-DATE
+#16 128.8 > Task :mockito-extensions:mockito-subclass:licenseMain UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:android-tests:preBuild UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:android-tests:preDebugBuild UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:android-tests:mergeDebugNativeDebugMetadata NO-SOURCE
+#16 128.8 > Task :mockito-integration-tests:android-tests:compileDebugAidl NO-SOURCE
+#16 128.8 > Task :mockito-integration-tests:android-tests:checkKotlinGradlePluginConfigurationErrors SKIPPED
+#16 128.8 > Task :mockito-integration-tests:android-tests:compileDebugRenderscript NO-SOURCE
+#16 128.8 > Task :mockito-integration-tests:graalvm-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:graalvm-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:graalvm-tests:processTestResources NO-SOURCE
+#16 128.8 > Task :mockito-integration-tests:kotlin-release-coroutines-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-extensions:mockito-subclass:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:junit-jupiter-extension-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-extensions:mockito-proxy:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:memory-tests:licenseTest UP-TO-DATE
+#16 128.8 Missing header in: mockito-integration-tests/module-named-tests/src/test/java/module-info.java
+#16 128.8 > Task :mockito-integration-tests:programmatic-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:groovy-inline-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:kotlin-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:groovy-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:java-21-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-extensions:mockito-errorprone:licenseMain UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:kotlin-release-coroutines-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-extensions:mockito-android:licenseMain UP-TO-DATE
+#16 128.8 > Task :mockito-extensions:mockito-junit-jupiter:licenseMain UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:module-named-tests:licenseTest
+#16 128.8 > Task :mockito-integration-tests:extensions-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:module-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:inline-mocks-tests:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:programmatic-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:programmatic-tests:processTestResources NO-SOURCE
+#16 128.8 > Task :mockito-integration-tests:extensions-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-extensions:mockito-subclass:license UP-TO-DATE
+#16 128.8 > Task :mockito-extensions:mockito-proxy:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:groovy-inline-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:groovy-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:java-21-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:inline-mocks-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-extensions:mockito-android:licenseTest NO-SOURCE
+#16 128.8 > Task :mockito-integration-tests:memory-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:kotlin-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:module-named-tests:license
+#16 128.8 > Task :mockito-integration-tests:module-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:inline-mocks-tests:processTestResources NO-SOURCE
+#16 128.8 > Task :mockito-integration-tests:kotlin-release-coroutines-tests:processTestResources
+#16 128.8 > Task :mockito-integration-tests:junit-jupiter-extension-tests:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:groovy-tests:processTestResources NO-SOURCE
+#16 128.8 > Task :mockito-extensions:mockito-android:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:memory-tests:processTestResources NO-SOURCE
+#16 128.8 > Task :mockito-integration-tests:java-21-tests:processTestResources NO-SOURCE
+#16 128.8 > Task :mockito-integration-tests:groovy-inline-tests:processTestResources NO-SOURCE
+#16 128.8 > Task :mockito-integration-tests:module-tests:processTestResources NO-SOURCE
+#16 128.8 > Task :mockito-integration-tests:module-named-tests:processTestResources NO-SOURCE
+#16 128.8 > Task :mockito-extensions:mockito-errorprone:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:extensions-tests:processTestResources
+#16 128.8 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:processTestResources
+#16 128.8 > Task :mockito-extensions:mockito-junit-jupiter:licenseTest UP-TO-DATE
+#16 128.8 > Task :mockito-extensions:mockito-junit-jupiter:license UP-TO-DATE
+#16 128.8 > Task :mockito-extensions:mockito-android:processTestResources NO-SOURCE
+#16 128.8 > Task :mockito-integration-tests:kotlin-tests:processTestResources
+#16 128.8 > Task :mockito-extensions:mockito-errorprone:license UP-TO-DATE
+#16 128.8 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:processTestResources
+#16 128.8 > Task :mockito-integration-tests:junit-jupiter-extension-tests:processTestResources
+#16 128.8 > Task :mockito-extensions:mockito-junit-jupiter:osgiProperties
+#16 128.8 > Task :mockito-integration-tests:android-tests:generateDebugBuildConfig
+#16 128.9 > Task :mockito-extensions:mockito-proxy:generatePomFileForMockitoLibraryPublication
+#16 128.9 > Task :mockito-extensions:mockito-android:generatePomFileForMockitoLibraryPublication
+#16 128.9 > Task :mockito-extensions:mockito-errorprone:generatePomFileForMockitoLibraryPublication
+#16 128.9 > Task :mockito-extensions:mockito-subclass:generatePomFileForMockitoLibraryPublication
+#16 128.9 > Task :mockito-extensions:mockito-junit-jupiter:generatePomFileForMockitoLibraryPublication
+#16 128.9 > Task :mockito-integration-tests:osgi-tests:jar
+#16 128.9 > Task :mockito-integration-tests:osgi-tests:assemble
+#16 128.9 > Task :mockito-integration-tests:osgi-tests:licenseMain NO-SOURCE
+#16 128.9 > Task :mockito-integration-tests:osgi-tests:licenseOtherBundle UP-TO-DATE
+#16 128.9 > Task :mockito-integration-tests:osgi-tests:licenseTest UP-TO-DATE
+#16 129.0 > Task :mockito-integration-tests:osgi-tests:licenseTestBundle UP-TO-DATE
+#16 129.0 > Task :mockito-integration-tests:osgi-tests:license UP-TO-DATE
+#16 129.0 > Task :mockito-integration-tests:android-tests:checkDebugAarMetadata
+#16 129.0 > Task :mockito-integration-tests:android-tests:generateDebugResValues
+#16 129.0 > Task :mockito-integration-tests:android-tests:mapDebugSourceSetPaths
+#16 129.0 > Task :mockito-integration-tests:android-tests:generateDebugResources
+#16 129.1 > Task :mockito-integration-tests:osgi-tests:compileOtherBundleJava
+#16 129.1 > Task :mockito-integration-tests:osgi-tests:processOtherBundleResources NO-SOURCE
+#16 129.1 > Task :mockito-integration-tests:osgi-tests:otherBundleClasses
+#16 129.1 > Task :mockito-integration-tests:osgi-tests:otherBundle
+#16 129.1 > Task :mockito-integration-tests:osgi-tests:processTestBundleResources NO-SOURCE
+#16 129.1 > Task :mockito-integration-tests:osgi-tests:processTestResources NO-SOURCE
+#16 129.2 > Task :mockito-integration-tests:android-tests:createDebugCompatibleScreenManifests
+#16 129.2 > Task :mockito-integration-tests:android-tests:extractDeepLinksDebug
+#16 129.3 > Task :mockito-integration-tests:android-tests:processDebugMainManifest
+#16 129.3 > Task :mockito-integration-tests:android-tests:mergeDebugResources
+#16 129.3 > Task :mockito-integration-tests:android-tests:processDebugManifest
+#16 129.4 > Task :mockito-integration-tests:android-tests:javaPreCompileDebug
+#16 129.4 > Task :mockito-integration-tests:android-tests:mergeDebugShaders
+#16 129.4 > Task :mockito-integration-tests:android-tests:compileDebugShaders NO-SOURCE
+#16 129.4 > Task :mockito-integration-tests:android-tests:generateDebugAssets UP-TO-DATE
+#16 129.4 > Task :mockito-integration-tests:android-tests:mergeDebugAssets FROM-CACHE
+#16 129.4 > Task :mockito-integration-tests:android-tests:compressDebugAssets
+#16 129.4 > Task :mockito-integration-tests:android-tests:processDebugJavaRes NO-SOURCE
+#16 129.4 > Task :mockito-integration-tests:android-tests:generateDebugJacocoPropertiesFile
+#16 129.5 > Task :mockito-integration-tests:android-tests:desugarDebugFileDependencies
+#16 129.5 > Task :mockito-integration-tests:android-tests:mergeDebugJniLibFolders FROM-CACHE
+#16 129.5 > Task :mockito-integration-tests:android-tests:checkDebugDuplicateClasses
+#16 130.0 > Task :mockito-integration-tests:android-tests:validateSigningDebug
+#16 138.9 > Task :mockito-integration-tests:android-tests:writeDebugAppMetadata
+#16 138.9 > Task :mockito-integration-tests:android-tests:writeDebugSigningConfigVersions
+#16 138.9 > Task :mockito-integration-tests:android-tests:license UP-TO-DATE
+#16 138.9 > Task :mockito-integration-tests:android-tests:preDebugAndroidTestBuild SKIPPED
+#16 139.5 Note: Some input files use or override a deprecated API.
+#16 139.5 Note: Recompile with -Xlint:deprecation for details.
+#16 139.5 
+#16 139.5 > Task :mockito-core:compileJava
+#16 139.6 Note: /home/cc/EnvGym/data/mockito_mockito/mockito-core/src/main/java/org/mockito/internal/configuration/plugins/DefaultMockitoPlugins.java uses or overrides a deprecated API that is marked for removal.
+#16 139.6 Note: Recompile with -Xlint:removal for details.
+#16 139.6 Note: Some input files use unchecked or unsafe operations.
+#16 139.6 Note: Recompile with -Xlint:unchecked for details.
+#16 140.2 
+#16 140.2 > Task :mockito-integration-tests:android-tests:processDebugAndroidTestManifest
+#16 140.2 > Task :mockito-integration-tests:android-tests:compileDebugAndroidTestRenderscript NO-SOURCE
+#16 140.2 > Task :mockito-integration-tests:android-tests:extractProguardFiles
+#16 140.2 > Task :mockito-integration-tests:android-tests:generateDebugAndroidTestResValues FROM-CACHE
+#16 140.2 > Task :mockito-integration-tests:android-tests:preDebugUnitTestBuild UP-TO-DATE
+#16 140.2 > Task :mockito-integration-tests:android-tests:javaPreCompileDebugUnitTest FROM-CACHE
+#16 140.2 > Task :mockito-integration-tests:android-tests:processDebugUnitTestJavaRes NO-SOURCE
+#16 140.2 > Task :mockito-integration-tests:android-tests:processDebugManifestForPackage
+#16 140.9 > Task :mockito-integration-tests:android-tests:mergeExtDexDebug
+#16 141.0 > Task :mockito-integration-tests:module-tests:compileJava NO-SOURCE
+#16 141.0 > Task :mockito-integration-tests:memory-tests:compileJava NO-SOURCE
+#16 141.0 > Task :mockito-integration-tests:java-21-tests:compileJava NO-SOURCE
+#16 141.0 > Task :mockito-integration-tests:module-named-tests:compileJava NO-SOURCE
+#16 141.0 > Task :mockito-integration-tests:memory-tests:classes UP-TO-DATE
+#16 141.0 > Task :mockito-integration-tests:module-tests:classes UP-TO-DATE
+#16 141.0 > Task :mockito-integration-tests:module-named-tests:classes UP-TO-DATE
+#16 141.0 > Task :mockito-integration-tests:programmatic-tests:compileJava NO-SOURCE
+#16 141.0 > Task :mockito-integration-tests:programmatic-tests:classes UP-TO-DATE
+#16 141.0 > Task :mockito-integration-tests:java-21-tests:classes UP-TO-DATE
+#16 141.0 > Task :mockito-extensions:mockito-subclass:compileJava NO-SOURCE
+#16 141.0 > Task :mockito-integration-tests:module-tests:jar
+#16 141.0 > Task :mockito-integration-tests:programmatic-tests:jar
+#16 141.0 > Task :mockito-integration-tests:module-named-tests:jar
+#16 141.0 > Task :mockito-integration-tests:memory-tests:jar
+#16 141.0 > Task :mockito-integration-tests:module-tests:assemble
+#16 141.0 > Task :mockito-integration-tests:inline-mocks-tests:compileJava NO-SOURCE
+#16 141.0 > Task :mockito-extensions:mockito-proxy:compileJava NO-SOURCE
+#16 141.0 > Task :mockito-integration-tests:inline-mocks-tests:classes UP-TO-DATE
+#16 141.0 > Task :mockito-core:copyMockMethodDispatcher
+#16 141.0 > Task :mockito-integration-tests:java-21-tests:jar
+#16 141.0 > Task :mockito-integration-tests:graalvm-tests:compileJava NO-SOURCE
+#16 141.0 > Task :mockito-integration-tests:graalvm-tests:classes UP-TO-DATE
+#16 141.0 > Task :mockito-extensions:mockito-proxy:classes
+#16 141.0 > Task :mockito-extensions:mockito-subclass:classes
+#16 141.0 > Task :mockito-integration-tests:memory-tests:assemble
+#16 141.0 > Task :mockito-core:processResources NO-SOURCE
+#16 141.0 > Task :mockito-extensions:mockito-proxy:javadoc SKIPPED
+#16 141.0 > Task :mockito-integration-tests:android-tests:processDebugResources
+#16 141.0 > Task :mockito-integration-tests:module-named-tests:assemble
+#16 141.0 > Task :mockito-extensions:mockito-subclass:javadoc SKIPPED
+#16 141.0 > Task :mockito-integration-tests:java-21-tests:assemble
+#16 141.0 > Task :mockito-integration-tests:inline-mocks-tests:jar
+#16 141.0 > Task :mockito-integration-tests:inline-mocks-tests:assemble
+#16 141.0 > Task :mockito-integration-tests:programmatic-tests:assemble
+#16 141.0 > Task :mockito-integration-tests:graalvm-tests:jar
+#16 141.0 > Task :mockito-integration-tests:graalvm-tests:assemble
+#16 141.0 > Task :mockito-core:removeInjectionPackageFromModuleInfo
+#16 141.0 > Task :mockito-core:classes
+#16 141.0 > Task :mockito-extensions:mockito-subclass:javadocJar
+#16 141.1 > Task :mockito-extensions:mockito-proxy:javadocJar
+#16 141.1 > Task :mockito-extensions:mockito-subclass:checkstyleMain NO-SOURCE
+#16 141.1 > Task :mockito-extensions:mockito-proxy:checkstyleMain NO-SOURCE
+#16 141.6 > Task :mockito-integration-tests:osgi-tests:compileTestBundleJava
+#16 141.6 > Task :mockito-integration-tests:osgi-tests:testBundleClasses
+#16 141.6 
+#16 141.6 > Transform main (project :mockito-core) with DexingNoClasspathTransform
+#16 141.6 ERROR:/home/cc/EnvGym/data/mockito_mockito/mockito-core/build/.transforms/324f2f8138b4e62c9017790697f7dc7f/transformed/instrumented_classes/org/mockito/Answers.class: D8: java.lang.NullPointerException: Cannot invoke "String.length()" because "<parameter1>" is null
+#16 141.7 
+#16 141.7 > Task :mockito-integration-tests:osgi-tests:testBundle
+#16 141.8 > Task :mockito-integration-tests:graalvm-tests:compileTestJava
+#16 141.8 
+#16 141.8 > Task :mockito-integration-tests:memory-tests:compileTestJava
+#16 141.8 
+#16 141.8 > Task :mockito-integration-tests:java-21-tests:compileTestJava
+#16 141.8 > Task :mockito-integration-tests:memory-tests:testClasses
+#16 141.8 > Task :mockito-integration-tests:java-21-tests:testClasses
+#16 141.8 > Task :mockito-integration-tests:graalvm-tests:testClasses
+#16 141.8 Note: /home/cc/EnvGym/data/mockito_mockito/mockito-integration-tests/memory-tests/src/test/java/org/mockito/memorytest/LocationFactoryAllocationRateTest.java uses or overrides a deprecated API.
+#16 141.8 Note: Recompile with -Xlint:deprecation for details.
+#16 141.8 > Task :mockito-integration-tests:programmatic-tests:compileTestJava
+#16 141.8 > Task :mockito-integration-tests:programmatic-tests:testClasses
+#16 141.9 > Task :mockito-integration-tests:osgi-tests:compileTestJava
+#16 141.9 > Task :mockito-integration-tests:osgi-tests:testClasses
+#16 142.0 > Task :mockito-integration-tests:module-tests:compileTestJava
+#16 142.0 > Task :mockito-integration-tests:module-tests:testClasses
+#16 142.1 > Task :mockito-integration-tests:inline-mocks-tests:compileTestJava
+#16 142.1 > Task :mockito-integration-tests:inline-mocks-tests:testClasses
+#16 142.3 > Task :mockito-core:jar
+#16 142.3 > Task :mockito-integration-tests:groovy-tests:compileTestJava NO-SOURCE
+#16 142.3 > Task :mockito-integration-tests:groovy-inline-tests:compileTestJava NO-SOURCE
+#16 142.5 > Task :mockito-extensions:mockito-android:compileJava
+#16 142.5 > Task :mockito-extensions:mockito-android:classes
+#16 142.5 > Task :mockito-extensions:mockito-android:jar
+#16 142.5 > Task :mockito-extensions:mockito-android:javadoc SKIPPED
+#16 142.5 > Task :mockito-extensions:mockito-android:javadocJar
+#16 142.5 > Task :mockito-extensions:mockito-android:assemble
+#16 142.5 > Task :mockito-extensions:mockito-android:compileTestJava NO-SOURCE
+#16 142.5 > Task :mockito-extensions:mockito-android:testClasses UP-TO-DATE
+#16 142.5 > Task :mockito-extensions:mockito-android:test NO-SOURCE
+#16 142.5 > Task :mockito-extensions:mockito-android:retryTest SKIPPED
+#16 142.5 > Task :mockito-extensions:mockito-android:check UP-TO-DATE
+#16 142.5 > Task :mockito-extensions:mockito-android:generateMetadataFileForMockitoLibraryPublication SKIPPED
+#16 142.6 > Task :mockito-extensions:mockito-android:publishMockitoLibraryPublicationToLocalRepository
+#16 142.6 > Task :mockito-extensions:mockito-android:publishAllPublicationsToLocalRepository
+#16 142.6 > Task :mockito-extensions:mockito-android:build
+#16 142.6 > Task :mockito-integration-tests:module-named-tests:compileTestJava
+#16 142.6 > Task :mockito-integration-tests:module-named-tests:testClasses
+#16 143.4 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 143.5 > Task :mockito-extensions:mockito-junit-jupiter:compileJava
+#16 143.5 > Task :mockito-extensions:mockito-junit-jupiter:classes
+#16 143.7 > Task :mockito-extensions:mockito-junit-jupiter:jar
+#16 143.7 > Task :mockito-extensions:mockito-subclass:compileTestJava
+#16 143.7 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:compileTestJava
+#16 143.7 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:testClasses
+#16 143.8 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 143.8 > Task :mockito-extensions:mockito-subclass:jar
+#16 143.8 > Task :mockito-extensions:mockito-subclass:assemble
+#16 143.8 > Task :mockito-extensions:mockito-subclass:testClasses
+#16 143.8 > Task :mockito-integration-tests:junit-jupiter-extension-tests:compileTestJava
+#16 143.8 > Task :mockito-integration-tests:junit-jupiter-extension-tests:testClasses
+#16 143.8 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:compileTestJava
+#16 143.8 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:testClasses
+#16 143.9 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 143.9 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 143.9 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 143.9 > Task :mockito-extensions:mockito-proxy:compileTestJava
+#16 144.0 > Task :mockito-extensions:mockito-proxy:jar
+#16 144.0 > Task :mockito-extensions:mockito-proxy:assemble
+#16 144.0 > Task :mockito-extensions:mockito-proxy:testClasses
+#16 144.3 
+#16 144.3 > Task :mockito-integration-tests:java-21-tests:testWithBytebuddyAgent
+#16 144.3 
+#16 144.3 
+#16 144.6 
+#16 144.6 
+#16 144.6 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 144.6 > Task :mockito-integration-tests:module-tests:test
+#16 144.6 
+#16 144.6 
+#16 144.8 
+#16 144.8 
+#16 144.8 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 144.8 > Task :mockito-integration-tests:memory-tests:test
+#16 144.8 
+#16 144.8 
+#16 145.4 
+#16 145.4 
+#16 145.4 > Task :mockito-integration-tests:inline-mocks-tests:test
+#16 145.4 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 145.4 
+#16 145.4 
+#16 145.7 
+#16 145.7 
+#16 145.7 > Task :mockito-integration-tests:programmatic-tests:test
+#16 145.7 
+#16 145.7 
+#16 145.7 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 145.9 
+#16 145.9 > Task :mockito-integration-tests:java-21-tests:testWithBytebuddyAgent
+#16 145.9 
+#16 145.9   [0K[32m8 passing [90m(3.3s)[m
+#16 145.9 
+#16 145.9 
+#16 145.9 > Task :mockito-integration-tests:osgi-tests:test
+#16 145.9 
+#16 145.9 
+#16 146.0 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 146.0 
+#16 146.0 
+#16 146.0 > Task :mockito-integration-tests:module-named-tests:test
+#16 146.0 
+#16 146.0 
+#16 146.1 
+#16 146.1 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 146.1 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 146.1 
+#16 146.1 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:test
+#16 146.1 
+#16 146.1 
+#16 146.4 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 146.4 
+#16 146.4 
+#16 146.4 > Task :mockito-integration-tests:groovy-inline-tests:compileTestGroovy
+#16 146.4 > Task :mockito-integration-tests:groovy-inline-tests:testClasses
+#16 146.4 
+#16 146.4 > Task :mockito-integration-tests:graalvm-tests:test
+#16 146.4 
+#16 146.4 
+#16 146.5 
+#16 146.5 > Task :mockito-integration-tests:groovy-tests:compileTestGroovy
+#16 146.5 > Task :mockito-integration-tests:groovy-tests:testClasses
+#16 146.5 
+#16 146.5 > Task :mockito-integration-tests:module-named-tests:test
+#16 146.5 
+#16 146.5   [0K[32m4 passing [90m(3.7s)[m
+#16 146.5 
+#16 146.5 
+#16 146.5 > Task :mockito-integration-tests:module-named-tests:check
+#16 146.5 > Task :mockito-integration-tests:module-named-tests:build
+#16 146.5 
+#16 146.5 > Task :mockito-integration-tests:junit-jupiter-extension-tests:test
+#16 146.5 
+#16 146.5 
+#16 146.8 
+#16 146.8 > Task :mockito-integration-tests:graalvm-tests:test
+#16 146.8 
+#16 146.8   [0K[32m1 passing [90m(2.9s)[m
+#16 146.8 
+#16 146.8 
+#16 146.8 > Task :mockito-integration-tests:graalvm-tests:check
+#16 146.8 > Task :mockito-integration-tests:graalvm-tests:build
+#16 146.8 
+#16 146.8 > Task :mockito-extensions:mockito-proxy:test
+#16 146.8 
+#16 146.8 
+#16 146.8 
+#16 146.8   [0K[32m6 passing [90m(2s)[m
+#16 146.8 
+#16 146.8 
+#16 146.8 > Task :mockito-extensions:mockito-proxy:retryTest SKIPPED
+#16 146.8 > Task :mockito-extensions:mockito-proxy:generateMetadataFileForMockitoLibraryPublication SKIPPED
+#16 146.8 > Task :mockito-extensions:mockito-proxy:publishMockitoLibraryPublicationToLocalRepository
+#16 146.8 > Task :mockito-extensions:mockito-proxy:publishAllPublicationsToLocalRepository
+#16 146.8 
+#16 146.8 > Task :mockito-integration-tests:module-tests:test
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleAccessTest [36m- cannot_read_unopened_private_field_but_exception_includes_cause[m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_open_java_util_module[0][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_open_reading_module[0][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_open_non_reading_module[0][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_closed_module[0][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_non_opened_non_exported_module_if_unsafe_injection[0][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_open_reading_private_module[0][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_open_non_reading_non_exporting_module[0][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- cannot_define_class_in_non_opened_non_exported_module_if_lookup_injection[0][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_open_java_util_module[1][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_open_reading_module[1][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_open_non_reading_module[1][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_closed_module[1][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_non_opened_non_exported_module_if_unsafe_injection[1][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_open_reading_private_module[1][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- can_define_class_in_open_non_reading_non_exporting_module[1][m
+#16 146.8   [0K[39morg.mockito.moduletest.ModuleHandlingTest [36m- cannot_define_class_in_non_opened_non_exported_module_if_lookup_injection[1][m
+#16 147.4 
+#16 147.4 
+#16 147.4 > Task :mockito-extensions:mockito-subclass:test
+#16 147.4 
+#16 147.4 
+#16 147.4 
+#16 147.4   [0K[32m2 passing [90m(2.6s)[m
+#16 147.4 
+#16 147.4 
+#16 147.4 > Task :mockito-extensions:mockito-subclass:retryTest SKIPPED
+#16 147.4 > Task :mockito-extensions:mockito-subclass:generateMetadataFileForMockitoLibraryPublication SKIPPED
+#16 147.4 > Task :mockito-extensions:mockito-junit-jupiter:javadoc
+#16 147.4 > Task :mockito-extensions:mockito-subclass:publishMockitoLibraryPublicationToLocalRepository
+#16 147.4 > Task :mockito-extensions:mockito-subclass:publishAllPublicationsToLocalRepository
+#16 147.4 > Task :mockito-extensions:mockito-junit-jupiter:javadocJar
+#16 147.4 > Task :mockito-extensions:mockito-junit-jupiter:assemble
+#16 147.4 
+#16 147.4 > Task :mockito-integration-tests:module-tests:test
+#16 147.4   [0K[32m5 passing [90m(4.8s)
+#16 147.4   [0K[36m17 pending[m
+#16 147.4 
+#16 147.4 
+#16 147.4 > Task :mockito-integration-tests:module-tests:check
+#16 147.4 > Task :mockito-integration-tests:module-tests:build
+#16 147.4 
+#16 147.4 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:test
+#16 147.4 
+#16 147.4 
+#16 147.7 
+#16 147.7 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 147.8 
+#16 147.8 > Task :mockito-extensions:mockito-errorprone:compileJava
+#16 147.8 > Task :mockito-extensions:mockito-errorprone:classes
+#16 147.9 
+#16 147.9 > Task :mockito-integration-tests:java-21-tests:testWithEnableDynamicAgentLoading
+#16 147.9 
+#16 147.9 
+#16 148.0 
+#16 148.0 > Task :mockito-extensions:mockito-errorprone:jar
+#16 148.1 
+#16 148.1 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:test
+#16 148.1 
+#16 148.1   [0K[32m14 passing [90m(4.2s)[m
+#16 148.1 
+#16 148.1 
+#16 148.1 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:check
+#16 148.1 > Task :mockito-integration-tests:junit-jupiter-parallel-tests:build
+#16 148.2 
+#16 148.2 > Task :mockito-integration-tests:osgi-tests:test
+#16 148.2 
+#16 148.2   [0K[32m3 passing [90m(5.7s)[m
+#16 148.2 
+#16 148.2 
+#16 148.2 > Task :mockito-integration-tests:osgi-tests:check
+#16 148.2 > Task :mockito-integration-tests:osgi-tests:build
+#16 148.3 
+#16 148.3 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:test
+#16 148.3 
+#16 148.3   [0K[32m6 passing [90m(4.3s)[m
+#16 148.3 
+#16 148.3 
+#16 148.3 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:check
+#16 148.3 > Task :mockito-integration-tests:junit-jupiter-inline-mock-maker-extension-tests:build
+#16 148.3 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 148.4 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 148.4 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 148.4 
+#16 148.4 > Task :mockito-integration-tests:groovy-inline-tests:test
+#16 148.4 
+#16 148.4 
+#16 148.6 
+#16 148.6 > Task :mockito-integration-tests:junit-jupiter-extension-tests:test
+#16 148.6 
+#16 148.6   [0K[32m1 passing [90m(4.7s)[m
+#16 148.6 
+#16 148.6 
+#16 148.6 > Task :mockito-integration-tests:junit-jupiter-extension-tests:check
+#16 148.6 > Task :mockito-integration-tests:junit-jupiter-extension-tests:build
+#16 148.6 
+#16 148.6 > Task :mockito-integration-tests:groovy-tests:test
+#16 148.6 
+#16 148.6 
+#16 148.8 
+#16 148.8 > Task :mockito-core:javadoc
+#16 148.8 > Task :mockito-extensions:mockito-proxy:checkstyleTest
+#16 148.8 > Task :mockito-extensions:mockito-proxy:check
+#16 148.8 > Task :mockito-extensions:mockito-proxy:build
+#16 148.8 > Task :mockito-extensions:mockito-subclass:checkstyleTest
+#16 148.8 > Task :mockito-extensions:mockito-subclass:check
+#16 148.8 > Task :mockito-extensions:mockito-subclass:build
+#16 149.0 > Task :mockito-core:javadocJar
+#16 149.1 > Task :mockito-core:sourcesJar
+#16 149.2 > Task :mockito-core:assemble
+#16 149.6 > Task :mockito-extensions:mockito-junit-jupiter:compileTestJava
+#16 149.6 > Task :mockito-extensions:mockito-junit-jupiter:testClasses
+#16 149.7 > Task :mockito-extensions:mockito-errorprone:javadoc
+#16 149.7 > Task :mockito-extensions:mockito-errorprone:javadocJar
+#16 149.7 > Task :mockito-extensions:mockito-errorprone:assemble
+#16 149.8 
+#16 149.8 > Task :mockito-integration-tests:programmatic-tests:test
+#16 149.8 
+#16 149.8   [0K[32m8 passing [90m(7.3s)[m
+#16 149.8 
+#16 149.8 
+#16 149.8 > Task :mockito-integration-tests:programmatic-tests:check
+#16 149.8 > Task :mockito-integration-tests:programmatic-tests:build
+#16 149.9 
+#16 149.9 > Task :mockito-integration-tests:java-21-tests:testWithEnableDynamicAgentLoading
+#16 149.9 
+#16 149.9   [0K[32m8 passing [90m(3.9s)[m
+#16 149.9 
+#16 150.2 
+#16 150.2 > Task :mockito-extensions:mockito-junit-jupiter:checkstyleTest
+#16 150.2 > Task :mockito-extensions:mockito-errorprone:checkstyleMain
+#16 150.6 
+#16 150.6 > Task :mockito-integration-tests:groovy-inline-tests:test
+#16 150.6 
+#16 150.6   [0K[32m1 passing [90m(4.1s)[m
+#16 150.6 
+#16 150.6 
+#16 150.6 > Task :mockito-integration-tests:groovy-inline-tests:check
+#16 150.6 > Task :mockito-integration-tests:groovy-inline-tests:build
+#16 150.7 > Task :mockito-core:animalsnifferMain
+#16 150.7 
+#16 150.7 > Task :mockito-integration-tests:groovy-tests:test
+#16 150.7 
+#16 150.7   [0K[32m1 passing [90m(4.1s)[m
+#16 150.7 
+#16 150.7 
+#16 150.7 > Task :mockito-integration-tests:groovy-tests:check
+#16 150.7 > Task :mockito-integration-tests:groovy-tests:build
+#16 150.8 > Task :mockito-extensions:mockito-junit-jupiter:checkstyleMain
+#16 150.9 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 151.2 > Task :mockito-integration-tests:android-tests:mergeLibDexDebug FAILED
+#16 151.3 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+#16 151.6 
+#16 151.6 > Task :mockito-extensions:mockito-junit-jupiter:test
+#16 151.6 
+#16 151.6 
+#16 152.3 
+#16 152.3 > Task :mockito-extensions:mockito-errorprone:compileTestJava
+#16 152.3 
+#16 152.3 > Task :mockito-integration-tests:java-21-tests:testWithMockitoAgent
+#16 152.3 
+#16 152.3 
+#16 152.3 Note: Some input files use or override a deprecated API.
+#16 152.3 Note: Recompile with -Xlint:deprecation for details.
+#16 152.4 
+#16 152.4   [0K[32m8 passing [90m(2.4s)[m
+#16 152.4 
+#16 153.2 
+#16 153.2 > Task :mockito-core:compileTestFixturesJava
+#16 153.2 Note: Some input files use or override a deprecated API.
+#16 153.2 Note: Recompile with -Xlint:deprecation for details.
+#16 153.6 
+#16 153.6 > Task :mockito-core:checkstyleMain
+#16 153.7 
+#16 153.7 > Task :mockito-extensions:mockito-junit-jupiter:test
+#16 153.7   [0K[39morg.mockitousage.JunitJupiterSkippedTest > NestedSkipBeforeAllMockitoThenSkip [36m- should_handle_skip_in_before_all()[m
+#16 153.7   [0K[39morg.mockitousage.JunitJupiterSkippedTest > NestedSkipBeforeAllSkipThenMockito [36m- should_handle_skip_in_before_all()[m
+#16 153.7   [0K[39morg.mockitousage.JunitJupiterSkippedTest > NestedSkipBeforeEachMockito [36m- should_handle_skip_after_before_each()[m
+#16 153.7   [0K[39morg.mockitousage.JunitJupiterSkippedTest > NestedSkipBeforeEachMockito [36m- should_handle_skip_in_before_each()[m
+#16 153.7   [0K[39morg.mockitousage.JunitJupiterSkippedTest > NestedSkipBeforeEachMockito [36m- should_handle_skip_in_test()[m
+#16 154.2 
+#16 154.2   [0K[32m42 passing [90m(4.4s)
+#16 154.2   [0K[36m5 pending[m
+#16 154.2 
+#16 154.2 
+#16 154.2 > Task :mockito-extensions:mockito-junit-jupiter:retryTest SKIPPED
+#16 154.3 
+#16 154.3 > Task :mockito-integration-tests:inline-mocks-tests:test
+#16 154.3 
+#16 154.3   [0K[32m63 passing [90m(11.8s)[m
+#16 154.3 
+#16 155.0 
+#16 155.0 > Task :mockito-integration-tests:android-tests:compileDebugKotlin
+#16 155.2 > Task :mockito-integration-tests:kotlin-release-coroutines-tests:compileTestKotlin
+#16 155.8 > Task :mockito-integration-tests:kotlin-tests:compileTestKotlin
+#16 160.8 
+#16 160.8 > Task :mockito-integration-tests:memory-tests:test
+#16 160.8 
+#16 160.8   [0K[32m2 passing [90m(18.3s)[m
+#16 160.8 
+#16 160.8 
+#16 160.8 [Incubating] Problems report is available at: file:///home/cc/EnvGym/data/mockito_mockito/build/reports/problems/problems-report.html
+#16 160.9 
+#16 160.9 FAILURE: Build failed with an exception.
+#16 160.9 
+#16 160.9 * What went wrong:
+#16 160.9 Execution failed for task ':mockito-integration-tests:android-tests:mergeLibDexDebug'.
+#16 160.9 > Could not resolve all files for configuration ':mockito-integration-tests:android-tests:debugRuntimeClasspath'.
+#16 160.9    > Failed to transform main (project :mockito-core) to match attributes {artifactType=android-dex, asm-transformed-variant=NONE, dexing-enable-desugaring=true, dexing-enable-jacoco-instrumentation=true, dexing-is-debuggable=true, dexing-min-sdk=26, org.gradle.category=library, org.gradle.dependency.bundling=external, org.gradle.jvm.version=11, org.gradle.libraryelements=classes, org.gradle.usage=java-runtime}.
+#16 160.9       > Execution failed for DexingNoClasspathTransform: /home/cc/EnvGym/data/mockito_mockito/mockito-core/build/.transforms/324f2f8138b4e62c9017790697f7dc7f/transformed/instrumented_classes.
+#16 160.9          > Error while dexing.
+#16 160.9 
+#16 160.9 * Try:
+#16 160.9 > Run with --info or --debug option to get more log output.
+#16 160.9 > Get more help at https://help.gradle.org.
+#16 160.9 
+#16 160.9 * Exception is:
+#16 160.9 org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':mockito-integration-tests:android-tests:mergeLibDexDebug'.
+#16 160.9 	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:38)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+#16 160.9 	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+#16 160.9 	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+#16 160.9 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+#16 160.9 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+#16 160.9 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+#16 160.9 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+#16 160.9 Caused by: org.gradle.api.internal.artifacts.ivyservice.TypedResolveException: Could not resolve all files for configuration ':mockito-integration-tests:android-tests:debugRuntimeClasspath'.
+#16 160.9 	at org.gradle.api.internal.artifacts.ResolveExceptionMapper.mapFailure(ResolveExceptionMapper.java:73)
+#16 160.9 	at org.gradle.api.internal.artifacts.ResolveExceptionMapper.mapFailures(ResolveExceptionMapper.java:65)
+#16 160.9 	at org.gradle.api.internal.artifacts.configurations.DefaultConfiguration$DefaultResolutionHost.consolidateFailures(DefaultConfiguration.java:1931)
+#16 160.9 	at org.gradle.api.internal.artifacts.configurations.ResolutionHost.rethrowFailuresAndReportProblems(ResolutionHost.java:75)
+#16 160.9 	at org.gradle.api.internal.artifacts.configurations.ResolutionBackedFileCollection.maybeThrowResolutionFailures(ResolutionBackedFileCollection.java:86)
+#16 160.9 	at org.gradle.api.internal.artifacts.configurations.ResolutionBackedFileCollection.visitContents(ResolutionBackedFileCollection.java:76)
+#16 160.9 	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:361)
+#16 160.9 	at org.gradle.api.internal.file.CompositeFileCollection.lambda$visitContents$0(CompositeFileCollection.java:112)
+#16 160.9 	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:66)
+#16 160.9 	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:91)
+#16 160.9 	at org.gradle.api.internal.file.DefaultFileCollectionFactory$ResolvingFileCollection.visitChildren(DefaultFileCollectionFactory.java:306)
+#16 160.9 	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:112)
+#16 160.9 	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:361)
+#16 160.9 	at org.gradle.api.internal.file.CompositeFileCollection.lambda$visitContents$0(CompositeFileCollection.java:112)
+#16 160.9 	at org.gradle.api.internal.tasks.PropertyFileCollection.visitChildren(PropertyFileCollection.java:48)
+#16 160.9 	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:112)
+#16 160.9 	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:361)
+#16 160.9 	at org.gradle.internal.fingerprint.impl.DefaultFileCollectionSnapshotter.snapshot(DefaultFileCollectionSnapshotter.java:47)
+#16 160.9 	at org.gradle.internal.execution.impl.DefaultInputFingerprinter$InputCollectingVisitor.visitInputFileProperty(DefaultInputFingerprinter.java:133)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.TaskExecution.visitRegularInputs(TaskExecution.java:324)
+#16 160.9 	at org.gradle.internal.execution.impl.DefaultInputFingerprinter.fingerprintInputProperties(DefaultInputFingerprinter.java:63)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.captureExecutionStateWithOutputs(AbstractCaptureStateBeforeExecutionStep.java:109)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.lambda$captureExecutionState$0(AbstractCaptureStateBeforeExecutionStep.java:74)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildOperationStep$1.call(BuildOperationStep.java:37)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildOperationStep.operation(BuildOperationStep.java:34)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.captureExecutionState(AbstractCaptureStateBeforeExecutionStep.java:69)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:62)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:56)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
+#16 160.9 	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+#16 160.9 	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+#16 160.9 	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+#16 160.9 	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+#16 160.9 	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+#16 160.9 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:289)
+#16 160.9 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+#16 160.9 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+#16 160.9 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+#16 160.9 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+#16 160.9 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+#16 160.9 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+#16 160.9 	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:48)
+#16 160.9 	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:35)
+#16 160.9 	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:64)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:127)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+#16 160.9 	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+#16 160.9 	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+#16 160.9 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+#16 160.9 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+#16 160.9 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+#16 160.9 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+#16 160.9 Caused by: org.gradle.api.internal.artifacts.transform.TransformException: Failed to transform main (project :mockito-core) to match attributes {artifactType=android-dex, asm-transformed-variant=NONE, dexing-enable-desugaring=true, dexing-enable-jacoco-instrumentation=true, dexing-is-debuggable=true, dexing-min-sdk=26, org.gradle.category=library, org.gradle.dependency.bundling=external, org.gradle.jvm.version=11, org.gradle.libraryelements=classes, org.gradle.usage=java-runtime}.
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.TransformedProjectArtifactSet.visit(TransformedProjectArtifactSet.java:87)
+#16 160.9 	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ParallelResolveArtifactSet$VisitingSet$StartVisitAction.visitResults(ParallelResolveArtifactSet.java:100)
+#16 160.9 	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ParallelResolveArtifactSet$VisitingSet.visit(ParallelResolveArtifactSet.java:69)
+#16 160.9 	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ResolvedArtifactSetResolver$1.run(ResolvedArtifactSetResolver.java:68)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:30)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:27)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:48)
+#16 160.9 	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ResolvedArtifactSetResolver.visitArtifacts(ResolvedArtifactSetResolver.java:65)
+#16 160.9 	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ResolvedArtifactSetResolver.lambda$visitInUnmanagedWorkerThread$0(ResolvedArtifactSetResolver.java:61)
+#16 160.9 	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsUnmanagedWorkerThread(DefaultWorkerLeaseService.java:139)
+#16 160.9 	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.ResolvedArtifactSetResolver.visitInUnmanagedWorkerThread(ResolvedArtifactSetResolver.java:61)
+#16 160.9 	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.DefaultSelectedArtifactSet.visitArtifacts(DefaultSelectedArtifactSet.java:59)
+#16 160.9 	at org.gradle.api.internal.artifacts.configurations.ResolutionResultProviderBackedSelectedArtifactSet.visitArtifacts(ResolutionResultProviderBackedSelectedArtifactSet.java:52)
+#16 160.9 	at org.gradle.api.internal.artifacts.ivyservice.resolveengine.artifact.SelectedArtifactSet.visitFiles(SelectedArtifactSet.java:34)
+#16 160.9 	at org.gradle.api.internal.artifacts.configurations.ResolutionBackedFileCollection.visitContents(ResolutionBackedFileCollection.java:75)
+#16 160.9 	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:361)
+#16 160.9 	at org.gradle.api.internal.file.CompositeFileCollection.lambda$visitContents$0(CompositeFileCollection.java:112)
+#16 160.9 	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:66)
+#16 160.9 	at org.gradle.api.internal.file.collections.UnpackingVisitor.add(UnpackingVisitor.java:91)
+#16 160.9 	at org.gradle.api.internal.file.DefaultFileCollectionFactory$ResolvingFileCollection.visitChildren(DefaultFileCollectionFactory.java:306)
+#16 160.9 	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:112)
+#16 160.9 	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:361)
+#16 160.9 	at org.gradle.api.internal.file.CompositeFileCollection.lambda$visitContents$0(CompositeFileCollection.java:112)
+#16 160.9 	at org.gradle.api.internal.tasks.PropertyFileCollection.visitChildren(PropertyFileCollection.java:48)
+#16 160.9 	at org.gradle.api.internal.file.CompositeFileCollection.visitContents(CompositeFileCollection.java:112)
+#16 160.9 	at org.gradle.api.internal.file.AbstractFileCollection.visitStructure(AbstractFileCollection.java:361)
+#16 160.9 	at org.gradle.internal.fingerprint.impl.DefaultFileCollectionSnapshotter.snapshot(DefaultFileCollectionSnapshotter.java:47)
+#16 160.9 	at org.gradle.internal.execution.impl.DefaultInputFingerprinter$InputCollectingVisitor.visitInputFileProperty(DefaultInputFingerprinter.java:133)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.TaskExecution.visitRegularInputs(TaskExecution.java:324)
+#16 160.9 	at org.gradle.internal.execution.impl.DefaultInputFingerprinter.fingerprintInputProperties(DefaultInputFingerprinter.java:63)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.captureExecutionStateWithOutputs(AbstractCaptureStateBeforeExecutionStep.java:109)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.lambda$captureExecutionState$0(AbstractCaptureStateBeforeExecutionStep.java:74)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildOperationStep$1.call(BuildOperationStep.java:37)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildOperationStep.operation(BuildOperationStep.java:34)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.captureExecutionState(AbstractCaptureStateBeforeExecutionStep.java:69)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:62)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:56)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
+#16 160.9 	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+#16 160.9 	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+#16 160.9 	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+#16 160.9 	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+#16 160.9 	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+#16 160.9 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:289)
+#16 160.9 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+#16 160.9 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+#16 160.9 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+#16 160.9 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+#16 160.9 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+#16 160.9 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+#16 160.9 	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:48)
+#16 160.9 	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:35)
+#16 160.9 	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:64)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:127)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+#16 160.9 	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+#16 160.9 	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+#16 160.9 	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+#16 160.9 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+#16 160.9 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+#16 160.9 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+#16 160.9 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+#16 160.9 Caused by: org.gradle.api.internal.artifacts.transform.TransformException: Execution failed for DexingNoClasspathTransform: /home/cc/EnvGym/data/mockito_mockito/mockito-core/build/.transforms/324f2f8138b4e62c9017790697f7dc7f/transformed/instrumented_classes.
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.DefaultTransformInvocationFactory.lambda$createInvocation$1(DefaultTransformInvocationFactory.java:167)
+#16 160.9 	at org.gradle.internal.Try$Failure.mapFailure(Try.java:284)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.DefaultTransformInvocationFactory.lambda$createInvocation$2(DefaultTransformInvocationFactory.java:167)
+#16 160.9 	at org.gradle.internal.Deferrable$1.applyAndRequireNonNull(Deferrable.java:63)
+#16 160.9 	at org.gradle.internal.Deferrable$1.completeAndGet(Deferrable.java:59)
+#16 160.9 	at org.gradle.internal.Deferrable$1.completeAndGet(Deferrable.java:59)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.TransformStepNode$ChainedTransformStepNode$TransformPreviousArtifacts$1.lambda$transform$0(TransformStepNode.java:319)
+#16 160.9 	at org.gradle.internal.Try$Success.flatMap(Try.java:170)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.TransformStepNode$ChainedTransformStepNode$TransformPreviousArtifacts$1.transform(TransformStepNode.java:317)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.TransformStepNode$TransformStepBuildOperation.call(TransformStepNode.java:381)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.TransformStepNode$TransformStepBuildOperation.call(TransformStepNode.java:360)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.TransformStepNode$AbstractTransformArtifacts.calculateValue(TransformStepNode.java:354)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.TransformStepNode$AbstractTransformArtifacts.calculateValue(TransformStepNode.java:334)
+#16 160.9 	at org.gradle.internal.model.CalculatedValueContainer$CalculationState.lambda$attachValue$0(CalculatedValueContainer.java:229)
+#16 160.9 	at org.gradle.internal.Try.ofFailable(Try.java:50)
+#16 160.9 	at org.gradle.internal.model.CalculatedValueContainer$CalculationState.attachValue(CalculatedValueContainer.java:224)
+#16 160.9 	at org.gradle.internal.model.CalculatedValueContainer.finalizeIfNotAlready(CalculatedValueContainer.java:195)
+#16 160.9 	at org.gradle.internal.model.CalculatedValueContainer.run(CalculatedValueContainer.java:181)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.TransformStepNode.execute(TransformStepNode.java:183)
+#16 160.9 	at org.gradle.execution.plan.WorkNodeExecutor.execute(WorkNodeExecutor.java:27)
+#16 160.9 	... 10 more
+#16 160.9 Caused by: com.android.builder.dexing.DexArchiveBuilderException: Error while dexing.
+#16 160.9 	at com.android.builder.dexing.D8DexArchiveBuilder.getExceptionToRethrow(D8DexArchiveBuilder.java:183)
+#16 160.9 	at com.android.builder.dexing.D8DexArchiveBuilder.convert(D8DexArchiveBuilder.java:122)
+#16 160.9 	at com.android.build.gradle.internal.dependency.BaseDexingTransform.process(DexingTransform.kt:294)
+#16 160.9 	at com.android.build.gradle.internal.dependency.BaseDexingTransform.processNonIncrementally(DexingTransform.kt:241)
+#16 160.9 	at com.android.build.gradle.internal.dependency.BaseDexingTransform.doTransform(DexingTransform.kt:151)
+#16 160.9 	at com.android.build.gradle.internal.dependency.BaseDexingTransform.transform(DexingTransform.kt:109)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.DefaultTransform.transform(DefaultTransform.java:282)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution$2.call(AbstractTransformExecution.java:154)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution$2.call(AbstractTransformExecution.java:145)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution.executeWithinTransformerListener(AbstractTransformExecution.java:145)
+#16 160.9 	at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution.execute(AbstractTransformExecution.java:138)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)
+#16 160.9 	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+#16 160.9 	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+#16 160.9 	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+#16 160.9 	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)
+#16 160.9 	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)
+#16 160.9 	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:67)
+#16 160.9 	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:37)
+#16 160.9 	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)
+#16 160.9 	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)
+#16 160.9 	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+#16 160.9 	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+#16 160.9 	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:40)
+#16 160.9 	at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:29)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildCacheStep.executeAndStoreInCache(BuildCacheStep.java:145)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$4(BuildCacheStep.java:101)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$5(BuildCacheStep.java:101)
+#16 160.9 	at org.gradle.internal.Try$Success.map(Try.java:175)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithCache(BuildCacheStep.java:85)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$0(BuildCacheStep.java:74)
+#16 160.9 	at org.gradle.internal.Either$Left.fold(Either.java:115)
+#16 160.9 	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)
+#16 160.9 	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)
+#16 160.9 	at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)
+#16 160.9 	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+#16 160.9 	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+#16 160.9 	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+#16 160.9 	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+#16 160.9 	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+#16 160.9 	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+#16 160.9 	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)
+#16 160.9 	at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)
+#16 160.9 	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:65)
+#16 160.9 	at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:36)
+#16 160.9 	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:107)
+#16 160.9 	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:56)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:64)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:56)
+#16 160.9 	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
+#16 160.9 	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+#16 160.9 	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+#16 160.9 	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+#16 160.9 	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+#16 160.9 	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+#16 160.9 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+#16 160.9 	at org.gradle.internal.execution.workspace.impl.NonLockingMutableWorkspaceProvider.withWorkspace(NonLockingMutableWorkspaceProvider.java:36)
+#16 160.9 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+#16 160.9 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+#16 160.9 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+#16 160.9 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$0(ExecuteWorkBuildOperationFiringStep.java:53)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildOperationStep$1.call(BuildOperationStep.java:37)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 	at org.gradle.internal.execution.steps.BuildOperationStep.operation(BuildOperationStep.java:34)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$1(ExecuteWorkBuildOperationFiringStep.java:51)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:51)
+#16 160.9 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+#16 160.9 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+#16 160.9 	at org.gradle.internal.execution.steps.IdentityCacheStep.executeInCache(IdentityCacheStep.java:80)
+#16 160.9 	at org.gradle.internal.execution.steps.IdentityCacheStep.lambda$executeDeferred$0(IdentityCacheStep.java:60)
+#16 160.9 	at org.gradle.cache.Cache.lambda$get$0(Cache.java:31)
+#16 160.9 	at org.gradle.cache.ManualEvictionInMemoryCache.get(ManualEvictionInMemoryCache.java:30)
+#16 160.9 	at org.gradle.cache.Cache.get(Cache.java:31)
+#16 160.9 	at org.gradle.internal.execution.steps.IdentityCacheStep.lambda$executeDeferred$1(IdentityCacheStep.java:58)
+#16 160.9 	at org.gradle.internal.Deferrable$3.completeAndGet(Deferrable.java:117)
+#16 160.9 	... 33 more
+#16 160.9 Caused by: com.android.tools.r8.CompilationFailedException: Compilation failed to complete, origin: /home/cc/EnvGym/data/mockito_mockito/mockito-core/build/.transforms/324f2f8138b4e62c9017790697f7dc7f/transformed/instrumented_classes/org/mockito/Answers.class
+#16 160.9 	at Version.fakeStackEntry(Version_4.0.52.java:0)
+#16 160.9 	at com.android.tools.r8.internal.vk.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:75)
+#16 160.9 	at com.android.tools.r8.internal.vk.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:28)
+#16 160.9 	at com.android.tools.r8.internal.vk.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:27)
+#16 160.9 	at com.android.tools.r8.internal.vk.b(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:2)
+#16 160.9 	at com.android.tools.r8.D8.run(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:11)
+#16 160.9 	at com.android.builder.dexing.D8DexArchiveBuilder.convert(D8DexArchiveBuilder.java:120)
+#16 160.9 	... 139 more
+#16 160.9 Caused by: java.lang.NullPointerException: Cannot invoke "String.length()" because "<parameter1>" is null
+#16 160.9 	at com.android.tools.r8.graph.e1.<init>(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:5)
+#16 160.9 	at com.android.tools.r8.graph.v0.b(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:14)
+#16 160.9 	at com.android.tools.r8.graph.x2.b(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:9)
+#16 160.9 	at com.android.tools.r8.internal.Ab.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:873)
+#16 160.9 	at com.android.tools.r8.graph.y2.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:44)
+#16 160.9 	at com.android.tools.r8.internal.vk.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:101)
+#16 160.9 	at com.android.tools.r8.internal.vk.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:102)
+#16 160.9 	at com.android.tools.r8.internal.vk.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:100)
+#16 160.9 	at com.android.tools.r8.graph.y2.b(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:2)
+#16 160.9 	at com.android.tools.r8.dex.a.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:27)
+#16 160.9 	at com.google.common.util.concurrent.TrustedListenableFutureTask$TrustedFutureInterruptibleTask.runInterruptibly(TrustedListenableFutureTask.java:131)
+#16 160.9 	at com.google.common.util.concurrent.InterruptibleTask.run(InterruptibleTask.java:76)
+#16 160.9 	at com.google.common.util.concurrent.TrustedListenableFutureTask.run(TrustedListenableFutureTask.java:82)
+#16 160.9 	at com.google.common.util.concurrent.MoreExecutors$DirectExecutorService.execute(MoreExecutors.java:327)
+#16 160.9 	at com.google.common.util.concurrent.AbstractListeningExecutorService.submit(AbstractListeningExecutorService.java:79)
+#16 160.9 	at com.google.common.util.concurrent.AbstractListeningExecutorService.submit(AbstractListeningExecutorService.java:37)
+#16 160.9 	at com.android.tools.r8.dex.a.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:24)
+#16 160.9 	at com.android.tools.r8.dex.a.b(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:38)
+#16 160.9 	at com.android.tools.r8.dex.b.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:66)
+#16 160.9 	at com.android.tools.r8.dex.b.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:23)
+#16 160.9 	at com.android.tools.r8.dex.b.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:22)
+#16 160.9 	at com.android.tools.r8.D8.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:50)
+#16 160.9 	at com.android.tools.r8.D8.d(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:19)
+#16 160.9 	at com.android.tools.r8.D8.b(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:1)
+#16 160.9 	at com.android.tools.r8.internal.vk.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:24)
+#16 160.9 	... 142 more
+#16 160.9 	Suppressed: java.lang.RuntimeException: java.util.concurrent.ExecutionException: com.android.tools.r8.internal.xk: java.lang.NullPointerException: Cannot invoke "String.length()" because "<parameter1>" is null
+#16 160.9 		at com.android.tools.r8.dex.b.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:86)
+#16 160.9 		at com.android.tools.r8.dex.b.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:23)
+#16 160.9 		at com.android.tools.r8.dex.b.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:22)
+#16 160.9 		at com.android.tools.r8.D8.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:50)
+#16 160.9 		at com.android.tools.r8.D8.d(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:19)
+#16 160.9 		at com.android.tools.r8.D8.b(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:1)
+#16 160.9 		at com.android.tools.r8.internal.vk.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:24)
+#16 160.9 		at com.android.tools.r8.internal.vk.b(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:2)
+#16 160.9 		at com.android.tools.r8.D8.run(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:11)
+#16 160.9 		at com.android.builder.dexing.D8DexArchiveBuilder.convert(D8DexArchiveBuilder.java:120)
+#16 160.9 		at com.android.build.gradle.internal.dependency.BaseDexingTransform.process(DexingTransform.kt:294)
+#16 160.9 		at com.android.build.gradle.internal.dependency.BaseDexingTransform.processNonIncrementally(DexingTransform.kt:241)
+#16 160.9 		at com.android.build.gradle.internal.dependency.BaseDexingTransform.doTransform(DexingTransform.kt:151)
+#16 160.9 		at com.android.build.gradle.internal.dependency.BaseDexingTransform.transform(DexingTransform.kt:109)
+#16 160.9 		at org.gradle.api.internal.artifacts.transform.DefaultTransform.transform(DefaultTransform.java:282)
+#16 160.9 		at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution$2.call(AbstractTransformExecution.java:154)
+#16 160.9 		at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution$2.call(AbstractTransformExecution.java:145)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 		at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution.executeWithinTransformerListener(AbstractTransformExecution.java:145)
+#16 160.9 		at org.gradle.api.internal.artifacts.transform.AbstractTransformExecution.execute(AbstractTransformExecution.java:138)
+#16 160.9 		at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:105)
+#16 160.9 		at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:44)
+#16 160.9 		at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:59)
+#16 160.9 		at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:56)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 		at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:56)
+#16 160.9 		at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:44)
+#16 160.9 		at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+#16 160.9 		at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+#16 160.9 		at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+#16 160.9 		at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:50)
+#16 160.9 		at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:28)
+#16 160.9 		at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:67)
+#16 160.9 		at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.execute(RemovePreviousOutputsStep.java:37)
+#16 160.9 		at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:61)
+#16 160.9 		at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:26)
+#16 160.9 		at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+#16 160.9 		at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+#16 160.9 		at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:40)
+#16 160.9 		at org.gradle.internal.execution.steps.ResolveInputChangesStep.execute(ResolveInputChangesStep.java:29)
+#16 160.9 		at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+#16 160.9 		at org.gradle.internal.execution.steps.BuildCacheStep.executeAndStoreInCache(BuildCacheStep.java:145)
+#16 160.9 		at org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$4(BuildCacheStep.java:101)
+#16 160.9 		at java.base/java.util.Optional.orElseGet(Optional.java:364)
+#16 160.9 		at org.gradle.internal.execution.steps.BuildCacheStep.lambda$executeWithCache$5(BuildCacheStep.java:101)
+#16 160.9 		at org.gradle.internal.Try$Success.map(Try.java:175)
+#16 160.9 		at org.gradle.internal.execution.steps.BuildCacheStep.executeWithCache(BuildCacheStep.java:85)
+#16 160.9 		at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$0(BuildCacheStep.java:74)
+#16 160.9 		at org.gradle.internal.Either$Left.fold(Either.java:115)
+#16 160.9 		at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+#16 160.9 		at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:73)
+#16 160.9 		at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:48)
+#16 160.9 		at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:46)
+#16 160.9 		at org.gradle.internal.execution.steps.StoreExecutionStateStep.execute(StoreExecutionStateStep.java:35)
+#16 160.9 		at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+#16 160.9 		at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+#16 160.9 		at java.base/java.util.Optional.orElseGet(Optional.java:364)
+#16 160.9 		at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+#16 160.9 		at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+#16 160.9 		at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+#16 160.9 		at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+#16 160.9 		at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:49)
+#16 160.9 		at org.gradle.internal.execution.steps.ResolveIncrementalCachingStateStep.executeDelegate(ResolveIncrementalCachingStateStep.java:27)
+#16 160.9 		at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:71)
+#16 160.9 		at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:39)
+#16 160.9 		at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:65)
+#16 160.9 		at org.gradle.internal.execution.steps.ResolveChangesStep.execute(ResolveChangesStep.java:36)
+#16 160.9 		at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:107)
+#16 160.9 		at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:56)
+#16 160.9 		at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:64)
+#16 160.9 		at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
+#16 160.9 		at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
+#16 160.9 		at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:56)
+#16 160.9 		at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
+#16 160.9 		at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+#16 160.9 		at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+#16 160.9 		at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+#16 160.9 		at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+#16 160.9 		at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+#16 160.9 		at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+#16 160.9 		at org.gradle.internal.execution.workspace.impl.NonLockingMutableWorkspaceProvider.withWorkspace(NonLockingMutableWorkspaceProvider.java:36)
+#16 160.9 		at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+#16 160.9 		at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+#16 160.9 		at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+#16 160.9 		at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+#16 160.9 		at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$0(ExecuteWorkBuildOperationFiringStep.java:53)
+#16 160.9 		at org.gradle.internal.execution.steps.BuildOperationStep$1.call(BuildOperationStep.java:37)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 		at org.gradle.internal.execution.steps.BuildOperationStep.operation(BuildOperationStep.java:34)
+#16 160.9 		at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$1(ExecuteWorkBuildOperationFiringStep.java:51)
+#16 160.9 		at java.base/java.util.Optional.map(Optional.java:260)
+#16 160.9 		at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:51)
+#16 160.9 		at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+#16 160.9 		at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+#16 160.9 		at org.gradle.internal.execution.steps.IdentityCacheStep.executeInCache(IdentityCacheStep.java:80)
+#16 160.9 		at org.gradle.internal.execution.steps.IdentityCacheStep.lambda$executeDeferred$0(IdentityCacheStep.java:60)
+#16 160.9 		at org.gradle.cache.Cache.lambda$get$0(Cache.java:31)
+#16 160.9 		at java.base/java.util.concurrent.ConcurrentHashMap.computeIfAbsent(ConcurrentHashMap.java:1708)
+#16 160.9 		at org.gradle.cache.ManualEvictionInMemoryCache.get(ManualEvictionInMemoryCache.java:30)
+#16 160.9 		at org.gradle.cache.Cache.get(Cache.java:31)
+#16 160.9 		at org.gradle.internal.execution.steps.IdentityCacheStep.lambda$executeDeferred$1(IdentityCacheStep.java:58)
+#16 160.9 		at org.gradle.internal.Deferrable$3.completeAndGet(Deferrable.java:117)
+#16 160.9 		at org.gradle.internal.Deferrable$1.completeAndGet(Deferrable.java:59)
+#16 160.9 		at org.gradle.internal.Deferrable$1.completeAndGet(Deferrable.java:59)
+#16 160.9 		at org.gradle.api.internal.artifacts.transform.TransformStepNode$ChainedTransformStepNode$TransformPreviousArtifacts$1.lambda$transform$0(TransformStepNode.java:319)
+#16 160.9 		at org.gradle.internal.Try$Success.flatMap(Try.java:170)
+#16 160.9 		at org.gradle.api.internal.artifacts.transform.TransformStepNode$ChainedTransformStepNode$TransformPreviousArtifacts$1.transform(TransformStepNode.java:317)
+#16 160.9 		at org.gradle.api.internal.artifacts.transform.TransformStepNode$TransformStepBuildOperation.call(TransformStepNode.java:381)
+#16 160.9 		at org.gradle.api.internal.artifacts.transform.TransformStepNode$TransformStepBuildOperation.call(TransformStepNode.java:360)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+#16 160.9 		at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+#16 160.9 		at org.gradle.api.internal.artifacts.transform.TransformStepNode$AbstractTransformArtifacts.calculateValue(TransformStepNode.java:354)
+#16 160.9 		at org.gradle.api.internal.artifacts.transform.TransformStepNode$AbstractTransformArtifacts.calculateValue(TransformStepNode.java:334)
+#16 160.9 		at org.gradle.internal.model.CalculatedValueContainer$CalculationState.lambda$attachValue$0(CalculatedValueContainer.java:229)
+#16 160.9 		at org.gradle.internal.Try.ofFailable(Try.java:50)
+#16 160.9 		at org.gradle.internal.model.CalculatedValueContainer$CalculationState.attachValue(CalculatedValueContainer.java:224)
+#16 160.9 		at org.gradle.internal.model.CalculatedValueContainer.finalizeIfNotAlready(CalculatedValueContainer.java:195)
+#16 160.9 		at org.gradle.internal.model.CalculatedValueContainer.run(CalculatedValueContainer.java:181)
+#16 160.9 		at org.gradle.api.internal.artifacts.transform.TransformStepNode.execute(TransformStepNode.java:183)
+#16 160.9 		at org.gradle.execution.plan.WorkNodeExecutor.execute(WorkNodeExecutor.java:27)
+#16 160.9 		at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+#16 160.9 		at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+#16 160.9 		at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+#16 160.9 		at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+#16 160.9 		at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+#16 160.9 		at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+#16 160.9 		at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+#16 160.9 		at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+#16 160.9 		at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+#16 160.9 		at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+#16 160.9 		at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+#16 160.9 		at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+#16 160.9 		at java.base/java.lang.Thread.run(Thread.java:1583)
+#16 160.9 	Caused by: java.util.concurrent.ExecutionException: com.android.tools.r8.internal.xk: java.lang.NullPointerException: Cannot invoke "String.length()" because "<parameter1>" is null
+#16 160.9 		at com.google.common.util.concurrent.AbstractFuture.getDoneValue(AbstractFuture.java:592)
+#16 160.9 		at com.google.common.util.concurrent.AbstractFuture.get(AbstractFuture.java:551)
+#16 160.9 		at com.google.common.util.concurrent.FluentFuture$TrustedFuture.get(FluentFuture.java:91)
+#16 160.9 		at com.android.tools.r8.utils.x.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:58)
+#16 160.9 		at com.android.tools.r8.dex.b.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:67)
+#16 160.9 		... 155 more
+#16 160.9 	Caused by: com.android.tools.r8.internal.xk: java.lang.NullPointerException: Cannot invoke "String.length()" because "<parameter1>" is null
+#16 160.9 		at com.android.tools.r8.internal.xk.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:6)
+#16 160.9 		at com.android.tools.r8.internal.vk.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:104)
+#16 160.9 		at com.android.tools.r8.internal.vk.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:100)
+#16 160.9 		at com.android.tools.r8.graph.y2.b(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:2)
+#16 160.9 		at com.android.tools.r8.dex.a.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:27)
+#16 160.9 		at com.google.common.util.concurrent.TrustedListenableFutureTask$TrustedFutureInterruptibleTask.runInterruptibly(TrustedListenableFutureTask.java:131)
+#16 160.9 		at com.google.common.util.concurrent.InterruptibleTask.run(InterruptibleTask.java:76)
+#16 160.9 		at com.google.common.util.concurrent.TrustedListenableFutureTask.run(TrustedListenableFutureTask.java:82)
+#16 160.9 		at com.google.common.util.concurrent.MoreExecutors$DirectExecutorService.execute(MoreExecutors.java:327)
+#16 160.9 		at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+#16 160.9 		at com.google.common.util.concurrent.AbstractListeningExecutorService.submit(AbstractListeningExecutorService.java:79)
+#16 160.9 		at com.google.common.util.concurrent.AbstractListeningExecutorService.submit(AbstractListeningExecutorService.java:37)
+#16 160.9 		at com.android.tools.r8.dex.a.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:24)
+#16 160.9 		at com.android.tools.r8.dex.a.b(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:38)
+#16 160.9 		at com.android.tools.r8.dex.b.a(R8_4.0.52_5a340ca2823c7e792fe09805c75f749b9d398d230bc0518bb54ae9b6b50addbe:66)
+#16 160.9 		... 155 more
+#16 160.9 	Caused by: [CIRCULAR REFERENCE: java.lang.NullPointerException: Cannot invoke "String.length()" because "<parameter1>" is null]
+#16 160.9 
+#16 160.9 
+#16 160.9 Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+#16 160.9 
+#16 160.9 You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+#16 160.9 
+#16 160.9 For more on this, please refer to https://docs.gradle.org/8.14.2/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+#16 160.9 
+#16 160.9 BUILD FAILED in 2m 40s
+#16 160.9 175 actionable tasks: 145 executed, 4 from cache, 26 up-to-date
+#16 161.0 
+#16 161.0 Publishing Build Scan...
+#16 161.3 https://gradle.com/s/rfg2gtjzmossg
+#16 161.3 
+#16 ERROR: process "/bin/sh -c ./gradlew build --stacktrace -Dorg.gradle.jvmargs=\"-Xmx2048m\"" did not complete successfully: exit code: 1
+------
+ > [13/14] RUN ./gradlew build --stacktrace -Dorg.gradle.jvmargs="-Xmx2048m":
+160.9 You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+160.9 
+160.9 For more on this, please refer to https://docs.gradle.org/8.14.2/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+160.9 
+160.9 BUILD FAILED in 2m 40s
+160.9 175 actionable tasks: 145 executed, 4 from cache, 26 up-to-date
+161.0 
+161.0 Publishing Build Scan...
+161.3 https://gradle.com/s/rfg2gtjzmossg
+161.3 
+------
+envgym.dockerfile:47
+--------------------
+  45 |     RUN git clone https://github.com/mockito/mockito.git .
+  46 |     
+  47 | >>> RUN ./gradlew build --stacktrace -Dorg.gradle.jvmargs="-Xmx2048m"
+  48 |     
+  49 |     RUN mkdir -p mockito-core/src/test/java/org/mockito/ && \
+--------------------
+ERROR: failed to solve: process "/bin/sh -c ./gradlew build --stacktrace -Dorg.gradle.jvmargs=\"-Xmx2048m\"" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

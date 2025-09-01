@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250828_041408",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756354447",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 1.36kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/rust:1.74-slim-bullseye\n#2 DONE 0.1s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/12] FROM docker.io/library/rust:1.74-slim-bullseye@sha256:94a9c74bd893356500a12cfc022fe8574fdbb9f980dbe7c546be5f51abc10fec\n#4 DONE 0.0s\n\n#5 [ 2/12] RUN apt-get update && apt-get install -y     git     build-essential     curl     pkg-config     libssl-dev     && rm -rf /var/lib/apt/lists/*\n#5 CACHED\n\n#6 [ 3/12] RUN rustup toolchain install stable-x86_64-unknown-linux-gnu &&     rustup default stable-x86_64-unknown-linux-gnu &&     rustup target add wasm32-unknown-unknown --toolchain stable-x86_64-unknown-linux-gnu\n#6 CACHED\n\n#7 [internal] load build context\n#7 transferring context: 109.09kB 0.1s done\n#7 DONE 0.1s\n\n#8 [ 4/12] RUN cargo install cargo-deny --locked || true &&     cargo install cargo-release --locked || true &&     cargo install cargo-typos --locked || true &&     cargo install pre-commit --locked || true &&     cargo install renovate --locked || true\n#8 0.273 error: could not parse `$(nproc)`. Number of parallel jobs should be `default` or a number.\n#8 0.330 error: could not parse `$(nproc)`. Number of parallel jobs should be `default` or a number.\n#8 0.387 error: could not parse `$(nproc)`. Number of parallel jobs should be `default` or a number.\n#8 0.443 error: could not parse `$(nproc)`. Number of parallel jobs should be `default` or a number.\n#8 0.509 error: could not parse `$(nproc)`. Number of parallel jobs should be `default` or a number.\n#8 DONE 0.6s\n\n#9 [ 5/12] WORKDIR /clap-rs_clap\n#9 DONE 0.0s\n\n#10 [ 6/12] COPY Cargo.toml Cargo.lock ./\n#10 DONE 0.0s\n\n#11 [ 7/12] RUN cargo fetch\n#11 0.358 error: failed to parse manifest at `/clap-rs_clap/Cargo.toml`\n#11 0.358 \n#11 0.358 Caused by:\n#11 0.358   can't find library `clap`, rename file to `src/lib.rs` or specify lib.path\n#11 ERROR: process \"/bin/sh -c cargo fetch\" did not complete successfully: exit code: 101\n------\n > [ 7/12] RUN cargo fetch:\n0.358 error: failed to parse manifest at `/clap-rs_clap/Cargo.toml`\n0.358 \n0.358 Caused by:\n0.358   can't find library `clap`, rename file to `src/lib.rs` or specify lib.path\n------\nenvgym.dockerfile:31\n--------------------\n  29 |     \n  30 |     COPY Cargo.toml Cargo.lock ./\n  31 | >>> RUN cargo fetch\n  32 |     COPY . .\n  33 |     \n--------------------\nERROR: failed to solve: process \"/bin/sh -c cargo fetch\" did not complete successfully: exit code: 101\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

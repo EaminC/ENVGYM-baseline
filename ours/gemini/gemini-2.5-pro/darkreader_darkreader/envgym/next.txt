@@ -1,0 +1,5 @@
+current progress
+The Dockerfile successfully implements the environment setup phase (Steps 1-4) from the plan. It correctly installs all required system packages, browsers (Chrome, Firefox, Thunderbird), and runtimes (Node.js, Deno). It then clones the project repository, installs dependencies with `npm ci`, and runs the `deno:bootstrap` script. The environment is fully prepared for the project's validation and build stages.
+
+next step
+Add `RUN` instructions to the Dockerfile to execute the code quality checks and the full test suite as specified in the plan's Steps 5 and 6. This involves running the linting scripts (`npm run lint`, `npm run lint:bundle`), the dependency check (`node tests/dependencies.js`), the unit tests (`npm run test:unit`), and the browser-based tests using the `xvfb-run` command (`xvfb-run --auto-servernum npm run test:all`).

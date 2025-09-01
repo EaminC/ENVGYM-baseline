@@ -1,0 +1,253 @@
+Based on the provided hardware and environment information, here is the adjusted and optimized setup plan. The modifications focus on the specified `linux/amd64` architecture, remove incompatible steps like CUDA testing, and provide concrete commands for a Debian/Ubuntu-based system.
+
+***
+
+### ADJUSTED ENVIRONMENT SETUP PLAN
+
+1.  **DOWNLOADS NEEDED:**
+    *   **Source Code**: The {fmt} library source code repository.
+    *   **Git**: A distributed version control system to clone the source code.
+    *   **CMake**: Version 3.8 or newer (3.28+ recommended for best C++20 module support).
+    *   **Bazel**: Version 7.0 or newer recommended for Bzlmod support.
+    *   **C++ Compiler**: A modern compiler supporting at least C++11. For this Linux environment, recommended options include:
+        *   **GCC**: Versions 4.9, 11, and 13 are tested. On Ubuntu 20.04, `g++-11` is a good target. The `build-essential` package provides a default version.
+        *   **Clang**: Versions 3.6, 11, and 14 are tested. Clang 11+ is required for the fuzzing build scripts.
+    *   **Code Formatting Tool**:
+        *   **clang-format**: A tool to automatically format C++ code. It is part of the LLVM/Clang toolchain and should be installed for code contributions.
+    *   **Alternative C++ Standard Library (for Clang testing)**:
+        *   **libc++**: Development headers for Clang's standard library (e.g., `libc++-11-dev`, `libc++abi-11-dev` on Debian/Ubuntu).
+    *   **Build Tool**:
+        *   **Ninja**: (Recommended, required for C++20 module support with CMake 3.28+).
+        *   **Make**: (Default build tool on Linux, provided by `build-essential`).
+    *   **Linker (Optional)**:
+        *   **LLD**: The LLVM linker, used for testing specific build configurations.
+    *   **(For Test Suite)**:
+        *   **Google Test**: The testing framework. It is typically downloaded automatically by CMake during the build configuration process when `FMT_TEST=ON`.
+    *   **(For Android Build)**:
+        *   **Java Development Kit (JDK)**: Version 8 or newer.
+        *   **Android SDK & NDK**: Can be managed via Android Studio or downloaded as command-line tools. NDK version 21.3.6528147 or newer is required.
+        *   **Gradle**: Build automation tool. Can be installed standalone or used via the provided Gradle wrapper (`gradlew`).
+    *   **(Optional for Documentation)**:
+        *   **Python**: Version 3.x, required for documentation generation tools.
+        *   **Doxygen**: Required to extract C++ code comments.
+        *   **Python Documentation Packages**: Installable via `pip` (e.g., `mkdocs`, `mkdocs-material`, `mkdocstrings[cpp]`, `mike`).
+    *   **(Optional for Fuzzing)**:
+        *   **Clang compiler toolchain**: Version 11+ required for LibFuzzer support.
+        *   **AFL (American Fuzzy Lop)**: A fuzzer, such as `afl++`.
+        *   **ccache**: A compiler cache to speed up recompilation.
+        *   **Docker**: Required for local reproduction of OSS-Fuzz/CIFuzz environments.
+        *   **OSS-Fuzz Source Code**: The `google/oss-fuzz` repository.
+    *   **(Optional for VM-based Testing)**:
+        *   **Vagrant**: Tool for building and managing virtual machine environments.
+        *   **Virtualization Provider**: A backend for Vagrant, such as VirtualBox.
+    *   **(Optional for CI/CD Local Testing)**:
+        *   `act`: A tool to run GitHub Actions workflows locally. Requires Docker.
+
+2.  **FILES TO CREATE:**
+    *   **`.gitignore`**:
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/.gitignore`
+        *   **Content Description**: Specifies files and directories for Git to ignore, keeping the repository clean of build artifacts and local configurations. Key entries include the `build/` directory, compiled libraries (`*.a`, `*.so*`), executables (`bin/`), editor-specific files (`.vscode/`), and numerous CMake-generated files (`CMakeFiles/`, `CMakeCache.txt`, etc.).
+    *   **`.clang-format`**:
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/.clang-format`
+        *   **Content Description**: Defines the C++ code formatting style for the project, based on the Google style with customizations, to be used by the `clang-format` tool.
+    *   **`build.sh`**: A shell script to automate the build process.
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/build.sh`
+        *   **Content Description**: This script will create a build directory, run CMake to configure the project with specific options (e.g., enabling tests and setting build type), compile the code using multiple cores, run tests, and optionally install the library.
+    *   **`support/build.gradle`**: A Gradle script for building the library for Android.
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/support/build.gradle`
+        *   **Content Description**: Configures the Android Gradle Plugin to build the C++ source code into shared libraries (`.so`) for various Android ABIs.
+    *   **`support/AndroidManifest.xml`**: A minimal manifest file required for an Android library module.
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/support/AndroidManifest.xml`
+        *   **Content Description**: Contains the package declaration required by the Android build tools.
+    *   **`support/Application.mk` (for Android ndk-build)**: A configuration file for the `ndk-build` system.
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/support/Application.mk`
+        *   **Content Description**: Specifies build parameters like target ABIs and the C++ standard library.
+    *   **`local.properties` (for Android)**: A local configuration file for Android projects.
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/local.properties`
+        *   **Content Description**: Specifies the path to the Android SDK installation. This file should not be checked into version control.
+    *   **`MODULE.bazel`**: The root file for Bazel's Bzlmod dependency management system.
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/MODULE.bazel`
+        *   **Content Description**: Defines the project as a Bazel module and declares its external dependencies using Bzlmod.
+    *   **`WORKSPACE` or `WORKSPACE.bazel` (for Bazel)**: The root file that defines a Bazel workspace.
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/WORKSPACE`
+        *   **Content Description**: A marker file that identifies the directory as the root of a Bazel project. Can be empty when using Bzlmod.
+    *   **`support/bazel/BUILD.bazel`**: A Bazel build file defining the C++ library target.
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/support/bazel/BUILD.bazel`
+        *   **Content Description**: Defines a `cc_library` target named `fmt`, specifying sources, headers, and include paths.
+    *   **`GitHub Actions Workflow File(s)` (e.g., `.github/workflows/linux.yml`, `.github/workflows/cifuzz.yml`)**:
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/.github/workflows/`
+        *   **Content Description**: YAML files that define the Continuous Integration (CI) pipeline. These workflows use a matrix strategy to build and test the library across numerous combinations of Linux distributions, compilers (GCC, Clang), C++ standards, and build configurations.
+    *   **`support/mkdocs.yml`**: The main configuration file for the MkDocs documentation generator.
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/support/mkdocs.yml`
+        *   **Content Description**: Defines the documentation site's structure, theme, navigation, and plugins.
+    *   **`doc/requirements.txt` (Recommended)**: A file to manage Python dependencies for documentation.
+        *   **Path**: `/home/cc/EnvGym/data/fmtlib_fmt/doc/requirements.txt`
+        *   **Content Description**: Lists all the required Python packages for building the documentation, allowing for reproducible installation via `pip install -r doc/requirements.txt`.
+
+3.  **NECESSARY TEST CASES IN THE CODEBASE:**
+    *   **Multi-Compiler and Multi-Standard Compatibility Test**:
+        *   A CI build matrix that compiles and runs tests across a range of C++ compilers (e.g., GCC 4.9-13, Clang 3.6-14), C++ standards (C++11 through C++23), and build types (Debug, Release) on Linux.
+    *   **Code Formatting Compliance Test**:
+        *   A CI job that runs `clang-format --dry-run -Werror` on the C++ source and header files.
+    *   **Pedantic and Werror Build Test**:
+        *   A build configuration test that enables `FMT_PEDANTIC=ON` and `FMT_WERROR=ON` to ensure the library compiles cleanly without any warnings on all supported compilers.
+    *   **Shared Library Build Test**:
+        *   A build configuration that enables the `BUILD_SHARED_LIBS` CMake option to verify that the library can be compiled into a shared object (`.so`).
+    *   **Header-Only Mode Test**:
+        *   A test case that defines `FMT_HEADER_ONLY=1` before including any `{fmt}` headers to ensure functionality without linking.
+    *   **C++20 Module Test**:
+        *   A test using `import fmt;` to verify that the module interface is correctly built and consumed.
+    *   **Libc++ Compatibility Test**:
+        *   A build configuration specifically for the Clang compiler using its `libc++` standard library implementation.
+    *   **No-Exceptions Build Test**:
+        *   A build configuration that compiles the library with exceptions disabled (`-fno-exceptions`).
+    *   **No-Locale Build Test**:
+        *   A build configuration that defines `FMT_STATIC_THOUSANDS_SEPARATOR=1` to test that the library works correctly without requiring system locale functionality.
+    *   **Compile-Error Test**:
+        *   A test that attempts to compile code with known API misuses and passes if the compilation *fails* with the expected static assertions.
+    *   **CMake Integration Test (`find_package` and `add_subdirectory`)**:
+        *   Tests verifying that the library can be correctly integrated into other CMake projects after installation or as a sub-project.
+    *   **OS-Specific API Test**:
+        *   A test case that compiles conditionally based on the `FMT_OS` definition to check OS-specific functionality like `fmt::system_error`.
+    *   **Enforced Compile String Test**:
+        *   A test case that defines `FMT_ENFORCE_COMPILE_STRING` to ensure that only compile-time format strings are accepted.
+    *   **Cross-Architecture Test (ARM64)**:
+        *   A build and test run executed on an ARM64 architecture (e.g., via emulation or a dedicated runner) to ensure portability.
+    *   **Documentation Build Verification Test**:
+        *   A CI job that runs `mkdocs build --strict` to ensure the documentation is always deployable.
+    *   **Android Build and Artifact Verification Test**:
+        *   Tests for both Gradle and `ndk-build` processes, verifying the creation of `.so`, `.aar`, and `.a` artifacts for target ABIs.
+    *   **Bazel Build Verification Test (Bzlmod)**:
+        *   A test of the Bazel build process, verifying that `bazel build //support/bazel:fmt` succeeds.
+    *   **LibFuzzer with Sanitizers Build Test**:
+        *   A build configuration using Clang that enables `FMT_FUZZ=ON` and links with `libFuzzer` while enabling AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan).
+    *   **OSS-Fuzz CIFuzz Integration Test**:
+        *   A CI job that runs on every pull request, building and running fuzzers using the OSS-Fuzz toolchain to check for regressions.
+
+4.  **COMPLETE TODO LIST:**
+
+   **--- OPTION A: MANUAL SETUP ON HOST MACHINE (CMake) ---**
+   This is the most direct approach for the specified Linux environment.
+
+   1.  **Install Core Dependencies**:
+       - Open a terminal and run:
+         ```bash
+         sudo apt-get update && sudo apt-get install -y \
+         git build-essential cmake ninja-build clang-format clang-11 \
+         afl++ ccache
+         ```
+   2.  **Acquire Source Code**:
+       - The working directory is `/home/cc/EnvGym/data/fmtlib_fmt`. We assume the code is already present. If not, clone it:
+         ```bash
+         # Only run if the directory is empty
+         git clone https://github.com/fmtlib/fmt.git /home/cc/EnvGym/data/fmtlib_fmt
+         ```
+       - Navigate into the project directory: `cd /home/cc/EnvGym/data/fmtlib_fmt`
+   3.  **Create Configuration Files (if not present)**:
+       - Create a `.gitignore` file in the root to prevent committing build artifacts. Add entries like `build/`, `bin/`, `*.a`, `*.so*`.
+       - Create a `.clang-format` file in the root with the project's C++ style rules.
+   4.  **Create Build Directory**:
+       - `mkdir -p build`
+       - `cd build`
+   5.  **Configure Project with CMake**:
+       - Command: `cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DFMT_PEDANTIC=ON -DFMT_WERROR=ON`
+       - **Verification**: Check for "Configuring done" and "Generating done" output. A `build.ninja` file should now exist in `/home/cc/EnvGym/data/fmtlib_fmt/build`.
+   6.  **Compile the Library**:
+       - Command: `cmake --build . --parallel $(nproc)`
+       - **Verification**: The command completes without errors. Check for `libfmt.a` inside the `build` directory.
+   7.  **Configure and Run Tests**:
+       - From the `build` directory, re-run CMake with the test option enabled. This will automatically download Google Test.
+       - `cmake .. -G "Ninja" -DFMT_TEST=ON`
+       - `cmake --build . --parallel $(nproc)`
+       - Run the compiled tests: `ctest --output-on-failure`
+       - **Verification**: The output should show "100% tests passed, 0 tests failed".
+   8.  **Format Code (Optional, for Contributors)**:
+       - Run `clang-format` on changed files before committing.
+       - Command: `clang-format -i ../src/format.cc`
+       - **Verification**: The command completes silently, modifying the file in place.
+   9.  **Install the Library (Optional)**:
+       - Command: `sudo cmake --install . --prefix "/usr/local"`
+       - **Verification**: Check the installation prefix. You should find `{fmt}` headers in `/usr/local/include/fmt/`, libraries in `/usr/local/lib/`, and CMake package files in `/usr/local/lib/cmake/fmt/`.
+
+   **--- OPTION B: AUTOMATED SETUP IN A VIRTUAL MACHINE (Vagrant) ---**
+   Useful for creating an isolated, reproducible environment.
+
+   1.  **Install Virtualization Software**:
+       - `sudo apt-get install vagrant virtualbox`
+   2.  **Navigate to Vagrant Directory**:
+       - `cd /home/cc/EnvGym/data/fmtlib_fmt/support`
+   3.  **Launch and Provision the VM**:
+       - `vagrant up`
+       - **Verification**: Vagrant downloads and provisions the VM without errors.
+   4.  **Access and Build in the VM**:
+       - Connect to the VM: `vagrant ssh`
+       - Navigate to the project directory: `cd /vagrant`
+       - Follow a subset of the manual steps (A.4 to A.7) to build and test within the VM.
+       - **Verification**: The build succeeds and tests pass within the isolated VM environment.
+
+   **--- OPTION C: REPOSITORY MAINTENANCE & CI SETUP ---**
+   Focuses on setting up automated checks for code quality and maintenance.
+
+   1.  **Navigate to Project Root**:
+       - `cd /home/cc/EnvGym/data/fmtlib_fmt`
+   2.  **Create GitHub Configuration Directories**:
+       - `mkdir -p .github/workflows`
+   3.  **Create Project Configuration Files**:
+       - Ensure `.gitignore` and `.clang-format` exist in the project root.
+   4.  **Create CI Workflow Files**:
+       - Create workflow files like `.github/workflows/linux.yml`.
+       - **Content**: Define a build matrix to test on Ubuntu with different GCC/Clang versions and C++ standards. Include a job that builds with `FMT_PEDANTIC=ON`.
+   5.  **Add Code Formatting Check to CI**:
+       - In `linux.yml`, add a job to install `clang-format` and run `clang-format --dry-run -Werror` on all C++ source and header files.
+   6.  **Create CIFuzz Workflow File**:
+       - Create `.github/workflows/cifuzz.yml` to integrate with Google's OSS-Fuzz for continuous fuzzing on pull requests.
+   7.  **Test Workflows Locally (Optional)**:
+       - The Docker environment is ideal for this. Install `act`.
+       - From the project root, run `act pull_request` to simulate and test the CI jobs.
+       - **Verification**: `act` successfully runs the jobs defined in the workflow files using Docker.
+
+   **--- OPTION D: BAZEL BUILD ---**
+   A modern, fast build system alternative.
+
+   1.  **Install Bazel**:
+       - Follow the official Bazel installation instructions for Linux.
+   2.  **Navigate to Project Root**:
+       - `cd /home/cc/EnvGym/data/fmtlib_fmt`
+   3.  **Create Bazel Configuration Files (if not present)**:
+       - `touch MODULE.bazel WORKSPACE`
+   4.  **Build the Library with Bazel**:
+       - `bazel build //support/bazel:fmt`
+       - **Verification**: The build completes successfully. The static library `libfmt.a` is located in the `bazel-bin/support/bazel/` directory.
+
+   **--- OPTION E: LOCAL FUZZING (OSS-Fuzz Docker Environment) ---**
+   The recommended fuzzing approach given the Docker-ready environment.
+
+   1.  **Acquire OSS-Fuzz**:
+       - `git clone https://github.com/google/oss-fuzz.git /home/cc/EnvGym/data/oss-fuzz`
+   2.  **Build Fuzzers**:
+       - Navigate to the `oss-fuzz` directory: `cd /home/cc/EnvGym/data/oss-fuzz`
+       - Run the build script, pointing it to the {fmt} source directory: `python3 infra/helper.py build_fuzzers fmt /home/cc/EnvGym/data/fmtlib_fmt`
+       - **Verification**: The script completes successfully, indicating the fuzzers were built inside a Docker container.
+   3.  **Run a Fuzzer**:
+       - `python3 infra/helper.py run_fuzzer fmt format_string_fuzzer`
+       - **Verification**: The fuzzer starts running. Any crashes will be reported with a stack trace.
+
+   **--- OPTION F: DOCUMENTATION SETUP AND GENERATION ---**
+   For building the project's documentation website.
+
+   1.  **Install Documentation Dependencies**:
+       - `sudo apt-get install -y python3 python3-pip doxygen`
+   2.  **Navigate to Project Root**:
+       - `cd /home/cc/EnvGym/data/fmtlib_fmt`
+   3.  **Create Documentation Configuration Files (if not present)**:
+       - Ensure `support/mkdocs.yml` exists.
+       - Create `doc/requirements.txt` and list the necessary Python packages.
+   4.  **Install Python Packages**:
+       - `pip3 install -r doc/requirements.txt`
+       - **Verification**: `pip3 list` shows the installed packages.
+   5.  **Build the Documentation Website**:
+       - Run the build command: `mkdocs build --strict -f support/mkdocs.yml`
+       - **Verification**: The build completes successfully. A `site/` directory is created in the project root containing the static website.
+   6.  **Serve the Documentation Locally (Optional)**:
+       - `mkdocs serve -f support/mkdocs.yml`
+       - **Verification**: Access the site at the provided local URL (e.g., `http://127.0.0.1:8000`) in a web browser.

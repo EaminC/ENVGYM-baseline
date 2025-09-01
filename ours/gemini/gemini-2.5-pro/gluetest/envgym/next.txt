@@ -1,0 +1,5 @@
+current progress
+The Dockerfile successfully implements all mandatory steps (1-5, 7, 8) from the plan, including the installation of system dependencies, Python 3.11, GraalVM, and Maven. The project files are copied, glue code is generated, and the primary verification script (`run.sh`) is executed to build and run the core tests. The previous execution log confirms this core setup is successful. The optional steps for performance benchmarking (6, 9) and dependency analysis (10) are currently disabled in the Dockerfile.
+
+next step
+To enable the optional functionalities, modify the Dockerfile. For performance benchmarks, uncomment the `COPY csv-1.0.jar` and `RUN mvn install:install-file` lines (Step 6), then add a `RUN cd /app/commons-csv && mvn test -Pbenchmark` command (Step 9). For the dependency analysis, uncomment the `COPY scripts/clients/clean.csv` line and add a `RUN bash scripts/clients/bash_script_version.sh` command (Step 10), ensuring the input file is present in the build context.
