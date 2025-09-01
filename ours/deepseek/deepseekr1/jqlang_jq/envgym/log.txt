@@ -1,0 +1,24 @@
+=== Docker Execution Log - 20250830_061307 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756534385
+
+=== Build Log ===
+Build Status: Failed
+Build Error:
+--------------------
+44 |     ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+45 | >>> RUN pkg-config --libs --cflags libjq && \
+46 | >>>     echo -e '#include <jq.h>\n#include <stdio.h>\nint main() { jq_state *jq = jq_init(); if(jq) { printf("libjq initialized\\n"); jq_teardown(&jq); return 0; } else { return 1; } }' > test_libjq.c && \
+47 | >>>     gcc test_libjq.c -o test_libjq $(pkg-config --libs --cflags libjq) && \
+48 | >>>     ./test_libjq && \
+49 | >>>     rm test_libjq test_libjq.c
+50 |
+--------------------
+ERROR: failed to solve: process "/bin/sh -c pkg-config --libs --cflags libjq &&     echo -e '#include <jq.h>\\n#include <stdio.h>\\nint main() { jq_state *jq = jq_init(); if(jq) { printf(\"libjq initialized\\\\n\"); jq_teardown(&jq); return 0; } else { return 1; } }' > test_libjq.c &&     gcc test_libjq.c -o test_libjq $(pkg-config --libs --cflags libjq) &&     ./test_libjq &&     rm test_libjq test_libjq.c" did not complete successfully: exit code: 1
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Error:
+
+
+=== Execution End ===

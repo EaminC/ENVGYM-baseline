@@ -1,0 +1,8 @@
+current progress: System dependencies and Node.js are installed, npm cache cleaned, dependencies installed, project built successfully, and build artifacts verified. Packaging step (npm run app-package) failed during Electron builder execution.
+
+next step: Add electron cache cleanup before packaging step and debug Electron builder issues by examining full log output. Modify Dockerfile as:
+```
+RUN ls -lR packages/insomnia
+RUN rm -rf /root/.cache/electron
+RUN xvfb-run -a env ELECTRON_BUILDER_ALLOW_SUPERUSER=1 DEBUG="electron-builder*" npm run app-package -- --verbose
+```

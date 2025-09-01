@@ -1,0 +1,86 @@
+=== Docker Execution Log - 20250830_214058 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756590057
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 2.47kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/rust:1.77-slim-bullseye
+#2 ...
+
+#3 [internal] load metadata for docker.io/library/debian:bullseye-slim
+#3 DONE 0.2s
+
+#2 [internal] load metadata for docker.io/library/rust:1.77-slim-bullseye
+#2 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [builder 1/8] FROM docker.io/library/rust:1.77-slim-bullseye@sha256:7479fa9dfc57f84dd90db9b0149b0a5e1076d902d6c31ea73ee5464d52d7c168
+#5 DONE 0.0s
+
+#6 [stage-1  1/11] FROM docker.io/library/debian:bullseye-slim@sha256:849d9d34d5fe0bf88b5fb3d09eb9684909ac4210488b52f4f7bbe683eedcb851
+#6 DONE 0.0s
+
+#7 [builder 4/8] RUN git clone https://github.com/eth-p/bat-extras.git /tmp/bat-extras &&     cd /tmp/bat-extras &&     ./build.sh --install &&     cd / &&     rm -rf /tmp/bat-extras
+#7 CACHED
+
+#8 [builder 2/8] RUN apt-get update &&     apt-get install -y --no-install-recommends         wget         dpkg         fakeroot         git         clang         cmake         pkg-config         libssl-dev         libc6-dev         build-essential         libdbus-1-dev         libsqlite3-dev         libgit2-dev         libssh2-1-dev         perl &&     rm -rf /var/lib/apt/lists/*
+#8 CACHED
+
+#9 [builder 3/8] RUN wget https://github.com/sharkdp/bat/releases/download/v0.25.0/bat_0.25.0_amd64.deb &&     dpkg -i bat_0.25.0_amd64.deb &&     rm bat_0.25.0_amd64.deb
+#9 CACHED
+
+#10 [builder 5/8] RUN rustup update stable
+#10 CACHED
+
+#11 [stage-1  2/11] RUN apt-get update &&     apt-get install -y git fzf ripgrep fd-find jq less &&     ln -s /usr/bin/fdfind /usr/bin/fd &&     rm -rf /var/lib/apt/lists/*
+#11 CACHED
+
+#12 [internal] load build context
+#12 transferring context: 798.70kB 0.1s done
+#12 DONE 0.1s
+
+#13 [builder 6/8] RUN cargo install --verbose cargo-audit
+#13 0.281     Updating crates.io index
+#13 0.369 error: cannot install package `cargo-audit 0.21.2`, it requires rustc 1.81.0 or newer, while the currently active rustc version is 1.77.2
+#13 0.369 `cargo-audit 0.21.1` supports rustc 1.74.0
+#13 ERROR: process "/bin/sh -c cargo install --verbose cargo-audit" did not complete successfully: exit code: 101
+------
+ > [builder 6/8] RUN cargo install --verbose cargo-audit:
+0.281     Updating crates.io index
+0.369 error: cannot install package `cargo-audit 0.21.2`, it requires rustc 1.81.0 or newer, while the currently active rustc version is 1.77.2
+0.369 `cargo-audit 0.21.1` supports rustc 1.74.0
+------
+envgym.dockerfile:40
+--------------------
+  38 |     
+  39 |     # Install Rust tools using cargo with verbose logging and separate commands
+  40 | >>> RUN cargo install --verbose cargo-audit
+  41 |     RUN cargo install --verbose cross
+  42 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c cargo install --verbose cargo-audit" did not complete successfully: exit code: 101
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

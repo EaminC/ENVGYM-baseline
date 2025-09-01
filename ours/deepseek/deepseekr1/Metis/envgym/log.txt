@@ -1,0 +1,25 @@
+=== Docker Execution Log - 20250828_131943 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756387164
+
+=== Build Log ===
+Build Status: Failed
+Build Error:
+--------------------
+23 |     # Clone explode with extended retries and validation
+24 | >>> RUN for i in {1..5}; do \
+25 | >>>     git clone https://github.com/sbu-fsl/explode-0.1pre.git && \
+26 | >>>     [ -d "explode-0.1pre" ] && break || \
+27 | >>>     (echo "Retry $i/5 for explode" && rm -rf explode-0.1pre && sleep 15); \
+28 | >>> done; \
+29 | >>> [ ! -d "explode-0.1pre" ] && echo "Failed to clone explode" && exit 1 || true
+30 |
+--------------------
+ERROR: failed to solve: process "/bin/sh -c for i in {1..5}; do     git clone https://github.com/sbu-fsl/explode-0.1pre.git &&     [ -d \"explode-0.1pre\" ] && break ||     (echo \"Retry $i/5 for explode\" && rm -rf explode-0.1pre && sleep 15); done; [ ! -d \"explode-0.1pre\" ] && echo \"Failed to clone explode\" && exit 1 || true" did not complete successfully: exit code: 1
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Error:
+
+
+=== Execution End ===

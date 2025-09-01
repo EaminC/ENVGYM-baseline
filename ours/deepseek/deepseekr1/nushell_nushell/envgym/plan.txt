@@ -1,0 +1,81 @@
+Based on your x86_64 Linux environment with Docker support and no GPU, here's the optimized environment setup plan:
+
+### Adjusted Environment Setup Plan
+
+**1. DOWNLOADS NEEDED:**  
+*(Unchanged - all items remain valid for x86_64 Linux)*  
+
+**2. FILES TO CREATE:**  
+*(Unchanged - all file creations remain applicable)*  
+
+**3. NECESSARY TEST CASES:**  
+*(Unchanged - test coverage remains consistent)*  
+
+**4. ADJUSTED TODO LIST:**  
+- Clone repositories:  
+  ```bash
+  git clone https://github.com/nushell/nushell && cd nushell
+  git clone https://github.com/nushell/nu_scripts
+  ```
+- Install Ubuntu dependencies:  
+  ```bash
+  sudo apt update && sudo apt install -y build-essential pkg-config libssl-dev python3.10 python3-pip docker.io
+  pip3 install virtualenv
+  ```
+- Configure Docker permissions:  
+  ```bash
+  sudo usermod -aG docker $USER && newgrp docker
+  ```
+- Install Rust toolchain (x86_64 focused):  
+  ```bash
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  source "$HOME/.cargo/env"
+  rustup toolchain install 1.87.0 beta
+  rustup target add wasm32-unknown-unknown
+  ```
+- Setup multi-arch Docker builds:  
+  ```bash
+  docker run --privileged --rm tonistiigi/binfmt --install all
+  docker buildx create --use
+  ```
+- Build Docker images (x86_64 optimized):  
+  ```bash
+  docker build -t nushell:alpine -f docker/Dockerfile --platform linux/amd64 .
+  docker build -t nushell:debian -f docker/debian.Dockerfile --platform linux/amd64 .
+  ```
+- Optimized Rust builds:  
+  ```bash
+  CARGO_NET_GIT_FETCH_WITH_CLI=true cargo build --release --features=full
+  ```
+- Configuration setup:  
+  ```bash
+  nu -c "config reset"  # Generates default config.nu/env.nu
+  ```
+- Run architecture-specific tests:  
+  ```bash
+  cargo test --workspace --exclude nu_plugin_* --profile ci
+  docker run --rm nushell:alpine nu -c "version"
+  ```
+- Skip Windows-specific steps:  
+  *(Omit Wix/MSI installation, winget submission, and Windows Terminal tests)*
+
+**Key Adjustments:**  
+1. **Platform Focus**: Removed macOS/Windows-specific installation steps, keeping only Ubuntu/Docker instructions  
+2. **Docker Optimization**:  
+   - Added `--platform linux/amd64` flag to builds  
+   - Enabled BuildKit and binfmt for cross-arch emulation  
+3. **Rust Efficiency**:  
+   - Added `CARGO_NET_GIT_FETCH_WITH_CLI=true` for faster dependency resolution  
+   - Removed ARM/RISC-V targets from local toolchain installation (handled by CI)  
+4. **Hardware Alignment**:  
+   - Skipped GPU-related checks  
+   - Removed Windows installer validation steps  
+   - Optimized for multi-core builds via cargo's parallel compilation  
+5. **Permission Handling**: Added Docker group configuration for non-root access  
+
+**Verification Focus:**  
+- Run architecture-specific tests: `cargo test --target x86_64-unknown-linux-gnu`  
+- Validate Alpine/Docker images: `docker run --rm nushell:alpine nu -c 'sys | get host.arch'` should return "x86_64"  
+- Check cross-compilation: `rustup target list | grep installed` shows only host-relevant targets  
+
+This plan maintains all essential functionality while optimizing for your x86_64 Linux environment with Docker 28.1.1, eliminating incompatible steps and leveraging containerization for multi-arch support.

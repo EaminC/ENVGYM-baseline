@@ -1,0 +1,72 @@
+Based on the hardware information (no NVIDIA GPU detected), here's the adjusted environment setup plan:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: 
+   - Python 3.7.x
+   - pip package manager
+   - PyTorch 1.2.0 (CPU-only version)
+   - torchvision 0.4.0 (CPU-compatible)
+   - numpy 1.17.2
+   - matplotlib 3.1.1
+   - git
+   - pandas 0.25.1
+   - seaborn 0.9.0
+   - tensorboardX 1.8
+   - scipy 1.3.1
+   - tqdm 4.36.1
+   - Pillow 6.2.0
+   - Additional dependencies: cycler, kiwisolver, pyparsing, python-dateutil, pytz, six
+
+   (Removed CUDA Toolkit 10.0 and cuDNN since no GPU available)
+
+2. FILES TO CREATE: 
+   - None (project structure exists, datasets download automatically during execution)
+
+3. NECESSARY TEST CASES IN THE CODEBASE: 
+   - Verify model initialization for all architectures (fc1, lenet5, AlexNet, resnet18, vgg16) in CPU mode
+   - Test pruning mechanism across different percentages (10%, 30%, 50%) without CUDA
+   - Validate training loop convergence on MNIST dataset using CPU
+   - Check weight reset functionality for "reinit" prune_type
+   - Test plot generation for combined results (including seaborn-enhanced visuals)
+   - Verify new architecture/dataset integration workflow
+   - Validate TensorBoardX logging functionality
+   - Test pandas data handling capabilities
+
+4. COMPLETE TODO LIST: 
+   - Install Python 3.7 using system package manager or official installer
+   - Verify Python version: `python3 --version`
+   - Clone repository: `git clone https://github.com/rahulvigneswaran/Lottery-Ticket-Hypothesis-in-Pytorch.git`
+   - Navigate to project directory: `cd Lottery-Ticket-Hypothesis-in-Pytorch`
+   - Create virtual environment: `python3 -m venv lottery_env`
+   - Activate virtual environment:  
+     - Linux/macOS: `source lottery_env/bin/activate`  
+     - Windows: `lottery_env\Scripts\activate`
+   - Install CPU-only PyTorch:  
+     `pip install torch==1.2.0+cpu torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html`
+   - Install other requirements: `pip install -r requirements.txt`
+   - Verify PyTorch/torchvision versions:  
+     `python -c "import torch; import torchvision; print(f'PyTorch: {torch.__version__} (expected 1.2.0)\\ntorchvision: {torchvision.__version__} (expected 0.4.0)')"`
+   - Confirm CPU-only operation:  
+     `python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()} (expected False)")"`
+   - Verify critical package installations:  
+     `python -c "import pandas, seaborn, tensorboardX; print('Critical packages imported successfully')"`
+   - Run smoke test: `python main.py --prune_iterations=3 --end_iter=5`
+   - Verify output:  
+     - Check for `saves/fc1_mnist` directory with .pt files  
+     - Confirm `plots/lt/fc1_mnist` directory contains plot images
+     - Validate TensorBoard logs generation
+   - Execute full test: `python main.py --arch_type=lenet5 --dataset=cifar10`
+   - Validate results:  
+     - Monitor training logs for accuracy metrics  
+     - Check seaborn-enhanced plot generation in `plots/lt/lenet5_cifar10`
+     - Verify TensorBoardX log parsing
+
+Key adjustments made:
+- Removed all GPU-specific components (CUDA Toolkit/cuDNN)
+- Changed PyTorch installation to CPU-only version
+- Added explicit CPU availability check in verification step
+- Removed CUDA version check since no GPU available
+- Updated PyTorch installation command to use CPU-compatible wheels
+- Confirmed all tests will run in CPU mode
+- Maintained AMD64/x86_64 compatibility through standard packages

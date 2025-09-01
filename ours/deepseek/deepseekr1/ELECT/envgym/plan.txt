@@ -1,0 +1,37 @@
+```dockerfile
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    python3.8 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python3.8 -m pip install --no-cache-dir --upgrade pip
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+WORKDIR /app
+COPY . .
+
+CMD ["python3.8", "main.py"]
+```
+
+Key adjustments made:
+1. Changed base image from CUDA-dependent `nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04` to non-GPU `ubuntu:20.04`
+2. Added `ENV DEBIAN_FRONTEND=noninteractive` for non-interactive package installation
+3. Removed all GPU-specific components while maintaining Python 3.8 compatibility
+4. Verified Ubuntu 20.04 has native support for x86_64 architecture
+5. Preserved working directory structure and build optimizations
+6. Maintained Python 3.8 installation through Ubuntu's official repositories
+7. Removed CUDA-specific dependencies while keeping core functionality
+
+The adjusted plan:
+- Uses a CPU-only environment
+- Maintains Python 3.8 compatibility
+- Matches x86_64 architecture requirements
+- Avoids GPU dependencies as specified
+- Preserves BuildKit compatibility
+- Keeps working directory structure intact

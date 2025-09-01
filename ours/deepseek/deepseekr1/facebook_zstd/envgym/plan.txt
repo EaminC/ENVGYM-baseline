@@ -1,0 +1,101 @@
+### Adjusted Environment Setup Plan
+
+**Changes Summary**  
+- Removed macOS, FreeBSD, iOS, tvOS, and Windows components (incompatible with Linux base image).  
+- Eliminated cross-architecture compilation toolchains (ARM/PowerPC) and GPU dependencies (N/A).  
+- Simplified dependencies to Ubuntu 20.04 packages.  
+- Removed Swift builds (requires macOS).  
+- Updated paths to use the provided working directory.  
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. **DOWNLOADS NEEDED**:  
+   - Zstandard source code from GitHub repository  
+   - Build tools: make (≥4.0), gcc (≥7.3.0) or clang  
+   - zlib development libraries  
+   - Optional: cmake (≥3.1)  
+   - Optional: Meson build system  
+   - Optional: scan-build tool (clang static analyzer)  
+   - Optional: valgrind for memory checking  
+
+2. **FILES TO CREATE**:  
+   - None required for standard build  
+
+3. **NECESSARY TEST CASES**:  
+   - Compilation on x86_64 (Linux)  
+   - Compilation with gcc/clang versions  
+   - CLI tests (`playTests.sh` without long data)  
+   - Small/large data tests  
+   - Fuzzer tests (`fuzzer.c`, `zstreamtest.c`)  
+   - Sanitizer tests (asan, ubsan, msan, tsan)  
+   - Valgrind memory checks  
+   - Zlib wrapper tests  
+   - Backward compatibility tests  
+   - Parallel zstd (pzstd) tests  
+   - Static analysis verification  
+   - Performance benchmarking  
+
+4. **COMPLETE TODO LIST**:  
+   1. **Install dependencies** (Ubuntu 20.04):  
+      ```bash
+      sudo apt update && sudo apt install -y build-essential git cmake clang-tools valgrind zlib1g-dev
+      ```  
+   2. **Clone repository**:  
+      ```bash
+      cd /home/cc/EnvGym/data/facebook_zstd
+      git clone https://github.com/facebook/zstd.git .  
+      ```  
+   3. **Primary build**:  
+      ```bash
+      make -j  
+      # Verify: ls -l zstd  
+      ```  
+   4. **Short tests**:  
+      ```bash
+      make check  
+      ```  
+   5. **Extended tests**:  
+      ```bash
+      make test  
+      ```  
+   6. **Static analysis**:  
+      ```bash
+      make staticAnalyze  
+      ```  
+   7. **Alternative builds (optional)**:  
+      - CMake:  
+        ```bash
+        mkdir build && cd build && cmake .. && make  
+        ```  
+      - Meson:  
+        ```bash
+        meson builddir && ninja -C builddir  
+        ```  
+   8. **Post-build verification**:  
+      ```bash
+      ./zstd -V  
+      ./zstd -12 README.md -o test.zst  
+      # Verify: ls test.zst  
+      ```  
+   9. **Installation (optional)**:  
+      ```bash
+      sudo make install  
+      ```  
+   10. **Dictionary test (optional)**:  
+       ```bash
+       zstd --train src/*.c -o dict  
+       zstd -D dict README.md  
+       ```  
+   11. **Benchmarking (optional)**:  
+       ```bash
+       ./zstd -b1 -i5 README.md  
+       ```  
+   12. **Additional tests (optional)**:  
+       - Sanitizers: `make asan`, `make usan`, `make msan`, `make tsan`  
+       - Valgrind: `make -C tests test-valgrind`  
+       - Large data: `./tests/playTests.sh --test-large-data`  
+       - Fuzzers: `./tests/fuzzer`, `./tests/zstreamtest`  
+   13. **Cleanup**:  
+       ```bash
+       make clean  
+       ```

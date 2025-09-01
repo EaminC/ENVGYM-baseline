@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250827_214554",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756331152",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 1.34kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/ubuntu:22.04\n#2 DONE 0.1s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/15] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0\n#4 DONE 0.0s\n\n#5 [ 7/15] RUN mkdir build\n#5 CACHED\n\n#6 [ 3/15] RUN mkdir -p /home/cc/EnvGym/data/Baleen\n#6 CACHED\n\n#7 [ 6/15] WORKDIR /home/cc/EnvGym/data/Baleen/Baleen-FAST24/BCacheSim\n#7 CACHED\n\n#8 [ 2/15] RUN apt-get update && apt-get install -y     git     build-essential     cmake     libnuma-dev     python3     python3-pip     python3-dev     wget     libaio-dev     libboost-all-dev     libtbb-dev     libgflags-dev     libssl-dev     zlib1g-dev\n#8 CACHED\n\n#9 [ 8/15] WORKDIR build\n#9 CACHED\n\n#10 [ 5/15] RUN git clone --recurse-submodules https://github.com/wonglkd/Baleen-FAST24.git\n#10 CACHED\n\n#11 [ 4/15] WORKDIR /home/cc/EnvGym/data/Baleen\n#11 CACHED\n\n#12 [ 9/15] RUN cmake .. 2>&1 | tee cmake_output.log || (echo \"===== CMake Output =====\"; cat cmake_output.log; if [ -f CMakeFiles/CMakeError.log ]; then echo \"===== Error Log =====\"; cat CMakeFiles/CMakeError.log; fi; exit 1)\n#12 CACHED\n\n#13 [10/15] RUN make 2>&1 | tee make_output.log || (echo \"===== Make Output =====\"; cat make_output.log; exit 1)\n#13 0.254 make: *** No targets specified and no makefile found.  Stop.\n#13 DONE 0.3s\n\n#14 [11/15] WORKDIR /home/cc/EnvGym/data/Baleen/Baleen-FAST24\n#14 DONE 0.0s\n\n#15 [12/15] RUN pip3 install -r requirements.txt\n#15 0.603 ERROR: Could not open requirements file: [Errno 2] No such file or directory: 'requirements.txt'\n#15 ERROR: process \"/bin/sh -c pip3 install -r requirements.txt\" did not complete successfully: exit code: 1\n------\n > [12/15] RUN pip3 install -r requirements.txt:\n0.603 ERROR: Could not open requirements file: [Errno 2] No such file or directory: 'requirements.txt'\n------\nenvgym.dockerfile:27\n--------------------\n  25 |     RUN make 2>&1 | tee make_output.log || (echo \"===== Make Output =====\"; cat make_output.log; exit 1)\n  26 |     WORKDIR /home/cc/EnvGym/data/Baleen/Baleen-FAST24\n  27 | >>> RUN pip3 install -r requirements.txt\n  28 |     RUN pip3 install -e .\n  29 |     RUN mkdir -p data && cd data && wget -O get-tectonic.sh https://raw.githubusercontent.com/wonglkd/Baleen-FAST24/main/get-tectonic.sh && bash get-tectonic.sh\n--------------------\nERROR: failed to solve: process \"/bin/sh -c pip3 install -r requirements.txt\" did not complete successfully: exit code: 1\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

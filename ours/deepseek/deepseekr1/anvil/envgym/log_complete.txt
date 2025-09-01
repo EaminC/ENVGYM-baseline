@@ -1,0 +1,216 @@
+=== Docker Execution Log - 20250829_105134 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756464686
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.57kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:latest
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/12] FROM docker.io/library/ubuntu:latest@sha256:7c06e91f61fa88c08cc74f7e1b7c69ae24910d745357e0dfe1d2c0322aaf20f9
+#4 DONE 0.0s
+
+#5 [ 5/12] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none &&     . "/home/cc/.cargo/env" &&     rustup toolchain install nightly &&     rustup toolchain install 1.88.0 &&     rustup default 1.88.0
+#5 CACHED
+
+#6 [ 2/12] RUN useradd -m cc &&     mkdir -p /home/cc/EnvGym/data/anvil &&     chown -R cc:cc /home/cc
+#6 CACHED
+
+#7 [ 3/12] RUN apt-get update &&     apt-get install -y --no-install-recommends     build-essential     cmake     pkg-config     libssl-dev     python3     python3-dev     python3-pip     python3-setuptools     python3-wheel     docker.io     golang-go     curl     git     libgmp-dev     re2c     libomp-dev     && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [ 4/12] WORKDIR /home/cc
+#8 CACHED
+
+#9 [ 6/12] RUN ln -s /usr/bin/python3 /usr/bin/python
+#9 CACHED
+
+#10 [internal] load build context
+#10 transferring context: 914.12kB 0.1s done
+#10 DONE 0.1s
+
+#11 [ 7/12] RUN set -x &&     git clone https://github.com/Z3Prover/z3 &&     cd z3 &&     git checkout z3-4.12.2 &&     python scripts/mk_make.py --parallel=2 &&     cd build &&     make -j2 VERBOSE=1 &&     make install
+#11 0.217 + git clone https://github.com/Z3Prover/z3
+#11 0.218 Cloning into 'z3'...
+#11 7.243 + cd z3
+#11 7.243 + git checkout z3-4.12.2
+#11 7.641 Note: switching to 'z3-4.12.2'.
+#11 7.641 
+#11 7.641 You are in 'detached HEAD' state. You can look around, make experimental
+#11 7.641 changes and commit them, and you can discard any commits you make in this
+#11 7.641 state without impacting any branches by switching back to a branch.
+#11 7.641 
+#11 7.641 If you want to create a new branch to retain commits you create, you may
+#11 7.641 do so (now or later) by using -c with the switch command. Example:
+#11 7.641 
+#11 7.641   git switch -c <new-branch-name>
+#11 7.641 
+#11 7.641 Or undo this operation with:
+#11 7.641 
+#11 7.641   git switch -
+#11 7.641 
+#11 7.641 Turn off this advice by setting config variable advice.detachedHead to false
+#11 7.641 
+#11 7.641 HEAD is now at e417f7d78 updated release notes for 12.2
+#11 7.644 + python scripts/mk_make.py --parallel=2
+#11 7.666 /home/cc/z3/scripts/mk_util.py:398: SyntaxWarning: invalid escape sequence '\['
+#11 7.666   open_pat = re.compile("\[search path for class files: (.*)\]")
+#11 7.668 /home/cc/z3/scripts/mk_util.py:816: SyntaxWarning: invalid escape sequence '\<'
+#11 7.668   system_inc_pat  = re.compile("[ \t]*#include[ \t]*\<.*\>[ \t]*")
+#11 7.672 /home/cc/z3/scripts/mk_util.py:1723: SyntaxWarning: invalid escape sequence '\%'
+#11 7.672   core_csproj_str = """<Project Sdk="Microsoft.NET.Sdk">
+#11 7.674 /home/cc/z3/scripts/mk_util.py:2249: SyntaxWarning: invalid escape sequence '\%'
+#11 7.675   dotnet_proj_str = """<Project Sdk="Microsoft.NET.Sdk">
+#11 7.679 /home/cc/z3/scripts/mk_util.py:3165: SyntaxWarning: invalid escape sequence '\M'
+#11 7.680   f.write('  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />\n')
+#11 7.680 /home/cc/z3/scripts/mk_util.py:3176: SyntaxWarning: invalid escape sequence '\M'
+#11 7.680   f.write('  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />\n')
+#11 7.680 /home/cc/z3/scripts/mk_util.py:3179: SyntaxWarning: invalid escape sequence '\M'
+#11 7.681   f.write('    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(\'$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props\')" Label="LocalAppDataPlatform" />  </ImportGroup>\n')
+#11 7.681 /home/cc/z3/scripts/mk_util.py:3182: SyntaxWarning: invalid escape sequence '\$'
+#11 7.681   f.write('    <OutDir Condition="\'$(Configuration)|$(Platform)\'==\'Debug|Win32\'">$(SolutionDir)\$(ProjectName)\$(Configuration)\</OutDir>\n')
+#11 7.681 /home/cc/z3/scripts/mk_util.py:3185: SyntaxWarning: invalid escape sequence '\$'
+#11 7.681   f.write('    <OutDir Condition="\'$(Configuration)|$(Platform)\'==\'Release|Win32\'">$(SolutionDir)\$(ProjectName)\$(Configuration)\</OutDir>\n')
+#11 7.682 /home/cc/z3/scripts/mk_util.py:3190: SyntaxWarning: invalid escape sequence '\$'
+#11 7.682   f.write('        <IntDir>$(ProjectName)\$(Configuration)\</IntDir>\n')
+#11 7.682 /home/cc/z3/scripts/mk_util.py:3193: SyntaxWarning: invalid escape sequence '\$'
+#11 7.682   f.write('    <IntDir>$(ProjectName)\$(Configuration)\</IntDir>\n')
+#11 7.683 /home/cc/z3/scripts/mk_util.py:3270: SyntaxWarning: invalid escape sequence '\M'
+#11 7.683   f.write('  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />\n')
+#11 7.684 /home/cc/z3/scripts/mk_util.py:3311: SyntaxWarning: invalid escape sequence '\M'
+#11 7.684   f.write('  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />\n')
+#11 7.705 /home/cc/z3/scripts/mk_genfile_common.py:142: SyntaxWarning: invalid escape sequence '\-'
+#11 7.705   words = re.split('[^\-a-zA-Z0-9_]+', line)
+#11 7.705 /home/cc/z3/scripts/mk_genfile_common.py:230: SyntaxWarning: invalid escape sequence '\-'
+#11 7.705   words = re.split('[^\-a-zA-Z0-9_]+', line)
+#11 7.705 /home/cc/z3/scripts/mk_genfile_common.py:318: SyntaxWarning: invalid escape sequence '\-'
+#11 7.705   words = re.split('[^\-a-zA-Z0-9_]+', line)
+#11 7.706 /home/cc/z3/scripts/mk_genfile_common.py:444: SyntaxWarning: invalid escape sequence '\-'
+#11 7.706   words = re.split('[^\-a-zA-Z0-9_]+', line)
+#11 7.706 /home/cc/z3/scripts/mk_genfile_common.py:577: SyntaxWarning: invalid escape sequence '\W'
+#11 7.706   words = re.split('\W+', line)
+#11 7.706 /home/cc/z3/scripts/mk_genfile_common.py:621: SyntaxWarning: invalid escape sequence '\('
+#11 7.706   reg_pat = re.compile('[ \t]*REG_PARAMS\(\'([^\']*)\'\)')
+#11 7.706 /home/cc/z3/scripts/mk_genfile_common.py:622: SyntaxWarning: invalid escape sequence '\('
+#11 7.706   reg_mod_pat = re.compile('[ \t]*REG_MODULE_PARAMS\(\'([^\']*)\', *\'([^\']*)\'\)')
+#11 7.706 /home/cc/z3/scripts/mk_genfile_common.py:623: SyntaxWarning: invalid escape sequence '\('
+#11 7.706   reg_mod_descr_pat = re.compile('[ \t]*REG_MODULE_DESCRIPTION\(\'([^\']*)\', *\'([^\']*)\'\)')
+#11 7.706 /home/cc/z3/scripts/mk_genfile_common.py:701: SyntaxWarning: invalid escape sequence '\('
+#11 7.706   tactic_pat   = re.compile('[ \t]*ADD_TACTIC\(.*\)')
+#11 7.706 /home/cc/z3/scripts/mk_genfile_common.py:702: SyntaxWarning: invalid escape sequence '\('
+#11 7.706   probe_pat    = re.compile('[ \t]*ADD_PROBE\(.*\)')
+#11 7.706 /home/cc/z3/scripts/mk_genfile_common.py:703: SyntaxWarning: invalid escape sequence '\('
+#11 7.706   simplifier_pat = re.compile('[ \t]*ADD_SIMPLIFIER\(.*\)')
+#11 7.707 /home/cc/z3/scripts/mk_genfile_common.py:783: SyntaxWarning: invalid escape sequence '\('
+#11 7.707   initializer_pat      = re.compile('[ \t]*ADD_INITIALIZER\(\'([^\']*)\'\)')
+#11 7.707 /home/cc/z3/scripts/mk_genfile_common.py:785: SyntaxWarning: invalid escape sequence '\('
+#11 7.707   initializer_prio_pat = re.compile('[ \t]*ADD_INITIALIZER\(\'([^\']*)\',[ \t]*(-?[0-9]*)\)')
+#11 7.707 /home/cc/z3/scripts/mk_genfile_common.py:786: SyntaxWarning: invalid escape sequence '\('
+#11 7.707   finalizer_pat        = re.compile('[ \t]*ADD_FINALIZER\(\'([^\']*)\'\)')
+#11 7.730 opt = --parallel, arg = 2
+#11 7.730 ERROR: Invalid command line option '--parallel'
+#11 7.730 mk_make.py: Z3 Makefile generator
+#11 7.730 
+#11 7.730 This script generates the Makefile for the Z3 theorem prover.
+#11 7.730 It must be executed from the Z3 root directory.
+#11 7.730 
+#11 7.730 Options:
+#11 7.730   -h, --help                    display this message.
+#11 7.730   -s, --silent                  do not print verbose messages.
+#11 7.730   -p <dir>, --prefix=<dir>      installation prefix (default: /usr).
+#11 7.730   --pypkgdir=<dir>              Force a particular Python package directory (default /usr/local/lib/python3.12/dist-packages)
+#11 7.730   -b <subdir>, --build=<subdir>  subdirectory where Z3 will be built (default: build).
+#11 7.730   --githash=hash                include the given hash in the binaries.
+#11 7.730   --git-describe                include the output of 'git describe' in the version information.
+#11 7.730   -d, --debug                   compile Z3 in debug mode.
+#11 7.730   -t, --trace                   enable tracing in release mode.
+#11 7.730   --x86                         force 32-bit x86 build on x64 systems.
+#11 7.730   --arm64=<bool>                    forcearm64 bit build  on/off (supported for Darwin).
+#11 7.730   -m, --makefiles               generate only makefiles.
+#11 7.730   --dotnet                      generate .NET platform bindings.
+#11 7.730   --dotnet-key=<file>           sign the .NET assembly using the private key in <file>.
+#11 7.730   --assembly-version=<x.x.x.x>  provide version number for build
+#11 7.730   --java                        generate Java bindings.
+#11 7.730   --ml                          generate OCaml bindings.
+#11 7.730   --js                          generate JScript bindings.
+#11 7.730   --python                      generate Python bindings.
+#11 7.730   --staticlib                   build Z3 static library.
+#11 7.730   --staticbin                   build a statically linked Z3 binary.
+#11 7.730   -g, --gmp                     use GMP.
+#11 7.730   --gprof                       enable gprof
+#11 7.730   --log-sync                    synchronize access to API log files to enable multi-thread API logging.
+#11 7.730   --single-threaded             non-thread-safe build
+#11 7.730 
+#11 7.730 Some influential environment variables:
+#11 7.730   CXX        C++ compiler
+#11 7.730   CC         C compiler
+#11 7.730   LDFLAGS    Linker flags, e.g., -L<lib dir> if you have libraries in a non-standard directory
+#11 7.730   CPPFLAGS   Preprocessor flags, e.g., -I<include dir> if you have header files in a non-standard directory
+#11 7.730   CXXFLAGS   C++ compiler flags
+#11 7.730   JDK_HOME   JDK installation directory (only relevant if -j or --java option is provided)
+#11 7.730   JNI_HOME   JNI bindings directory (only relevant if -j or --java option is provided)
+#11 7.730   OCAMLC     Ocaml byte-code compiler (only relevant with --ml)
+#11 7.730   OCAMLFIND  Ocaml find tool (only relevant with --ml)
+#11 7.730   OCAMLOPT   Ocaml native compiler (only relevant with --ml)
+#11 7.730   OCAML_LIB  Ocaml library directory (only relevant with --ml)
+#11 7.730   Z3_INSTALL_BIN_DIR Install directory for binaries relative to install prefix
+#11 7.730   Z3_INSTALL_LIB_DIR Install directory for libraries relative to install prefix
+#11 7.730   Z3_INSTALL_INCLUDE_DIR Install directory for header files relative to install prefix
+#11 7.730   Z3_INSTALL_PKGCONFIG_DIR Install directory for pkgconfig files relative to install prefix
+#11 ERROR: process "/bin/sh -c set -x &&     git clone https://github.com/Z3Prover/z3 &&     cd z3 &&     git checkout z3-4.12.2 &&     python scripts/mk_make.py --parallel=2 &&     cd build &&     make -j2 VERBOSE=1 &&     make install" did not complete successfully: exit code: 1
+------
+ > [ 7/12] RUN set -x &&     git clone https://github.com/Z3Prover/z3 &&     cd z3 &&     git checkout z3-4.12.2 &&     python scripts/mk_make.py --parallel=2 &&     cd build &&     make -j2 VERBOSE=1 &&     make install:
+7.730   JDK_HOME   JDK installation directory (only relevant if -j or --java option is provided)
+7.730   JNI_HOME   JNI bindings directory (only relevant if -j or --java option is provided)
+7.730   OCAMLC     Ocaml byte-code compiler (only relevant with --ml)
+7.730   OCAMLFIND  Ocaml find tool (only relevant with --ml)
+7.730   OCAMLOPT   Ocaml native compiler (only relevant with --ml)
+7.730   OCAML_LIB  Ocaml library directory (only relevant with --ml)
+7.730   Z3_INSTALL_BIN_DIR Install directory for binaries relative to install prefix
+7.730   Z3_INSTALL_LIB_DIR Install directory for libraries relative to install prefix
+7.730   Z3_INSTALL_INCLUDE_DIR Install directory for header files relative to install prefix
+7.730   Z3_INSTALL_PKGCONFIG_DIR Install directory for pkgconfig files relative to install prefix
+------
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - UndefinedVar: Usage of undefined variable '$HOME' (line 3)
+envgym.dockerfile:44
+--------------------
+  43 |     RUN ln -s /usr/bin/python3 /usr/bin/python
+  44 | >>> RUN set -x && \
+  45 | >>>     git clone https://github.com/Z3Prover/z3 && \
+  46 | >>>     cd z3 && \
+  47 | >>>     git checkout z3-4.12.2 && \
+  48 | >>>     python scripts/mk_make.py --parallel=2 && \
+  49 | >>>     cd build && \
+  50 | >>>     make -j2 VERBOSE=1 && \
+  51 | >>>     make install
+  52 |     RUN cd / && rm -rf /home/cc/z3
+--------------------
+ERROR: failed to solve: process "/bin/sh -c set -x &&     git clone https://github.com/Z3Prover/z3 &&     cd z3 &&     git checkout z3-4.12.2 &&     python scripts/mk_make.py --parallel=2 &&     cd build &&     make -j2 VERBOSE=1 &&     make install" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

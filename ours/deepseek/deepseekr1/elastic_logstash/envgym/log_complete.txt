@@ -1,0 +1,76 @@
+=== Docker Execution Log - 20250829_192910 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756495739
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 974B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:latest
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 60B done
+#3 DONE 0.0s
+
+#4 [1/7] FROM docker.io/library/ubuntu:latest@sha256:7c06e91f61fa88c08cc74f7e1b7c69ae24910d745357e0dfe1d2c0322aaf20f9
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 426.51kB 0.1s done
+#5 DONE 0.1s
+
+#6 [2/7] RUN apt-get update &&     DEBIAN_FRONTEND=noninteractive apt-get install -y     build-essential     cmake     git     wget     python3     python3-pip     libboost-all-dev     libeigen3-dev     libgmp-dev     libmpfr-dev     tcl-dev     tk-dev     libreadline-dev     bison     flex     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [3/7] WORKDIR /app
+#7 CACHED
+
+#8 [4/7] COPY . .
+#8 DONE 0.2s
+
+#9 [5/7] RUN if [ -f "requirements.txt" ]; then         echo "requirements.txt found. Content:";         cat requirements.txt;         echo "Installing with verbose output...";         pip3 install --no-cache-dir -v -r requirements.txt;     else         echo "requirements.txt not found. Skipping pip install.";     fi
+#9 0.237 requirements.txt not found. Skipping pip install.
+#9 DONE 0.3s
+
+#10 [6/7] RUN mkdir build &&     cd build &&     cmake .. | tee cmake.log &&     make -j$(nproc) | tee make.log || { cat cmake.log make.log; exit 1; }
+#10 0.364 CMake Warning:
+#10 0.364   Ignoring extra path from command line:
+#10 0.364 
+#10 0.364    ".."
+#10 0.364 
+#10 0.364 
+#10 0.364 CMake Error: The source directory "/app" does not appear to contain CMakeLists.txt.
+#10 0.364 Specify --help for usage, or press the help button on the CMake GUI.
+#10 0.371 make: *** No targets specified and no makefile found.  Stop.
+#10 DONE 0.4s
+
+#11 [7/7] WORKDIR /app
+#11 DONE 0.0s
+
+#12 exporting to image
+#12 exporting layers
+#12 exporting layers 9.1s done
+#12 writing image sha256:3e0851d620cd8b41988b741afa8f52e2d5908070b1718a4f772d82ae95b1efcb done
+#12 naming to docker.io/library/envgym_test_1756495739 done
+#12 DONE 9.1s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

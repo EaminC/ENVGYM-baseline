@@ -1,0 +1,76 @@
+Based on the provided hardware information (x86_64 architecture, Ubuntu 20.04 base), here's the adjusted environment setup plan:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: 
+   - Node.js (version >=22.17.1)
+   - Git CLI
+   - Insomnia client application
+   - libfontconfig-dev (Ubuntu/Debian dependency)
+   - npm (version >=10)
+   - Remove Windows Build Tools (not needed on Linux)
+   - Remove libcurl-devel (Fedora-specific)
+
+2. FILES TO CREATE: 
+   - .env (project root)
+   - .eslintrc.local (project root)
+   - test-setup.js (project root)
+   - .github/workflows/ci.yml
+
+3. NECESSARY TEST CASES IN THE CODEBASE: 
+   - Same as original plan
+
+4. COMPLETE TODO LIST: 
+   1. Install Git: `sudo apt update && sudo apt install git -y`  
+      Verification: `git --version`
+   
+   2. Install Node Version Manager: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash`  
+      Verification: `nvm --version`
+   
+   3. Install Node.js: `nvm install $(cat .nvmrc) && nvm use $(cat .nvmrc)`  
+      Verification: `node -v` matches .nvmrc and >=22.17.1, `npm -v` >=10
+   
+   4. Install Ubuntu dependencies: `sudo apt install libfontconfig-dev -y`  
+      Verification: `dpkg -l libfontconfig-dev` shows installed status
+   
+   5. Clear Electron cache: `rm -rf ~/.cache/electron`  
+      Verification: `ls ~/.cache/electron` returns "No such file"
+   
+   6. Install dependencies: `npm install`  
+      Verification: `npm ls` shows no missing packages
+   
+   7. Configure ESLint: Create .eslintrc.local  
+      Verification: `npm run lint` shows no errors
+   
+   8. Set up test environment: Create test-setup.js  
+      Verification: `npm test` runs successfully
+   
+   9. Build project: `npm run app-build`  
+      Verification: `ls packages/insomnia/dist` shows build artifacts
+   
+   10. Run development mode: `npm run dev`  
+       Verification: Insomnia GUI launches without errors
+   
+   11. Create CI pipeline: Add GitHub Actions config with steps:  
+        - lint: `npm run lint`  
+        - test: `npm run test`  
+        - build: `npm run app-build`  
+       Verification: CI passes on repository push
+   
+   12. Validate Linux support:  
+        - Test on Linux: `npm run dev:autoRestart`  
+       Verification: Consistent functionality on Linux
+   
+   13. Verify Linux build: `npm run app-package`  
+       Verification: Linux installer generated in `/packages/insomnia/release`
+   
+   14. Build CLI tool: `npm run inso-package`  
+       Verification: CLI executable in `/packages/insomnia-inso/dist`
+
+Key adjustments:
+- Removed Windows/Fedora-specific packages (retained only Ubuntu-compatible dependencies)
+- Simplified cross-platform testing to focus only on Linux
+- Added package index update to Git installation for reliability
+- Verified paths match working directory location (/home/cc/EnvGym/data/Kong_insomnia)
+- Removed macOS/Windows build steps (focus only on Linux artifacts)
+- Confirmed all steps are compatible with x86_64 architecture

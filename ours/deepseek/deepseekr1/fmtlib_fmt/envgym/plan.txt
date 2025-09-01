@@ -1,0 +1,435 @@
+
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: 
+   - C++ compiler (GCC ≥4.9 / Clang ≥3.6 / MSVC ≥14.0)
+   - CMake ≥3.10 (updated to support modules)
+   - Git (for repository cloning)
+   - Python 3 (for benchmark tests and documentation generation)
+   - fmtlib source code (https://github.com/fmtlib/fmt)
+   - Doxygen and MkDocs with extensions: mkdocs-material==9.5.25, mkdocstrings==0.26.1, mike==2.1.1
+   - Visual Studio Build Tools (Windows-specific)
+   - clang-format-17 (for linting workflow)
+   - libatomic1, libc6-dev, libgomp1, libitm1, libmpc3 (GCC 4.9 dependencies)
+   - libtinfo5, libffi6, libasan2, libubsan0, libcilkrts5 (Clang 3.6 dependencies)
+   - locales-all (for CI environment setup)
+   - libc++-dev, libc++abi-dev (for libc++ configurations)
+   - Xcode 14.3 (for macOS 13 builds)
+   - Android NDK ≥r21 (version 21.3.6528147 required)
+   - Android SDK (for Android testing)
+   - Gradle 6.8 (for Android Gradle builds)
+   - wget and unzip (for Gradle installation)
+   - VirtualBox (for Vagrant virtualization)
+   - Vagrant (for automated VM testing)
+   - VMware Desktop (alternative virtualization provider)
+   - Ubuntu 22.04 ARM64 VM image (bento/ubuntu-22.04-arm64)
+   - Bazel 8.1.1 (for Bazel build system)
+   - pkg-config (for .pc file validation)
+
+2. FILES TO CREATE: 
+   - ~/fmt_project/test_app/main.cpp
+   - ~/fmt_project/CMakeLists.txt
+   - ~/fmt_project/.github/workflows/linux.yml
+   - ~/fmt_project/.github/workflows/macos.yml (updated with new matrix strategy)
+   - ~/fmt_project/.github/workflows/windows.yml
+   - ~/fmt_project/.github/workflows/module.yml
+   - ~/fmt_project/.github/workflows/cifuzz.yml
+   - ~/fmt_project/.github/workflows/lint.yml
+   - ~/fmt_project/.github/workflows/doc.yml
+   - ~/fmt_project/.github/workflows/scorecard.yml
+   - ~/fmt_project/.github/workflows/android.yml
+   - ~/fmt_project/.github/workflows/bazel.yml
+   - ~/fmt_project/.github/dependabot.yml
+   - ~/fmt_project/support/cmake/fmt-config.cmake.in (UPDATED with new template content)
+   - ~/fmt_project/support/cmake/FindSetEnv.cmake (NEW Windows SDK configuration)
+   - ~/fmt_project/support/cmake/fmt.pc.in (NEW pkg-config template)
+   - ~/fmt_project/fmt.pc
+   - ~/fmt_project/test/android_test_app/jni/Application.mk
+   - ~/fmt_project/test/android_test_app/jni/Android.mk (updated for shared libraries)
+   - ~/fmt_project/support/build.gradle
+   - ~/fmt_project/support/AndroidManifest.xml
+   - ~/fmt_project/support/mkdocs.yml
+   - ~/fmt_project/support/Vagrantfile (with virtualization configuration)
+   - ~/fmt_project/support/bazel/.bazelversion
+   - ~/fmt_project/support/bazel/WORKSPACE.bazel
+   - ~/fmt_project/support/bazel/BUILD.bazel
+   - ~/fmt_project/support/bazel/MODULE.bazel
+   - ~/fmt_project/support/bazel/README.md (NEW documentation file)
+   - ~/fmt_project/WORKSPACE
+   - ~/fmt_project/.bazelversion
+   - ~/fmt_project/MODULE.bazel
+   - ~/fmt_project/BUILD.bazel
+
+3. NECESSARY TEST CASES IN THE CODEBASE: 
+   - Core formatting functionality tests (integers, floats, strings)
+   - Unicode handling verification (with FMT_UNICABLE enabled)
+   - Compile-time format string validation
+   - Performance benchmark vs std::printf
+   - Cross-platform consistency checks
+   - Module build compatibility tests
+   - Header-only mode validation
+   - Automated fuzzing tests via CI pipeline
+   - CUDA compatibility tests (optional)
+   - Pedantic warning/error compliance checks
+   - Code formatting compliance (clang-format verification)
+   - Dependabot configuration validation
+   - Documentation deployment workflow validation (including theme/extension checks)
+   - Compiler version compatibility tests (GCC 4.9-13, Clang 3.6-14, MSVC 2022, MinGW)
+   - Shared library build validation
+   - C++ standard compliance tests (11/14/17/20/23)
+   - Timezone configuration checks (Europe/Kyiv and Europe/Minsk)
+   - Fuzz build integration tests
+   - Hidden symbol visibility configuration tests
+   - macOS version compatibility tests (13-14)
+   - Xcode version compatibility tests (14.3)
+   - Scorecard supply chain security analysis
+   - Security event reporting validation
+   - Code scanning dashboard integration tests
+   - Android Gradle shared library build validation (armeabi-v7a, arm64-v8a, x86_64)
+   - Android AAR packaging validation
+   - Android application integration test (shared library linkage)
+   - Vagrant virtualization environment build validation
+   - Bazel build and test execution
+   - Bazel target visibility validation
+   - Platform-specific compiler flag verification (Windows UTF-8 handling)
+   - Bazel module dependency resolution validation
+   - Bazel workspace configuration validation
+   - Bazel file copy validation (root directory file presence)
+   - Windows SDK environment configuration validation (SetEnv.cmd availability)
+   - CMake package configuration validation (fmt-config.cmake generation/functionality)
+   - pkg-config file generation and functionality validation
+   - pkg-config dependency resolution tests
+
+4. COMPLETE TODO LIST: 
+   1. Install system dependencies:
+        - Ubuntu: 
+            `sudo apt install build-essential cmake git python3 doxygen mkdocs locales-all libtinfo5 libatomic1 android-sdk wget unzip virtualbox vagrant pkg-config`
+            `wget https://services.gradle.org/distributions/gradle-6.8-bin.zip -O /tmp/gradle-6.8-bin.zip`
+            `sudo unzip -d /opt/gradle /tmp/gradle-6.8-bin.zip`
+            `export PATH=$PATH:/opt/gradle/gradle-6.8/bin`
+            `pip3 install mkdocs-material==9.5.25 mkdocstrings==0.26.1 mike==2.1.1`
+            `sudo apt install apt-transport-https curl gnupg`
+            `curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel-archive-keyring.gpg`
+            `sudo mv bazel-archive-keyring.gpg /usr/share/keyrings`
+            `echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list`
+            `sudo apt update && sudo apt install bazel-8.1.1`
+        - macOS: 
+            `brew install cmake git python doxygen mkdocs android-ndk gradle@6 virtualbox vagrant pkg-config`
+            `echo 'export PATH="/usr/local/opt/gradle@6/bin:$PATH"' >> ~/.bash_profile`
+            `pip install mkdocs-material==9.5.25 mkdocstrings==0.26.1 mike==2.1.1`
+            `brew install bazel@8.1`
+        - Windows: 
+            Install Visual Studio Build Tools, CMake, Doxygen/MkDocs, Android Studio, Gradle 6.8, VirtualBox, Vagrant, pkg-config
+            `pip install mkdocs-material==9.5.25 mkdocstrings==0.26.1 mike==2.1.1`
+            Download and install Bazel 8.1.1 from https://github.com/bazelbuild/bazel/releases/tag/8.1.1
+
+   2. Clone repository:  
+        `git clone https://github.com/fmtlib/fmt.git && cd fmt`
+
+   3. Create FindSetEnv.cmake module and configuration templates:  
+        `mkdir -p support/cmake`  
+        `echo '# A CMake script to find SetEnv.cmd.' > support/cmake/FindSetEnv.cmake`  
+        `echo 'find_program(WINSDK_SETENV NAMES SetEnv.cmd' >> support/cmake/FindSetEnv.cmake`  
+        `echo '  PATHS "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows;CurrentInstallFolder]/bin")' >> support/cmake/FindSetEnv.cmake`  
+        `echo 'if (WINSDK_SETENV AND PRINT_PATH)' >> support/cmake/FindSetEnv.cmake`  
+        `echo '  execute_process(COMMAND ${CMAKE_COMMAND} -E echo "${WINSDK_SETENV}")' >> support/cmake/FindSetEnv.cmake`  
+        `echo 'endif ()' >> support/cmake/FindSetEnv.cmake`  
+        `echo '@PACKAGE_INIT@' > support/cmake/fmt-config.cmake.in`  
+        `echo '' >> support/cmake/fmt-config.cmake.in`  
+        `echo 'if (NOT TARGET fmt::fmt)' >> support/cmake/fmt-config.cmake.in`  
+        `echo '  include(${CMAKE_CURRENT_LIST_DIR}/@targets_export_name@.cmake)' >> support/cmake/fmt-config.cmake.in`  
+        `echo 'endif ()' >> support/cmake/fmt-config.cmake.in`  
+        `echo '' >> support/cmake/fmt-config.cmake.in`  
+        `echo 'check_required_components(fmt)' >> support/cmake/fmt-config.cmake.in`  
+        `cat << 'EOF' > support/cmake/fmt.pc.in`  
+        `prefix=@CMAKE_INSTALL_PREFIX@`  
+        `exec_prefix=@CMAKE_INSTALL_PREFIX@`  
+        `libdir=@libdir_for_pc_file@`  
+        `includedir=@includedir_for_pc_file@`  
+        ``  
+        `Name: fmt`  
+        `Description: A modern formatting library`  
+        `Version: @FMT_VERSION@`  
+        `Libs: -L${libdir} -l@FMT_LIB_NAME@`  
+        `Cflags: -I${includedir}`  
+        `EOF`
+
+   4. Create Bazel version file and workspace marker:  
+        `mkdir -p support/bazel`  
+        `echo "8.1.1" > support/bazel/.bazelversion`  
+        `echo "# WORKSPACE marker file needed by Bazel" > support/bazel/WORKSPACE.bazel`
+
+   5. Create Bazel module configuration:  
+        Create ~/fmt_project/support/bazel/MODULE.bazel with:
+        ```
+        module(
+           name = "fmt",
+           compatibility_level = 10,
+        )
+
+        bazel_dep(name = "platforms", version = "0.0.11")
+        bazel_dep(name = "rules_cc", version = "0.1.1")
+        ```
+
+   6. Create BUILD.bazel file:  
+        Create ~/fmt_project/support/bazel/BUILD.bazel:
+        ```
+        load("@rules_cc//cc:defs.bzl", "cc_library")
+        cc_library(
+            name = "fmt",
+            srcs = [
+                "../../src/format.cc",
+                "../../src/os.cc",
+            ],
+            hdrs = glob([
+                "../../include/fmt/*.h",
+            ]),
+            copts = select({
+                "@platforms//os:windows": ["-utf-8"],
+                "//conditions:default": [],
+            }),
+            includes = ["../../include"],
+            strip_include_prefix = "../../include",
+            visibility = ["//visibility:public"],
+        )
+        ```
+
+   7. Create Bazel documentation:  
+        Create ~/fmt_project/support/bazel/README.md:
+        ```
+        # Bazel support
+
+        To get [Bazel](https://bazel.build/) working with {fmt} you can copy the files `BUILD.bazel`, 
+        `MODULE.bazel`, `WORKSPACE.bazel`, and `.bazelversion` from this folder (`support/bazel`) to the root folder of this project. 
+        This way {fmt} gets bazelized and can be used with Bazel (e.g. doing a `bazel build //...` on {fmt}). 
+
+        ## Using {fmt} as a dependency
+
+        ### Using Bzlmod
+
+        The [Bazel Central Registry](https://github.com/bazelbuild/bazel-central-registry/tree/main/modules/fmt) provides support for {fmt}.
+
+        For instance, to use {fmt} add to your `MODULE.bazel` file:
+
+        ```
+        bazel_dep(name = "fmt", version = "11.1.4")
+        ```
+
+        ### Live at head
+
+        For a live-at-head approach, you can copy the contents of this repository and move the Bazel-related build files to the root folder of this project as described above and make use of `local_path_override`, e.g.:
+
+        ```
+        local_path_override(
+            module_name = "fmt",
+            path = "../third_party/fmt",
+        )
+        ```
+        ```
+
+   8. Copy Bazel files to root directory:  
+        `cp support/bazel/.bazelversion .`  
+        `cp support/bazel/WORKSPACE.bazel WORKSPACE`  
+        `cp support/bazel/MODULE.bazel .`  
+        `cp support/bazel/BUILD.bazel .`
+
+   9. Configure traditional build:  
+        `mkdir build && cd build`  
+        `cmake .. -DCMAKE_BUILD_TYPE=Release -DFMT_TEST=ON -DFMT_DOC=ON -DFMT_PEDANTIC=ON -DFMT_WERROR=ON`
+
+   10. Build library and tests:  
+        `cmake --build . --parallel`
+
+   11. Run verification tests:  
+        `ctest -V --output-on-failure`
+
+   12. Build documentation:  
+        `cmake --build . --target doc`  
+        Verify material theme integration and custom assets
+
+   13. Configure module build:  
+        `cd .. && mkdir build-module && cd build-module`  
+        `cmake .. -DCMAKE_BUILD_TYPE=Release -DFMT_MODULE=ON`
+
+   14. Build module library:  
+        `cmake --build . --parallel`
+
+   15. Install library and verify package files:  
+        `cmake --install . --prefix ~/fmt-install`  
+        `Verify fmt-config.cmake and fmt.pc generation in ~/fmt-install/lib/pkgconfig directory`  
+        `export PKG_CONFIG_PATH=~/fmt-install/lib/pkgconfig`  
+        `pkg-config --modversion fmt` (confirm version output)  
+        `pkg-config --cflags fmt` (verify include paths)  
+        `pkg-config --libs fmt` (verify linking flags)
+
+   16. Create sample application:  
+        Create ~/fmt_project/main.cpp with content from README examples  
+        Create CMakeLists.txt linking to fmt::fmt or fmt::fmt-header-only
+
+   17. Build sample app:  
+        `cmake -S . -B build -DCMAKE_PREFIX_PATH=~/fmt/build`  
+        `cmake --build build`
+
+   18. Verify output:  
+        Run built sample app and confirm expected output formats
+
+   19. Test header-only mode:  
+        Use `target_link_libraries(<target> PRIVATE fmt::fmt-header-only)` in CMake  
+        Rebuild and verify functionality
+
+   20. Test module usage:  
+        Add C++20 module import statements to sample app  
+        Build against module-enabled installation
+
+   21. Configure CI pipelines:  
+        Create ~/fmt_project/.github/workflows/linux.yml  
+        Create ~/fmt_project/.github/workflows/macos.yml with provided matrix strategy (macOS 13-14, std=11/17/20/23)  
+        Create ~/fmt_project/.github/workflows/windows.yml with Windows SDK validation  
+        Create ~/fmt_project/.github/workflows/module.yml  
+        Create ~/fmt_project/.github/workflows/cifuzz.yml  
+        Create ~/fmt_project/.github/workflows/lint.yml  
+        Create ~/fmt_project/.github/workflows/doc.yml  
+        Create ~/fmt_project/.github/workflows/scorecard.yml  
+        Create ~/fmt_project/.github/workflows/android.yml  
+        Create ~/fmt_project/.github/workflows/bazel.yml (ensure root-level MODULE.bazel and WORKSPACE integration)  
+        Add pkg-config validation step to relevant workflows
+
+   22. Performance validation:  
+        `git clone https://github.com/fmtlib/format-benchmark`  
+        `cd format-benchmark && cmake . && make speed-test`
+
+   23. Security compliance:  
+        Verify OSS-Fuzz integration  
+        Run static analysis with pedantic flags  
+        Verify Dependabot configuration  
+        Confirm all CI workflows execute successfully (including Windows SDK validation)  
+        Validate SCORECARD_TOKEN secret configuration  
+        Validate Werror enforcement in CI builds  
+        Verify KEY secret for documentation deployment  
+        Check hidden symbol visibility configurations  
+        Verify Scorecard SARIF results upload  
+        Confirm scheduled security analysis execution  
+        Validate Android AAR packaging  
+        Verify mkdocs.yml configuration  
+        Confirm Bazel CI workflow executes successfully (including module dependency and workspace configuration validation)  
+        Validate fmt-config.cmake and fmt.pc template processing in CI builds  
+        Test pkg-config file functionality across platforms
+
+   24. Fuzzing tests (local validation):  
+        `mkdir build-fuzz && cd build-fuzz`  
+        `cmake .. -DFMT_FUZZ=ON -DFMT_FUZZ_LINKMAIN=ON`  
+        `cmake --build . --target fmt_fuzzer`
+
+   25. Linting verification (CI simulation):  
+        `wget https://apt.llvm.org/llvm.sh`  
+        `sudo bash ./llvm.sh 17`  
+        `sudo apt install clang-format-17`  
+        `find include src -name '*.h' -o -name '*.cc' | xargs clang-format-17 -i -style=file -fallback-style=none`  
+        `git diff --exit-code`
+
+   26. Timezone configuration test:  
+        - On Ubuntu: `sudo timedatectl set-timezone 'Europe/Kyiv'`  
+        - On macOS: `sudo systemsetup -settimezone 'Europe/Kyiv'`  
+        - On Windows: `tzutil /s "FLE Standard Time"`
+        Rebuild and verify locale-sensitive formatting  
+        Repeat for Europe/Minsk:
+            - On Ubuntu: `sudo timedatectl set-timezone 'Europe/Minsk'`
+            - On macOS: `sudo systemsetup -settimezone 'Europe/Minsk'`
+            - On Windows: `tzutil /s "Belarus Standard Time"`
+
+   27. Shared library build test:  
+        `mkdir build-shared && cd build-shared`  
+        `cmake .. -DBUILD_SHARED_LIBS=ON`  
+        `cmake --build . --parallel`  
+        Verify dynamic linking functionality
+
+   28. Hidden visibility build test:  
+        `mkdir build-hidden && cd build-hidden`  
+        `cmake .. -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DCMAKE_VISIBILITY_INLINES_HIDDEN=ON`  
+        `cmake --build . --parallel`  
+        Verify symbol visibility in compiled binaries
+
+   29. Create AndroidManifest.xml:  
+        Create ~/fmt_project/support/AndroidManifest.xml:
+        <?xml version="1.0" encoding="utf-8"?>
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+            package="org.fmt">
+        </manifest>
+
+   30. Set up mkdocs.yml:  
+        Create ~/fmt_project/support/mkdocs.yml with provided theme/javascript configuration
+
+   31. Set up Gradle wrapper:  
+        `cd support`  
+        `gradle wrapper --gradle-version 6.8`
+
+   32. Build Android shared library and AAR:  
+        `cd support`  
+        `./gradlew assembleRelease`  
+        Verify output in ${rootDir}/libs/release (armeabi-v7a, arm64-v8a, x86_64 libfmt.so) and ${rootDir}/libs/fmt-release.aar
+
+   33. Configure Android test application:  
+        Create ~/fmt_project/test/android_test_app/jni/Application.mk:
+          APP_ABI := armeabi-v7a arm64-v8a x86_64
+          APP_PLATFORM := android-21
+          APP_STL := c++_shared
+        Create ~/fmt_project/test/android_test_app/jni/Android.mk:
+          LOCAL_PATH := $(call my-dir)
+          include $(CLEAR_VARS)
+          LOCAL_MODULE := fmt
+          LOCAL_SRC_FILES := ../../../libs/release/$(TARGET_ARCH_ABI)/libfmt.so
+          include $(PREBUILT_SHARED_LIBRARY)
+          include $(CLEAR_VARS)
+          LOCAL_MODULE := android_test_app
+          LOCAL_SRC_FILES := main.cpp
+          LOCAL_SHARED_LIBRARIES := fmt
+          include $(BUILD_SHARED_LIBRARY)
+
+   34. Build and run Android test app:  
+        `cd test/android_test_app`  
+        `ndk-build NDK_PROJECT_PATH=.`  
+        Deploy and verify shared library integration
+
+   35. Scorecard workflow validation:  
+        Trigger manual workflow run for scorecard.yml  
+        Verify SARIF artifact generation and code scanning dashboard integration  
+        Confirm OpenSSF results publication
+
+   36. Documentation theme verification:  
+        Inspect built documentation for material theme features  
+        Confirm custom JavaScript/CSS integration  
+        Validate navigation structure
+
+   37. Android integration verification:  
+        Check AAR file structure and contents  
+        Validate shared library loading in test application  
+        Confirm formatted output correctness
+
+   38. Vagrant virtualization test:  
+        `cd support`  
+        `vagrant up`  
+        `vagrant ssh -c "cd /fmt_project && mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release -DFMT_TEST=ON && cmake --build . --parallel && ctest"`  
+        Verify build output
+
+   39. Bazel build and test execution:  
+        `cd ~/fmt_project`  
+        `bazel test //...`  
+        Verify library builds under Bazel 8.1.1 with root-level configuration files  
+        Confirm Windows UTF-8 flag application  
+        Validate Bazel file copy operations  
+        Test module dependency resolution
+
+   40. pkg-config integration test:  
+        Create test application using pkg-config:  
+          `echo '#include <fmt/core.h>' > pkgtest.cpp`  
+          `echo 'int main() { fmt::print("pkg-config test\\n"); }' >> pkgtest.cpp`  
+        Compile with:  
+          `g++ pkgtest.cpp -o pkgtest $(pkg-config --cflags --libs fmt)`  
+        Run executable and verify output
+
+   41. Windows SDK validation:  
+        On Windows:  
+        `cmake -P support/cmake/FindSetEnv.cmake -DPRINT_PATH=ON`  
+        Verify SetEnv.cmd path output in build logs  
+        Confirm successful execution in CI workflows  
+        Validate fmt-config.cmake template functionality in package configuration

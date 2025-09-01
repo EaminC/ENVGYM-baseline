@@ -1,0 +1,166 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: 
+   - Git
+   - Python 3.7.x
+   - Virtual environment package (python3-venv)
+   - Dependencies from requirements.txt (z3-solver, tensorflow-cpu==2.5.0, aif360)  # GPU-less version
+   - Adult Census Income dataset (via repository clone)
+   - Bank Marketing dataset (via repository clone)
+   - German Credit dataset (via repository clone)
+
+2. FILES TO CREATE: 
+   - None
+
+3. NECESSARY TEST CASES IN THE CODEBASE: 
+   - Verify virtual environment activation
+   - Test package installation completeness (z3-solver, tensorflow-cpu==2.5.0, aif360)  # Updated package
+   - Check Python version compatibility
+   - Validate repository structure post-clone
+   - Verify critical dependency functionality
+   - Confirm presence of experiment directories (src/, stress/, relaxed/, targeted/, targeted2/)
+   - Verify output directory structure for experiments (relaxed/AC/res, relaxed/BM/res, relaxed/GC/res, src/AC/res-race, src/AC/res-sex, src/BM/res, src/GC/res-sex, stress/AC/res, stress/BM/res, stress/GC/res, targeted/AC/res, targeted/BM/res, targeted/GC/res, targeted2/AC/res, targeted2/BM/res, targeted2/GC/res)
+   - Verify CSV output generation in experiment directories including src/AC/res-race, src/AC/res-sex, src/BM/res, src/GC/res-sex, stress/AC/res, stress/BM/res, stress/GC/res, targeted/AC/res, targeted/BM/res, targeted/GC/res, targeted2/AC/res, targeted2/BM/res, targeted2/GC/res
+   - Verify executability of Fairify scripts
+   - Test script execution flow for multiple datasets (GC, Adult, Bank)
+   - Validate Adult dataset structure (adult.data, adult.test, adult.names)
+   - Validate Bank dataset structure (bank-additional-full.csv, bank-additional-names.txt)
+   - Validate German dataset structure (german.data, german.doc)
+   - Verify dataset preprocessing compatibility
+   - Verify CSV output location matches directory documentation across all output paths
+   - Validate res-race/res-sex directory documentation content
+   - Verify src/BM/res directory documentation content
+   - Verify src/GC/res-sex directory documentation content
+   - Verify stress/AC/res directory documentation content
+   - Verify stress/BM/res directory documentation content
+   - Verify stress/GC/res directory documentation content
+   - Verify targeted/AC/res directory documentation content
+   - Verify targeted/BM/res directory documentation content
+   - Verify targeted/GC/res directory documentation content
+   - Verify targeted2/AC/res directory documentation content
+   - Verify targeted2/BM/res directory documentation content
+   - Verify targeted2/GC/res directory documentation content
+
+4. COMPLETE TODO LIST: 
+   - Install Git: `sudo apt-get install git -y`  # Added -y for non-interactive
+     Verification: `git --version`
+   - Install Python 3.7: `sudo apt-get install python3.7 python3.7-venv -y`
+     Verification: `python3.7 --version`
+   - Prepare working directory: 
+        `mkdir -p /home/cc/EnvGym/data/Fairify`
+        `cd /home/cc/EnvGym/data/Fairify`
+   - Clone repository directly: `git clone https://github.com/sumonbis/Fairify .`  # Cloned into target dir
+     Verification: `ls data` shows adult/, bank/, german/
+   - Modify requirements.txt for CPU: 
+        `sed -i 's/tensorflow==2.5.0/tensorflow-cpu==2.5.0/' requirements.txt`  # Force CPU version
+   - Verify output directories: 
+        `ls src/AC/res-race/readme.md src/AC/res-sex/readme.md src/BM/res/readme.md src/GC/res-sex/readme.md stress/AC/res/readme.md stress/BM/res/readme.md stress/GC/res/readme.md targeted/AC/res/readme.md targeted/BM/res/readme.md targeted/GC/res/readme.md targeted2/AC/res/readme.md targeted2/BM/res/readme.md targeted2/GC/res/readme.md`
+     Verification: All files exist
+   - Verify experiment output directories: 
+        `ls relaxed/AC/res/readme.md relaxed/BM/res/readme.md relaxed/GC/res/readme.md stress/AC/res/readme.md stress/BM/res/readme.md stress/GC/res/readme.md targeted/AC/res/readme.md targeted/BM/res/readme.md targeted/GC/res/readme.md targeted2/AC/res/readme.md targeted2/BM/res/readme.md targeted2/GC/res/readme.md`
+     Verification: All files exist
+   - Set execute permissions: 
+        `chmod +x src/fairify.sh stress/fairify-stress.sh relaxed/fairify-relaxed.sh targeted/fairify-targeted.sh targeted2/fairify-targeted.sh`
+     Verification: `ls -l targeted2/fairify-targeted.sh` shows executable flag
+   - Create virtual environment: `python3.7 -m venv fenv`
+     Verification: `ls fenv` shows bin/include/lib folders
+   - Activate environment: `source fenv/bin/activate`  # Assuming Linux base
+     Verification: Prompt shows `(fenv)` prefix
+   - Update pip: `python3 -m pip install --upgrade pip`
+     Verification: `pip --version` shows latest version
+   - Install requirements: `pip install -r requirements.txt`  # Now installs CPU version
+     Verification: `pip list` shows z3-solver==4.12.2.0, tensorflow-cpu==2.5.0, aif360
+   - Validate setup: 
+        Run: `python -c "import tensorflow as tf; print(tf.__version__)"`
+        Verification: Outputs "2.5.0"
+        Run: `python -c "import z3"`
+        Verification: No error output
+        Run: `python -c "import aif360"`
+        Verification: No error output
+   - Verify Adult dataset integrity:
+        Run: `ls data/adult/adult.*` 
+        Verification: adult.data, adult.test, and adult.names exist
+   - Verify Bank dataset integrity:
+        Run: `ls data/bank/bank-additional-*` 
+        Verification: bank-additional-full.csv and bank-additional-names.txt exist
+   - Verify German dataset integrity:
+        Run: `ls data/german/german.*`
+        Verification: german.data and german.doc exist
+   - Verify output documentation: 
+        `grep "csv" src/AC/res-race/readme.md src/AC/res-sex/readme.md src/BM/res/readme.md src/GC/res-sex/readme.md stress/AC/res/readme.md stress/BM/res/readme.md stress/GC/res/readme.md targeted/AC/res/readme.md targeted/BM/res/readme.md targeted/GC/res/readme.md targeted2/AC/res/readme.md targeted2/BM/res/readme.md targeted2/GC/res/readme.md`
+     Verification: Output confirms CSV files are saved in all directories
+   - Validate output directory documentation:
+        Run: `grep "csv" relaxed/*/res/readme.md stress/*/res/readme.md targeted/*/res/readme.md targeted2/*/res/readme.md`
+        Verification: Output confirms CSV files are saved in respective res directories
+   - Verify experiment readiness for GC:
+        Run: `cd src && ./fairify.sh GC --dry-run && cd ..`
+        Verification: No execution errors
+   - Verify experiment readiness for Adult:
+        Run: `cd src && ./fairify.sh adult --dry-run && cd ..`
+        Verification: No execution errors
+   - Verify experiment readiness for Bank:
+        Run: `cd src && ./fairify.sh bank --dry-run && cd ..`
+        Verification: No execution errors
+   - Verify targeted experiment readiness for AC:
+        Run: `cd targeted && ./fairify-targeted.sh AC --dry-run && cd ..`
+        Verification: No execution errors
+   - Verify targeted experiment readiness for BM:
+        Run: `cd targeted && ./fairify-targeted.sh BM --dry-run && cd ..`
+        Verification: No execution errors
+   - Verify targeted experiment readiness for GC:
+        Run: `cd targeted && ./fairify-targeted.sh GC --dry-run && cd ..`
+        Verification: No execution errors
+   - Verify targeted2 experiment readiness for AC:
+        Run: `cd targeted2 && ./fairify-targeted.sh AC --dry-run && cd ..`
+        Verification: No execution errors
+   - Verify targeted2 experiment readiness for BM:
+        Run: `cd targeted2 && ./fairify-targeted.sh BM --dry-run && cd ..`
+        Verification: No execution errors
+   - Verify targeted2 experiment readiness for GC:
+        Run: `cd targeted2 && ./fairify-targeted.sh GC --dry-run && cd ..`
+        Verification: No execution errors
+   - Verify CSV output capability in directories:
+        Run: `cd src && ./fairify.sh adult && cd ..`
+        Verification: 
+            `ls src/AC/res-race/*.csv` shows generated CSV files
+            `ls src/AC/res-sex/*.csv` shows generated CSV files
+            `ls stress/AC/res/*.csv` shows generated CSV files
+        Run: `cd src && ./fairify.sh bank && cd ..`
+        Verification: 
+            `ls src/BM/res/*.csv` shows generated CSV files
+            `ls relaxed/BM/res/*.csv` shows generated CSV files
+            `ls stress/BM/res/*.csv` shows generated CSV files
+        Run: `cd src && ./fairify.sh GC && cd ..`
+        Verification: 
+            `ls src/GC/res-sex/*.csv` shows generated CSV files
+            `ls stress/GC/res/*.csv` shows generated CSV files
+   - Verify targeted experiment output for AC:
+        Run: `cd targeted && ./fairify-targeted.sh AC && cd ..`
+        Verification: `ls targeted/AC/res/*.csv` shows generated CSV files
+   - Verify targeted experiment output for BM:
+        Run: `cd targeted && ./fairify-targeted.sh BM && cd ..`
+        Verification: `ls targeted/BM/res/*.csv` shows generated CSV files
+   - Verify targeted experiment output for GC:
+        Run: `cd targeted && ./fairify-targeted.sh GC && cd ..`
+        Verification: `ls targeted/GC/res/*.csv` shows generated CSV files
+   - Verify targeted2 experiment output for AC:
+        Run: `cd targeted2 && ./fairify-targeted.sh AC && cd ..`
+        Verification: `ls targeted2/AC/res/*.csv` shows generated CSV files
+   - Verify targeted2 experiment output for BM:
+        Run: `cd targeted2 && ./fairify-targeted.sh BM && cd ..`
+        Verification: `ls targeted2/BM/res/*.csv` shows generated CSV files
+   - Verify targeted2 experiment output for GC:
+        Run: `cd targeted2 && ./fairify-targeted.sh GC && cd ..`
+        Verification: `ls targeted2/GC/res/*.csv` shows generated CSV files
+   - Deactivate environment: `deactivate`
+     Verification: `(fenv)` prefix disappears from prompt
+
+Key Adjustments:
+1. TensorFlow GPU → CPU: Explicitly modified requirements.txt to use tensorflow-cpu
+2. Path normalization: All operations anchored at /home/cc/EnvGym/data/Fairify
+3. Directory handling: Removed redundant cd Fairify after direct cloning into target directory
+4. Added directory navigation safety (&& cd ..) after script executions
+5. Simplified package installation with unified apt-get commands
+6. Added working directory preparation step
+7. Verified compatibility with Ubuntu/Debian base images via apt-get
+8. Confirmed x86_64 architecture compatibility through standard packages

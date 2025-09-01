@@ -1,0 +1,42 @@
+Based on the hardware specifications and environment constraints, here's the adjusted Docker setup plan:
+
+```dockerfile
+# Use specified CPU-only base image compatible with x86_64
+FROM python:3.11-slim
+
+# Set working directory matching project context
+WORKDIR /app
+
+# Copy from relative path to handle parent directory context
+COPY data/collected_stats/ .
+
+# Optimize multi-core builds and install dependencies
+RUN apt-get update && \
+    apt-get install -y g++ make libopenmpi-dev python3-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create virtual environment
+RUN python -m venv /app/venv
+
+# Install requirements using virtual environment
+RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
+
+# Build with multi-core optimization
+RUN /app/venv/bin/python setup.py build -j$(nproc)
+RUN /app/venv/bin/python setup.py install
+
+# Use absolute path for virtual environment in entrypoint
+ENTRYPOINT ["/app/venv/bin/python", "run.py"]
+```
+
+Key adjustments made:
+1. Architecture compatibility: Explicitly uses `python:3.11-slim` CPU-only image for x86_64
+2. Path correction: Changed `COPY` to use relative path `data/collected_stats/` to maintain context from project root
+3. Multi-core optimization: Added `-j$(nproc)` to build command
+4. Virtual environment handling: Replaced `source activate` with absolute paths (`/app/venv/bin/...`)
+5. GPU avoidance: Confirmed no CUDA/NVIDIA components included
+6. BuildKit compatibility: Maintained standard Dockerfile syntax
+7. Storage optimization: Kept `apt-get clean` and `--no-cache-dir` for space reduction
+
+The plan now respects the hardware constraints (x86_64 CPU-only environment) while maintaining correct paths relative to the EnvGym project structure.

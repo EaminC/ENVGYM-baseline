@@ -1,0 +1,124 @@
+Here's the adjusted environment setup plan based on your hardware specifications:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - cpp-httplib header (httplib.h) from GitHub repository
+   - OpenSSL v3.0+ libraries (libssl, libcrypto)
+   - Zlib library (if compression needed)
+   - Brotli library (if compression needed)
+   - Zstd library (if compression needed)
+   - C++11 compatible compiler (GCC/Clang)
+   - CMake 3.10+ (for build automation)
+   - Docker CE (already installed v28.1.1)
+   - Docker Compose Plugin (already installed v2.10+)
+   - Ubuntu-builder Docker image (yhirose4dockerhub/ubuntu-builder)
+
+2. FILES TO CREATE (relative to /home/cc/EnvGym/data/yhirose_cpp-httplib):
+   - include/httplib.h
+   - src/server.cpp
+   - src/client.cpp
+   - ssl/cert.pem
+   - ssl/key.pem
+   - CMakeLists.txt
+   - Dockerfile (with multi-stage build)
+   - .dockerignore (new addition)
+   - docker-compose.yml
+   - docker/main.cc
+   - docker/html/index.html
+   - www/index.html
+
+3. NECESSARY TEST CASES (no changes):
+   - [Same as original]
+
+4. ADJUSTED TODO LIST:
+1. Download httplib.h from GitHub
+   - Verify SHA256 checksum: 2a8be9e0b876d905d76d6af4a0d6cbb0e3da1d7c
+
+2. Install Linux dependencies ONLY:
+   - `sudo apt-get update && sudo apt-get install -y libssl-dev zlib1g-dev`
+
+3. Generate self-signed SSL certificate:
+   - `mkdir -p ssl && openssl req -x509 -newkey rsa:4096 -keyout ssl/key.pem -out ssl/cert.pem -days 365 -nodes`
+
+4. Create server.cpp with endpoints
+   - Implement GET /hi → "Hello World"
+   - Add POST /echo returning received data
+   - Implement static file serving at "/public" from "./www"
+   - Create www/index.html test content
+
+5. Create client.cpp with test requests
+   - Test against local development server
+   - Verify SSL custom CA bundle handling
+
+6. Configure CMakeLists.txt
+   - Set C++11 standard
+   - Add OpenSSL linking: `find_package(OpenSSL REQUIRED)`
+   - Include Linux-specific configurations only
+   - Create server/client build targets
+
+7. Build and test on Linux ONLY:
+   - `mkdir build && cd build && cmake .. && make`
+   - Test with GCC/Clang
+
+8. Implement verification tests:
+   - HTTP: `curl http://localhost:8080/hi`
+   - HTTPS: `curl -k https://localhost:8080/hi`
+   - Static files: `curl http://localhost:8080/public/index.html`
+
+9. Add compression support (optional):
+   - Enable CPPHTTPLIB_ZLIB_SUPPORT in CMake
+
+10. Configure IDE settings
+    - Set include path to project's include directory
+
+11. Create containerization files:
+    - Dockerfile (multi-stage build):
+      ```dockerfile
+      # Build stage
+      FROM ubuntu:20.04 AS builder
+      RUN apt-get update && apt-get install -y build-essential cmake libssl-dev zlib1g-dev
+      COPY . /app
+      WORKDIR /app/build
+      RUN cmake .. && make
+
+      # Runtime stage
+      FROM ubuntu:20.04
+      RUN apt-get update && apt-get install -y libssl3
+      COPY --from=builder /app/build/server /usr/local/bin/
+      COPY docker/html /html
+      EXPOSE 80
+      CMD ["server", "80", "/html"]
+      ```
+    - .dockerignore:
+      ```
+      build/
+      .git
+      *.o
+      *.a
+      ```
+    - docker-compose.yml (with volume mapping for live reload)
+
+12. Build and test containers:
+    - `docker build -t my-server .`
+    - `docker-compose up -d`
+    - Verify: `curl http://localhost:8080`
+
+13. Document configuration:
+    - Specify Linux-only instructions
+    - Note Docker pre-installed (v28.1.1)
+    - Include BuildKit optimization tips
+    - Document .dockerignore usage
+    - Add multi-stage build documentation
+
+Key adjustments made:
+- Removed macOS/Windows-specific instructions
+- Simplified dependency install to Linux-only (libssl-dev + zlib1g-dev)
+- Added .dockerignore for build context optimization
+- Implemented multi-stage Docker build
+- Removed CUDA-related considerations
+- Set Ubuntu 20.04 as base image in Dockerfile
+- Removed cross-platform build/test requirements
+- Updated paths relative to provided working directory
+- Leveraged existing Docker 28.1.1 with BuildKit support
+- Simplified SSL cert generation with directory creation

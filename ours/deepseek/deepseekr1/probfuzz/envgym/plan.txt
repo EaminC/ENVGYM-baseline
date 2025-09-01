@@ -1,0 +1,74 @@
+Based on the hardware specifications (x86_64, no GPU, Debian/Ubuntu base), here is the adjusted environment setup plan:
+
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: 
+   - Python 3.7 or higher
+   - Stan (via PyStan)
+   - Edward 1.3.5
+   - Pyro (PyTorch-based PPL)
+   - pip package manager
+   - Virtualenv (optional)
+   - Git (for repository cloning)
+   - Node.js (for grammar toolkit)
+   - Java Runtime Environment (for ANTLR)
+
+2. FILES TO CREATE: 
+   - requirements.txt in project root with content:
+        pystan==2.19.1.1
+        edward==1.3.5
+        pyro-ppl==1.8.0
+        torch==1.12.1+cpu  # CPU-specific build for x86_64
+        tensorflow-cpu==1.15.0  # CPU-only version
+        antlr4-python3-runtime==4.9.3
+   - environment.sh in project root with content:
+        #!/bin/bash
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install -r requirements.txt
+
+3. NECESSARY TEST CASES IN THE CODEBASE: 
+   - Grammar parsing test: Verify template hole filling
+   - Stan translation test: Validate generated model.stan syntax
+   - Edward execution test: Check parameter output format
+   - Pyro execution test: Validate *_w/*_v output patterns (ensure CPU execution)
+   - Differential testing: Cross-validate results across PPS
+   - Output directory structure verification
+   - Error handling for invalid distribution parameters
+
+4. COMPLETE TODO LIST: 
+   1. Install system dependencies:  
+        sudo apt update  
+        sudo apt install python3-pip python3-venv git nodejs default-jre  
+   2. Navigate to working directory and clone repository:  
+        cd /home/cc/EnvGym/data/probfuzz  
+        git clone https://github.com/.../probfuzz.git  
+        cd probfuzz  
+   3. Create virtual environment:  
+        chmod +x environment.sh  
+        ./environment.sh  
+   4. Verify Python version:  
+        python --version → Should show 3.7+  
+   5. Validate installations:  
+        python -c "import pystan, edward, pyro, torch, tensorflow; print('OK')"  
+   6. Run installation script:  
+        sudo ./install.sh → Verify "Install successful" output  
+   7. Execute smoke test:  
+        ./probfuzz.py 1  
+   8. Verify output structure:  
+        ls output/progs*/prob_rand_1 → Check for model.stan, edward_prog.py, pyro_prog.py  
+   9. Validate PPS outputs:  
+        Check pplout_* contains 'mean se_mean sd' tables  
+        Check edwardout_1 contains [float] arrays  
+        Check pyroout_1 contains '*_w'/'*_v' patterns  
+   10. Run comprehensive test:  
+        ./probfuzz.py 5 → Verify no errors in 30min runtime  
+
+Key adjustments made:
+1. TensorFlow changed to CPU-only version (`tensorflow-cpu==1.15.0`) to avoid GPU dependencies
+2. PyTorch specified with CPU build suffix (`torch==1.12.1+cpu`) for x86_64 compatibility
+3. Added explicit path for repository cloning (`/home/cc/EnvGym/data/probfuzz`)
+4. Installation validation includes TensorFlow and PyTorch imports
+5. Removed redundant pip install step (covered by environment.sh)
+6. All GPU-specific instructions eliminated per hardware constraints
+7. Verified Pyro test case explicitly checks CPU execution patterns

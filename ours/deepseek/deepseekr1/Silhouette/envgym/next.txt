@@ -1,0 +1,15 @@
+current progress
+The Dockerfile setup has progressed through several steps: installed required packages, created user and workspace, cloned the repository, downloaded VM image, set up Python virtual environment, and ran initial scripts (install_dep.sh and prepare.sh). The build failed at the md5 tool verification step due to a hash mismatch (actual output differed from expected "098f6bcd4621d373cade4e832627b4f6").
+
+next step
+Modify the md5 test command to use `head -c 32` for hash extraction instead of `tr -d '\n'`, ensuring consistent hash format handling. Update the Dockerfile test step to:  
+```bash
+RUN cd md5 && \\
+    [ -f ./md5 ] && \\
+    chmod +x md5 && \\
+    echo "=== Testing md5 binary ===" && \\
+    ACTUAL_HASH=$(printf "test" | ./md5 | head -c 32) && \\
+    echo "Expected: 098f6bcd4621d373cade4e832627b4f6" && \\
+    echo "Actual: '$ACTUAL_HASH'" && \\
+    [ "$ACTUAL_HASH" = "098f6bcd4621d373cade4e832627b4f6" ]
+```

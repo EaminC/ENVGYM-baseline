@@ -1,0 +1,96 @@
+Based on the provided hardware details (x86_64 architecture, Linux base image, no GPU, ample storage), I've made the following adjustments to the environment setup plan:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. **SYSTEM DEPENDENCIES INSTALLATION** (Added for cross-compilation):
+   ```bash
+   sudo apt-get update
+   sudo apt-get install -y git gcc-i686-linux-gnu gcc-arm-linux-gnueabihf gcc-powerpc-linux-gnu gcc-powerpc64-linux-gnu
+   ```
+
+2. **MODIFIED TODO LIST**:
+   1. Install rustup: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
+      - Verify: `rustc --version` (≥1.57)
+   2. Install specific nightly: `rustup toolchain install nightly-2024-09-15`
+      - Verify: `rustup toolchain list | grep nightly-2024-09-15`
+   3. Add targets: `rustup target add thumbv6m-none-eabi thumbv7m-none-eabi wasm32-unknown-unknown i686-unknown-linux-gnu armv7-unknown-linux-gnueabihf powerpc-unknown-linux-gnu powerpc64-unknown-linux-gnu wasm32-wasip1`
+      - Verify: `rustup target list | grep installed`
+   4. **SKIPPED**: Project creation (already exists at /home/cc/EnvGym/data/tokio-rs_bytes)
+   5. **MODIFIED**: Configure Cargo.toml (if not present):
+      ```bash
+      if [ ! -f Cargo.toml ]; then
+        echo '[dependencies]' > Cargo.toml
+        echo 'bytes = { version = "1.10.1", default-features = false }' >> Cargo.toml
+      fi
+      ```
+   6. **MODIFIED**: Create main.rs only if missing:
+      ```bash
+      mkdir -p src
+      [ -f src/main.rs ] || echo 'use bytes::{Bytes, BytesMut, Buf, BufMut};' > src/main.rs
+      ```
+   7. Build standard config: `cargo build`
+      - Verify exit code 0
+   8. **MODIFIED**: Test Serde feature without editing manifest:
+      ```bash
+      cargo test --features serde
+      ```
+   9. Create no_std test: 
+      `mkdir -p tests && echo '#![no_std]' > tests/no_std_test.rs`
+   10. Build no_std target:
+        `cargo build --no-default-features --target thumbv7m-none-eabi`
+   11. **MODIFIED**: Test extra-platforms without manifest edit:
+        ```bash
+        cargo build --target thumbv6m-none-eabi --no-default-features --features extra-platforms
+        ```
+   12. Build docs:
+        `RUSTDOCFLAGS="--cfg docsrs" cargo +nightly-2024-09-15 doc --all-features`
+   13. Configure CI:
+        `mkdir -p .github/workflows && cat > .github/workflows/ci.yml <<'EOF' ...` (paste provided content)
+   14. Install cargo-hack: `cargo install cargo-hack`
+   15. Formatting check: `cargo fmt --all --check`
+   16. Minrust check: `cargo hack check --feature-powerset --optional-deps --rust-version`
+   17. **MODIFIED**: Cross-platform tests (use native first):
+        ```bash
+        cargo test  # Native (x86_64)
+        cargo test --target i686-unknown-linux-gnu
+        cargo test --target armv7-unknown-linux-gnueabihf
+        ```
+   18. **ADJUSTED**: Loom concurrency tests (skip GPU-specific checks):
+        ```bash
+        echo '[target."cfg(loom)".dev-dependencies]' >> Cargo.toml
+        echo 'loom = "0.7"' >> Cargo.toml
+        RUSTFLAGS="--cfg loom -Dwarnings" cargo +nightly-2024-09-15 test --lib
+        ```
+   19. Sanitizer tests (TSAN only - no GPU):
+        `./ci/tsan.sh`
+   20. Miri tests: `./ci/miri.sh`
+   21. Panic=abort tests: `./ci/panic-abort.sh`
+   22. Full CI simulation (skip GPU tests):
+        `for test in stable no-std tsan miri loom; do ./ci/$test.sh; done`
+
+3. **PATH ADJUSTMENTS** (All operations use absolute path):
+   ```bash
+   cd /home/cc/EnvGym/data/tokio-rs_bytes
+   # All subsequent commands run in this directory
+   ```
+
+4. **STORAGE OPTIMIZATION** (Added cleanup):
+   ```bash
+   cargo clean
+   rm -rf target/*/release
+   ```
+
+Key adjustments made:
+1. Added system package installation for cross-compilation support
+2. Removed redundant project creation (existing directory used)
+3. Added conditional file operations to prevent overwrites
+4. Replaced manifest edits with CLI feature flags for safer testing
+5. Prioritized native (x86_64) tests first
+6. Added GPU-irrelevant test exclusions
+7. Explicit absolute path usage
+8. Added storage cleanup steps
+9. Skipped macOS/Windows cross-tests (focus on Linux variants)
+10. Added condition checks for file modifications
+11. Optimized cross-test order based on native architecture
+
+All operations respect the x86_64 architecture, Linux environment, and 60.8GB storage constraints while maintaining the original testing scope.

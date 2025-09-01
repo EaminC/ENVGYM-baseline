@@ -1,0 +1,186 @@
+=== Docker Execution Log - 20250830_061307 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756534385
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.60kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/25] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0
+#4 DONE 0.0s
+
+#5 [ 6/25] RUN git submodule update --init
+#5 CACHED
+
+#6 [ 4/25] RUN git clone https://github.com/jqlang/jq.git /jq
+#6 CACHED
+
+#7 [ 9/25] WORKDIR /jq/vendor/decNumber
+#7 CACHED
+
+#8 [ 5/25] WORKDIR /jq
+#8 CACHED
+
+#9 [15/25] RUN make check 2>&1 | tee make_check.log || (cat tests/test-suite.log make_check.log && false)
+#9 CACHED
+
+#10 [ 7/25] WORKDIR /jq/docs
+#10 CACHED
+
+#11 [ 8/25] RUN pipenv sync
+#11 CACHED
+
+#12 [14/25] RUN make -j$(nproc)
+#12 CACHED
+
+#13 [ 2/25] RUN apt-get update &&     apt-get install -y     git     build-essential     automake     autoconf     libtool     bison     flex     pkg-config     python3     python3-pip     valgrind     rpm     && rm -rf /var/lib/apt/lists/*
+#13 CACHED
+
+#14 [ 3/25] RUN pip3 install pipenv
+#14 CACHED
+
+#15 [13/25] RUN ./configure --with-oniguruma=builtin --enable-docs
+#15 CACHED
+
+#16 [11/25] WORKDIR /jq
+#16 CACHED
+
+#17 [10/25] RUN gcc -O3 -o example1 example1.c decNumber.c decContext.c &&     ./example1 1.23 1.27 | grep "2.50"
+#17 CACHED
+
+#18 [12/25] RUN autoreconf -i
+#18 CACHED
+
+#19 [16/25] RUN make install
+#19 CACHED
+
+#20 [17/25] RUN ldconfig
+#20 DONE 0.2s
+
+#21 [18/25] RUN man -w jq >/dev/null && echo "Manpage verified"
+#21 0.306 Manpage verified
+#21 DONE 0.4s
+
+#22 [19/25] RUN pkg-config --libs --cflags libjq &&     echo -e '#include <jq.h>\n#include <stdio.h>\nint main() { jq_state *jq = jq_init(); if(jq) { printf("libjq initialized\\n"); jq_teardown(&jq); return 0; } else { return 1; } }' > test_libjq.c &&     gcc test_libjq.c -o test_libjq $(pkg-config --libs --cflags libjq) &&     ./test_libjq &&     rm test_libjq test_libjq.c
+#22 0.364 -I/usr/local/include -L/usr/local/lib -ljq
+#22 0.376 test_libjq.c:1:1: error: expected identifier or '(' before '-' token
+#22 0.376     1 | -e #include <jq.h>
+#22 0.376       | ^
+#22 0.376 test_libjq.c:1:4: error: stray '#' in program
+#22 0.376     1 | -e #include <jq.h>
+#22 0.376       |    ^
+#22 0.380 In file included from /usr/include/stdio.h:43,
+#22 0.380                  from test_libjq.c:2:
+#22 0.380 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:95:3: error: unknown type name 'size_t'
+#22 0.380    95 |   size_t __pad5;
+#22 0.380       |   ^~~~~~
+#22 0.380 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:98:67: error: 'size_t' undeclared here (not in a function)
+#22 0.380    98 |   char _unused2[15 * sizeof (int) - 4 * sizeof (void *) - sizeof (size_t)];
+#22 0.380       |                                                                   ^~~~~~
+#22 0.380 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:1:1: note: 'size_t' is defined in header '<stddef.h>'; did you forget to '#include <stddef.h>'?
+#22 0.380   +++ |+#include <stddef.h>
+#22 0.380     1 | /* Copyright (C) 1991-2022 Free Software Foundation, Inc.
+#22 0.380 In file included from test_libjq.c:2:
+#22 0.380 /usr/include/stdio.h:308:35: error: expected declaration specifiers or '...' before 'size_t'
+#22 0.380   308 | extern FILE *fmemopen (void *__s, size_t __len, const char *__modes)
+#22 0.380       |                                   ^~~~~~
+#22 0.380 /usr/include/stdio.h:314:47: error: expected declaration specifiers or '...' before 'size_t'
+#22 0.380   314 | extern FILE *open_memstream (char **__bufloc, size_t *__sizeloc) __THROW
+#22 0.380       |                                               ^~~~~~
+#22 0.380 /usr/include/stdio.h:333:34: error: expected declaration specifiers or '...' before 'size_t'
+#22 0.380   333 |                     int __modes, size_t __n) __THROW;
+#22 0.380       |                                  ^~~~~~
+#22 0.380 /usr/include/stdio.h:339:24: error: expected declaration specifiers or '...' before 'size_t'
+#22 0.380   339 |                        size_t __size) __THROW;
+#22 0.380       |                        ^~~~~~
+#22 0.381 /usr/include/stdio.h:378:44: error: expected declaration specifiers or '...' before 'size_t'
+#22 0.381   378 | extern int snprintf (char *__restrict __s, size_t __maxlen,
+#22 0.381       |                                            ^~~~~~
+#22 0.381 /usr/include/stdio.h:382:45: error: expected declaration specifiers or '...' before 'size_t'
+#22 0.381   382 | extern int vsnprintf (char *__restrict __s, size_t __maxlen,
+#22 0.381       |                                             ^~~~~~
+#22 0.382 In file included from test_libjq.c:2:
+#22 0.382 /usr/include/stdio.h:633:30: error: expected declaration specifiers or '...' before 'size_t'
+#22 0.382   633 |                              size_t *__restrict __n, int __delimiter,
+#22 0.382       |                              ^~~~~~
+#22 0.382 /usr/include/stdio.h:636:28: error: expected declaration specifiers or '...' before 'size_t'
+#22 0.382   636 |                            size_t *__restrict __n, int __delimiter,
+#22 0.382       |                            ^~~~~~
+#22 0.382 /usr/include/stdio.h:646:27: error: expected declaration specifiers or '...' before 'size_t'
+#22 0.382   646 |                           size_t *__restrict __n,
+#22 0.382       |                           ^~~~~~
+#22 0.382 /usr/include/stdio.h:675:15: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'fread'
+#22 0.382   675 | extern size_t fread (void *__restrict __ptr, size_t __size,
+#22 0.382       |               ^~~~~
+#22 0.383 /usr/include/stdio.h:681:15: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'fwrite'
+#22 0.383   681 | extern size_t fwrite (const void *__restrict __ptr, size_t __size,
+#22 0.383       |               ^~~~~~
+#22 0.383 /usr/include/stdio.h:702:15: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'fread_unlocked'
+#22 0.383   702 | extern size_t fread_unlocked (void *__restrict __ptr, size_t __size,
+#22 0.383       |               ^~~~~~~~~~~~~~
+#22 0.383 /usr/include/stdio.h:704:15: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'fwrite_unlocked'
+#22 0.383   704 | extern size_t fwrite_unlocked (const void *__restrict __ptr, size_t __size,
+#22 0.383       |               ^~~~~~~~~~~~~~~
+#22 0.383 test_libjq.c: In function 'main':
+#22 0.383 test_libjq.c:3:14: error: unknown type name 'jq_state'
+#22 0.383     3 | int main() { jq_state *jq = jq_init(); if(jq) { printf("libjq initialized\n"); jq_teardown(&jq); return 0; } else { return 1; } }
+#22 0.383       |              ^~~~~~~~
+#22 0.384 test_libjq.c:3:29: warning: implicit declaration of function 'jq_init' [-Wimplicit-function-declaration]
+#22 0.384     3 | int main() { jq_state *jq = jq_init(); if(jq) { printf("libjq initialized\n"); jq_teardown(&jq); return 0; } else { return 1; } }
+#22 0.384       |                             ^~~~~~~
+#22 0.384 test_libjq.c:3:29: warning: initialization of 'int *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+#22 0.384 test_libjq.c:3:80: warning: implicit declaration of function 'jq_teardown' [-Wimplicit-function-declaration]
+#22 0.384     3 | int main() { jq_state *jq = jq_init(); if(jq) { printf("libjq initialized\n"); jq_teardown(&jq); return 0; } else { return 1; } }
+#22 0.384       |                                                                                ^~~~~~~~~~~
+#22 ERROR: process "/bin/sh -c pkg-config --libs --cflags libjq &&     echo -e '#include <jq.h>\\n#include <stdio.h>\\nint main() { jq_state *jq = jq_init(); if(jq) { printf(\"libjq initialized\\\\n\"); jq_teardown(&jq); return 0; } else { return 1; } }' > test_libjq.c &&     gcc test_libjq.c -o test_libjq $(pkg-config --libs --cflags libjq) &&     ./test_libjq &&     rm test_libjq test_libjq.c" did not complete successfully: exit code: 1
+------
+ > [19/25] RUN pkg-config --libs --cflags libjq &&     echo -e '#include <jq.h>\n#include <stdio.h>\nint main() { jq_state *jq = jq_init(); if(jq) { printf("libjq initialized\\n"); jq_teardown(&jq); return 0; } else { return 1; } }' > test_libjq.c &&     gcc test_libjq.c -o test_libjq $(pkg-config --libs --cflags libjq) &&     ./test_libjq &&     rm test_libjq test_libjq.c:
+0.383 test_libjq.c:3:14: error: unknown type name 'jq_state'
+0.383     3 | int main() { jq_state *jq = jq_init(); if(jq) { printf("libjq initialized\n"); jq_teardown(&jq); return 0; } else { return 1; } }
+0.383       |              ^~~~~~~~
+0.384 test_libjq.c:3:29: warning: implicit declaration of function 'jq_init' [-Wimplicit-function-declaration]
+0.384     3 | int main() { jq_state *jq = jq_init(); if(jq) { printf("libjq initialized\n"); jq_teardown(&jq); return 0; } else { return 1; } }
+0.384       |                             ^~~~~~~
+0.384 test_libjq.c:3:29: warning: initialization of 'int *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+0.384 test_libjq.c:3:80: warning: implicit declaration of function 'jq_teardown' [-Wimplicit-function-declaration]
+0.384     3 | int main() { jq_state *jq = jq_init(); if(jq) { printf("libjq initialized\n"); jq_teardown(&jq); return 0; } else { return 1; } }
+0.384       |                                                                                ^~~~~~~~~~~
+------
+envgym.dockerfile:45
+--------------------
+  44 |     ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+  45 | >>> RUN pkg-config --libs --cflags libjq && \
+  46 | >>>     echo -e '#include <jq.h>\n#include <stdio.h>\nint main() { jq_state *jq = jq_init(); if(jq) { printf("libjq initialized\\n"); jq_teardown(&jq); return 0; } else { return 1; } }' > test_libjq.c && \
+  47 | >>>     gcc test_libjq.c -o test_libjq $(pkg-config --libs --cflags libjq) && \
+  48 | >>>     ./test_libjq && \
+  49 | >>>     rm test_libjq test_libjq.c
+  50 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c pkg-config --libs --cflags libjq &&     echo -e '#include <jq.h>\\n#include <stdio.h>\\nint main() { jq_state *jq = jq_init(); if(jq) { printf(\"libjq initialized\\\\n\"); jq_teardown(&jq); return 0; } else { return 1; } }' > test_libjq.c &&     gcc test_libjq.c -o test_libjq $(pkg-config --libs --cflags libjq) &&     ./test_libjq &&     rm test_libjq test_libjq.c" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

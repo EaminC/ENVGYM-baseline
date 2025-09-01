@@ -1,0 +1,84 @@
+Based on the hardware constraints (no NVIDIA GPU, CPU-only environment), here's the adjusted environment setup plan:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: 
+   - Miniconda (Python 3.6 environment manager)
+   - PyTorch 1.6.0 **CPU version**
+   - torchvision 0.7.0 **CPU version**
+   - matplotlib
+   - scipy 1.5.2
+   - pycocotools (GitHub source)
+   - RelTR pretrained models (Visual Genome and OpenImages V6)
+   - Visual Genome images Part1/Part2
+   - Visual Genome annotations (COCO format)
+   - Open Images V6 annotations (oidv6 CSV files)
+   - Open Images V6 images (Rongjie Li version)
+   - Processed Open Images annotations (optional alternative)
+   - Cython
+   - numpy
+
+2. FILES TO CREATE: 
+   - .gitignore in root directory with specified patterns
+   - data/vg/ directory with rel.json, test.json, train.json, val.json, images/
+   - data/oi/ directory with rel.json, test.json, train.json, val.json, images/
+   - ckpt/ directory for pretrained models
+   - data/oi/raw_annotations/ for Open Images CSV files
+   - Modified data/process.py with updated paths
+   - Compiled bbox_cython module in lib/fpn/box_intersections_cpu/
+
+3. NECESSARY TEST CASES IN THE CODEBASE: 
+   - **CPU-only inference test**: Verify image processing without CUDA
+   - Training smoke test: Single-epoch training on small dataset subset **using CPU**
+   - Evaluation test: Metrics calculation on validation set **without GPU**
+   - Data loading test: Verify dataset parsing
+   - Model loading test: Check pretrained weights integration **with CPU mapping**
+   - Open Images processing test
+   - Cython module test
+   - Git ignore test
+
+4. COMPLETE TODO LIST: 
+   - Create .gitignore: `echo -e "ckpt/\n*.json\n.idea/\n__pycache__/" > .gitignore`
+   - Install system dependencies: `sudo apt-get update && sudo apt-get install -y build-essential wget`
+   - Install Miniconda: `wget https://repo.anaconda.com/miniconda/Miniconda3-py36_4.10.3-Linux-x86_64.sh && bash Miniconda3-py36_4.10.3-Linux-x86_64.sh -b`
+   - Initialize conda: `eval "$(/home/$USER/miniconda3/bin/conda shell.bash hook)"`
+   - Create environment: `conda create -n reltr python=3.6 -y`
+   - Activate environment: `conda activate reltr`
+   - **Install CPU-only PyTorch**: `conda install pytorch==1.6.0 torchvision==0.7.0 cpuonly -c pytorch`
+   - Install matplotlib: `conda install matplotlib`
+   - Install scipy: `conda install scipy=1.5.2`
+   - Install pycocotools: `pip install -U 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'`
+   - Install Cython and numpy: `pip install cython numpy`
+   - Verify CPU installations: `python -c "import torch; print(torch.__version__); assert not torch.cuda.is_available()"`
+   - Create dataset directories: `mkdir -p data/{vg,oi}/images data/oi/raw_annotations`
+   - Download VG images:
+     - `wget https://cs.stanford.edu/people/rak248/VG_100K_2/images.zip`
+     - `wget https://cs.stanford.edu/people/rak248/VG_100K_2/images2.zip`
+     - Unzip to `data/vg/images/`
+   - Download VG annotations:
+     - `gdown https://drive.google.com/uc?id=1aGwEu392DiECGdvwaYr-LgqGLmWhn8yD`
+     - Unzip to `data/vg/`
+   - Download Open Images V6 annotations to `data/oi/raw_annotations/`
+   - Process Open Images:
+     - Update paths in `data/process.py` to use CPU-compatible operations
+     - Run `python data/process.py`
+   - Move processed OI data to appropriate directories
+   - Download pretrained models to ckpt/ **with CPU mapping**
+   - Compile CPU-only components:
+     - `cd lib/fpn && sh make.sh`
+     - `cd box_intersections_cpu && python setup.py build_ext --inplace`
+   - **Test CPU inference**: `python inference.py --img_path demo/vg1.jpg --resume ckpt/checkpoint0149.pth --device cpu`
+   - **Test CPU training**: `python main.py --dataset vg --img_folder data/vg/images/ --ann_path data/vg/ --batch_size 1 --epochs 1 --output_dir test_train --device cpu`
+   - **Test CPU evaluation**: `python main.py --dataset vg --img_folder data/vg/images/ --ann_path data/vg/ --eval --batch_size 1 --resume ckpt/checkpoint0149.pth --device cpu`
+
+Key Adjustments:
+1. Removed all CUDA/CUDNN dependencies
+2. Replaced GPU-specific PyTorch with CPU-only version
+3. Added explicit `--device cpu` flags to all test commands
+4. Added system dependency installation for build tools
+5. Removed GCC compiler download (covered by build-essential)
+6. Added CPU availability check in verification step
+7. Simplified distributed training call (removed unnecessary GPU flags)
+8. Added model loading with explicit CPU mapping
+9. Removed NVIDIA-specific components like `--gpus` flag and CUDA base images
+10. Optimized for high-core parallelism through CPU-only batch processing

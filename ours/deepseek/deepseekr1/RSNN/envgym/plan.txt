@@ -1,0 +1,54 @@
+Based on the hardware information provided, here's the adjusted environment setup plan:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.10.12
+   - Git (for cloning repository if not already present)
+   - Required Python packages from requirements.txt: numpy, torch, scipy, matplotlib, seaborn, h5py, soundfile, tables, torchaudio, torchvision, tonic, xlsxwriter, hydra-core, neurobench, pandas, snntorch, omegaconf, KDEpy
+   - GitHub packages: stork@40c68fe, randman (latest)
+
+2. FILES TO CREATE:
+   - /conf/config.yaml: Set hydra.run.dir to /home/cc/EnvGym/data/RSNN/output
+   - /conf/data/data-default.yaml: Configure data_dir to /home/cc/EnvGym/data/RSNN/datasets
+   - environment_validation.py: Script to verify environment setup (CPU-specific)
+
+3. NECESSARY TEST CASES:
+   - Package version validation test
+   - CPU utilization test (multi-core)
+   - Model loading test for both bigRSNN and tinyRSNN
+   - Data loader integrity test
+   - Forward pass execution test
+   - Audio processing stack test (torchaudio/soundfile)
+   - HDF5 data handling test (h5py/tables)
+   - Visualization library test (matplotlib/seaborn)
+
+4. COMPLETE TODO LIST:
+   - Install Python 3.10.12 using pyenv or official installer
+   - Verify Python version: `python --version`
+   - Create virtual environment: `python -m venv snn_env`
+   - Activate environment: `source snn_env/bin/activate`
+   - Install CPU-only PyTorch: `pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu`
+   - Install requirements: `pip install -r requirements.txt`
+   - Install GitHub packages:
+     - `pip install git+https://github.com/meistero/Stork.git@40c68fe`
+     - `pip install git+https://github.com/IGITUGraz/randman.git`
+   - Download dataset from Zenodo (records/583331) to /home/cc/EnvGym/data/RSNN/datasets
+   - Update configuration files with correct paths
+   - Create validation script environment_validation.py with CPU-specific tests
+   - Run validation tests: `python environment_validation.py`
+   - Execute small-scale test: `OMP_NUM_THREADS=96 python train-tinyRSNN.py seed=1 max_epochs=1`
+   - Verify neurobench installation: `python -c "import neurobench"`
+   - Confirm randman installation: `python -c "import randman"`
+
+Key adjustments made:
+- Removed all CUDA Toolkit and NVIDIA driver dependencies
+- Added CPU-only PyTorch installation
+- Specified full absolute paths for configuration files
+- Added OMP_NUM_THREADS=96 to leverage 96 logical cores
+- Replaced GPU test with CPU utilization test
+- Set default dataset location to /home/cc/EnvGym/data/RSNN/datasets
+- Set default output directory to /home/cc/EnvGym/data/RSNN/output
+- Confirmed x86_64 compatibility through standard Python packages
+- Removed GPU-specific validation cases
+- Optimized for CPU-only execution environment

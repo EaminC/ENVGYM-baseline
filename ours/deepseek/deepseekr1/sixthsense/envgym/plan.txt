@@ -1,0 +1,94 @@
+Based on the hardware specifications and Docker constraints, here's the adjusted environment setup plan:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. **DOWNLOADS NEEDED**:  
+   - Continuumio Miniconda3 base image (Python 3.7)  
+   - Dependencies from requirements.txt (scikit-learn, numpy, matplotlib, pandas, jsonpickle, nearpy, cleanlab)  
+   - Zenodo dataset via Dockerfile (https://zenodo.org/record/6388301)  
+   - Debian slim-based image (replaces Ubuntu 18.04 requirement)  
+
+2. **FILES TO CREATE**:  
+   - Directory: /app/plots (in-container)  
+   - Directory: /app/models (in-container)  
+   - Directory: /app/results (in-container)  
+   - Directory: /app/csvs (dataset location in-container)  
+   - Dockerfile with BuildKit optimizations  
+   - .dockerignore to exclude build context bloat  
+
+3. **NECESSARY TEST CASES**:  
+   - Cross-OS compatibility test: Verify Docker execution on Ubuntu/WSL/macOS hosts  
+   - Dependency test: Validate non-GPU versions of all libraries  
+   - Path validation test: Confirm in-container paths (/app prefix)  
+   - Layer caching test: Benchmark BuildKit cache efficiency  
+
+4. **COMPLETE TODO LIST**:  
+   ```dockerfile
+   # Dockerfile
+   # syntax=docker/dockerfile:1.4
+   FROM continuumio/miniconda3:4.7.12
+   WORKDIR /app
+   
+   # System dependencies with cache mount
+   RUN --mount=type=cache,target=/var/cache/apt \
+     apt-get update && \
+     apt-get install -y wget unzip && \
+     rm -rf /var/lib/apt/lists/*
+   
+   # Create directories
+   RUN mkdir -p plots models results csvs
+   
+   # Download datasets
+   RUN wget -O dataset.zip "https://zenodo.org/record/6388301/files/sixthsense-dataset-v2.0.zip?download=1" && \
+       unzip dataset.zip -d csvs/ && \
+       rm dataset.zip
+   
+   # Environment setup
+   RUN conda create -n ssense python=3.7 && \
+       echo "conda activate ssense" >> ~/.bashrc
+   ENV PATH /opt/conda/envs/ssense/bin:$PATH
+   
+   # Dependency installation with cache
+   COPY requirements.txt .
+   RUN --mount=type=cache,target=/root/.cache/pip \
+       pip install -r requirements.txt
+   
+   # Copy application files
+   COPY . .
+   ```
+   Build and execute workflow:  
+   ```bash
+   # Build with BuildKit
+   DOCKER_BUILDKIT=1 docker build -t ssense-env .
+   
+   # Run container with storage mapping
+   docker run -it --rm \
+     -v ./results:/app/results \
+     -v ./plots:/app/plots \
+     -v ./models:/app/models \
+     ssense-env bash
+   
+   # Execute inside container:
+   conda activate ssense
+   python train.py -f csvs/lrm_features.csv -l csvs/lrm_metrics.csv ... [original parameters]
+   
+   # Post-execution validation:
+   ls plots/ results/ models/
+   ```
+
+5. **KEY ADJUSTMENTS**:  
+   - Replaced Ubuntu 18.04 with Miniconda3 Debian slim image  
+   - All paths prefixed with /app for container isolation  
+   - GPU-related packages and CUDA references removed  
+   - Dataset download automated in Docker build stage  
+   - Persistent volumes mapped for output directories  
+   - BuildKit cache mounts for apt/pip dependencies  
+   - x86_64 compatibility enforced via base image  
+   - Environment activation embedded in image build  
+
+This plan maintains all original functionality while optimizing for:  
+- Non-GPU execution paths  
+- Efficient Docker layer caching  
+- Cross-host compatibility (Linux/macOS/WSL)  
+- Storage isolation via volume mapping  
+- Build context minimization via .dockerignore

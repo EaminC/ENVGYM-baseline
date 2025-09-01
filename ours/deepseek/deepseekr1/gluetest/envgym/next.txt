@@ -1,0 +1,4 @@
+current progress: Docker build failed during SDKMAN! and GraalVM installation step due to non-zero exit code (2) when executing SDKMAN! initialization and package installation commands.
+
+next step: Modify the problematic RUN command by wrapping it in a single bash shell invocation to ensure proper environment propagation:
+RUN bash -c 'source "$SDKMAN_DIR/bin/sdkman-init.sh" && sdk install java 23.0.1-graal && sdk install maven && $SDKMAN_DIR/candidates/java/current/bin/gu install python'

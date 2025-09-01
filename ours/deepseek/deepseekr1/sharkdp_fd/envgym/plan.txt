@@ -1,0 +1,91 @@
+Based on the provided hardware details (Linux/amd64, Docker available, no GPU), here is the adjusted environment setup plan:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:  
+   (All Linux/amd64 focused, remove Windows/macOS specifics)  
+   - Rust toolchain (rustc, cargo) version 1.64+  
+   - Git  
+   - fd binary package for Linux/amd64  
+   - Build tools: `build-essential pkg-config`  
+   - Hyperfine (benchmarking)  
+   - Test dependencies: `ripgrep unzip clang-format jq p7zip-full`  
+   - Cross-compilation tools: `gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf`  
+   - Rust components: `rustfmt clippy`  
+   - Docker (for cross-compilation via `cross`)  
+   - `cross` tool: `cargo install cross`  
+   - Dependencies: `home = "=0.5.9"`, `aho-corasick`, `anstream`, etc. (via Cargo.lock)
+
+2. FILES TO CREATE:  
+   (Unix paths only, remove Windows paths)  
+   - `~/.fdignore`  
+   - `~/.config/fd/ignore`  
+   - `test_env/` with sample files  
+   - `Cross.toml` (configured for aarch64 jemalloc)  
+   - Autocompletion files: `autocomplete/fd.{bash,fish}`, `autocomplete/_fd`  
+   - Debian packaging artifacts (Linux only)  
+
+3. NECESSARY TEST CASES:  
+   (Focus on Linux/amd64 and Docker cross-compilation)  
+   - All core functionality tests (search, ignore, filetypes)  
+   - Cross-compilation verification: `aarch64-unknown-linux-gnu/musl`  
+   - Docker-based builds using `cross`  
+   - Debian package creation  
+   - Cargo.lock integrity checks  
+   - Jemalloc allocator tests for Linux targets  
+   - MSRV tests (Rust 1.64)  
+   - Shell completion generation  
+
+4. ADJUSTED TODO LIST:  
+   1. Install Rust: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`  
+   2. Verify Rust: `rustc --version` (≥1.64)  
+   3. Add components: `rustup component add rustfmt clippy`  
+   4. Install dependencies:  
+      `sudo apt update && sudo apt install -y git build-essential pkg-config jq p7zip-full gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf`  
+   5. Clone repo: `git clone https://github.com/sharkdp/fd /home/cc/EnvGym/data/sharkdp_fd`  
+   6. Build: `cd /home/cc/EnvGym/data/sharkdp_fd && make`  
+   7. Verify Cargo.lock: `sha256sum Cargo.lock`  
+   8. Install globally: `sudo make install`  
+   9. Verify install: `fd --version`  
+   10. Check installed paths:  
+       - Binary: `/usr/local/bin/fd`  
+       - Completions: `/usr/local/share/bash-completion/completions/fd` etc.  
+       - Manpage: `/usr/local/share/man/man1/fd.1`  
+   11. Install cross: `cargo install cross`  
+   12. Configure cross: `echo '[target.aarch64-unknown-linux-gnu]' > Cross.toml`  
+       `echo 'env = { JEMALLOC_SYS_WITH_LG_PAGE = "16" }' >> Cross.toml`  
+   13. Cross-compile:  
+       `cross build --target aarch64-unknown-linux-gnu --release`  
+       `cross build --target aarch64-unknown-linux-musl --release`  
+   14. Create test env:  
+       `mkdir -p test_env/{hidden,ignored}`  
+       `touch test_env/{file1.txt,hidden/.file2,ignored/file3.log}`  
+       `echo "ignored/" > test_env/.gitignore`  
+   15-19. Run search tests (same as original)  
+   20. Configure global ignore:  
+       `mkdir -p ~/.config/fd && echo "*.log" > ~/.config/fd/ignore`  
+   21. Verify ignore: `fd file3 test_env` (no results)  
+   22. Run tests: `cargo test --locked --all`  
+   23. Check format: `cargo fmt -- --check`  
+   24. Run linter: `cargo clippy --all-targets --all-features -- -Dwarnings`  
+   25. Test MSRV:  
+       `rustup toolchain install 1.64 && cargo +1.64 test --locked`  
+   26. Install hyperfine: `cargo install hyperfine`  
+   27. Performance test:  
+       `mkdir -p bench/{1..1000} && touch bench/{1..1000}/file_{1..100}.txt`  
+       `hyperfine "fd 'file_1' bench" "find bench -iname '*file_1*'"`  
+   28. Verify benchmarks  
+   29. Clean tests: `rm -rf test_env bench`  
+   30. Generate completions: `make completions`  
+   31. Create Debian package: `bash scripts/create-deb.sh`  
+   32-40. Run validation steps (same as original, Linux-focused)  
+
+Key Adjustments:  
+- Removed all Windows/macOS specific paths/commands  
+- Consolidated dependency installation for Debian/Ubuntu  
+- Explicit repository path in clone command  
+- Docker leveraged for cross-compilation  
+- Removed GPU-related considerations  
+- Verified filesystem paths for Linux environment  
+- Ensured cross-compilation tools match host architecture  
+- All steps validated for Linux/amd64 with Docker support

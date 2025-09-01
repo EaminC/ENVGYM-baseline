@@ -1,0 +1,29 @@
+=== Docker Execution Log - 20250828_155544 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756396543
+
+=== Build Log ===
+Build Status: Failed
+Build Error:
+> [5/7] RUN set -eux;     if [ -f "bf-sde-9.7.0.tgz" ]; then         echo "Using local SDE tarball";         cp bf-sde-9.7.0.tgz /tmp/bf-sde-9.7.0.tgz;     elif [ -z "${SDE_URL:-}" ]; then         echo "ERROR: Either place bf-sde-9.7.0.tgz in project root or provide SDE_URL" >&2;         exit 1;     else         wget -v -O /tmp/bf-sde-9.7.0.tgz "$SDE_URL" || { echo "wget failed with status $?" >&2; exit 1; };     fi;     echo "Verifying tarball exists...";     test -f /tmp/bf-sde-9.7.0.tgz || { echo "SDE tarball missing" >&2; exit 1; };     echo "Extracting tarball...";     mkdir -p /home/cc/bf-sde-9.7.0;     tar xvf /tmp/bf-sde-9.7.0.tgz -C /home/cc/bf-sde-9.7.0 --strip-components=1 || { echo "tar extraction failed" >&2; exit 1; };     echo "Cleaning up...";     rm -f /tmp/bf-sde-9.7.0.tgz:
+0.208 + [ -f bf-sde-9.7.0.tgz ]
+0.208 + [ -z  ]
+0.208 + echo ERROR: Either place bf-sde-9.7.0.tgz in project root or provide SDE_URL
+0.208 ERROR: Either place bf-sde-9.7.0.tgz in project root or provide SDE_URL
+0.208 + exit 1
+------
+envgym.dockerfile:30
+--------------------
+29 |     ARG SDE_URL
+30 | >>> RUN set -eux; \
+31 | >>>     if [ -f "bf-sde-9.7.0.tgz" ]; then \
+32 | >>>         echo "Using local SDE tarball"; \
+33 | >>>         cp bf-sde-9.7.0.tgz /tmp/bf-sde-9.7.0.tgz; \
+34 | >>>     elif [ -z "${SDE_URL:-}" ]; then \
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Error:
+
+
+=== Execution End ===

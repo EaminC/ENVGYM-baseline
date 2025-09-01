@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250829_004918",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756428557",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 2.76kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/ubuntu:22.04\n#2 DONE 0.1s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/26] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0\n#4 DONE 0.0s\n\n#5 [10/26] RUN . venv/bin/activate &&     bash install_dep.sh &&     bash prepare.sh\n#5 CACHED\n\n#6 [ 8/26] WORKDIR /home/cc/EnvGym/data/Silhouette/Silhouette\n#6 CACHED\n\n#7 [ 2/26] RUN apt-get update && apt-get install -y     git     python3.10     python3.10-venv     llvm-15     clang-15     libmemcached-dev     cmake     linux-headers-generic     llvm-15-tools     qemu-system-x86     memcached     wget     build-essential     libssl-dev     zlib1g-dev     libbz2-dev     libreadline-dev     libsqlite3-dev     curl     libncursesw5-dev     xz-utils     tk-dev     libxml2-dev     libxmlsec1-dev     libffi-dev     liblzma-dev     python3-pip     && rm -rf /var/lib/apt/lists/*\n#7 CACHED\n\n#8 [ 3/26] RUN useradd -ms /bin/bash cc\n#8 CACHED\n\n#9 [ 4/26] WORKDIR /home/cc\n#9 CACHED\n\n#10 [ 7/26] RUN wget -O EnvGym/data/Silhouette/qemu_imgs/silhouette_guest_vm.qcow2     https://zenodo.org/records/14550794/files/silhouette_guest_vm.qcow2\n#10 CACHED\n\n#11 [ 9/26] RUN python3.10 -m venv venv\n#11 CACHED\n\n#12 [ 6/26] RUN git clone https://github.com/iaoing/Silhouette.git EnvGym/data/Silhouette/Silhouette\n#12 CACHED\n\n#13 [ 5/26] RUN mkdir -p EnvGym/data/Silhouette/qemu_imgs\n#13 CACHED\n\n#14 [11/26] WORKDIR /home/cc/EnvGym/data/Silhouette/Silhouette/tools\n#14 CACHED\n\n#15 [12/26] RUN ls -la md5\n#15 0.262 ls: cannot access 'md5': No such file or directory\n#15 ERROR: process \"/bin/sh -c ls -la md5\" did not complete successfully: exit code: 2\n------\n > [12/26] RUN ls -la md5:\n0.262 ls: cannot access 'md5': No such file or directory\n------\nenvgym.dockerfile:60\n--------------------\n  58 |     # Build and validate tools\n  59 |     WORKDIR /home/cc/EnvGym/data/Silhouette/Silhouette/tools\n  60 | >>> RUN ls -la md5\n  61 |     RUN cd md5 && { CC=gcc make V=1 > build.log 2>&1 || { cat build.log; exit 1; }; }\n  62 |     RUN cd md5 && \\\n--------------------\nERROR: failed to solve: process \"/bin/sh -c ls -la md5\" did not complete successfully: exit code: 2\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

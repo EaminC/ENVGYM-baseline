@@ -1,0 +1,99 @@
+Based on the hardware specifications and environment constraints, here is the adjusted environment setup plan:
+
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: 
+   - openjdk-8-jdk (version 8)
+   - ant (latest version)
+   - MiniSat dependencies: g++, make, zlib1g-dev
+   - cmake (version 3.10+)
+   - libgmp-dev (for GMP library support)
+   - SymMC source code repository
+   - External Java libraries for Enhanced_Kodkod (lib directory dependencies including org.alloytools.alloy.dist.jar)
+
+2. FILES TO CREATE: 
+   - None required
+
+3. NECESSARY TEST CASES: 
+   - Verify Enhanced_Kodkod builds without errors using ant compile
+   - Validate SAT formula generation using ./run.sh with sample Alloy spec
+   - Confirm run.sh script handles realpath command
+   - Test classpath configuration in run.sh (src:bin:lib paths)
+   - Test non-isomorphic counting with minisat -getmcFSB
+   - Verify isomorphic counting with minisat -getmcNSB
+   - Confirm pruning metric calculation with minisat -kodkodpruning
+   - Validate lib directory contains org.alloytools.alloy.dist.jar
+   - Check bin directory generation after build
+   - Verify output file generation (.cnf and .sym)
+   - Confirm Enumerator_Estimator builds release binaries
+   - Test GMP library linkage in minisat binaries
+   - Verify C++17 standard compliance during build
+
+4. COMPLETE TODO LIST: 
+   1. Install packages with parallel optimization:
+        apt-get update && \
+        apt-get install -y --no-install-recommends \
+        openjdk-8-jdk \
+        ant \
+        g++ \
+        make \
+        zlib1g-dev \
+        cmake \
+        libgmp-dev
+      Verification: java -version, ant -version, g++ --version, cmake --version, ldconfig -p | grep libgmp
+   
+   2. Clone repository with depth optimization:
+        git clone [repo_url] /home/cc/EnvGym/data/SymMC --depth=1
+        cd /home/cc/EnvGym/data/SymMC
+      Verification: ls -la
+   
+   3. Verify critical JAR path:
+        ls /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib/org.alloytools.alloy.dist.jar
+      Verification: Confirm file exists
+   
+   4. Set execute permissions:
+        chmod +x /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/*.sh
+        chmod +x /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/*.sh
+      Verification: ls -l */*.sh | grep '\.sh'
+   
+   5. Build Enhanced_Kodkod with parallel compilation:
+        cd /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod
+        ant -Djavac.fork=true -Djavac.executable=javac compile
+      Verification: ls -l bin | grep '.class'
+   
+   6. Build Enumerator_Estimator with parallel make:
+        cd /home/cc/EnvGym/data/SymMC/Enumerator_Estimator
+        export MAKEFLAGS="-j$(nproc)"
+        ./build.sh
+      Verification: ldd cmake-build-release/minisat | grep gmp
+   
+   7. Test Enhanced_Kodkod with absolute paths:
+        cd /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod
+        ./run.sh \
+        /home/cc/EnvGym/data/SymMC/Datasets/specs/Alloy/sample.als \
+        /home/cc/EnvGym/data/SymMC/output_sat \
+        /home/cc/EnvGym/data/SymMC/output_sym
+      Verification: ls /home/cc/EnvGym/data/SymMC/output_sat/*.cnf
+   
+   8. Test Enumerator with absolute paths:
+        cd /home/cc/EnvGym/data/SymMC/Enumerator_Estimator
+        ./cmake-build-release/minisat -getmcFSB \
+        /home/cc/EnvGym/data/SymMC/Datasets/cnfs_PSB/sample.cnf \
+        /home/cc/EnvGym/data/SymMC/Datasets/syms/sample.sym
+      Verification: Check model count output
+   
+   9. Full integration test with parallel execution:
+        Run end-to-end tests using all Dataset specs
+        Verification: Monitor for C++17 feature usage in build logs
+
+Key Adjustments:
+1. All paths updated to absolute paths (/home/cc/EnvGym/data/SymMC) for consistency
+2. Added build parallelism:
+   - MAKEFLAGS="-j$(nproc)" for Enumerator_Estimator
+   - ant -Djavac.fork=true for Enhanced_Kodkod
+3. Optimized git clone with --depth=1
+4. Removed sudo (not needed in container environments)
+5. Added --no-install-recommends to minimize image size
+6. Explicit path handling in verification steps
+7. ldd verification for GMP linkage
+8. Parallel-safe directory operations using absolute paths

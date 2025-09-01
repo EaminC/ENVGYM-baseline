@@ -1,0 +1,52 @@
+Based on the hardware information provided (x86_64 architecture, non-CUDA Ubuntu/Debian base, no GPU), here are the necessary adjustments to the environment setup plan:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: (No changes)
+
+2. FILES TO CREATE:  
+   - Update all paths to use: `/home/cc/EnvGym/data/Baleen/...`
+
+3. NECESSARY TEST CASES: (No changes)
+
+4. COMPLETE TODO LIST:
+
+   0. **Add resource check at start**  
+      `df -h /home/cc/EnvGym/data/Baleen | grep -E 'Size|Available'`  
+      `free -h`  
+      *Verification: Confirm >50GB disk space and >8GB RAM available*
+
+   1. Install system dependencies: (No changes)
+
+   2. Set up repository:  
+      ```bash
+      mkdir -p /home/cc/EnvGym/data/Baleen
+      cd /home/cc/EnvGym/data/Baleen
+      git clone --recurse-submodules https://github.com/wonglkd/Baleen-FAST24.git
+      ```
+      *Verification: `/home/cc/EnvGym/data/Baleen/Baleen-FAST24/BCacheSim` exists*
+
+   3-5. (No changes to commands)
+
+   6. Create jupyter.service:  
+      Update WorkingDirectory:  
+      `WorkingDirectory=/home/cc/EnvGym/data/Baleen`
+
+   7. Download trace files:  
+      ```bash
+      cd /home/cc/EnvGym/data/Baleen/Baleen-FAST24
+      mkdir -p data && cd data && bash get-tectonic.sh
+      ```
+      *Verification: `/home/cc/EnvGym/data/Baleen/Baleen-FAST24/data/tectonic` exists*
+
+   8-16. (No changes to commands, but ensure all execute in `/home/cc/EnvGym/data/Baleen/Baleen-FAST24`)
+
+**Key Adjustments Summary**:
+1. All paths updated to use base directory: `/home/cc/EnvGym/data/Baleen`
+2. Added explicit resource check at start
+3. Repository now clones into hardware-specific working directory
+4. Jupyter service configured to use hardware-specific path
+5. Trace downloads directed to hardware-specific location
+6. All verification steps use absolute paths matching hardware config
+
+The plan maintains all original functionality while ensuring path consistency with the provided hardware configuration. Storage/memory checks are prioritized upfront to prevent failures during large operations.

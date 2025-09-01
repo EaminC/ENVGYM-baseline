@@ -1,0 +1,112 @@
+=== Docker Execution Log - 20250829_234237 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756510956
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 2.71kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/20] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [10/20] RUN ln -s /root/miniconda /root/anaconda3
+#5 CACHED
+
+#6 [ 3/20] RUN apt-get install -y --no-install-recommends     ca-certificates     git build-essential curl cmake swig     libeigen3-dev libc6-dev     libsdl-image1.2-dev libsdl-ttf2.0-dev libsdl1.2-dev     subversion ffmpeg libswscale-dev libavformat-dev libavcodec-dev     libfreetype6-dev portaudio19-dev libsndfile1-dev pkg-config     libopenmpi-dev libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev     libsdl2-gfx-dev libboost-all-dev mesa-utils xvfb x11vnc     libpq-dev gdal-bin libgdal-dev
+#6 CACHED
+
+#7 [ 4/20] RUN uname -m && echo "Architecture: $(uname -m)"
+#7 CACHED
+
+#8 [ 6/20] RUN rm -rf /var/lib/apt/lists/*
+#8 CACHED
+
+#9 [11/20] RUN bash -c "source /root/miniconda/etc/profile.d/conda.sh && conda --version"
+#9 CACHED
+
+#10 [ 5/20] RUN dpkg -l | (grep -E 'libsdl|ffmpeg|portaudio|boost|gdal' || echo "No matching packages found")
+#10 CACHED
+
+#11 [ 8/20] RUN [ -e /usr/include/eigen3/Eigen ] && [ ! -e /usr/include/Eigen ] &&     ln -s /usr/include/eigen3/Eigen /usr/include/Eigen || true
+#11 CACHED
+
+#12 [ 7/20] RUN [ -e /usr/include/locale.h ] && [ ! -e /usr/include/xlocale.h ] &&     ln -s /usr/include/locale.h /usr/include/xlocale.h || true
+#12 CACHED
+
+#13 [ 9/20] RUN curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh &&     bash Miniconda3-latest-Linux-x86_64.sh -b -p /root/miniconda &&     rm Miniconda3-latest-Linux-x86_64.sh
+#13 CACHED
+
+#14 [ 2/20] RUN apt-get update
+#14 CACHED
+
+#15 [12/20] RUN bash -c "source /root/miniconda/etc/profile.d/conda.sh && conda create -n fourier -c conda-forge --override-channels --strict-channel-priority python=3.8 -y"
+#15 CACHED
+
+#16 [internal] load build context
+#16 transferring context: 1.29MB 0.0s done
+#16 DONE 0.1s
+
+#17 [13/20] RUN bash -c "source /root/miniconda/etc/profile.d/conda.sh &&     conda install -n fourier -c conda-forge r-base r-essentials -y"
+#17 1.290 
+#17 1.290 CondaToSNonInteractiveError: Terms of Service have not been accepted for the following channels. Please accept or remove them before proceeding:
+#17 1.290     - https://repo.anaconda.com/pkgs/main
+#17 1.290     - https://repo.anaconda.com/pkgs/r
+#17 1.290 
+#17 1.290 To accept these channels' Terms of Service, run the following commands:
+#17 1.290     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+#17 1.290     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+#17 1.290 
+#17 1.290 For information on safely removing channels from your conda configuration,
+#17 1.290 please see the official documentation:
+#17 1.290 
+#17 1.290     https://www.anaconda.com/docs/tools/working-with-conda/channels
+#17 1.290 
+#17 ERROR: process "/bin/sh -c bash -c \"source /root/miniconda/etc/profile.d/conda.sh &&     conda install -n fourier -c conda-forge r-base r-essentials -y\"" did not complete successfully: exit code: 1
+------
+ > [13/20] RUN bash -c "source /root/miniconda/etc/profile.d/conda.sh &&     conda install -n fourier -c conda-forge r-base r-essentials -y":
+1.290 
+1.290 To accept these channels' Terms of Service, run the following commands:
+1.290     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+1.290     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+1.290 
+1.290 For information on safely removing channels from your conda configuration,
+1.290 please see the official documentation:
+1.290 
+1.290     https://www.anaconda.com/docs/tools/working-with-conda/channels
+1.290 
+------
+envgym.dockerfile:51
+--------------------
+  50 |     # Install R dependencies
+  51 | >>> RUN bash -c "source /root/miniconda/etc/profile.d/conda.sh && \
+  52 | >>>     conda install -n fourier -c conda-forge r-base r-essentials -y"
+  53 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c bash -c \"source /root/miniconda/etc/profile.d/conda.sh &&     conda install -n fourier -c conda-forge r-base r-essentials -y\"" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

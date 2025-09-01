@@ -1,0 +1,85 @@
+=== Docker Execution Log - 20250831_105308 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756637587
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.35kB done
+#1 DONE 0.0s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1.4
+#2 DONE 0.1s
+
+#3 docker-image://docker.io/docker/dockerfile:1.4@sha256:9ba7531bd80fb0a858632727cf7a112fbfd19b17e94c4e84ced81e24ef1a0dbc
+#3 CACHED
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [internal] load metadata for docker.io/continuumio/miniconda3:4.7.12
+#5 DONE 0.2s
+
+#6 [stage-0  1/11] FROM docker.io/continuumio/miniconda3:4.7.12@sha256:6c979670684d970f8ba934bf9b7bf42e77c30a22eb96af1f30a039b484719159
+#6 DONE 0.0s
+
+#7 [stage-0  4/11] RUN --mount=type=cache,target=/var/cache/apt     apt-get update &&     apt-get install -y wget unzip &&     rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [stage-0  2/11] WORKDIR /app
+#8 CACHED
+
+#9 [stage-0  3/11] RUN echo "deb http://archive.debian.org/debian buster main" > /etc/apt/sources.list     && echo "deb http://archive.debian.org/debian-security buster/updates main" >> /etc/apt/sources.list
+#9 CACHED
+
+#10 [stage-0  5/11] RUN mkdir -p plots models results csvs
+#10 CACHED
+
+#11 [internal] load build context
+#11 transferring context: 311B done
+#11 DONE 0.0s
+
+#12 [stage-0  6/11] RUN wget -O dataset.zip "https://zenodo.org/record/6388301/files/sixthsense-dataset-v2.0.zip?download=1" &&     unzip dataset.zip -d csvs/ &&     rm dataset.zip
+#12 0.224 --2025-08-31 10:53:07--  https://zenodo.org/record/6388301/files/sixthsense-dataset-v2.0.zip?download=1
+#12 0.234 Resolving zenodo.org (zenodo.org)... 188.185.45.92, 188.185.43.25, 188.185.48.194, ...
+#12 0.459 Connecting to zenodo.org (zenodo.org)|188.185.45.92|:443... connected.
+#12 0.779 HTTP request sent, awaiting response... 301 MOVED PERMANENTLY
+#12 0.913 Location: /records/6388301/files/sixthsense-dataset-v2.0.zip [following]
+#12 0.913 --2025-08-31 10:53:08--  https://zenodo.org/records/6388301/files/sixthsense-dataset-v2.0.zip
+#12 0.914 Reusing existing connection to zenodo.org:443.
+#12 0.914 HTTP request sent, awaiting response... 404 NOT FOUND
+#12 1.041 2025-08-31 10:53:08 ERROR 404: NOT FOUND.
+#12 1.041 
+#12 ERROR: process "/bin/sh -c wget -O dataset.zip \"https://zenodo.org/record/6388301/files/sixthsense-dataset-v2.0.zip?download=1\" &&     unzip dataset.zip -d csvs/ &&     rm dataset.zip" did not complete successfully: exit code: 8
+------
+ > [stage-0  6/11] RUN wget -O dataset.zip "https://zenodo.org/record/6388301/files/sixthsense-dataset-v2.0.zip?download=1" &&     unzip dataset.zip -d csvs/ &&     rm dataset.zip:
+0.224 --2025-08-31 10:53:07--  https://zenodo.org/record/6388301/files/sixthsense-dataset-v2.0.zip?download=1
+connected.
+301 MOVED PERMANENTLY
+0.913 Location: /records/6388301/files/sixthsense-dataset-v2.0.zip [following]
+0.913 --2025-08-31 10:53:08--  https://zenodo.org/records/6388301/files/sixthsense-dataset-v2.0.zip
+0.914 Reusing existing connection to zenodo.org:443.
+0.914 HTTP request sent, awaiting response... 404 NOT FOUND
+1.041 2025-08-31 10:53:08 ERROR 404: NOT FOUND.
+1.041 
+------
+ERROR: failed to solve: process "/bin/sh -c wget -O dataset.zip \"https://zenodo.org/record/6388301/files/sixthsense-dataset-v2.0.zip?download=1\" &&     unzip dataset.zip -d csvs/ &&     rm dataset.zip" did not complete successfully: exit code: 8
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

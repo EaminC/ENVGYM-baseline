@@ -1,0 +1,5 @@
+current progress
+The Dockerfile has been set up as a multi-stage build. The builder stage successfully installs required packages, configures Rust toolchain with specified targets, sets up environment variables and config files, prepares the preprocessor script, builds the release binary, runs tests, and generates documentation. The final stage uses a slim Debian image, copies the built binary, and installs runtime dependencies. The entrypoint is set to bash.
+
+next step
+Modify Dockerfile to: 1) Add static MUSL build step in builder stage 2) Install cargo-deb and create Debian package 3) Remove redundant /app copy in final stage 4) Change entrypoint to run rg --version 5) Append required crate dependencies to Cargo.toml

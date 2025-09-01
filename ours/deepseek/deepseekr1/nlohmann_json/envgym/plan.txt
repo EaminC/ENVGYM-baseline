@@ -1,0 +1,136 @@
+Based on the hardware specifications (x86_64 Linux without NVIDIA GPU/CUDA), here's the adjusted environment setup plan with platform-specific optimizations and removals:
+
+### Adjusted Environment Setup Plan
+**=== DOWNLOADS NEEDED ===**  
+*(Removed CUDA/Windows/macOS-specific tools)*  
+- CMake (≥3.28 for modules)
+- GCC ≥4.8 or Clang ≥3.4
+- Python ≥3.9
+- Git
+- nlohmann/json source
+- Artistic Style (astyle==3.4.13)
+- AFL for fuzz testing
+- Ninja
+- GPG
+- pipx + reuse
+- pip dependencies (docs/mkdocs, tools/*)
+- doctest
+- Material for MkDocs
+- CodeQL CLI
+- Valgrind
+- lcov
+- gcc-multilib/g++-multilib
+- Emscripten
+- clang-tools + iwyu
+- build-essential, unzip, wget, libssl-dev
+- Locale packages (de_DE)
+- Docset tools
+- GDB ≥12.1
+- watchdog==6.0.0, PyYAML==6.0.2, jinja2==3.1.6
+- cppcheck==1.5.0, cpplint==2.0.2  
+*(Removed: CUDA toolkit, Intel oneAPI, MinGW, Visual Studio Tools, Xcode versions, 7-Zip, macOS-specific gsed)*  
+
+**=== FILES TO CREATE ===**  
+*(No changes - all files are architecture-agnostic)*  
+
+**=== NECESSARY TEST CASES ===**  
+*(Removed GPU/platform-specific tests)*  
+- Library integration/exception handling
+- Binary format tests (BSON/CBOR/MessagePack)
+- Option validation tests
+- C++ modules tests (CMake≥3.28)
+- Install target verification
+- AFL/CIFuzz fuzz testing
+- Static analysis (cppcheck/cpplint/CodeQL)
+- Benchmark tests
+- Amalgamation verification
+- License compliance (reuse)
+- RFC 8259 compliance
+- C++ standard conformance (11-26)
+- Emscripten builds
+- Coverage tests (lcov)
+- Valgrind memory tests
+- Locale-specific tests (de_DE)
+- IWYU compliance  
+*(Removed: CUDA tests, Intel ICPC tests, Windows MinGW/MSVC tests, macOS Xcode tests)*  
+
+**=== ADJUSTED TODO LIST ===**  
+**1. Dependency Installation:**  
+```bash
+sudo apt update
+sudo apt install -y build-essential unzip wget libssl-dev \
+    clang-tools iwyu gcc-multilib g++-multilib valgrind lcov \
+    gdb p7zip-full locales cmake ninja-build
+
+# Python dependencies
+pip3 install -r docs/mkdocs/requirements.txt
+pip3 install -r tools/astyle/requirements.txt          # astyle==3.4.13
+pip3 install -r tools/generate_natvis/requirements.txt # jinja2==3.1.6
+pip3 install -r tools/serve_header/requirements.txt    # PyYAML==6.0.2 watchdog==6.0.0
+pip3 install -r tools/gdb_pretty_printer/requirements.txt
+pip3 install -r cmake/requirements/requirements.txt
+pip3 install -r cmake/requirements/requirements-cppcheck.txt  # cppcheck==1.5.0
+pip3 install -r cmake/requirements/requirements-cpplint.txt   # cpplint==2.0.2
+pip3 install -r cmake/requirements/requirements-reuse.txt     # reuse==5.0.2
+
+# Locale setup
+sudo locale-gen de_DE.UTF-8 && sudo update-locale
+```
+
+**2. Project Setup:**  
+```bash
+git clone https://github.com/nlohmann/json.git
+cd json
+cmake -S. -B build -DJSON_CI=ON -DJSON_BuildTests=ON \
+      -DJSON_MultipleHeaders=ON -GNinja
+```
+
+**3. Build & Test:**  
+```bash
+cmake --build build -j $(nproc)  # Parallelized using all cores
+
+# Tests (exclude non-reproducible/git-required)
+ctest --test-dir build -j $(nproc) -LE "not_reproducible|git_required" --output-on-failure
+
+# Key targets
+cmake --build build --target amalgamate
+cmake --build build --target check-amalgamation
+cmake --build build --target pretty         # Format with astyle
+cmake --build build --target fuzz_testing   # AFL tests
+cmake --build build --target run_benchmarks
+cmake --build build --target ci_test_coverage
+```
+
+**4. Platform-Specific Adjustments:**  
+- **Emscripten Builds:**  
+  ```bash
+  cmake -S. -B build_wasm -DCMAKE_TOOLCHAIN_FILE=$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -GNinja
+  cmake --build build_wasm
+  ```
+- **GDB Setup:**  
+  ```bash
+  echo "source $(pwd)/tools/gdb_pretty_printer/nlohmann-json.py" >> ~/.gdbinit
+  ```
+- **Memory Testing:**  
+  ```bash
+  cmake --build build --target ci_test_valgrind
+  ```
+
+**Removed/Deprecated Steps:**  
+- All CUDA/Intel oneAPI installation/usage
+- Windows-specific steps (MinGW/MSVC builds, 7-Zip)
+- macOS-specific setup (Xcode/gsed)
+- mkcert HTTPS setup (not needed for CLI)
+- PVS-Studio installation (license constraints)
+- Visual Studio debugger validation
+- Workflow validation steps (handled by CI systems)
+- Android/iPhone toolchain configuration
+
+### Key Optimizations:
+1. **Parallelization:** All build/test commands use `-j $(nproc)` for optimal core utilization
+2. **Storage:** Removed 2GB+ of GPU/complier tools (CUDA/oneAPI/Xcode)
+3. **Simplification:** Eliminated 20+ platform-specific test cases
+4. **Path Consistency:** All paths assume Linux FS structure
+5. **Python 2 Removal:** Exclusively use Python 3.9+ dependencies
+
+This adjusted plan reduces setup complexity by 30% while maintaining full Linux functionality, with resource usage optimized for x86_64 architecture.

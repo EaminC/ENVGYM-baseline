@@ -1,0 +1,80 @@
+=== Docker Execution Log - 20250828_131943 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756387164
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 2.56kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/15] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [ 2/15] WORKDIR /home/cc/EnvGym/data
+#5 CACHED
+
+#6 [ 3/15] RUN apt-get update &&     DEBIAN_FRONTEND=noninteractive apt-get install -y     git build-essential mtd-utils xfsprogs python3-pip rename spin     libssl-dev libxxhash-dev zlib1g-dev libgoogle-perftools-dev libfuse-dev gcc cmake bc     linux-headers-generic &&     rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [ 4/15] RUN pip3 install numpy scipy matplotlib pulp
+#7 CACHED
+
+#8 [ 5/15] RUN for repo in Metis RefFS IOCov fsl-spin swarm-mcfs; do     for i in {1..5}; do         git clone https://github.com/sbu-fsl/${repo}.git && break ||         (echo "Retry $i/5 for $repo" && rm -rf ${repo} && sleep 15);     done; done
+#8 0.235 Cloning into 'Metis'...
+#8 1.550 Cloning into 'RefFS'...
+#8 1.885 Cloning into 'IOCov'...
+#8 2.244 Cloning into 'fsl-spin'...
+#8 2.771 Cloning into 'swarm-mcfs'...
+#8 DONE 3.1s
+
+#9 [ 6/15] RUN for i in {1..5}; do     git clone https://github.com/sbu-fsl/explode-0.1pre.git &&     [ -d "explode-0.1pre" ] && break ||     (echo "Retry $i/5 for explode" && rm -rf explode-0.1pre && sleep 15); done; [ ! -d "explode-0.1pre" ] && echo "Failed to clone explode" && exit 1 || true
+#9 0.289 Cloning into 'explode-0.1pre'...
+#9 0.445 fatal: could not read Username for 'https://github.com': No such device or address
+#9 0.448 Retry {1..5}/5 for explode
+#9 15.45 Failed to clone explode
+#9 ERROR: process "/bin/sh -c for i in {1..5}; do     git clone https://github.com/sbu-fsl/explode-0.1pre.git &&     [ -d \"explode-0.1pre\" ] && break ||     (echo \"Retry $i/5 for explode\" && rm -rf explode-0.1pre && sleep 15); done; [ ! -d \"explode-0.1pre\" ] && echo \"Failed to clone explode\" && exit 1 || true" did not complete successfully: exit code: 1
+------
+ > [ 6/15] RUN for i in {1..5}; do     git clone https://github.com/sbu-fsl/explode-0.1pre.git &&     [ -d "explode-0.1pre" ] && break ||     (echo "Retry $i/5 for explode" && rm -rf explode-0.1pre && sleep 15); done; [ ! -d "explode-0.1pre" ] && echo "Failed to clone explode" && exit 1 || true:
+0.289 Cloning into 'explode-0.1pre'...
+0.445 fatal: could not read Username for 'https://github.com': No such device or address
+0.448 Retry {1..5}/5 for explode
+15.45 Failed to clone explode
+------
+envgym.dockerfile:24
+--------------------
+  23 |     # Clone explode with extended retries and validation
+  24 | >>> RUN for i in {1..5}; do \
+  25 | >>>     git clone https://github.com/sbu-fsl/explode-0.1pre.git && \
+  26 | >>>     [ -d "explode-0.1pre" ] && break || \
+  27 | >>>     (echo "Retry $i/5 for explode" && rm -rf explode-0.1pre && sleep 15); \
+  28 | >>> done; \
+  29 | >>> [ ! -d "explode-0.1pre" ] && echo "Failed to clone explode" && exit 1 || true
+  30 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c for i in {1..5}; do     git clone https://github.com/sbu-fsl/explode-0.1pre.git &&     [ -d \"explode-0.1pre\" ] && break ||     (echo \"Retry $i/5 for explode\" && rm -rf explode-0.1pre && sleep 15); done; [ ! -d \"explode-0.1pre\" ] && echo \"Failed to clone explode\" && exit 1 || true" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

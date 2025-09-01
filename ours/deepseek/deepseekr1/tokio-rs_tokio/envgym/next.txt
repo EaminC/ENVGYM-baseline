@@ -1,0 +1,5 @@
+current progress
+The Dockerfile currently implements a two-stage build: cloning Tokio and building the hello_world example in the builder stage, then copying the entire workspace to a Debian runtime image. However, it fails to optimize the runtime image size by copying unnecessary files and runs Bash instead of the application. The previous build and runtime executions succeeded.
+
+next step
+Modify the runtime stage to copy only the hello_world binary, set the working directory to /usr/local/bin, and update CMD to launch the application. Combine the git clone and cargo build commands into a single RUN layer in the build stage for caching efficiency.

@@ -1,0 +1,28 @@
+=== Docker Execution Log - 20250829_184753 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756493192
+
+=== Build Log ===
+Build Status: Failed
+Build Error:
+0.330 Please install it with:
+0.330
+0.330 snap install firefox
+0.330
+------
+envgym.dockerfile:54
+--------------------
+52 |     RUN echo "Testing xvfb-run availability..." && /usr/bin/xvfb-run --help
+53 |     RUN echo "Testing npm availability..." && /usr/bin/npm --version
+54 | >>> RUN echo "Testing Firefox binary..." && /usr/bin/xvfb-run -a firefox --version
+55 |     RUN echo "Testing Chromium binary..." && /usr/bin/chromium-browser --version
+56 |     RUN /usr/bin/xvfb-run -a --server-args='-screen 0 1024x768x24' TEST_WORKERS=96 /usr/bin/npm run test:browser
+--------------------
+ERROR: failed to solve: process "/bin/sh -c echo \"Testing Firefox binary...\" && /usr/bin/xvfb-run -a firefox --version" did not complete successfully: exit code: 1
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Error:
+
+
+=== Execution End ===

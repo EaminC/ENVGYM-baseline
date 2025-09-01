@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250830_203053",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756585852",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 558B done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/rust:1.61\n#2 DONE 0.2s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/11] FROM docker.io/library/rust:1.61@sha256:e9a087a78f4b632ee8977f70a3a6fb3b6c7746c392e63afc98cab7b6afdc37d7\n#4 DONE 0.0s\n\n#5 [internal] load build context\n#5 transferring context: 120.22kB 0.0s done\n#5 DONE 0.0s\n\n#6 [ 2/11] WORKDIR /serde_project\n#6 CACHED\n\n#7 [ 3/11] COPY . .\n#7 DONE 0.1s\n\n#8 [ 4/11] RUN echo '1.61' > .rust-version\n#8 DONE 0.3s\n\n#9 [ 5/11] RUN cargo build --jobs $(nproc)\n#9 0.419 error: failed to load manifest for workspace member `/serde_project/serde`\n#9 0.419 \n#9 0.419 Caused by:\n#9 0.419   failed to load manifest for dependency `serde_derive`\n#9 0.419 \n#9 0.419 Caused by:\n#9 0.419   failed to parse manifest at `/serde_project/serde_derive/Cargo.toml`\n#9 0.419 \n#9 0.419 Caused by:\n#9 0.419   feature `workspace-inheritance` is required\n#9 0.419 \n#9 0.419   The package requires the Cargo feature called `workspace-inheritance`, but that feature is not stabilized in this version of Cargo (1.61.0 (a028ae4 2022-04-29)).\n#9 0.419   Consider trying a newer version of Cargo (this may require the nightly release).\n#9 0.419   See https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#workspace-inheritance for more information about the status of this feature.\n#9 ERROR: process \"/bin/sh -c cargo build --jobs $(nproc)\" did not complete successfully: exit code: 101\n------\n > [ 5/11] RUN cargo build --jobs $(nproc):\n0.419 \n0.419 Caused by:\n0.419   failed to parse manifest at `/serde_project/serde_derive/Cargo.toml`\n0.419 \n0.419 Caused by:\n0.419   feature `workspace-inheritance` is required\n0.419 \n0.419   The package requires the Cargo feature called `workspace-inheritance`, but that feature is not stabilized in this version of Cargo (1.61.0 (a028ae4 2022-04-29)).\n0.419   Consider trying a newer version of Cargo (this may require the nightly release).\n0.419   See https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#workspace-inheritance for more information about the status of this feature.\n------\nenvgym.dockerfile:9\n--------------------\n   7 |     RUN echo '1.61' > .rust-version\n   8 |     \n   9 | >>> RUN cargo build --jobs $(nproc)\n  10 |     RUN cargo test --jobs $(nproc)\n  11 |     RUN cargo build --features serde/rc,serde/unstable,serde_derive/deserialize_in_place --jobs $(nproc)\n--------------------\nERROR: failed to solve: process \"/bin/sh -c cargo build --jobs $(nproc)\" did not complete successfully: exit code: 101\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

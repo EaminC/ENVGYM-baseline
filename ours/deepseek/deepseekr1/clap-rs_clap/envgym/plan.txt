@@ -1,0 +1,56 @@
+```dockerfile
+FROM rust:1.73.0-focal
+
+RUN apt-get update && apt-get install -y git-lfs software-properties-common
+RUN git lfs install
+
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get update && apt-get install -y python3.8 python3.8-distutils
+
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python3.8 get-pip.py
+
+RUN ln -s /usr/bin/python3.8 /usr/bin/python
+
+RUN pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 --index-url https://download.pytorch.org/whl/cpu
+RUN pip install numpy==1.24.3 transformers==4.30.2
+
+WORKDIR /workspace
+COPY . .
+RUN cargo build --release
+```
+
+### Key Adjustments:
+1. **Base Image Changed**:  
+   Replaced CUDA-enabled `hakuchuum` image with official `rust:1.73.0-focal` (Ubuntu 20.04 compatible) since:
+   - Hardware lacks GPU (`none`)
+   - Base image must be non-CUDA (`amd64 Linux base images without CUDA`)
+   - Includes Rust toolchain natively (required for `cargo build`)
+
+2. **PyTorch Installation**:  
+   Changed CUDA-based PyTorch (`cu118`) to CPU-only version:
+   ```diff
+   - RUN pip install ... --index-url https://download.pytorch.org/whl/cu118
+   + RUN pip install ... --index-url https://download.pytorch.org/whl/cpu
+   ```
+
+3. **Added Rust Build Steps**:  
+   Included missing project build commands:
+   ```dockerfile
+   WORKDIR /workspace
+   COPY . .
+   RUN cargo build --release
+   ```
+   (Required for Rust project in `/home/cc/EnvGym/data/clap-rs_clap`)
+
+4. **Optimized Layer Caching**:  
+   Combined `apt-get install` commands to reduce image layers while maintaining compatibility with x86_64 architecture.
+
+5. **Path Consistency**:  
+   Retained `/workspace` as working directory (matches typical Rust project structure).
+
+All adjustments maintain compatibility with:
+- x86_64 architecture
+- Ubuntu 20.04 (focal)
+- Host resources ("supports heavy builds")
+- Non-CUDA environment constraints

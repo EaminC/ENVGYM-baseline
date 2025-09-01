@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250830_220016",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756591204",
+  "build": {
+    "success": true,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 1.07kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/ubuntu:latest\n#2 DONE 0.2s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/11] FROM docker.io/library/ubuntu:latest@sha256:7c06e91f61fa88c08cc74f7e1b7c69ae24910d745357e0dfe1d2c0322aaf20f9\n#4 DONE 0.0s\n\n#5 [ 5/11] WORKDIR /fd\n#5 CACHED\n\n#6 [ 6/11] RUN git clone https://github.com/sharkdp/fd .\n#6 CACHED\n\n#7 [ 4/11] RUN cargo install cross hyperfine\n#7 CACHED\n\n#8 [ 7/11] RUN make && make install\n#8 CACHED\n\n#9 [ 2/11] RUN apt-get update &&     apt-get install -y curl git build-essential pkg-config jq p7zip-full     gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf unzip clang-format docker.io\n#9 CACHED\n\n#10 [ 3/11] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &&     export PATH=\"/root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\" &&     rustup component add rustfmt clippy\n#10 CACHED\n\n#11 [ 8/11] RUN mkdir -p /root/.config/fd && echo \"*.log\" > /root/.config/fd/ignore\n#11 CACHED\n\n#12 [ 9/11] RUN mkdir -p test_env/hidden test_env/ignored &&     touch test_env/file1.txt test_env/hidden/.file2 test_env/ignored/file3.log &&     echo \"ignored/\" > test_env/.gitignore\n#12 DONE 0.3s\n\n#13 [10/11] RUN echo '[target.aarch64-unknown-linux-gnu]' > Cross.toml &&     echo 'env = { JEMALLOC_SYS_WITH_LG_PAGE = \"16\" }' >> Cross.toml\n#13 DONE 0.3s\n\n#14 [11/11] RUN mkdir -p autocomplete &&     cp contrib/completion/_fd autocomplete/_fd\n#14 DONE 0.4s\n\n#15 exporting to image\n#15 exporting layers\n#15 exporting layers 10.4s done\n#15 writing image sha256:d9ba7872eae09e303996fa62103b84a20ae15a19567f782846fc1866ea061866 done\n#15 naming to docker.io/library/envgym_test_1756591204 done\n#15 DONE 10.4s\n"
+  },
+  "run": {
+    "success": true,
+    "stdout": "",
+    "stderr": ""
+  }
+}

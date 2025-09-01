@@ -1,0 +1,43 @@
+Based on the hardware information and project requirements, here's the adjusted Dockerfile plan:
+
+```dockerfile
+# syntax = docker/dockerfile:1.4
+
+FROM ubuntu:20.04 as builder
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY . .
+RUN mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release .. && \
+    cmake --build . --parallel $(nproc)
+
+FROM ubuntu:20.04 as runtime
+COPY --from=builder /app/build/bin /usr/local/bin
+
+CMD ["/bin/bash"]
+```
+
+Key adjustments:
+1. Removed redundant `--config Release` flag (not needed for Makefile generators)
+2. Verified x86_64 compatibility through Ubuntu 20.04 base image
+3. Maintained multi-stage build to minimize final image size
+4. Kept build parallelism via `--parallel $(nproc)`
+5. Confirmed path consistency with project location
+6. Ensured non-CUDA image usage per hardware constraints
+7. Preserved BuildKit syntax compatibility for Docker 28.1.1
+
+The plan now:
+- Uses appropriate x86_64 base image
+- Avoids GPU-specific components
+- Maintains correct working directory paths
+- Optimizes build performance through parallel compilation
+- Keeps minimal runtime dependencies
+- Ensures compatibility with Docker version 28.1.1 features
+- Respects project's C++ nature through build tooling

@@ -1,0 +1,87 @@
+Based on the hardware information and project context, here is the complete adjusted environment setup plan:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: 
+   - Python 3.7 interpreter
+   - Tofino Switch SDE 9.7.0 (Intel Barefoot SDK)
+   - BCC (BPF Compiler Collection) for Linux kernel 5.15.0
+   - Bison 3.8.2 parser generator
+   - Flex 2.6.4 lexical analyzer
+   - Scapy 2.4.5 network packet library
+   - ncat network utility tool
+   - Linux kernel headers for 5.15.0
+   - build-essential (for compiler toolchain)
+   - libfl-dev (Flex library development files)
+
+2. FILES TO CREATE: 
+   - /home/cc/EnvGym/data/P4Ctl/network_topology.conf: Defines host IPs/labels
+   - /home/cc/EnvGym/data/P4Ctl/interface_mapping.conf: Maps host interfaces to switch ports
+   - /home/cc/EnvGym/data/P4Ctl/netcl_rules.ncl: Contains NetCL security policies
+   - /home/cc/EnvGym/data/P4Ctl/sde_env.sh: Sets SDE/SDE_INSTALL environment variables
+
+3. NECESSARY TEST CASES IN THE CODEBASE: 
+   - Switch policy enforcement test: Verify traffic blocking between HOST1-HOST3
+   - Host agent labeling test: Validate PID-to-label mapping in kernel
+   - NetCL compiler build test: Verify successful compiler rebuild
+   - NetCL rule translation test: Check rule compilation to P4 runtime commands
+   - DIFC header test: Verify custom packet generation/parsing
+   - Control plane failover test: Validate switch reconfiguration resilience
+   - Compiler dependency test: Validate Bison/Flex version compatibility
+
+4. COMPLETE TODO LIST: 
+   - Install Ubuntu 20.04.1 LTS on all systems (x86_64 compatible)
+   - Configure static IPs: 10.0.0.1/24, 10.0.0.2/24, 10.0.0.3/24
+   - Install dependencies: 
+        sudo apt install python3.7 bison flex libfl-dev python3-scapy ncat build-essential linux-headers-5.15.0-91-generic
+   - Build/install BCC for kernel 5.15.0 (x86_64 compatible)
+   - Download/unpack Tofino SDE 9.7.0 to /home/cc/bf-sde-9.7.0
+   - Create sde_env.sh: 
+        export SDE=/home/cc/bf-sde-9.7.0
+        export SDE_INSTALL=$SDE/install
+   - Build NetCL compiler: 
+        cd /home/cc/EnvGym/data/P4Ctl/compiler
+        make clean
+        make netcl
+   - Build P4 program: 
+        source /home/cc/EnvGym/data/P4Ctl/sde_env.sh
+        $SDE/p4_build.sh -p /home/cc/EnvGym/data/P4Ctl/switch/p4control.p4
+   - Start switch: $SDE/run_switchd.sh -p p4control
+   - Compile initial rules: 
+        cd /home/cc/EnvGym/data/P4Ctl/compiler
+        ./netcl-compile -i ../netcl_rules.ncl -o ../compiled_rules
+   - Update /home/cc/EnvGym/data/P4Ctl/switch/netcl.py with compiled_rules content
+   - Run control plane: 
+        python3 /home/cc/EnvGym/data/P4Ctl/switch/controller.py
+   - Update interface names in /home/cc/EnvGym/data/P4Ctl/host_agent/host_agent.py per host
+   - Determine terminal PID: ps aux | grep bash
+   - Set TAGGED_TERMINAL in /home/cc/EnvGym/data/P4Ctl/host_agent/host_agent_ebpf.c
+   - Load host agents: 
+        python3 /home/cc/EnvGym/data/P4Ctl/host_agent/host_agent.py (all hosts)
+   - Start listeners: sudo ncat -nlvp 9999 -e /bin/bash (Host2/Host3)
+   - Initiate connections: sudo ncat 10.0.0.2 9999 (Host1)
+   - Verify attack blocking: ncat 10.0.0.3 9999 from Host1 session
+   - Recompile updated rules: 
+        cd /home/cc/EnvGym/data/P4Ctl/compiler
+        make netcl
+        ./netcl-compile -i ../netcl_rules.ncl -o ../compiled_rules
+   - Update /home/cc/EnvGym/data/P4Ctl/switch/netcl.py with recompiled_rules content
+   - Re-run controller: 
+        python3 /home/cc/EnvGym/data/P4Ctl/switch/controller.py
+   - Test custom tools: 
+        /home/cc/EnvGym/data/P4Ctl/custom-send.py and custom-receive.py with DIFC headers
+   - Validate kernel logs: dmesg | grep -e BPF -e DIFC
+   - Verify NetCL compiler integrity: 
+        /home/cc/EnvGym/data/P4Ctl/compiler/netcl-compile --version
+
+Key Adjustments:
+1. All paths updated to absolute paths using /home/cc/EnvGym/data/P4Ctl as base directory
+2. Linux headers package explicitly specified for kernel 5.15.0 (linux-headers-5.15.0-91-generic)
+3. GPU-related dependencies removed (Matrox controller doesn't require CUDA)
+4. SDE environment variables set using absolute paths
+5. P4 build command uses absolute path to p4control.p4
+6. Host agent operations use absolute paths for Python scripts
+7. NetCL compiler operations use absolute paths for input/output files
+8. All tool references use absolute paths to ensure correct execution context
+9. Kernel header installation integrated into apt command
+10. Directory navigation standardized to project root (/home/cc/EnvGym/data/P4Ctl)

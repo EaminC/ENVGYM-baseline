@@ -1,0 +1,110 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:  
+   - SDKMAN! (from https://sdkman.io/install)  
+   - GraalVM JDK 23.0.1-graal (via SDKMAN!)  
+   - Maven (if not installed)  
+   - Python 3.11.4  
+   - pytest Python package  
+   - Subversion client (for profile-based site operations)  
+   - Checkstyle 9.0.1 (automatic via Maven)  
+   - SpotBugs 4.4.2 (automatic via Maven)  
+   - Graal SDK (automatic via Maven)  
+   - JAPICMP 0.15.3 (automatic via Maven)  
+   - Manual download: csv-1.0.jar from http://kasparov.skife.org/csv/csv-1.0.jar  
+   - Benchmark dependencies (automatic via Maven profile):  
+     * JMH Core 1.5.2  
+     * OpenCSV 3.1  
+     * Super CSV 2.2.1  
+     * JavaCSV 2.0  
+   - JavaParser Symbol Solver Core 3.25.5 (automatic via Maven)  
+   - JUnit 3.8.1 (automatic via Maven)
+
+2. FILES TO CREATE:  
+   - None required (all configuration files exist in repository)  
+   - Verify presence of:  
+     * commons-cli/src/conf/checkstyle.xml  
+     * commons-cli/src/conf/checkstyle-suppressions.xml  
+     * commons-cli/src/conf/spotbugs-exclude-filter.xml  
+     * commons-cli-graal/src/conf/checkstyle.xml  
+     * commons-cli-graal/src/conf/checkstyle-suppressions.xml  
+     * commons-cli-graal/src/conf/spotbugs-exclude-filter.xml  
+     * commons-cli-python/src/conf/checkstyle.xml  
+     * commons-cli-python/src/conf/checkstyle-suppressions.xml  
+     * commons-cli-python/src/conf/spotbugs-exclude-filter.xml  
+     * commons-csv/checkstyle.xml  
+     * commons-csv/LICENSE-header.txt  
+     * commons-csv-graal/checkstyle.xml  
+     * commons-csv-graal/LICENSE-header.txt  
+     * graal-glue-generator/pom.xml
+
+3. NECESSARY TEST CASES IN THE CODEBASE:  
+   - Original Java tests: commons-cli and commons-csv Maven tests  
+   - Translated Python tests: commons-cli-python and commons-csv-python pytest cases  
+   - Glue code tests: commons-cli-graal and commons-csv-graal integration tests  
+   - Coverage validation: cover_local.py script execution  
+   - Glue automation: generate_glue.py functionality and graal-glue-generator execution  
+   - Graal glue generator unit tests (JUnit 3.8.1)  
+   - Additional build validations:  
+     * Checkstyle verification for Java code (all modules including commons-csv and graal-glue-generator)  
+     * SpotBugs static analysis (all modules including commons-csv and graal-glue-generator)  
+     * JAPICMP binary compatibility checks (all modules including commons-csv)  
+     * RAT license validation (all modules including commons-csv)  
+     * Graal SDK compatibility testing  
+   - Site generation profile execution tests  
+   - CSV benchmark tests (via Maven benchmark profile)  
+   - Java 9 compatibility tests (via java9 profile)  
+   - JMH benchmark execution validation (output file generation)  
+   - Site deployment verification via Subversion  
+
+4. COMPLETE TODO LIST:  
+   - Install SDKMAN!: curl -s "https://get.sdkman.io" | bash  
+   - Verify SDKMAN! installation: sdk version  
+   - Install GraalVM: sdk install java 23.0.1-graal  
+   - Verify GraalVM installation: java -version (should show 23.0.1)  
+   - Install GraalPython: gu install python  
+   - Verify GraalPython: gu list | grep python  
+   - Install Maven if missing (following https://maven.apache.org/install.html)  
+   - Verify Maven: mvn -v  
+   - Install Python 3.11.4 (system-specific installation)  
+   - Verify Python version: python3.11 --version  
+   - Install pytest: python3.11 -m pip install pytest  
+   - Verify pytest: pytest --version  
+   - Install Subversion client (OS-specific: svn --version)  
+   - Download and install manual dependency:  
+        mvn install:install-file -Dfile=/path/to/csv-1.0.jar -DgroupId=org.skife.kasparov -DartifactId=csv -Dversion=1.0 -Dpackaging=jar  
+   - Run full Java builds with validations:  
+        mvn -f commons-cli/pom.xml clean verify -Drat.skip=true -Dspotbugs.skip=true -Djapicmp.skip=true  
+        mvn -f commons-cli-python/pom.xml clean verify -Drat.skip=true -Dspotbugs.skip=true -Djapicmp.skip=true  
+        mvn -f commons-csv/pom.xml clean verify -Drat.skip=true -Dspotbugs.skip=true -Djapicmp.skip=true  
+        mvn -f commons-csv-graal/pom.xml clean verify -Drat.skip=true -Dspotbugs.skip=true -Djapicmp.skip=true  
+        mvn -f graal-glue-generator/pom.xml clean install  
+   - Verify Java builds: Check BUILD SUCCESS and validation reports  
+   - Run Java tests:  
+        mvn -f commons-cli/pom.xml test -Drat.skip  
+        mvn -f commons-csv/pom.xml test -Drat.skip  
+        mvn -f graal-glue-generator/pom.xml test  
+   - Verify Java tests: Check passed tests in output  
+   - Run Python tests:  
+        pytest commons-cli-python  
+        pytest commons-csv-python  
+   - Verify Python tests: Check passed tests in output  
+   - Generate glue code: python scripts/generate_glue.py  
+   - Execute Graal glue generator: mvn -f graal-glue-generator/pom.xml exec:java  
+   - Verify glue generation: Check generated/commons-cli and generated/commons-csv  
+   - Run glue code validations:  
+        mvn -f commons-cli-graal/pom.xml clean verify -Drat.skip=true -Dspotbugs.skip=true -Djapicmp.skip=true  
+        mvn -f commons-csv-graal/pom.xml clean verify -Drat.skip=true -Dspotbugs.skip=true -Djapicmp.skip=true  
+   - Verify glue validations: Check BUILD SUCCESS and integration results  
+   - Measure coverage: python scripts/coverage/cover_local.py  
+   - Verify coverage: Check generated coverage report  
+   - Run benchmark tests:  
+        mvn -f commons-csv/pom.xml test -Pbenchmark  
+        Verify JMH output: Check target/jmh-result.json exists  
+   - Execute site generation profiles:  
+        mvn -f commons-cli/pom.xml site -Psetup-checkout  
+        mvn -f commons-cli-python/pom.xml site -Psetup-checkout  
+        mvn -f commons-csv/pom.xml site -Psetup-checkout  
+        Verify site deployment artifacts  
+   - Verify Java 9 compatibility:  
+        mvn -f commons-csv/pom.xml verify -Pjava9

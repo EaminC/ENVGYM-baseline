@@ -1,0 +1,49 @@
+Based on the hardware specifications (x86_64 Linux, no GPU dependencies), the original plan is largely compatible. Key adjustments focus on Docker utilization and Kubernetes verification:
+
+### ADJUSTED ENVIRONMENT SETUP PLAN ###
+
+1. **DOWNLOADS NEEDED**  
+   *(No changes - all components support x86_64)*  
+
+2. **FILES TO CREATE**  
+   *(No changes - paths are hardware-agnostic)*  
+
+3. **NECESSARY TEST CASES**  
+   *(No changes)*  
+
+4. **ADJUSTED TODO LIST**  
+   **Step 4: Install goctl**  
+   - Prioritize Docker method given environment:  
+     `docker run --rm -v /home/cc/EnvGym/data/zeromicro_go-zero:/app kevinwan/goctl --version`  
+   - Add architecture verification:  
+     `uname -m` should return `x86_64` before installation  
+
+   **Step 8: Start server**  
+   - Use absolute path for reliability:  
+     `go run /home/cc/EnvGym/data/zeromicro_go-zero/greet.go -f etc/greet-api.yaml`  
+
+   **Step 9: Test resilience features**  
+   - Install load testing tools via Docker if missing:  
+     ```bash
+     docker run --network=host -it alpine sh -c "apk add wrk && wrk ..."
+     ```
+
+   **Step 12: Kubernetes deployment prep**  
+   - Replace verification with Docker-based dry-run:  
+     ```bash
+     docker run --rm -v ${PWD}:/work -w /work bitnami/kubectl:latest apply -f [MANIFEST_PATH] --dry-run=client
+     ```  
+     *(Removes host kubectl dependency)*  
+
+   **All Steps:**  
+   - Prepend `cd /home/cc/EnvGym/data/zeromicro_go-zero` to commands requiring project root context  
+
+### CHANGES RATIONALE ###
+1. Leverages Docker consistently (v28.1.1 available) to:
+   - Avoid host toolchain dependencies (kubectl, wrk)
+   - Ensure architecture compatibility via official images
+2. Absolute paths prevent directory ambiguity
+3. Maintains all original functionality while adapting to:
+   - Confirmed x86_64 architecture
+   - Non-GPU environment
+   - Docker-capable Linux base

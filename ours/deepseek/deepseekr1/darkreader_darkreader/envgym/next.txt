@@ -1,0 +1,12 @@
+current progress
+The Docker build fails at the step testing the Firefox binary installation due to a missing Firefox executable, with the error suggesting snap installation. The current Dockerfile includes Firefox installation via Mozilla PPA but still encounters this issue. All previous steps (dependencies, Node.js setup, repository cloning, config file creation, and initial package installs) appear successful based on the Dockerfile structure.
+
+next step
+Modify the Firefox installation step in the Dockerfile to enforce priority for the Mozilla PPA package and verify binary existence. Specifically, add package pinning configuration before installing Firefox to prevent snap fallback:  
+```
+RUN add-apt-repository ppa:mozillateam/ppa -y && \
+    printf 'Package: *\nPin: release o=LP-PPA-mozillateam\nPin-Priority: 1001\n' > /etc/apt/preferences.d/mozilla-firefox && \
+    apt-get update && \
+    apt-get install -y firefox && \
+    ls -l /usr/bin/firefox
+```

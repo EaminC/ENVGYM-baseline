@@ -1,0 +1,83 @@
+Based on the provided hardware information (x86_64 architecture, Docker 28.1.1, Linux-based paths), here's the adjusted environment setup plan:
+
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: 
+   - Docker Engine (latest stable version)
+   - Golang (v1.20.5 specifically for CI compatibility)
+   - Kind v0.20.0
+   - Python 3.12+ (local dev) and Python 3.10 (CI compatibility)
+   - kubectl (latest stable version matching Kubernetes v1.25+)
+   - Helm v3.8+ (optional)
+   - Development toolchain (C compiler and make for library builds)
+   - Python package dependencies (specified in pyproject.toml and requirements-dev.txt)
+
+2. FILES TO CREATE: 
+   - N/A (Project provides all necessary configuration files)
+   - Note: Ensure requirements-dev.txt exists for dependency installation
+
+3. NECESSARY TEST CASES IN THE CODEBASE: 
+   - Cassandra operator bug reproduction test (test/e2e_tests/test_data/cassop-330)
+   - Bug reproduction tests (marked with "all_bug_reproduction" and "single_bug_reproduction" pytest tags)
+   - Kubernetes cluster health validation test
+   - Operator deployment verification test
+   - Pydantic model validation tests
+   - JSON schema validation tests
+   - Kubernetes API compatibility tests
+   - Static type checking tests (mypy)
+   - Linting validation (pylint)
+   - Code formatting checks (black)
+   - Unit test coverage (pytest-cov)
+   - Security dependency validation tests
+   - Tool configuration compatibility tests (black/isort/pytest)
+   - Library build verification tests
+   - Gitignore coverage validation tests
+   - Pre-commit hook validation tests
+   - CI pipeline validation tests
+   - GitHub Actions workflow validation test
+   - Bug counter script functional test
+   - End-to-End workflow execution test
+
+4. COMPLETE TODO LIST: 
+   1. Install Docker: Follow official instructions for Linux x86_64. Verify with `docker version`
+   2. Install Golang: Download v1.20.5 for linux/amd64, add to PATH. Verify with `go version`
+   3. Install Kind: Run `go install sigs.k8s.io/kind@v0.20.0`. Verify with `kind --version`
+   4. Install Python 3.12+: Use system package manager. Verify with `python3 --version`
+   5. Install development toolchain:
+        - `sudo apt-get install build-essential` (Debian/Ubuntu)
+   6. Install kubectl: Download linux/amd64 binary. Verify with `kubectl version --client`
+   7. Create Python virtual environment: `python3 -m venv .venv`
+   8. Activate virtual environment: `source .venv/bin/activate`
+   9. Install main Python package: `pip install .` 
+   10. Install Helm: Download linux/amd64 binary if needed. Verify with `helm version`
+   11. Install dev dependencies: `pip install '.[dev]'` and `pip install -r requirements-dev.txt`
+   12. Set up pre-commit hooks: Run `pre-commit install`
+   13. Run pre-commit validation: `pre-commit run --all-files`
+   14. **Build libraries with parallelization**: Run `make -j$(nproc)` to compile acto/k8s_util/lib and ssa components
+   15. Verify library builds: Check exit code and build logs
+   16. Create profile directory: `mkdir -m 777 -p /home/cc/EnvGym/data/acto/profile/data`
+   17. Validate Python installation: `python -c "import pydantic, kubernetes, pandas, pytest, mypy, black, pylint, requests, docker, cryptography, pre_commit"`
+   18. Start Kind cluster: `kind create cluster --name acto-test --config=/home/cc/EnvGym/data/acto/kind_config`
+   19. Verify cluster: `kubectl cluster-info` and `kubectl get nodes`
+   20. Run demo test: `python3 -m acto.reproduce --reproduce-dir /home/cc/EnvGym/data/acto/test/e2e_tests/test_data/cassop-330/trial-demo --config /home/cc/EnvGym/data/acto/data/cass-operator/config.json`
+   21. Check test output for Cassandra operator bug reproduction results
+   22. Run full bug reproduction suite: `python -m pytest /home/cc/EnvGym/data/acto/test/e2e_tests -m "all_bug_reproduction" -s`
+   23. Run targeted bug reproduction: `python -m pytest /home/cc/EnvGym/data/acto/test/e2e_tests -m "single_bug_reproduction" -s`
+   24. Run development quality checks: `pytest`, `mypy .`, `black --check .`, `pylint acto`
+   25. Validate GitHub Actions workflow: `python /home/cc/EnvGym/data/acto/.github/workflows/bug_counter.py --dry-run`
+   26. Test workflow trigger simulation: Manually verify bugs.md change detection logic
+   27. Validate end-to-end workflow: Execute dry-run of GitHub Actions workflow
+   28. Clean up: 
+        - `kind delete cluster --name acto-test`
+        - `make clean`
+        - `rm -f /home/cc/EnvGym/data/acto/testrun*`
+        - `rm -rf /home/cc/EnvGym/data/acto/profile`
+
+Key adjustments made:
+1. Added explicit paths for all project-specific directories and files (steps 16, 18, 20, 22, 23, 25, 28)
+2. Modified library build to use parallel compilation (make -j$(nproc)) to utilize all CPU cores
+3. Specified architecture-specific package installers (linux/amd64)
+4. Simplified toolchain installation to Debian/Ubuntu commands
+5. Removed Windows-specific commands since working directory indicates Linux environment
+6. Added absolute paths for Kind config and test data directories
+7. Confirmed Docker compatibility with x86_64 architecture

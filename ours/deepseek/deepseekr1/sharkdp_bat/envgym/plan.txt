@@ -1,0 +1,111 @@
+### Adjusted Environment Setup Plan
+
+#### **Key Adjustments Based on Hardware (Linux/amd64)**
+- Removed all **Windows-specific components** (Visual C++, `less`, Scoop/Choco, paths like `%APPDATA%`).
+- Replaced Windows package managers with **Linux-native methods** (APT).
+- Omitted **GPU/CUDA dependencies** (none were present).
+- Simplified paths using **Linux conventions** (`~/.config`, `/etc/bat`).
+- Excluded **cross-platform tests** irrelevant to Linux (Cygwin, Windows paths).
+- Added **Docker-in-Docker (DinD)** setup for containerized benchmarks.
+- Optimized storage via multi-stage Docker builds.
+
+---
+
+### 1. DOWNLOADS NEEDED
+- **bat** (≥0.25.0, install via APT or build from source)
+- **git** (Git integration/submodules)
+- **fzf** (preview integration)
+- **ripgrep** (batgrep integration)
+- **fd** (find integration)
+- **Rust toolchain** (via `rustup` for source builds)
+- **Cargo.lock dependencies** (auto-resolved during build)
+- **cargo-audit** (via `cargo install`)
+- **jq** (JSON processing)
+- **dpkg/fakeroot** (Debian packaging)
+- **cross** (cross-compilation via `cargo install`)
+- **iconv** (encoding conversion)
+- **bat-extras** (batgrep/batdiff)
+- **yaml2json/json_pp** (JSON utilities)
+- **Docker CE CLI** (benchmarks)  
+  *(No change for 7-Zip—retained for cross-compilation to Windows)*
+
+---
+
+### 2. FILES TO CREATE
+- **Configuration file**:  
+  `~/.config/bat/config`  
+  Content unchanged.
+- **System-wide config**:  
+  `/etc/bat/config`  
+  Content unchanged.
+- **Project files**:  
+  All paths use Linux conventions (e.g., `.gitignore`, `rustfmt.toml`, `.cargo/audit.toml`). Content unchanged.
+- **CI/CD & Docs**:  
+  Unchanged (paths are OS-agnostic).
+- **Removed**:  
+  Windows paths (`%APPDATA%`, `C:\ProgramData`), alias files (handled in Docker ENV).
+
+---
+
+### 3. NECESSARY TEST CASES
+**Removed/Adjusted Tests:**
+- ❌ Cygwin path compatibility
+- ❌ Windows-specific path handling
+- ❌ Visual C++/winget/choco installs  
+- ✅ Focus on **Linux/amd64**:
+  - Pager behavior (`less -RF`)
+  - Debian packaging (`dpkg`, `fakeroot`)
+  - Docker-in-Docker benchmarks
+  - Linux file encoding (`iconv`)
+  - APT-based install verification  
+  *(All other tests unchanged)*
+
+---
+
+### 4. COMPLETE TODO LIST (Linux/amd64 Focus)
+```bash
+# INSTALLATIONS (APT)
+sudo apt update
+sudo apt install -y bat git fzf ripgrep fd jq dpkg fakeroot iconv
+cargo install cargo-audit cross bat-extras
+
+# DOCKER SETUP (DinD for benchmarks)
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER  # Enable non-root access
+
+# CONFIGURATION
+mkdir -p ~/.config/bat
+echo '--theme="TwoDark"\n--style="numbers,changes,header"\n--italic-text=always\n--pager="less -RF"' > ~/.config/bat/config
+sudo mkdir -p /etc/bat
+sudo cp ~/.config/bat/config /etc/bat/config  # System-wide defaults
+
+# ENVIRONMENT VARIABLES (persistent)
+echo 'export BAT_PAGER="less -RFK"' >> ~/.bashrc
+echo 'export MANPAGER="sh -c '\''awk \"{ gsub(/\\x1B\\[[0-9;]*m/, \"\", \$0); gsub(/.\\x08/, \"\", \$0); print }\" | bat -p -lman'\''"' >> ~/.bashrc
+source ~/.bashrc
+
+# PROJECT SETUP
+git submodule update --init --recursive
+bat cache --build  # Verify themes/languages: bat --list-themes
+
+# DOCKER IMAGE BUILD (benchmarks)
+cd tests/benchmarks/startup-time-src
+docker build -t bat-benchmark .
+docker run --rm bat-benchmark
+docker rmi bat-benchmark
+
+# VERIFICATIONS
+bat --version  # ≥0.25.0
+cargo audit --version
+docker --version
+bat README.md  # Core functionality
+fzf --preview "bat --color=always {}"  # Integration
+```
+
+---
+
+### Hardware-Specific Notes:
+1. **Storage Optimization**: Use multi-stage Docker builds to minimize image size.
+2. **Paths**: All configs use Linux defaults (`~/.config`, `/etc`).
+3. **CPU**: Tests assume `amd64` architecture; ARM cross-compilation via `cross`.
+4. **GPU**: No GPU dependencies—benchmarks are CPU-only.

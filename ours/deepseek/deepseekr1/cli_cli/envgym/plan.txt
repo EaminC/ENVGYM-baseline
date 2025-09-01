@@ -1,0 +1,61 @@
+```dockerfile
+# Use the official Ubuntu image as the base
+FROM ubuntu:20.04
+
+# Set the working directory
+WORKDIR /home/cc/EnvGym/data/cli_cli
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    bzip2 \
+    ca-certificates \
+    libglib2.0-0 \
+    libxext6 \
+    libsm6 \
+    libxrender1 \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Miniconda
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+    bash ~/miniconda.sh -b -p $HOME/miniconda && \
+    rm ~/miniconda.sh
+
+# Set environment variables for Conda
+ENV PATH="/root/miniconda/bin:${PATH}"
+
+# Setup Python environment and install requirements
+COPY requirements.txt .
+RUN . /root/miniconda/etc/profile.d/conda.sh && \
+    conda create -n myenv python=3.8 -y && \
+    conda activate myenv && \
+    pip install -r requirements.txt
+
+# Copy the src directory
+COPY ./src ./src
+
+# Command to run when the container starts
+CMD ["bash"]
+```
+
+**Key Adjustments:**
+1. **Removed GPU dependencies**:
+   - Deleted NVIDIA Container Toolkit installation steps
+   - Removed NVIDIA environment variables (`NVIDIA_VISIBLE_DEVICES`, `NVIDIA_DRIVER_CAPABILITIES`)
+   - Eliminated CUDA Toolkit (`cudatoolkit=11.0`) installation
+
+2. **Optimized Conda setup**:
+   - Replaced `.bashrc` activation with direct sourcing of `conda.sh`
+   - Removed redundant `conda install python=3.8` (already handled in `conda create`)
+   - Added `-y` flag to `conda create` for non-interactive installation
+
+3. **Maintained compatibility**:
+   - Kept `ubuntu:20.04` base image (x86_64 compatible)
+   - Preserved relative COPY paths matching working directory
+   - Retained CPU-only packages and architecture-specific Miniconda installer
+
+4. **Streamlined operations**:
+   - Combined Conda environment activation and package installation in single RUN step
+   - Removed unused GPU support artifacts to reduce image size
+   - Ensured all paths align with specified working directory

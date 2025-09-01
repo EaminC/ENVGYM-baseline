@@ -1,0 +1,89 @@
+=== Docker Execution Log - 20250828_155544 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756396543
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.58kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/7] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [2/7] WORKDIR /home/cc/EnvGym/data/P4Ctl
+#5 CACHED
+
+#6 [3/7] RUN apt-get update &&     apt-get install -y     python3.7     bison=2:3.5.1+dfsg-1     flex=2.6.4-6.2     libfl-dev=2.6.4-6.2     python3-scapy     ncat     build-essential     linux-headers-5.15.0-91-generic     git     cmake     libedit-dev     llvm-12-dev     libclang-12-dev     zlib1g-dev     libelf-dev     wget     ca-certificates     bpfcc-tools
+#6 CACHED
+
+#7 [internal] load build context
+#7 transferring context: 459.91kB 0.0s done
+#7 DONE 0.0s
+
+#8 [4/7] COPY . .
+#8 DONE 0.0s
+
+#9 [5/7] RUN set -eux;     if [ -f "bf-sde-9.7.0.tgz" ]; then         echo "Using local SDE tarball";         cp bf-sde-9.7.0.tgz /tmp/bf-sde-9.7.0.tgz;     elif [ -z "${SDE_URL:-}" ]; then         echo "ERROR: Either place bf-sde-9.7.0.tgz in project root or provide SDE_URL" >&2;         exit 1;     else         wget -v -O /tmp/bf-sde-9.7.0.tgz "$SDE_URL" || { echo "wget failed with status $?" >&2; exit 1; };     fi;     echo "Verifying tarball exists...";     test -f /tmp/bf-sde-9.7.0.tgz || { echo "SDE tarball missing" >&2; exit 1; };     echo "Extracting tarball...";     mkdir -p /home/cc/bf-sde-9.7.0;     tar xvf /tmp/bf-sde-9.7.0.tgz -C /home/cc/bf-sde-9.7.0 --strip-components=1 || { echo "tar extraction failed" >&2; exit 1; };     echo "Cleaning up...";     rm -f /tmp/bf-sde-9.7.0.tgz
+#9 0.208 + [ -f bf-sde-9.7.0.tgz ]
+#9 0.208 + [ -z  ]
+#9 0.208 + echo ERROR: Either place bf-sde-9.7.0.tgz in project root or provide SDE_URL
+#9 0.208 ERROR: Either place bf-sde-9.7.0.tgz in project root or provide SDE_URL
+#9 0.208 + exit 1
+#9 ERROR: process "/bin/sh -c set -eux;     if [ -f \"bf-sde-9.7.0.tgz\" ]; then         echo \"Using local SDE tarball\";         cp bf-sde-9.7.0.tgz /tmp/bf-sde-9.7.0.tgz;     elif [ -z \"${SDE_URL:-}\" ]; then         echo \"ERROR: Either place bf-sde-9.7.0.tgz in project root or provide SDE_URL\" >&2;         exit 1;     else         wget -v -O /tmp/bf-sde-9.7.0.tgz \"$SDE_URL\" || { echo \"wget failed with status $?\" >&2; exit 1; };     fi;     echo \"Verifying tarball exists...\";     test -f /tmp/bf-sde-9.7.0.tgz || { echo \"SDE tarball missing\" >&2; exit 1; };     echo \"Extracting tarball...\";     mkdir -p /home/cc/bf-sde-9.7.0;     tar xvf /tmp/bf-sde-9.7.0.tgz -C /home/cc/bf-sde-9.7.0 --strip-components=1 || { echo \"tar extraction failed\" >&2; exit 1; };     echo \"Cleaning up...\";     rm -f /tmp/bf-sde-9.7.0.tgz" did not complete successfully: exit code: 1
+------
+ > [5/7] RUN set -eux;     if [ -f "bf-sde-9.7.0.tgz" ]; then         echo "Using local SDE tarball";         cp bf-sde-9.7.0.tgz /tmp/bf-sde-9.7.0.tgz;     elif [ -z "${SDE_URL:-}" ]; then         echo "ERROR: Either place bf-sde-9.7.0.tgz in project root or provide SDE_URL" >&2;         exit 1;     else         wget -v -O /tmp/bf-sde-9.7.0.tgz "$SDE_URL" || { echo "wget failed with status $?" >&2; exit 1; };     fi;     echo "Verifying tarball exists...";     test -f /tmp/bf-sde-9.7.0.tgz || { echo "SDE tarball missing" >&2; exit 1; };     echo "Extracting tarball...";     mkdir -p /home/cc/bf-sde-9.7.0;     tar xvf /tmp/bf-sde-9.7.0.tgz -C /home/cc/bf-sde-9.7.0 --strip-components=1 || { echo "tar extraction failed" >&2; exit 1; };     echo "Cleaning up...";     rm -f /tmp/bf-sde-9.7.0.tgz:
+0.208 + [ -f bf-sde-9.7.0.tgz ]
+0.208 + [ -z  ]
+0.208 + echo ERROR: Either place bf-sde-9.7.0.tgz in project root or provide SDE_URL
+0.208 ERROR: Either place bf-sde-9.7.0.tgz in project root or provide SDE_URL
+0.208 + exit 1
+------
+envgym.dockerfile:30
+--------------------
+  29 |     ARG SDE_URL
+  30 | >>> RUN set -eux; \
+  31 | >>>     if [ -f "bf-sde-9.7.0.tgz" ]; then \
+  32 | >>>         echo "Using local SDE tarball"; \
+  33 | >>>         cp bf-sde-9.7.0.tgz /tmp/bf-sde-9.7.0.tgz; \
+  34 | >>>     elif [ -z "${SDE_URL:-}" ]; then \
+  35 | >>>         echo "ERROR: Either place bf-sde-9.7.0.tgz in project root or provide SDE_URL" >&2; \
+  36 | >>>         exit 1; \
+  37 | >>>     else \
+  38 | >>>         wget -v -O /tmp/bf-sde-9.7.0.tgz "$SDE_URL" || { echo "wget failed with status $?" >&2; exit 1; }; \
+  39 | >>>     fi; \
+  40 | >>>     echo "Verifying tarball exists..."; \
+  41 | >>>     test -f /tmp/bf-sde-9.7.0.tgz || { echo "SDE tarball missing" >&2; exit 1; }; \
+  42 | >>>     echo "Extracting tarball..."; \
+  43 | >>>     mkdir -p /home/cc/bf-sde-9.7.0; \
+  44 | >>>     tar xvf /tmp/bf-sde-9.7.0.tgz -C /home/cc/bf-sde-9.7.0 --strip-components=1 || { echo "tar extraction failed" >&2; exit 1; }; \
+  45 | >>>     echo "Cleaning up..."; \
+  46 | >>>     rm -f /tmp/bf-sde-9.7.0.tgz
+  47 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c set -eux;     if [ -f \"bf-sde-9.7.0.tgz\" ]; then         echo \"Using local SDE tarball\";         cp bf-sde-9.7.0.tgz /tmp/bf-sde-9.7.0.tgz;     elif [ -z \"${SDE_URL:-}\" ]; then         echo \"ERROR: Either place bf-sde-9.7.0.tgz in project root or provide SDE_URL\" >&2;         exit 1;     else         wget -v -O /tmp/bf-sde-9.7.0.tgz \"$SDE_URL\" || { echo \"wget failed with status $?\" >&2; exit 1; };     fi;     echo \"Verifying tarball exists...\";     test -f /tmp/bf-sde-9.7.0.tgz || { echo \"SDE tarball missing\" >&2; exit 1; };     echo \"Extracting tarball...\";     mkdir -p /home/cc/bf-sde-9.7.0;     tar xvf /tmp/bf-sde-9.7.0.tgz -C /home/cc/bf-sde-9.7.0 --strip-components=1 || { echo \"tar extraction failed\" >&2; exit 1; };     echo \"Cleaning up...\";     rm -f /tmp/bf-sde-9.7.0.tgz" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

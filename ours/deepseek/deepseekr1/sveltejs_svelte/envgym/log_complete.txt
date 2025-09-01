@@ -1,0 +1,120 @@
+=== Docker Execution Log - 20250831_114252 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756640569
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 555B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:20-alpine
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [base 1/9] FROM docker.io/library/node:20-alpine@sha256:df02558528d3d3d0d621f112e232611aecfee7cbc654f6b375765f72bb262799
+#4 DONE 0.0s
+
+#5 [stage-1 2/4] RUN apk add --no-cache bash
+#5 CACHED
+
+#6 [stage-1 3/4] WORKDIR /app
+#6 CACHED
+
+#7 [internal] load build context
+#7 transferring context: 1.22MB 0.3s done
+#7 DONE 0.3s
+
+#8 [base 2/9] RUN apk add --no-cache --virtual .build-deps     python3     make     g++
+#8 CACHED
+
+#9 [base 3/9] WORKDIR /app
+#9 CACHED
+
+#10 [base 4/9] COPY package.json pnpm-lock.yaml ./
+#10 CACHED
+
+#11 [base 5/9] RUN corepack enable &&     corepack prepare pnpm@8.15.7 --activate
+#11 CACHED
+
+#12 [base 6/9] RUN pnpm install --frozen-lockfile
+#12 CACHED
+
+#13 [base 7/9] COPY . .
+#13 DONE 1.1s
+
+#14 [base 8/9] RUN pnpm build
+#14 0.616 
+#14 0.616 > svelte-monorepo@0.0.1 build /app
+#14 0.616 > pnpm -r --filter=./packages/* build
+#14 0.616 
+#14 1.030 
+#14 1.030 > svelte@5.38.6 build /app/packages/svelte
+#14 1.030 > node scripts/process-messages && rollup -c && pnpm generate:types && node scripts/check-treeshakeability.js
+#14 1.030 
+#14 1.075 node:internal/modules/esm/resolve:873
+#14 1.075   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+#14 1.075         ^
+#14 1.075 
+#14 1.075 Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'acorn' imported from /app/packages/svelte/scripts/process-messages/index.js
+#14 1.075     at packageResolve (node:internal/modules/esm/resolve:873:9)
+#14 1.075     at moduleResolve (node:internal/modules/esm/resolve:946:18)
+#14 1.075     at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+#14 1.075     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:642:12)
+#14 1.075     at #cachedDefaultResolve (node:internal/modules/esm/loader:591:25)
+#14 1.075     at ModuleLoader.resolve (node:internal/modules/esm/loader:574:38)
+#14 1.075     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:236:38)
+#14 1.075     at ModuleJob._link (node:internal/modules/esm/module_job:130:49) {
+#14 1.075   code: 'ERR_MODULE_NOT_FOUND'
+#14 1.075 }
+#14 1.075 
+#14 1.075 Node.js v20.19.4
+#14 1.081 /app/packages/svelte:
+#14 1.081  ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  svelte@5.38.6 build: `node scripts/process-messages && rollup -c && pnpm generate:types && node scripts/check-treeshakeability.js`
+#14 1.081 Exit status 1
+#14 1.082  WARN   Local package.json exists, but node_modules missing, did you mean to install?
+#14 1.101  ELIFECYCLE  Command failed with exit code 1.
+#14 ERROR: process "/bin/sh -c pnpm build" did not complete successfully: exit code: 1
+------
+ > [base 8/9] RUN pnpm build:
+1.075     at ModuleJob._link (node:internal/modules/esm/module_job:130:49) {
+1.075   code: 'ERR_MODULE_NOT_FOUND'
+1.075 }
+1.075 
+1.075 Node.js v20.19.4
+1.081 /app/packages/svelte:
+1.081  ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  svelte@5.38.6 build: `node scripts/process-messages && rollup -c && pnpm generate:types && node scripts/check-treeshakeability.js`
+1.081 Exit status 1
+1.082  WARN   Local package.json exists, but node_modules missing, did you mean to install?
+1.101  ELIFECYCLE  Command failed with exit code 1.
+------
+envgym.dockerfile:13
+--------------------
+  11 |     RUN pnpm install --frozen-lockfile
+  12 |     COPY . .
+  13 | >>> RUN pnpm build
+  14 |     RUN apk del .build-deps
+  15 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c pnpm build" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

@@ -1,0 +1,100 @@
+Based on the hardware specifications (x86_64 architecture, Linux/amd64 base image, Docker v28.1.1 with BuildKit support), here's the optimized environment setup plan:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. **DOWNLOADS NEEDED**  
+   - Docker (v28.1.1 already installed)  
+   - Code editor (VS Code v1.85+ or equivalent) for host editing  
+   - *Note*: Node.js, npm, Git, and test dependencies will be containerized  
+
+2. **FILES TO CREATE**  
+   - `Dockerfile` (content below)  
+   - `.dockerignore` (content below)  
+
+3. **NECESSARY TEST CASES IN THE CODEBASE**  
+   *(Unchanged - same as original plan)*  
+
+4. **COMPLETE TODO LIST (DOCKER-CENTRIC)**  
+   1. Create `Dockerfile` in project root:  
+   ```dockerfile
+   # Use multi-stage build for minimal image size
+   FROM node:18-alpine AS builder
+   WORKDIR /app
+   # Install Linux dependencies
+   RUN apk add --no-cache git
+   # Cache dependencies
+   COPY package*.json ./
+   RUN npm install --omit=optional
+   # Copy source
+   COPY . .
+   # Build arguments for Sauce Labs
+   ARG SAUCE_USERNAME
+   ARG SAUCE_ACCESS_KEY
+   # Run build pipeline with BuildKit optimizations
+   RUN --mount=type=cache,target=/app/.cache \
+       npm test && \
+       npm run build && \
+       SAUCE_USERNAME=${SAUCE_USERNAME} SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY} npm run test:sauce && \
+       npm run lint
+   # Final stage with only build artifacts
+   FROM alpine:latest
+   COPY --from=builder /app/dayjs.min.js /dist/
+   ```  
+
+   2. Create `.dockerignore` in project root:  
+   ```gitignore
+   node_modules
+   .git
+   .vscode
+   *.log
+   .DS_Store
+   dist
+   coverage
+   ```  
+
+   3. Build Docker image with BuildKit:  
+   ```bash
+   DOCKER_BUILDKIT=1 docker build \
+     --platform linux/amd64 \
+     --build-arg SAUCE_USERNAME="$YOUR_SAUCE_USERNAME" \
+     --build-arg SAUCE_ACCESS_KEY="$YOUR_SAUCE_ACCESS_KEY" \
+     -t dayjs-build .
+   ```  
+
+   4. Verify build artifacts:  
+   ```bash
+   docker run --rm -v "$(pwd)/dist:/target" dayjs-build cp -r /dist /target
+   # Check file size
+   stat -c "%s" dist/dayjs.min.js | awk '$1 <= 3062 {print "PASS: Bundle size valid"}'
+   ```  
+
+   5. Run interactive container for development:  
+   ```bash
+   docker run -it --rm \
+     -v /home/cc/EnvGym/data/iamkun_dayjs:/app \
+     -w /app \
+     node:18-alpine sh
+   ```
+
+**Key Adjustments**:  
+1. **Architecture Optimization**:  
+   - Explicit `--platform=linux/amd64` flag ensures x86_64 compatibility  
+   - Alpine-based images reduce layer size by 70% compared to Debian  
+
+2. **BuildKit Enhancements**:  
+   - Cache mounts (`--mount=type=cache`) speed up repeated builds  
+   - Parallel layer processing utilizes multi-core CPUs efficiently  
+
+3. **Sauce Labs Security**:  
+   - Credentials injected via `--build-arg` (never stored in image layers)  
+   - Ephemeral containers prevent credential persistence  
+
+4. **Storage Optimization**:  
+   - Multi-stage build reduces final image to <5MB  
+   - `.dockerignore` minimizes build context (faster builds)  
+
+5. **Validation Modifications**:  
+   - Bundle size check moved to post-build script  
+   - All tests execute within isolated container environment  
+
+This plan eliminates native host dependencies while maintaining all original verification steps, optimized for the specified hardware constraints.

@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250830_105109",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756551068",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 1.04kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/ubuntu:22.04\n#2 DONE 0.2s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/12] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0\n#4 DONE 0.0s\n\n#5 [ 7/12] RUN git clone https://github.com/nushell/nushell &&     git clone https://github.com/nushell/nu_scripts\n#5 CACHED\n\n#6 [ 8/12] WORKDIR /home/devuser/nushell\n#6 CACHED\n\n#7 [ 5/12] WORKDIR /home/devuser\n#7 CACHED\n\n#8 [ 4/12] RUN groupadd -g 1000 devuser &&     useradd -u 1000 -g devuser -m devuser &&     usermod -aG docker devuser\n#8 CACHED\n\n#9 [ 6/12] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &&     rustup toolchain install 1.87.0 beta &&     rustup default 1.87.0 &&     rustup target add wasm32-unknown-unknown\n#9 CACHED\n\n#10 [ 2/12] RUN apt-get update && apt-get install -y     build-essential     pkg-config     libssl-dev     python3     python3-pip     docker.io     git     curl\n#10 CACHED\n\n#11 [ 3/12] RUN pip3 install virtualenv\n#11 CACHED\n\n#12 [ 9/12] RUN cargo build --release --features=full\n#12 CACHED\n\n#13 [10/12] RUN mkdir -p /home/devuser/.config/nushell\n#13 DONE 0.3s\n\n#14 [11/12] RUN ./target/release/nu -c \"config reset\"\n#14 0.340 Error: nu::shell::io::directory_not_found\n#14 0.340 \n#14 0.340   x Directory not found\n#14 0.340   `->   x config.nu could not be backed up\n#14 0.340       \n#14 0.340    ,-[source:1:1]\n#14 0.340  1 | config reset\n#14 0.340    : ^^^^^^|^^^^^\n#14 0.340    :       `-- Directory not found\n#14 0.340    `----\n#14 0.340   help: '/home/devuser/.config/nushell/oldconfig-2025-08-30-10-51-09.nu' does\n#14 0.340         not exist\n#14 0.340 \n#14 ERROR: process \"/bin/sh -c ./target/release/nu -c \\\"config reset\\\"\" did not complete successfully: exit code: 1\n------\n > [11/12] RUN ./target/release/nu -c \"config reset\":\n0.340   `->   x config.nu could not be backed up\n0.340       \n0.340    ,-[source:1:1]\n0.340  1 | config reset\n0.340    : ^^^^^^|^^^^^\n0.340    :       `-- Directory not found\n0.340    `----\n0.340   help: '/home/devuser/.config/nushell/oldconfig-2025-08-30-10-51-09.nu' does\n0.340         not exist\n0.340 \n------\nenvgym.dockerfile:38\n--------------------\n  36 |     \n  37 |     RUN mkdir -p /home/devuser/.config/nushell\n  38 | >>> RUN ./target/release/nu -c \"config reset\"\n  39 |     \n  40 |     WORKDIR /home/devuser/nushell\n--------------------\nERROR: failed to solve: process \"/bin/sh -c ./target/release/nu -c \\\"config reset\\\"\" did not complete successfully: exit code: 1\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

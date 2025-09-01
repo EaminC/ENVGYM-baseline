@@ -1,0 +1,97 @@
+=== Docker Execution Log - 20250830_105631 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756551358
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.13kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/14] FROM docker.io/library/ubuntu:22.04@sha256:1aa979d85661c488ce030ac292876cf6ed04535d3a237e49f61542d8e5de5ae0
+#4 DONE 0.0s
+
+#5 [ 4/14] RUN groupadd -g 1000 devuser &&     useradd -u 1000 -g devuser -m devuser &&     usermod -aG docker devuser
+#5 CACHED
+
+#6 [ 9/14] RUN cargo build --release --features=full
+#6 CACHED
+
+#7 [ 2/14] RUN apt-get update && apt-get install -y     build-essential     pkg-config     libssl-dev     python3     python3-pip     docker.io     git     curl
+#7 CACHED
+
+#8 [ 6/14] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &&     rustup toolchain install 1.87.0 beta &&     rustup default 1.87.0 &&     rustup target add wasm32-unknown-unknown
+#8 CACHED
+
+#9 [ 7/14] RUN git clone https://github.com/nushell/nushell &&     git clone https://github.com/nushell/nu_scripts
+#9 CACHED
+
+#10 [ 8/14] WORKDIR /home/devuser/nushell
+#10 CACHED
+
+#11 [ 5/14] WORKDIR /home/devuser
+#11 CACHED
+
+#12 [ 3/14] RUN pip3 install virtualenv
+#12 CACHED
+
+#13 [10/14] RUN mkdir -p /home/devuser/.config/nushell
+#13 CACHED
+
+#14 [11/14] RUN chmod 755 /home/devuser/.config/nushell
+#14 DONE 0.3s
+
+#15 [12/14] RUN ./target/release/nu --version
+#15 0.359 0.106.2
+#15 DONE 0.4s
+
+#16 [13/14] RUN ./target/release/nu -c "config reset" || true
+#16 0.337 Error: nu::shell::io::directory_not_found
+#16 0.337 
+#16 0.337   x Directory not found
+#16 0.337   `->   x config.nu could not be backed up
+#16 0.337       
+#16 0.337    ,-[source:1:1]
+#16 0.337  1 | config reset
+#16 0.337    : ^^^^^^|^^^^^
+#16 0.337    :       `-- Directory not found
+#16 0.337    `----
+#16 0.337   help: '/home/devuser/.config/nushell/oldconfig-2025-08-30-10-55-59.nu' does
+#16 0.337         not exist
+#16 0.337 
+#16 DONE 0.4s
+
+#17 [14/14] WORKDIR /home/devuser/nushell
+#17 DONE 0.0s
+
+#18 exporting to image
+#18 exporting layers
+#18 exporting layers 31.3s done
+#18 writing image sha256:8400b6d0b59850108758338eccced79c5ca174913c2d8ab4c72f80dfe1e051fa done
+#18 naming to docker.io/library/envgym_test_1756551358 done
+#18 DONE 31.3s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

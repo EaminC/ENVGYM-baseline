@@ -1,0 +1,7 @@
+current progress
+The current Dockerfile uses a single-stage build, installs both build and runtime dependencies, copies the entire context, generates SSL certificates if missing, and builds the project to run in a bash shell. It does not implement the multi-stage build specified in the plan.
+
+next step
+Modify the Dockerfile to implement a multi-stage build: 
+1. Builder stage: Use ubuntu:20.04 base, install build dependencies (build-essential, cmake, libssl-dev, zlib1g-dev), copy source, and build the project. 
+2. Runtime stage: Use ubuntu:20.04 base, install only runtime dependencies (libssl3), copy the built server binary from builder stage to /usr/local/bin, copy ssl certificates to /ssl, and copy static content from docker/html to /html. Set EXPOSE 80 and CMD to run the server on port 80 with /html as document root. Remove certificate generation and build steps from runtime stage.

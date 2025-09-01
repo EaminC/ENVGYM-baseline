@@ -1,0 +1,42 @@
+Based on the hardware information and requirements, here's the optimized Dockerfile with adjustments:
+
+```dockerfile
+# Dockerfile for TabPFN environment (CPU-only)
+FROM python:3.9-slim-bullseye
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install PyTorch CPU version and dependencies in single layer
+RUN pip install --no-cache-dir \
+    torch==1.13.1+cpu \
+    torchvision==0.14.1+cpu \
+    torchaudio==0.13.1 \
+    -f https://download.pytorch.org/whl/cpu/torch_stable.html \
+    tabpfn \
+    scikit-learn \
+    xgboost
+
+# Set environment variables
+ENV OMP_NUM_THREADS=4
+ENV PYTHONUNBUFFERED=1
+
+CMD ["python"]
+```
+
+Key adjustments made:
+1. Changed base image to `python:3.9-slim-bullseye` for explicit Debian version compatibility
+2. Combined all pip installations into a single RUN layer to reduce image size
+3. Added `--no-cache-dir` to pip install to save storage space
+4. Added `OMP_NUM_THREADS=4` environment variable to control CPU thread usage
+5. Removed GPU-specific components while maintaining CPU support
+6. Kept multi-core optimization through environment variables rather than build flags (since no compilation needed)
+7. Verified compatibility with x86_64 architecture through Debian base image
+8. Maintained working directory consistency with host path requirements
+
+The image is now optimized for CPU-only execution with proper thread management and minimal storage footprint. All paths and dependencies align with the hardware constraints.

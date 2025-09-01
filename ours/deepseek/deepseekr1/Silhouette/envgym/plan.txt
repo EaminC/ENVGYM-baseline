@@ -1,0 +1,107 @@
+Based on the provided hardware information (x86_64 architecture, no NVIDIA GPU, Docker environment without GPU support), here's the adjusted environment setup plan:
+
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: 
+   - Git (latest)
+   - QEMU (v6.2+ via qemu-system-x86)
+   - Python 3.10.x with ctypes/readline modules
+   - Silhouette repository via git clone
+   - VM image (silhouette_guest_vm.qcow2) from Zenodo
+   - Ubuntu 22.x packages: build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev python3-pip qemu-system-x86 memcached linux-headers-generic llvm-15-tools
+   - LLVM 15 (required for trace instrumentation)
+   - Clang 15 (for building struct layout tools)
+   - Python packages: pymemcache memcache psutil pytz qemu.qmp intervaltree aenum netifaces prettytable tqdm numpy matplotlib
+   - Build tools (cmake)
+   - libmemcached-dev (for memcached development)
+   - PMFS dependencies: NVDIMM-enabled kernel (CONFIG_BLK_DEV_PMEM)
+
+   REMOVED:  
+   - linux-headers-$(uname -r) → Replaced with linux-headers-generic (container-safe)
+   - Explicit CUDA/NVIDIA references removed (no GPU support)
+
+2. FILES TO CREATE: 
+   - SSH config: ~/.ssh/config (for VM port forwarding)
+   - QEMU snapshot: qemu-img create -f qcow2 -b silhouette_guest_vm.qcow2 snapshot.qcow2
+   - Environment log: /home/cc/EnvGym/data/Silhouette/setup.log
+   - Python virtual environment: /home/cc/EnvGym/data/Silhouette/Silhouette/venv
+   - Memcached configuration: /etc/memcached.conf
+   - Temporary test files for tool validation
+   - ACE workload sequence directories
+   - Bug reproduction artifacts
+   - Scalability result directories
+   - PMFS mount directory: /mnt/ramdisk (in guest VM)
+   - PMFS build artifacts
+
+   PATH ADJUSTMENTS:  
+   - All paths rooted at /home/cc/EnvGym/data/Silhouette
+
+3. NECESSARY TEST CASES: 
+   (Unchanged from original plan - all tests remain valid for x86_64 without GPU)
+
+4. COMPLETE TODO LIST: 
+   1. Verify hardware support: 
+      - `grep -E 'vmx|svm' /proc/cpuinfo` (KVM)
+      - `dmesg | grep -i pmem` (Persistent Memory)
+      - Check kernel config: `grep CONFIG_BLK_DEV_PMEM /boot/config-$(uname -r)`
+   
+   2. Install core packages: 
+      - `apt update && apt install -y git python3.10 python3-venv llvm-15 clang-15 libmemcached-dev cmake linux-headers-generic llvm-15-tools qemu-system-x86 memcached`
+   
+   3. Create workspace: 
+      - `mkdir -p /home/cc/EnvGym/data/Silhouette/qemu_imgs && cd /home/cc/EnvGym/data/Silhouette`
+   
+   4. Clone repository: 
+      - `git clone https://github.com/iaoing/Silhouette.git`
+   
+   5. Download VM image: 
+      - `wget -P /home/cc/EnvGym/data/Silhouette/qemu_imgs https://zenodo.org/records/14550794/files/silhouette_guest_vm.qcow2`
+   
+   6. Create Python virtual environment: 
+      - `cd Silhouette && python3.10 -m venv venv && source venv/bin/activate`
+   
+   7. Run installation scripts: 
+      - `bash install_dep.sh && bash prepare.sh`
+   
+   8. Configure SSH key permissions: 
+      - `cd scripts/fs_conf/sshkey && chmod 600 fast25_ae_vm && chmod 644 fast25_ae_vm.pub`
+   
+   9. Build and validate tools: 
+      - `cd tools/md5 && make`
+      - Verify: `echo -n "test" | ./md5` → 098f6bcd4621d373cade4e832627b4f6
+      - `cd tools/src_info && make`
+      - `cd tools/struct_layout_ast && make`
+      - `cd tools/struct_layout_pass && make`
+   
+   10. Build trace instrumentation: 
+        - `cd trace/build-llvm15 && make`
+   
+   11. Build ACE workload generator: 
+        - `cd workload/ace`
+        - Generate sequences: `python ace.py -t pm -l 1`, `-l 2`, `-l 3`
+        - Build binaries: `python3 cmAdapterParallel.py --i seqX -n 8 && make SEQ_DIR=seqX OUT_DIR=bin -j8` (X=1,2,3)
+   
+   12. Create VM snapshot: 
+        - `qemu-img create -f qcow2 -b silhouette_guest_vm.qcow2 /home/cc/EnvGym/data/Silhouette/qemu_imgs/snapshot.qcow2`
+   
+   13. Test VM launch: 
+        - Use QEMU command from README → `ssh -p 9001 bing@localhost`
+   
+   14. Build and configure PMFS in guest VM: (via SSH)
+        - `ssh -p 9001 bing@localhost`
+        - `cd thirdPart/pmfs-chipmunk-disable-chipmunk-bugs && make`
+        - `sudo insmod pmfs.ko`
+        - `sudo mkdir -p /mnt/ramdisk`
+        - Test mounts: `sudo mount -t pmfs -o init /dev/pmem0 /mnt/ramdisk`
+   
+   15-28. (Remain unchanged from original plan - paths auto-adjusted to /home/cc/EnvGym/data/Silhouette)
+
+KEY ADJUSTMENTS:
+1. All paths rooted at /home/cc/EnvGym/data/Silhouette
+2. linux-headers-$(uname -r) → linux-headers-generic (container-safe alternative)
+3. Removed GPU-specific dependencies
+4. Added `-y` flag to apt commands for non-interactive installation
+5. QEMU image paths updated to absolute location
+6. Docker-specific kernel header handling
+7. Retained all x86_64-compatible components
+8. Confirmed QEMU software emulation path (no KVM acceleration required)

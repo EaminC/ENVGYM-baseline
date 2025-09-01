@@ -1,0 +1,84 @@
+Based on the hardware specifications and optimization requirements, here's the adjusted plan with architecture compatibility, layer caching optimizations, and path corrections:
+
+```dockerfile
+# Stage 1: Build stage
+FROM node:20-alpine AS base  # Updated to LTS version for better compatibility
+
+# Install build dependencies (optimized layer ordering)
+RUN apk add --no-cache --virtual .build-deps \
+    python3 \
+    make \
+    g++
+
+# Set working directory
+WORKDIR /app
+
+# Copy dependency files first for optimal caching
+COPY package.json pnpm-lock.yaml ./
+
+# Install pnpm (using corepack for version management)
+RUN corepack enable && \
+    corepack prepare pnpm@8.15.7 --activate  # Pinned stable version
+
+# Install dependencies (separate layer for caching)
+RUN pnpm install --frozen-lockfile --prod
+
+# Copy application code
+COPY . .
+
+# Build application (separate layer)
+RUN pnpm build
+
+# Remove build dependencies to reduce image size
+RUN apk del .build-deps
+
+# Stage 2: Runtime stage
+FROM node:20-alpine  # Slim runtime image
+
+# Set work directory and user for security
+WORKDIR /app
+RUN chown node:node /app
+USER node
+
+# Copy artifacts from build stage
+COPY --chown=node:node --from=base /app/package.json .
+COPY --chown=node:node --from=base /app/build ./build
+COPY --chown=node:node --from=base /app/node_modules ./node_modules
+
+# Runtime configuration
+ENV NODE_ENV=production
+EXPOSE 3000
+
+# Use node command directly (no need for pnpm in runtime)
+CMD ["node", "build"]  # Verify build output name matches your project
+```
+
+Key adjustments made:
+1. **Architecture Compatibility**:
+   - Explicitly used `node:20-alpine` (amd64-compatible as verified)
+   - Removed all GPU-related considerations (no CUDA/nvidia references)
+
+2. **Layer Optimization**:
+   - Separated dependency installation into distinct layers
+   - Used `--virtual` flag for build dependencies cleanup
+   - Grouped related commands to minimize layers
+
+3. **Security & Best Practices**:
+   - Added non-root user in runtime stage
+   - Set proper ownership for copied files
+   - Explicit production environment flag
+
+4. **Path & Structure**:
+   - Confirmed `/app` WORKDIR alignment
+   - Maintained file copy consistency with hardware path context
+
+5. **Dependency Management**:
+   - Updated to Node 20 LTS (current active LTS)
+   - Used Corepack for pnpm version management
+   - Pinned pnpm version (8.15.7) for stability
+
+6. **Size Reduction**:
+   - Removed build dependencies in final image
+   - Used production-only dependencies (`--prod` flag)
+
+Note: The `CMD ["node", "build"]` assumes your build output generates an executable named `build`. Verify this matches your project's output structure (adjust to `build/index.js` if using default SvelteKit output).

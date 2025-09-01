@@ -1,0 +1,107 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: 
+   - jq prebuilt binary for linux/amd64 (jq-linux64) from https://github.com/jqlang/jq/releases
+   - Docker Engine
+   - Git
+   - libtool, make, automake, autoconf
+   - gcc/clang compiler toolchain
+   - build-essential package
+   - bison (≥3.0) and flex
+   - pipenv
+   - Valgrind (optional)
+   - libasan/libubsan (optional)
+   - Python 3.9+
+   - Python dependencies: jinja2, pyyaml, markdown, lxml, jsonschema, importlib_resources
+   - rpm-build (optional)
+   - pkg-config
+
+2. FILES TO CREATE: 
+   - jq.spec (in source directory during RPM build)
+   - test.json (in /home/cc/EnvGym/data/jqlang_jq)
+
+3. NECESSARY TEST CASES IN THE CODEBASE: 
+   [Unchanged from original plan]
+
+4. COMPLETE TODO LIST: 
+   1. Confirm OS: Linux/amd64 (x86_64)
+   2. For prebuilt binary installation:
+        a. Download jq-linux64 binary
+        b. Move to /usr/local/bin: `sudo mv jq-linux64 /usr/local/bin/jq`
+        c. `sudo chmod +x /usr/local/bin/jq`
+        d. Verify: `jq --version`
+   3. For Docker installation (using BuildKit):
+        a. Install Docker Engine
+        b. Option 1: Prebuilt image
+            i. `docker pull ghcr.io/jqlang/jq:latest`
+            ii. `docker run --rm ghcr.io/jqlang/jq:latest --version`
+        c. Option 2: Custom image
+            i. Ensure Dockerfile in /home/cc/EnvGym/data/jqlang_jq
+            ii. `docker build -t jq-custom .`
+            iii. `docker run --rm jq-custom --version`
+            iv. `docker run --rm jq-custom sh -c "test -f /usr/local/lib/libjq.* && echo 'libjq found'; test -f /usr/local/lib/pkgconfig/libjq.pc && echo 'pkg-config found'"`
+   4. For source build:
+        a. Install dependencies:  
+           `sudo apt update && sudo apt install git make automake autoconf libtool build-essential bison flex pkg-config`
+        b. `git clone https://github.com/jqlang/jq.git`
+        c. `cd jq`
+        d. Documentation setup:
+             i. Install pipenv: `sudo apt install pipenv` or `pip3 install pipenv`
+             ii. `python3 -c "import sys; assert sys.version_info >= (3,9)"`
+             iii. `cd docs && pipenv sync`
+             iv. `pipenv run pip list | grep -E 'jinja2|pyyaml|markdown|lxml|jsonschema|importlib_resources'`
+        e. `git submodule update --init`
+        f. [Optional] decNumber validation:
+             i. `cd vendor/decNumber`
+             ii. `gcc -O3 -o example1 example1.c decNumber.c decContext.c`
+             iii. `./example1 1.23 1.27 | grep "2.50"`
+             iv. `cd ../..`
+        g. `autoreconf -i`
+        h. [Optional] Configure flags (amd64-compatible):
+             - Sanitizers: `./configure --with-oniguruma=builtin --enable-asan --enable-ubsan`
+             - Valgrind: `./configure --with-oniguruma=builtin --enable-valgrind`
+             - Static: `./configure --with-oniguruma=builtin --enable-all-static`
+             - Docs: `./configure --with-oniguruma=builtin --enable-docs`
+             - Devel: `./configure --enable-devel`
+        i. `make -j$(nproc)`
+        j. `make check`
+        k. `sudo make install`
+        l. `jq --version`
+        m. [If docs] `man -w jq >/dev/null && echo "Manpage verified"`
+        n. Library verification:
+             - `pkg-config --libs --cflags libjq`
+             - Create test_libjq.c with specified content
+             - `gcc test_libjq.c -o test_libjq $(pkg-config --libs --cflags libjq)`
+             - `./test_libjq`
+             - `rm test_libjq test_libjq.c`
+        o. [Optional] Docs build:
+             - `(cd docs && pipenv run python3 build_website.py)`
+             - [Preview] `(cd docs && python3 -m http.server -d output)`
+        p. [Optional] RPM packaging (Ubuntu requires rpm package):
+             - `sudo apt install rpm`
+             - Overwrite jq.spec
+             - `make rpm`
+             - [Verify] `rpm -qlp ./jq-*.rpm`
+             - [Test install] `sudo rpm -ivh jq-*.rpm && jq --version && jq '.test' /home/cc/EnvGym/data/jqlang_jq/test.json`
+   5. Create test file:  
+        `cd /home/cc/EnvGym/data/jqlang_jq && echo '{"test":1234}' > test.json`
+   6. Smoke tests (from /home/cc/EnvGym/data/jqlang_jq):
+        - Binary:  
+          `jq --version`  
+          `jq '.test' test.json`  
+          `echo '123.45' | jq '.*1.1'`
+        - Docker prebuilt:  
+          `docker run --rm ghcr.io/jqlang/jq:latest --version`  
+          `docker run --rm -i ghcr.io/jqlang/jq:latest '.test' < test.json`
+        - Custom image:  
+          `docker run --rm jq-custom --version`  
+          `docker run --rm -i jq-custom '.test' < test.json`
+   7. Complex processing test:  
+        `echo '{"a":{"b":[1,2]}}' | jq '.a.b[]'`  
+        `echo '{"a":{"b":[1,2]}}' | docker run --rm -i jq-custom '.a.b[]'`
+   8. Error handling:  
+        `echo invalid | jq .`  
+        `echo invalid | docker run --rm -i jq-custom .`
+   9. [Optional] Valgrind:  
+        `sudo apt install valgrind`  
+        `cd /home/cc/EnvGym/data/jqlang_jq/jq && make check`

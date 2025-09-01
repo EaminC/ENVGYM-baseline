@@ -1,0 +1,77 @@
+Based on the provided hardware information (Linux/amd64 architecture, no GPU), here's the adjusted environment setup plan with compatibility modifications:
+
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED: 
+   - Node.js (v22+ Linux x64 binaries)
+   - npm (v9.x+ bundled with Node.js)
+   - Vercel CLI (latest Linux-compatible version)
+   - Git (latest Linux build)
+   - Jest (v29.7.0+)
+   - ESLint (v9.33.0+)
+   - Prettier (v3.6.2+)
+   - Cairo/Pango dependencies: `sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev`  [ADDED FOR LINUX COMPAT]
+
+2. FILES TO CREATE: 
+   - /home/cc/EnvGym/data/anuraghazra_github-readme-stats/.env
+   - /home/cc/EnvGym/data/anuraghazra_github-readme-stats/vercel.json
+   - /home/cc/EnvGym/data/anuraghazra_github-readme-stats/test/unit/api.test.js
+   - Jest config files (if missing)
+
+3. NECESSARY TEST CASES: 
+   - API endpoint validation (/api?username=test)
+   - Theme rendering checks (headless mode)
+   - Private repo stat tests
+   - Rate limit simulations
+   - Error handling tests
+   - WakaTime integration
+   - Param validation
+   - Performance benchmarks
+   - Theme doc generation
+   - Linting/formatting checks
+   - Snapshot verification
+
+4. COMPLETE TODO LIST: 
+   - Install Node.js v22+: `curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs`
+   - Verify installations: `node -v && npm -v`
+   - Clone repo: `git clone https://github.com/anuraghazra/github-readme-stats.git`
+   - Navigate: `cd github-readme-stats`
+   - Install Cairo/Pango: `sudo apt-get update && sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev`  [ADDED]
+   - Install deps: `npm install`
+   - Generate GitHub PAT (repo/user scopes)
+   - Create .env: `echo "PAT_1=<token>" > .env`
+   - Create vercel.json: `echo '{"builds": [{"src": "*.js", "use": "@vercel/node"}], "headers": [{"source": "/(.*)", "headers": [{"key": "Cache-Control", "value": "max-age=21600"}]}]}' > vercel.json`
+   - Run linter: `npm run lint`
+   - Run formatter: `npm run format`
+   - Generate theme docs: `npm run theme-readme-gen`
+   - Start server: `npm run dev`
+   - Verify local: `curl http://localhost:3000/api?username=test`
+   - Install Vercel: `npm install -g vercel`
+   - Vercel login: `vercel login`
+   - Link project: `vercel link`
+   - Set env var: `vercel env add PAT_1`
+   - Deploy: `vercel --prod`
+   - Verify deployment: `curl https://<your-domain>.vercel.app/api?username=test`
+   - Create test dir: `mkdir -p test/unit`
+   - Add test cases to api.test.js
+   - Run tests: `npm test`
+   - Benchmarks: `npm run bench`
+   - Update snapshots: `npm run test:update:snapshot`
+   - Configure Vercel CI/CD
+   - Add caching: `CACHE_SECONDS=86400` in Vercel env
+   - Verify cache headers
+   - Test private stats
+   - Theme verification: `npm run preview-theme`
+   - Test WakaTime
+   - Verify error handling
+   - Generate languages: `npm run generate-langs-json`
+
+Key adjustments made:
+1. Added explicit Linux dependencies (Cairo/Pango) for SVG rendering
+2. Specified absolute paths for file creation
+3. Simplified Vercel config creation by combining cache headers
+4. Added Linux-compatible Node.js installation method
+5. Replaced browser checks with curl commands for headless validation
+6. Removed GPU-dependent operations (none present in original plan)
+7. Verified all paths match working directory structure
+8. Kept all test cases compatible with headless environment

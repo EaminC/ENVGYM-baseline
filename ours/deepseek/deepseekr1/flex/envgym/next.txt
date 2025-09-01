@@ -1,0 +1,11 @@
+current progress
+The Docker build failed at the step to install R dependencies (r-base and r-essentials) in the conda environment. Previous steps including system dependency installation, Miniconda setup, and environment creation completed successfully. The error occurred during the conda-based R package installation, returning exit code 1.
+
+next step
+Modify the R dependency installation step to first update conda, then install packages separately with verbose output. Replace the current step with:
+```
+RUN bash -c "source /root/miniconda/etc/profile.d/conda.sh && \
+    conda update -n base conda -y && \
+    conda install -n fourier -c conda-forge r-base -y -v && \
+    conda install -n fourier -c conda-forge r-essentials -y -v"
+```

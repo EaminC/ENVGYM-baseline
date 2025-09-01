@@ -1,0 +1,87 @@
+### ADJUSTED ENVIRONMENT SETUP PLAN ###
+
+**HARDWARE ADAPTATIONS APPLIED:**
+- All paths updated to match working directory: `/home/cc/EnvGym/data/exli`
+- Optimized for x86_64 architecture (linux/amd64)
+- Removed GPU/CUDA dependencies
+- Enabled BuildKit for Docker builds
+- Multi-core build optimizations
+- Directory structure validated against host OS (Linux)
+
+1. **DOWNLOADS NEEDED** (No changes - compatible with x86_64):  
+   - Docker (latest stable version)  
+   - Git  
+   - Pre-generated tests from exlidata repository (optional)  
+   - Python (≥3.7)  
+   - Python packages: seutil, xmltodict, tqdm, universalmutator  
+   - Research extras: seaborn, unidiff, gensim, pandas, venn, beautifulsoup4  
+   - Dev tools: flake8, black, ipykernel  
+
+2. **FILES TO CREATE** (Paths adjusted):  
+   - `/home/cc/EnvGym/data/exli/results/target-stmt/project-file.txt`  
+   - `/home/cc/EnvGym/data/exli/log/raninline.log`  
+   - `/home/cc/EnvGym/data/exli/all-tests/project-dir/`  
+   - `/home/cc/EnvGym/data/exli/results/its-report.json`  
+   - `/home/cc/EnvGym/data/exli/exlidata/` (cloned location)  
+   - `/home/cc/EnvGym/data/exli/exli/README.rst` (project root)  
+
+3. **NECESSARY TEST CASES** (No changes - hardware agnostic):  
+   - Target statement identification tests  
+   - Inline test construction tests  
+   - ... (original test cases unchanged)  
+
+4. **ADJUSTED TODO LIST**:  
+   - Install Docker and verify: `docker --version`  
+   - **Clone repository**:  
+     ```bash
+     cd /home/cc/EnvGym/data/exli
+     git clone https://github.com/EngineeringSoftware/exli.git
+     ```  
+   - **Build Docker image with BuildKit**:  
+     ```bash
+     cd exli
+     DOCKER_BUILDKIT=1 docker build -t exli --build-arg MAVEN_OPTS="-T 4" .
+     ```  
+   - **Start container with mounted volume**:  
+     ```bash
+     docker run -it -v /home/cc/EnvGym/data/exli:/exli exli /bin/bash
+     ```  
+   - Inside container:  
+     - Activate environment: `conda activate exli`  
+     - Verify dependencies:  
+       ```bash
+       java -version
+       mvn -v
+       python --version  # Confirm ≥3.7
+       ```  
+     - **Create directory structure**:  
+       ```bash
+       mkdir -p /exli/{results/target-stmt,log,all-tests,results/r0-its-report,results/r1-its-report,results/mutants,generated-tests}
+       ```  
+     - **(Optional) Download pre-generated tests**:  
+       ```bash
+       cd /exli && git clone https://pipiyu@bitbucket.org/sedata/exlidata.git
+       ```  
+     - **Install Python package**:  
+       ```bash
+       cd /exli/exli/python
+       pip install .[research]
+       ```  
+     - Execute reproduction script: `bash reproduce.sh`  
+     - Verify installations:  
+       ```bash
+       python -c "import exli_research, seaborn, pandas"
+       ```  
+     - Validate README: `/exli/exli/README.rst`  
+     - Verify JSON reports: `/exli/results/its-report.json`  
+   - **Troubleshooting additions**:  
+     - Check file permissions in mounted volume  
+     - Verify inotify limits: `sysctl fs.inotify.max_user_watches`  
+     - Monitor storage: `df -h /exli`  
+
+**KEY CHANGES SUMMARY**:  
+1. All paths updated to `/home/cc/EnvGym/data/exli` or container-mounted `/exli`  
+2. Docker build uses BuildKit and parallel Maven builds (`-T 4`)  
+3. Added volume mount in `docker run` for host-container sync  
+4. Added storage/inotify checks for Linux host optimization  
+5. Removed redundant path levels in directory structure
