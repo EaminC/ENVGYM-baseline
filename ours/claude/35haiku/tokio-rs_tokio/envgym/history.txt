@@ -1,0 +1,1971 @@
+=== Iteration 1 - [2025-09-02 08:58:46] ===
+PLAN:
+  === ADJUSTED ENVIRONMENT SETUP PLAN ===
+  1. DOWNLOADS NEEDED:
+     - Rust Programming Language (rustc & cargo)
+       * Version: 1.70 or higher (confirmed x86_64 compatibility)
+       * Nightly version support for documentation
+       * Specific nightly version: nightly-2025-01-25
+       * Download from: https://rustup.rs/
+     - Git (for version control)
+       * Latest stable version compatible with x86_64
+     - Visual Studio Code or Rust-compatible IDE
+     - Docker Configuration
+       * Base Image: rust:slim-bullseye (optimized for x86_64)
+       * Platform: linux/amd64
+       * Multi-stage build support
+       * Use .dockerignore for optimization
+     - Development Tools
+       * Standard x86_64 Linux development packages
+       * Build-essential
+       * pkg-config
+       * libssl-dev
+  2. SYSTEM REQUIREMENTS ADJUSTMENTS:
+     - Minimum RAM: 8GB (recommended for Rust compilation)
+     - Storage: 20GB free space
+     - CPU: x86_64 architecture optimization
+     - Operating System: Ubuntu 22.04 LTS or Debian-based Linux
+  3. TOOLCHAIN CONFIGURATION:
+     - Rust Toolchain
+       * Target: x86_64-unknown-linux-gnu
+       * Use rustup for multi-toolchain management
+       * Configure nightly and stable channels
+     - Cross-Compilation
+       * Limit to x86_64 and compatible architectures
+       * Remove FreeBSD 32-bit support
+       * Focus on 64-bit Linux and compatible platforms
+  4. DOCKER OPTIMIZATION:
+     - Dockerfile Recommendations:
+       * Use rust:slim-bullseye as base image
+       * Implement multi-stage build
+       * Minimize layer count
+       * Use BuildKit features
+       * Optimize caching strategies
+     - Container Configuration
+       * Platform: linux/amd64
+       * No GPU-specific configurations needed
+  5. DEVELOPMENT ENVIRONMENT:
+     - Working Directory: /home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio
+     - Path Configurations
+       * Ensure consistent path handling
+       * Use absolute paths in configurations
+       * Set up proper volume mounting for Docker
+  6. DEPENDENCY MANAGEMENT:
+     - Keep all previously listed dependencies
+     - Prioritize x86_64 compatible versions
+     - Remove architecture-specific dependencies
+     - Validate package compatibility with x86_64
+  7. PERFORMANCE CONSIDERATIONS:
+     - Use cargo build --release for optimized builds
+     - Enable LTO (Link Time Optimization)
+     - Configure CPU-specific optimizations
+     - Leverage x86_64 instruction set features
+  8. TESTING STRATEGY:
+     - Focus on x86_64 Linux testing
+     - Use GitHub Actions for CI/CD
+     - Implement comprehensive test matrix
+     - Validate cross-platform compatibility
+  9. DOCUMENTATION:
+     - Generate documentation for x86_64 platform
+     - Use rustdoc with nightly toolchain
+     - Ensure cross-platform documentation generation
+  10. ADDITIONAL RECOMMENDATIONS:
+      - Use cargo-audit for security checks
+      - Implement comprehensive error handling
+      - Create detailed documentation
+      - Use semantic versioning
+  Compatibility Summary:
+  - Primary Platform: x86_64 Linux
+  - Recommended Base Image: rust:slim-bullseye
+  - Docker Support: Full compatibility
+  - Architecture Optimization: x86_64
+  - Minimal External Dependencies
+  - Streamlined Build Process
+  The plan maintains the original comprehensive approach while optimizing for the specific x86_64 Linux environment, ensuring efficient development, testing, and deployment strategies.
+NEXT:
+  current progress
+  - Docker build failed during artifact copy stage
+  - Rust toolchain and dependencies successfully installed
+  - Build process encountered artifact location mismatch
+  - Executable binary path seems incorrect or not generated
+  next step
+  - Verify actual binary output path after cargo build
+  - Modify dockerfile to use correct binary path
+  - Add debug step to list target directory contents
+  - Confirm binary name matches dockerfile COPY instruction
+  - Validate cargo build configuration for precise output location
+LOG:
+  === Docker Execution Log - 20250902_085842 ===
+  Dockerfile: envgym/envgym.dockerfile
+  Image Name: envgym_test_1756803436
+  === Build Log ===
+  Build Status: Failed
+  Build Output:
+  Build Error:
+  #0 building with "default" instance using docker driver
+  #1 [internal] load build definition from envgym.dockerfile
+  #1 transferring dockerfile: 1.40kB done
+  #1 DONE 0.0s
+  #2 [internal] load metadata for docker.io/library/rust:slim-bullseye
+  #2 DONE 0.2s
+  #3 [internal] load .dockerignore
+  #3 transferring context: 2B done
+  #3 DONE 0.0s
+  #4 [builder 1/6] FROM docker.io/library/rust:slim-bullseye@sha256:1bf538b6b2931ea86c4761e7f979dc85ebab6af2ac905b039fd36e6a23436365
+  #4 CACHED
+  #5 [internal] load build context
+  #5 transferring context: 23.20MB 0.2s done
+  #5 DONE 0.2s
+  #6 [builder 2/6] RUN apt-get update && apt-get install -y     build-essential     git     pkg-config     libssl-dev     curl     && rm -rf /var/lib/apt/lists/*
+  #6 0.241 Get:1 http://deb.debian.org/debian bullseye InRelease [75.1 kB]
+  #6 0.249 Get:2 http://deb.debian.org/debian-security bullseye-security InRelease [27.2 kB]
+  #6 0.250 Get:3 http://deb.debian.org/debian bullseye-updates InRelease [44.0 kB]
+  #6 0.329 Get:4 http://deb.debian.org/debian bullseye/main amd64 Packages [8066 kB]
+  #6 0.731 Get:5 http://deb.debian.org/debian-security bullseye-security/main amd64 Packages [393 kB]
+  #6 0.755 Get:6 http://deb.debian.org/debian bullseye-updates/main amd64 Packages [18.8 kB]
+  #6 1.721 Fetched 8624 kB in 1s (5809 kB/s)
+  #6 1.721 Reading package lists...
+  #6 2.239 Reading package lists...
+  #6 2.688 Building dependency tree...
+  #6 2.767 Reading state information...
+  #6 2.874 The following additional packages will be installed:
+  #6 2.874   bzip2 dirmngr dpkg-dev fakeroot g++ g++-10 git-man gnupg gnupg-l10n
+  #6 2.874   gnupg-utils gpg gpg-agent gpg-wks-client gpg-wks-server gpgconf gpgsm less
+  #6 2.874   libalgorithm-diff-perl libalgorithm-diff-xs-perl libalgorithm-merge-perl
+  #6 2.874   libassuan0 libbrotli1 libbsd0 libcbor0 libcurl3-gnutls libcurl4 libdpkg-perl
+  #6 2.874   libedit2 liberror-perl libexpat1 libfakeroot libfido2-1
+  #6 2.874   libfile-fcntllock-perl libgdbm-compat4 libgdbm6 libglib2.0-0 libglib2.0-data
+  #6 2.874   libgpm2 libicu67 libksba8 libldap-2.4-2 libldap-common
+  #6 2.874   liblocale-gettext-perl libmd0 libncursesw6 libnghttp2-14 libnpth0
+  #6 2.875   libperl5.32 libpsl5 libreadline8 librtmp1 libsasl2-2 libsasl2-modules
+  #6 2.875   libsasl2-modules-db libsqlite3-0 libssh2-1 libstdc++-10-dev libx11-6
+  #6 2.875   libx11-data libxau6 libxcb1 libxdmcp6 libxext6 libxml2 libxmuu1 make netbase
+  #6 2.875   openssh-client patch perl perl-modules-5.32 pinentry-curses publicsuffix
+  #6 2.875   readline-common shared-mime-info xauth xdg-user-dirs xz-utils
+  #6 2.875 Suggested packages:
+  #6 2.875   bzip2-doc dbus-user-session libpam-systemd pinentry-gnome3 tor
+  #6 2.875   debian-keyring g++-multilib g++-10-multilib gcc-10-doc gettext-base
+  #6 2.875   git-daemon-run | git-daemon-sysvinit git-doc git-el git-email git-gui gitk
+  #6 2.875   gitweb git-cvs git-mediawiki git-svn parcimonie xloadimage scdaemon
+  #6 2.875   sensible-utils bzr gdbm-l10n gpm libsasl2-modules-gssapi-mit
+  #6 2.875   | libsasl2-modules-gssapi-heimdal libsasl2-modules-ldap libsasl2-modules-otp
+  #6 2.875   libsasl2-modules-sql libssl-doc libstdc++-10-doc make-doc keychain
+  #6 2.875   libpam-ssh monkeysphere ssh-askpass ed diffutils-doc perl-doc
+  #6 2.875   libterm-readline-gnu-perl | libterm-readline-perl-perl
+  #6 2.875   libtap-harness-archive-perl pinentry-doc readline-doc
+  #6 3.209 The following NEW packages will be installed:
+  #6 3.209   build-essential bzip2 curl dirmngr dpkg-dev fakeroot g++ g++-10 git git-man
+  #6 3.209   gnupg gnupg-l10n gnupg-utils gpg gpg-agent gpg-wks-client gpg-wks-server
+  #6 3.209   gpgconf gpgsm less libalgorithm-diff-perl libalgorithm-diff-xs-perl
+  #6 3.209   libalgorithm-merge-perl libassuan0 libbrotli1 libbsd0 libcbor0
+  #6 3.210   libcurl3-gnutls libcurl4 libdpkg-perl libedit2 liberror-perl libexpat1
+  #6 3.210   libfakeroot libfido2-1 libfile-fcntllock-perl libgdbm-compat4 libgdbm6
+  #6 3.210   libglib2.0-0 libglib2.0-data libgpm2 libicu67 libksba8 libldap-2.4-2
+  #6 3.210   libldap-common liblocale-gettext-perl libmd0 libncursesw6 libnghttp2-14
+  #6 3.210   libnpth0 libperl5.32 libpsl5 libreadline8 librtmp1 libsasl2-2
+  #6 3.210   libsasl2-modules libsasl2-modules-db libsqlite3-0 libssh2-1 libssl-dev
+  #6 3.210   libstdc++-10-dev libx11-6 libx11-data libxau6 libxcb1 libxdmcp6 libxext6
+  #6 3.210   libxml2 libxmuu1 make netbase openssh-client patch perl perl-modules-5.32
+  #6 3.210   pinentry-curses pkg-config publicsuffix readline-common shared-mime-info
+  #6 3.210   xauth xdg-user-dirs xz-utils
+  #6 3.243 0 upgraded, 83 newly installed, 0 to remove and 0 not upgraded.
+  #6 3.243 Need to get 59.4 MB of archives.
+  #6 3.243 After this operation, 237 MB of additional disk space will be used.
+  #6 3.243 Get:1 http://deb.debian.org/debian-security bullseye-security/main amd64 perl-modules-5.32 all 5.32.1-4+deb11u4 [2824 kB]
+  #6 3.273 Get:2 http://deb.debian.org/debian bullseye/main amd64 libgdbm6 amd64 1.19-2 [64.9 kB]
+  #6 3.274 Get:3 http://deb.debian.org/debian bullseye/main amd64 libgdbm-compat4 amd64 1.19-2 [44.7 kB]
+  #6 3.274 Get:4 http://deb.debian.org/debian-security bullseye-security/main amd64 libperl5.32 amd64 5.32.1-4+deb11u4 [4132 kB]
+  #6 3.450 Get:5 http://deb.debian.org/debian-security bullseye-security/main amd64 perl amd64 5.32.1-4+deb11u4 [293 kB]
+  #6 3.468 Get:6 http://deb.debian.org/debian bullseye/main amd64 liblocale-gettext-perl amd64 1.07-4+b1 [19.0 kB]
+  #6 3.470 Get:7 http://deb.debian.org/debian bullseye/main amd64 less amd64 551-2+deb11u2 [136 kB]
+  #6 3.478 Get:8 http://deb.debian.org/debian bullseye/main amd64 readline-common all 8.1-1 [73.7 kB]
+  #6 3.482 Get:9 http://deb.debian.org/debian bullseye/main amd64 libreadline8 amd64 8.1-1 [169 kB]
+  #6 3.492 Get:10 http://deb.debian.org/debian bullseye/main amd64 netbase all 6.3 [19.9 kB]
+  #6 3.493 Get:11 http://deb.debian.org/debian bullseye/main amd64 bzip2 amd64 1.0.8-4 [49.3 kB]
+  #6 3.496 Get:12 http://deb.debian.org/debian bullseye/main amd64 libmd0 amd64 1.0.3-3 [28.0 kB]
+  #6 3.498 Get:13 http://deb.debian.org/debian bullseye/main amd64 libbsd0 amd64 0.11.3-1+deb11u1 [108 kB]
+  #6 3.507 Get:14 http://deb.debian.org/debian bullseye/main amd64 libedit2 amd64 3.1-20191231-2+b1 [96.7 kB]
+  #6 3.516 Get:15 http://deb.debian.org/debian bullseye/main amd64 libcbor0 amd64 0.5.0+dfsg-2 [24.0 kB]
+  #6 3.518 Get:16 http://deb.debian.org/debian bullseye/main amd64 libfido2-1 amd64 1.6.0-2 [53.3 kB]
+  #6 3.526 Get:17 http://deb.debian.org/debian-security bullseye-security/main amd64 openssh-client amd64 1:8.4p1-5+deb11u5 [932 kB]
+  #6 3.634 Get:18 http://deb.debian.org/debian bullseye/main amd64 xz-utils amd64 5.2.5-2.1~deb11u1 [220 kB]
+  #6 3.667 Get:19 http://deb.debian.org/debian bullseye/main amd64 libstdc++-10-dev amd64 10.2.1-6 [1741 kB]
+  #6 3.881 Get:20 http://deb.debian.org/debian bullseye/main amd64 g++-10 amd64 10.2.1-6 [9380 kB]
+  #6 4.900 Get:21 http://deb.debian.org/debian bullseye/main amd64 g++ amd64 4:10.2.1-1 [1644 B]
+  #6 4.901 Get:22 http://deb.debian.org/debian bullseye/main amd64 make amd64 4.3-4.1 [396 kB]
+  #6 4.931 Get:23 http://deb.debian.org/debian bullseye/main amd64 libdpkg-perl all 1.20.13 [1552 kB]
+  #6 5.084 Get:24 http://deb.debian.org/debian bullseye/main amd64 patch amd64 2.7.6-7 [128 kB]
+  #6 5.101 Get:25 http://deb.debian.org/debian bullseye/main amd64 dpkg-dev all 1.20.13 [2314 kB]
+  #6 5.298 Get:26 http://deb.debian.org/debian bullseye/main amd64 build-essential amd64 12.9 [7704 B]
+  #6 5.298 Get:27 http://deb.debian.org/debian bullseye/main amd64 libbrotli1 amd64 1.0.9-2+b2 [279 kB]
+  #6 5.319 Get:28 http://deb.debian.org/debian bullseye/main amd64 libsasl2-modules-db amd64 2.1.27+dfsg-2.1+deb11u1 [69.1 kB]
+  #6 5.328 Get:29 http://deb.debian.org/debian bullseye/main amd64 libsasl2-2 amd64 2.1.27+dfsg-2.1+deb11u1 [106 kB]
+  #6 5.342 Get:30 http://deb.debian.org/debian bullseye/main amd64 libldap-2.4-2 amd64 2.4.57+dfsg-3+deb11u1 [232 kB]
+  #6 5.372 Get:31 http://deb.debian.org/debian-security bullseye-security/main amd64 libnghttp2-14 amd64 1.43.0-1+deb11u2 [77.0 kB]
+  #6 5.383 Get:32 http://deb.debian.org/debian bullseye/main amd64 libpsl5 amd64 0.21.0-1.2 [57.3 kB]
+  #6 5.390 Get:33 http://deb.debian.org/debian bullseye/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2+b2 [60.8 kB]
+  #6 5.398 Get:34 http://deb.debian.org/debian bullseye/main amd64 libssh2-1 amd64 1.9.0-2+deb11u1 [156 kB]
+  #6 5.418 Get:35 http://deb.debian.org/debian-security bullseye-security/main amd64 libcurl4 amd64 7.74.0-1.3+deb11u15 [347 kB]
+  #6 5.460 Get:36 http://deb.debian.org/debian-security bullseye-security/main amd64 curl amd64 7.74.0-1.3+deb11u15 [272 kB]
+  #6 5.494 Get:37 http://deb.debian.org/debian bullseye/main amd64 libassuan0 amd64 2.5.3-7.1 [50.5 kB]
+  #6 5.501 Get:38 http://deb.debian.org/debian bullseye/main amd64 gpgconf amd64 2.2.27-2+deb11u2 [548 kB]
+  #6 5.568 Get:39 http://deb.debian.org/debian bullseye/main amd64 libksba8 amd64 1.5.0-3+deb11u2 [123 kB]
+  #6 5.579 Get:40 http://deb.debian.org/debian bullseye/main amd64 libnpth0 amd64 1.6-3 [19.0 kB]
+  #6 5.581 Get:41 http://deb.debian.org/debian bullseye/main amd64 dirmngr amd64 2.2.27-2+deb11u2 [763 kB]
+  #6 5.681 Get:42 http://deb.debian.org/debian bullseye/main amd64 libfakeroot amd64 1.25.3-1.1 [47.0 kB]
+  #6 5.687 Get:43 http://deb.debian.org/debian bullseye/main amd64 fakeroot amd64 1.25.3-1.1 [87.0 kB]
+  #6 5.697 Get:44 http://deb.debian.org/debian-security bullseye-security/main amd64 libcurl3-gnutls amd64 7.74.0-1.3+deb11u15 [344 kB]
+  #6 5.728 Get:45 http://deb.debian.org/debian-security bullseye-security/main amd64 libexpat1 amd64 2.2.10-2+deb11u7 [99.2 kB]
+  #6 5.736 Get:46 http://deb.debian.org/debian bullseye/main amd64 liberror-perl all 0.17029-1 [31.0 kB]
+  #6 5.738 Get:47 http://deb.debian.org/debian-security bullseye-security/main amd64 git-man all 1:2.30.2-1+deb11u4 [1831 kB]
+  #6 5.900 Get:48 http://deb.debian.org/debian-security bullseye-security/main amd64 git amd64 1:2.30.2-1+deb11u4 [5566 kB]
+  #6 6.364 Get:49 http://deb.debian.org/debian bullseye/main amd64 gnupg-l10n all 2.2.27-2+deb11u2 [1086 kB]
+  #6 6.500 Get:50 http://deb.debian.org/debian bullseye/main amd64 gnupg-utils amd64 2.2.27-2+deb11u2 [905 kB]
+  #6 6.588 Get:51 http://deb.debian.org/debian-security bullseye-security/main amd64 libsqlite3-0 amd64 3.34.1-3+deb11u1 [797 kB]
+  #6 6.642 Get:52 http://deb.debian.org/debian bullseye/main amd64 gpg amd64 2.2.27-2+deb11u2 [928 kB]
+  #6 6.690 Get:53 http://deb.debian.org/debian bullseye/main amd64 libncursesw6 amd64 6.2+20201114-2+deb11u2 [132 kB]
+  #6 6.696 Get:54 http://deb.debian.org/debian bullseye/main amd64 pinentry-curses amd64 1.1.0-4 [64.9 kB]
+  #6 6.698 Get:55 http://deb.debian.org/debian bullseye/main amd64 gpg-agent amd64 2.2.27-2+deb11u2 [669 kB]
+  #6 6.736 Get:56 http://deb.debian.org/debian bullseye/main amd64 gpg-wks-client amd64 2.2.27-2+deb11u2 [524 kB]
+  #6 6.778 Get:57 http://deb.debian.org/debian bullseye/main amd64 gpg-wks-server amd64 2.2.27-2+deb11u2 [516 kB]
+  #6 6.836 Get:58 http://deb.debian.org/debian bullseye/main amd64 gpgsm amd64 2.2.27-2+deb11u2 [645 kB]
+  #6 6.909 Get:59 http://deb.debian.org/debian bullseye/main amd64 gnupg all 2.2.27-2+deb11u2 [825 kB]
+  #6 7.002 Get:60 http://deb.debian.org/debian bullseye/main amd64 libalgorithm-diff-perl all 1.201-1 [43.3 kB]
+  #6 7.006 Get:61 http://deb.debian.org/debian bullseye/main amd64 libalgorithm-diff-xs-perl amd64 0.04-6+b1 [12.0 kB]
+  #6 7.007 Get:62 http://deb.debian.org/debian bullseye/main amd64 libalgorithm-merge-perl all 0.08-3 [12.7 kB]
+  #6 7.007 Get:63 http://deb.debian.org/debian bullseye/main amd64 libfile-fcntllock-perl amd64 0.22-3+b7 [35.5 kB]
+  #6 7.012 Get:64 http://deb.debian.org/debian-security bullseye-security/main amd64 libglib2.0-0 amd64 2.66.8-1+deb11u6 [1377 kB]
+  #6 7.131 Get:65 http://deb.debian.org/debian-security bullseye-security/main amd64 libglib2.0-data all 2.66.8-1+deb11u6 [1177 kB]
+  #6 7.256 Get:66 http://deb.debian.org/debian bullseye/main amd64 libgpm2 amd64 1.20.7-8 [35.6 kB]
+  #6 7.262 Get:67 http://deb.debian.org/debian-security bullseye-security/main amd64 libicu67 amd64 67.1-7+deb11u1 [8624 kB]
+  #6 8.214 Get:68 http://deb.debian.org/debian bullseye/main amd64 libldap-common all 2.4.57+dfsg-3+deb11u1 [95.8 kB]
+  #6 8.220 Get:69 http://deb.debian.org/debian bullseye/main amd64 libsasl2-modules amd64 2.1.27+dfsg-2.1+deb11u1 [104 kB]
+  #6 8.227 Get:70 http://deb.debian.org/debian-security bullseye-security/main amd64 libssl-dev amd64 1.1.1w-0+deb11u3 [1821 kB]
+  #6 8.352 Get:71 http://deb.debian.org/debian bullseye/main amd64 libxau6 amd64 1:1.0.9-1 [19.7 kB]
+  #6 8.353 Get:72 http://deb.debian.org/debian bullseye/main amd64 libxdmcp6 amd64 1:1.1.2-3 [26.3 kB]
+  #6 8.354 Get:73 http://deb.debian.org/debian bullseye/main amd64 libxcb1 amd64 1.14-3 [140 kB]
+  #6 8.362 Get:74 http://deb.debian.org/debian bullseye/main amd64 libx11-data all 2:1.7.2-1+deb11u2 [311 kB]
+  #6 8.377 Get:75 http://deb.debian.org/debian bullseye/main amd64 libx11-6 amd64 2:1.7.2-1+deb11u2 [772 kB]
+  #6 8.417 Get:76 http://deb.debian.org/debian bullseye/main amd64 libxext6 amd64 2:1.3.3-1.1 [52.7 kB]
+  #6 8.420 Get:77 http://deb.debian.org/debian-security bullseye-security/main amd64 libxml2 amd64 2.9.10+dfsg-6.7+deb11u8 [694 kB]
+  #6 8.463 Get:78 http://deb.debian.org/debian bullseye/main amd64 libxmuu1 amd64 2:1.1.2-2+b3 [23.9 kB]
+  #6 8.464 Get:79 http://deb.debian.org/debian bullseye/main amd64 pkg-config amd64 0.29.2-1 [65.1 kB]
+  #6 8.470 Get:80 http://deb.debian.org/debian bullseye/main amd64 publicsuffix all 20220811.1734-0+deb11u1 [127 kB]
+  #6 8.480 Get:81 http://deb.debian.org/debian bullseye/main amd64 shared-mime-info amd64 2.0-1 [701 kB]
+  #6 8.575 Get:82 http://deb.debian.org/debian bullseye/main amd64 xauth amd64 1:1.1-1 [40.5 kB]
+  #6 8.580 Get:83 http://deb.debian.org/debian bullseye/main amd64 xdg-user-dirs amd64 0.17-2 [53.8 kB]
+  #6 8.692 debconf: delaying package configuration, since apt-utils is not installed
+  #6 8.712 Fetched 59.4 MB in 5s (11.1 MB/s)
+  #6 8.728 Selecting previously unselected package perl-modules-5.32.
+  #6 8.728 (Reading database ... 
+  (Reading database ... 5%
+  (Reading database ... 10%
+  (Reading database ... 15%
+  (Reading database ... 20%
+  (Reading database ... 25%
+  (Reading database ... 30%
+  (Reading database ... 35%
+  (Reading database ... 40%
+  (Reading database ... 45%
+  (Reading database ... 50%
+  (Reading database ... 55%
+  (Reading database ... 60%
+  (Reading database ... 65%
+  (Reading database ... 70%
+  (Reading database ... 75%
+  (Reading database ... 80%
+  (Reading database ... 85%
+  (Reading database ... 90%
+  (Reading database ... 95%
+  (Reading database ... 100%
+  (Reading database ... 9302 files and directories currently installed.)
+  #6 8.733 Preparing to unpack .../00-perl-modules-5.32_5.32.1-4+deb11u4_all.deb ...
+  #6 8.734 Unpacking perl-modules-5.32 (5.32.1-4+deb11u4) ...
+  #6 9.018 Selecting previously unselected package libgdbm6:amd64.
+  #6 9.019 Preparing to unpack .../01-libgdbm6_1.19-2_amd64.deb ...
+  #6 9.020 Unpacking libgdbm6:amd64 (1.19-2) ...
+  #6 9.041 Selecting previously unselected package libgdbm-compat4:amd64.
+  #6 9.042 Preparing to unpack .../02-libgdbm-compat4_1.19-2_amd64.deb ...
+  #6 9.043 Unpacking libgdbm-compat4:amd64 (1.19-2) ...
+  #6 9.060 Selecting previously unselected package libperl5.32:amd64.
+  #6 9.061 Preparing to unpack .../03-libperl5.32_5.32.1-4+deb11u4_amd64.deb ...
+  #6 9.061 Unpacking libperl5.32:amd64 (5.32.1-4+deb11u4) ...
+  #6 9.442 Selecting previously unselected package perl.
+  #6 9.443 Preparing to unpack .../04-perl_5.32.1-4+deb11u4_amd64.deb ...
+  #6 9.448 Unpacking perl (5.32.1-4+deb11u4) ...
+  #6 9.484 Selecting previously unselected package liblocale-gettext-perl.
+  #6 9.485 Preparing to unpack .../05-liblocale-gettext-perl_1.07-4+b1_amd64.deb ...
+  #6 9.486 Unpacking liblocale-gettext-perl (1.07-4+b1) ...
+  #6 9.500 Selecting previously unselected package less.
+  #6 9.501 Preparing to unpack .../06-less_551-2+deb11u2_amd64.deb ...
+  #6 9.503 Unpacking less (551-2+deb11u2) ...
+  #6 9.528 Selecting previously unselected package readline-common.
+  #6 9.529 Preparing to unpack .../07-readline-common_8.1-1_all.deb ...
+  #6 9.530 Unpacking readline-common (8.1-1) ...
+  #6 9.547 Selecting previously unselected package libreadline8:amd64.
+  #6 9.548 Preparing to unpack .../08-libreadline8_8.1-1_amd64.deb ...
+  #6 9.548 Unpacking libreadline8:amd64 (8.1-1) ...
+  #6 9.575 Selecting previously unselected package netbase.
+  #6 9.576 Preparing to unpack .../09-netbase_6.3_all.deb ...
+  #6 9.577 Unpacking netbase (6.3) ...
+  #6 9.588 Selecting previously unselected package bzip2.
+  #6 9.589 Preparing to unpack .../10-bzip2_1.0.8-4_amd64.deb ...
+  #6 9.589 Unpacking bzip2 (1.0.8-4) ...
+  #6 9.605 Selecting previously unselected package libmd0:amd64.
+  #6 9.606 Preparing to unpack .../11-libmd0_1.0.3-3_amd64.deb ...
+  #6 9.607 Unpacking libmd0:amd64 (1.0.3-3) ...
+  #6 9.622 Selecting previously unselected package libbsd0:amd64.
+  #6 9.623 Preparing to unpack .../12-libbsd0_0.11.3-1+deb11u1_amd64.deb ...
+  #6 9.624 Unpacking libbsd0:amd64 (0.11.3-1+deb11u1) ...
+  #6 9.644 Selecting previously unselected package libedit2:amd64.
+  #6 9.644 Preparing to unpack .../13-libedit2_3.1-20191231-2+b1_amd64.deb ...
+  #6 9.645 Unpacking libedit2:amd64 (3.1-20191231-2+b1) ...
+  #6 9.664 Selecting previously unselected package libcbor0:amd64.
+  #6 9.665 Preparing to unpack .../14-libcbor0_0.5.0+dfsg-2_amd64.deb ...
+  #6 9.666 Unpacking libcbor0:amd64 (0.5.0+dfsg-2) ...
+  #6 9.681 Selecting previously unselected package libfido2-1:amd64.
+  #6 9.682 Preparing to unpack .../15-libfido2-1_1.6.0-2_amd64.deb ...
+  #6 9.683 Unpacking libfido2-1:amd64 (1.6.0-2) ...
+  #6 9.699 Selecting previously unselected package openssh-client.
+  #6 9.700 Preparing to unpack .../16-openssh-client_1%3a8.4p1-5+deb11u5_amd64.deb ...
+  #6 9.704 Unpacking openssh-client (1:8.4p1-5+deb11u5) ...
+  #6 9.781 Selecting previously unselected package xz-utils.
+  #6 9.782 Preparing to unpack .../17-xz-utils_5.2.5-2.1~deb11u1_amd64.deb ...
+  #6 9.783 Unpacking xz-utils (5.2.5-2.1~deb11u1) ...
+  #6 9.809 Selecting previously unselected package libstdc++-10-dev:amd64.
+  #6 9.809 Preparing to unpack .../18-libstdc++-10-dev_10.2.1-6_amd64.deb ...
+  #6 9.810 Unpacking libstdc++-10-dev:amd64 (10.2.1-6) ...
+  #6 9.989 Selecting previously unselected package g++-10.
+  #6 9.991 Preparing to unpack .../19-g++-10_10.2.1-6_amd64.deb ...
+  #6 9.992 Unpacking g++-10 (10.2.1-6) ...
+  #6 10.70 Selecting previously unselected package g++.
+  #6 10.70 Preparing to unpack .../20-g++_4%3a10.2.1-1_amd64.deb ...
+  #6 10.70 Unpacking g++ (4:10.2.1-1) ...
+  #6 10.71 Selecting previously unselected package make.
+  #6 10.71 Preparing to unpack .../21-make_4.3-4.1_amd64.deb ...
+  #6 10.71 Unpacking make (4.3-4.1) ...
+  #6 10.76 Selecting previously unselected package libdpkg-perl.
+  #6 10.76 Preparing to unpack .../22-libdpkg-perl_1.20.13_all.deb ...
+  #6 10.76 Unpacking libdpkg-perl (1.20.13) ...
+  #6 10.82 Selecting previously unselected package patch.
+  #6 10.82 Preparing to unpack .../23-patch_2.7.6-7_amd64.deb ...
+  #6 10.82 Unpacking patch (2.7.6-7) ...
+  #6 10.85 Selecting previously unselected package dpkg-dev.
+  #6 10.85 Preparing to unpack .../24-dpkg-dev_1.20.13_all.deb ...
+  #6 10.85 Unpacking dpkg-dev (1.20.13) ...
+  #6 10.95 Selecting previously unselected package build-essential.
+  #6 10.95 Preparing to unpack .../25-build-essential_12.9_amd64.deb ...
+  #6 10.95 Unpacking build-essential (12.9) ...
+  #6 10.97 Selecting previously unselected package libbrotli1:amd64.
+  #6 10.97 Preparing to unpack .../26-libbrotli1_1.0.9-2+b2_amd64.deb ...
+  #6 10.97 Unpacking libbrotli1:amd64 (1.0.9-2+b2) ...
+  #6 11.00 Selecting previously unselected package libsasl2-modules-db:amd64.
+  #6 11.00 Preparing to unpack .../27-libsasl2-modules-db_2.1.27+dfsg-2.1+deb11u1_amd64.deb ...
+  #6 11.00 Unpacking libsasl2-modules-db:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+  #6 11.02 Selecting previously unselected package libsasl2-2:amd64.
+  #6 11.02 Preparing to unpack .../28-libsasl2-2_2.1.27+dfsg-2.1+deb11u1_amd64.deb ...
+  #6 11.02 Unpacking libsasl2-2:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+  #6 11.04 Selecting previously unselected package libldap-2.4-2:amd64.
+  #6 11.04 Preparing to unpack .../29-libldap-2.4-2_2.4.57+dfsg-3+deb11u1_amd64.deb ...
+  #6 11.04 Unpacking libldap-2.4-2:amd64 (2.4.57+dfsg-3+deb11u1) ...
+  #6 11.07 Selecting previously unselected package libnghttp2-14:amd64.
+  #6 11.07 Preparing to unpack .../30-libnghttp2-14_1.43.0-1+deb11u2_amd64.deb ...
+  #6 11.07 Unpacking libnghttp2-14:amd64 (1.43.0-1+deb11u2) ...
+  #6 11.09 Selecting previously unselected package libpsl5:amd64.
+  #6 11.09 Preparing to unpack .../31-libpsl5_0.21.0-1.2_amd64.deb ...
+  #6 11.09 Unpacking libpsl5:amd64 (0.21.0-1.2) ...
+  #6 11.11 Selecting previously unselected package librtmp1:amd64.
+  #6 11.11 Preparing to unpack .../32-librtmp1_2.4+20151223.gitfa8646d.1-2+b2_amd64.deb ...
+  #6 11.11 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+  #6 11.13 Selecting previously unselected package libssh2-1:amd64.
+  #6 11.13 Preparing to unpack .../33-libssh2-1_1.9.0-2+deb11u1_amd64.deb ...
+  #6 11.13 Unpacking libssh2-1:amd64 (1.9.0-2+deb11u1) ...
+  #6 11.15 Selecting previously unselected package libcurl4:amd64.
+  #6 11.16 Preparing to unpack .../34-libcurl4_7.74.0-1.3+deb11u15_amd64.deb ...
+  #6 11.16 Unpacking libcurl4:amd64 (7.74.0-1.3+deb11u15) ...
+  #6 11.19 Selecting previously unselected package curl.
+  #6 11.19 Preparing to unpack .../35-curl_7.74.0-1.3+deb11u15_amd64.deb ...
+  #6 11.19 Unpacking curl (7.74.0-1.3+deb11u15) ...
+  #6 11.22 Selecting previously unselected package libassuan0:amd64.
+  #6 11.22 Preparing to unpack .../36-libassuan0_2.5.3-7.1_amd64.deb ...
+  #6 11.22 Unpacking libassuan0:amd64 (2.5.3-7.1) ...
+  #6 11.24 Selecting previously unselected package gpgconf.
+  #6 11.24 Preparing to unpack .../37-gpgconf_2.2.27-2+deb11u2_amd64.deb ...
+  #6 11.24 Unpacking gpgconf (2.2.27-2+deb11u2) ...
+  #6 11.26 Selecting previously unselected package libksba8:amd64.
+  #6 11.26 Preparing to unpack .../38-libksba8_1.5.0-3+deb11u2_amd64.deb ...
+  #6 11.26 Unpacking libksba8:amd64 (1.5.0-3+deb11u2) ...
+  #6 11.28 Selecting previously unselected package libnpth0:amd64.
+  #6 11.28 Preparing to unpack .../39-libnpth0_1.6-3_amd64.deb ...
+  #6 11.29 Unpacking libnpth0:amd64 (1.6-3) ...
+  #6 11.30 Selecting previously unselected package dirmngr.
+  #6 11.30 Preparing to unpack .../40-dirmngr_2.2.27-2+deb11u2_amd64.deb ...
+  #6 11.31 Unpacking dirmngr (2.2.27-2+deb11u2) ...
+  #6 11.35 Selecting previously unselected package libfakeroot:amd64.
+  #6 11.35 Preparing to unpack .../41-libfakeroot_1.25.3-1.1_amd64.deb ...
+  #6 11.35 Unpacking libfakeroot:amd64 (1.25.3-1.1) ...
+  #6 11.37 Selecting previously unselected package fakeroot.
+  #6 11.37 Preparing to unpack .../42-fakeroot_1.25.3-1.1_amd64.deb ...
+  #6 11.37 Unpacking fakeroot (1.25.3-1.1) ...
+  #6 11.39 Selecting previously unselected package libcurl3-gnutls:amd64.
+  #6 11.39 Preparing to unpack .../43-libcurl3-gnutls_7.74.0-1.3+deb11u15_amd64.deb ...
+  #6 11.39 Unpacking libcurl3-gnutls:amd64 (7.74.0-1.3+deb11u15) ...
+  #6 11.42 Selecting previously unselected package libexpat1:amd64.
+  #6 11.42 Preparing to unpack .../44-libexpat1_2.2.10-2+deb11u7_amd64.deb ...
+  #6 11.42 Unpacking libexpat1:amd64 (2.2.10-2+deb11u7) ...
+  #6 11.44 Selecting previously unselected package liberror-perl.
+  #6 11.44 Preparing to unpack .../45-liberror-perl_0.17029-1_all.deb ...
+  #6 11.44 Unpacking liberror-perl (0.17029-1) ...
+  #6 11.46 Selecting previously unselected package git-man.
+  #6 11.46 Preparing to unpack .../46-git-man_1%3a2.30.2-1+deb11u4_all.deb ...
+  #6 11.46 Unpacking git-man (1:2.30.2-1+deb11u4) ...
+  #6 11.55 Selecting previously unselected package git.
+  #6 11.55 Preparing to unpack .../47-git_1%3a2.30.2-1+deb11u4_amd64.deb ...
+  #6 11.56 Unpacking git (1:2.30.2-1+deb11u4) ...
+  #6 11.98 Selecting previously unselected package gnupg-l10n.
+  #6 11.98 Preparing to unpack .../48-gnupg-l10n_2.2.27-2+deb11u2_all.deb ...
+  #6 11.98 Unpacking gnupg-l10n (2.2.27-2+deb11u2) ...
+  #6 12.06 Selecting previously unselected package gnupg-utils.
+  #6 12.06 Preparing to unpack .../49-gnupg-utils_2.2.27-2+deb11u2_amd64.deb ...
+  #6 12.06 Unpacking gnupg-utils (2.2.27-2+deb11u2) ...
+  #6 12.12 Selecting previously unselected package libsqlite3-0:amd64.
+  #6 12.12 Preparing to unpack .../50-libsqlite3-0_3.34.1-3+deb11u1_amd64.deb ...
+  #6 12.12 Unpacking libsqlite3-0:amd64 (3.34.1-3+deb11u1) ...
+  #6 12.18 Selecting previously unselected package gpg.
+  #6 12.18 Preparing to unpack .../51-gpg_2.2.27-2+deb11u2_amd64.deb ...
+  #6 12.19 Unpacking gpg (2.2.27-2+deb11u2) ...
+  #6 12.24 Selecting previously unselected package libncursesw6:amd64.
+  #6 12.25 Preparing to unpack .../52-libncursesw6_6.2+20201114-2+deb11u2_amd64.deb ...
+  #6 12.25 Unpacking libncursesw6:amd64 (6.2+20201114-2+deb11u2) ...
+  #6 12.27 Selecting previously unselected package pinentry-curses.
+  #6 12.27 Preparing to unpack .../53-pinentry-curses_1.1.0-4_amd64.deb ...
+  #6 12.28 Unpacking pinentry-curses (1.1.0-4) ...
+  #6 12.29 Selecting previously unselected package gpg-agent.
+  #6 12.29 Preparing to unpack .../54-gpg-agent_2.2.27-2+deb11u2_amd64.deb ...
+  #6 12.29 Unpacking gpg-agent (2.2.27-2+deb11u2) ...
+  #6 12.33 Selecting previously unselected package gpg-wks-client.
+  #6 12.33 Preparing to unpack .../55-gpg-wks-client_2.2.27-2+deb11u2_amd64.deb ...
+  #6 12.33 Unpacking gpg-wks-client (2.2.27-2+deb11u2) ...
+  #6 12.35 Selecting previously unselected package gpg-wks-server.
+  #6 12.35 Preparing to unpack .../56-gpg-wks-server_2.2.27-2+deb11u2_amd64.deb ...
+  #6 12.36 Unpacking gpg-wks-server (2.2.27-2+deb11u2) ...
+  #6 12.38 Selecting previously unselected package gpgsm.
+  #6 12.38 Preparing to unpack .../57-gpgsm_2.2.27-2+deb11u2_amd64.deb ...
+  #6 12.38 Unpacking gpgsm (2.2.27-2+deb11u2) ...
+  #6 12.41 Selecting previously unselected package gnupg.
+  #6 12.42 Preparing to unpack .../58-gnupg_2.2.27-2+deb11u2_all.deb ...
+  #6 12.42 Unpacking gnupg (2.2.27-2+deb11u2) ...
+  #6 12.45 Selecting previously unselected package libalgorithm-diff-perl.
+  #6 12.45 Preparing to unpack .../59-libalgorithm-diff-perl_1.201-1_all.deb ...
+  #6 12.45 Unpacking libalgorithm-diff-perl (1.201-1) ...
+  #6 12.47 Selecting previously unselected package libalgorithm-diff-xs-perl.
+  #6 12.47 Preparing to unpack .../60-libalgorithm-diff-xs-perl_0.04-6+b1_amd64.deb ...
+  #6 12.47 Unpacking libalgorithm-diff-xs-perl (0.04-6+b1) ...
+  #6 12.48 Selecting previously unselected package libalgorithm-merge-perl.
+  #6 12.48 Preparing to unpack .../61-libalgorithm-merge-perl_0.08-3_all.deb ...
+  #6 12.48 Unpacking libalgorithm-merge-perl (0.08-3) ...
+  #6 12.49 Selecting previously unselected package libfile-fcntllock-perl.
+  #6 12.49 Preparing to unpack .../62-libfile-fcntllock-perl_0.22-3+b7_amd64.deb ...
+  #6 12.49 Unpacking libfile-fcntllock-perl (0.22-3+b7) ...
+  #6 12.51 Selecting previously unselected package libglib2.0-0:amd64.
+  #6 12.51 Preparing to unpack .../63-libglib2.0-0_2.66.8-1+deb11u6_amd64.deb ...
+  #6 12.51 Unpacking libglib2.0-0:amd64 (2.66.8-1+deb11u6) ...
+  #6 12.62 Selecting previously unselected package libglib2.0-data.
+  #6 12.62 Preparing to unpack .../64-libglib2.0-data_2.66.8-1+deb11u6_all.deb ...
+  #6 12.62 Unpacking libglib2.0-data (2.66.8-1+deb11u6) ...
+  #6 12.74 Selecting previously unselected package libgpm2:amd64.
+  #6 12.74 Preparing to unpack .../65-libgpm2_1.20.7-8_amd64.deb ...
+  #6 12.74 Unpacking libgpm2:amd64 (1.20.7-8) ...
+  #6 12.75 Selecting previously unselected package libicu67:amd64.
+  #6 12.75 Preparing to unpack .../66-libicu67_67.1-7+deb11u1_amd64.deb ...
+  #6 12.76 Unpacking libicu67:amd64 (67.1-7+deb11u1) ...
+  #6 13.45 Selecting previously unselected package libldap-common.
+  #6 13.45 Preparing to unpack .../67-libldap-common_2.4.57+dfsg-3+deb11u1_all.deb ...
+  #6 13.45 Unpacking libldap-common (2.4.57+dfsg-3+deb11u1) ...
+  #6 13.48 Selecting previously unselected package libsasl2-modules:amd64.
+  #6 13.48 Preparing to unpack .../68-libsasl2-modules_2.1.27+dfsg-2.1+deb11u1_amd64.deb ...
+  #6 13.48 Unpacking libsasl2-modules:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+  #6 13.50 Selecting previously unselected package libssl-dev:amd64.
+  #6 13.51 Preparing to unpack .../69-libssl-dev_1.1.1w-0+deb11u3_amd64.deb ...
+  #6 13.51 Unpacking libssl-dev:amd64 (1.1.1w-0+deb11u3) ...
+  #6 13.65 Selecting previously unselected package libxau6:amd64.
+  #6 13.65 Preparing to unpack .../70-libxau6_1%3a1.0.9-1_amd64.deb ...
+  #6 13.65 Unpacking libxau6:amd64 (1:1.0.9-1) ...
+  #6 13.66 Selecting previously unselected package libxdmcp6:amd64.
+  #6 13.66 Preparing to unpack .../71-libxdmcp6_1%3a1.1.2-3_amd64.deb ...
+  #6 13.66 Unpacking libxdmcp6:amd64 (1:1.1.2-3) ...
+  #6 13.68 Selecting previously unselected package libxcb1:amd64.
+  #6 13.68 Preparing to unpack .../72-libxcb1_1.14-3_amd64.deb ...
+  #6 13.68 Unpacking libxcb1:amd64 (1.14-3) ...
+  #6 13.70 Selecting previously unselected package libx11-data.
+  #6 13.70 Preparing to unpack .../73-libx11-data_2%3a1.7.2-1+deb11u2_all.deb ...
+  #6 13.70 Unpacking libx11-data (2:1.7.2-1+deb11u2) ...
+  #6 13.75 Selecting previously unselected package libx11-6:amd64.
+  #6 13.75 Preparing to unpack .../74-libx11-6_2%3a1.7.2-1+deb11u2_amd64.deb ...
+  #6 13.75 Unpacking libx11-6:amd64 (2:1.7.2-1+deb11u2) ...
+  #6 13.81 Selecting previously unselected package libxext6:amd64.
+  #6 13.81 Preparing to unpack .../75-libxext6_2%3a1.3.3-1.1_amd64.deb ...
+  #6 13.81 Unpacking libxext6:amd64 (2:1.3.3-1.1) ...
+  #6 13.83 Selecting previously unselected package libxml2:amd64.
+  #6 13.83 Preparing to unpack .../76-libxml2_2.9.10+dfsg-6.7+deb11u8_amd64.deb ...
+  #6 13.83 Unpacking libxml2:amd64 (2.9.10+dfsg-6.7+deb11u8) ...
+  #6 13.89 Selecting previously unselected package libxmuu1:amd64.
+  #6 13.89 Preparing to unpack .../77-libxmuu1_2%3a1.1.2-2+b3_amd64.deb ...
+  #6 13.89 Unpacking libxmuu1:amd64 (2:1.1.2-2+b3) ...
+  #6 13.91 Selecting previously unselected package pkg-config.
+  #6 13.91 Preparing to unpack .../78-pkg-config_0.29.2-1_amd64.deb ...
+  #6 13.91 Unpacking pkg-config (0.29.2-1) ...
+  #6 13.93 Selecting previously unselected package publicsuffix.
+  #6 13.93 Preparing to unpack .../79-publicsuffix_20220811.1734-0+deb11u1_all.deb ...
+  #6 13.93 Unpacking publicsuffix (20220811.1734-0+deb11u1) ...
+  #6 13.95 Selecting previously unselected package shared-mime-info.
+  #6 13.95 Preparing to unpack .../80-shared-mime-info_2.0-1_amd64.deb ...
+  #6 13.95 Unpacking shared-mime-info (2.0-1) ...
+  #6 14.02 Selecting previously unselected package xauth.
+  #6 14.03 Preparing to unpack .../81-xauth_1%3a1.1-1_amd64.deb ...
+  #6 14.03 Unpacking xauth (1:1.1-1) ...
+  #6 14.04 Selecting previously unselected package xdg-user-dirs.
+  #6 14.04 Preparing to unpack .../82-xdg-user-dirs_0.17-2_amd64.deb ...
+  #6 14.05 Unpacking xdg-user-dirs (0.17-2) ...
+  #6 14.07 Setting up libksba8:amd64 (1.5.0-3+deb11u2) ...
+  #6 14.08 Setting up libexpat1:amd64 (2.2.10-2+deb11u7) ...
+  #6 14.08 Setting up libxau6:amd64 (1:1.0.9-1) ...
+  #6 14.08 Setting up libpsl5:amd64 (0.21.0-1.2) ...
+  #6 14.08 Setting up libstdc++-10-dev:amd64 (10.2.1-6) ...
+  #6 14.09 Setting up libgpm2:amd64 (1.20.7-8) ...
+  #6 14.09 Setting up g++-10 (10.2.1-6) ...
+  #6 14.09 Setting up libicu67:amd64 (67.1-7+deb11u1) ...
+  #6 14.09 Setting up xdg-user-dirs (0.17-2) ...
+  #6 14.10 Setting up libglib2.0-0:amd64 (2.66.8-1+deb11u6) ...
+  #6 14.12 No schema files found: doing nothing.
+  #6 14.12 Setting up perl-modules-5.32 (5.32.1-4+deb11u4) ...
+  #6 14.12 Setting up libbrotli1:amd64 (1.0.9-2+b2) ...
+  #6 14.12 Setting up libsqlite3-0:amd64 (3.34.1-3+deb11u1) ...
+  #6 14.12 Setting up libcbor0:amd64 (0.5.0+dfsg-2) ...
+  #6 14.13 Setting up libsasl2-modules:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+  #6 14.13 Setting up libnghttp2-14:amd64 (1.43.0-1+deb11u2) ...
+  #6 14.14 Setting up less (551-2+deb11u2) ...
+  #6 14.14 Setting up libnpth0:amd64 (1.6-3) ...
+  #6 14.14 Setting up libassuan0:amd64 (2.5.3-7.1) ...
+  #6 14.15 Setting up bzip2 (1.0.8-4) ...
+  #6 14.15 Setting up libldap-common (2.4.57+dfsg-3+deb11u1) ...
+  #6 14.15 Setting up libfakeroot:amd64 (1.25.3-1.1) ...
+  #6 14.15 Setting up libsasl2-modules-db:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+  #6 14.16 Setting up fakeroot (1.25.3-1.1) ...
+  #6 14.16 update-alternatives: using /usr/bin/fakeroot-sysv to provide /usr/bin/fakeroot (fakeroot) in auto mode
+  #6 14.16 update-alternatives: warning: skip creation of /usr/share/man/man1/fakeroot.1.gz because associated file /usr/share/man/man1/fakeroot-sysv.1.gz (of link group fakeroot) doesn't exist
+  #6 14.16 update-alternatives: warning: skip creation of /usr/share/man/man1/faked.1.gz because associated file /usr/share/man/man1/faked-sysv.1.gz (of link group fakeroot) doesn't exist
+  #6 14.16 update-alternatives: warning: skip creation of /usr/share/man/es/man1/fakeroot.1.gz because associated file /usr/share/man/es/man1/fakeroot-sysv.1.gz (of link group fakeroot) doesn't exist
+  #6 14.16 update-alternatives: warning: skip creation of /usr/share/man/es/man1/faked.1.gz because associated file /usr/share/man/es/man1/faked-sysv.1.gz (of link group fakeroot) doesn't exist
+  #6 14.16 update-alternatives: warning: skip creation of /usr/share/man/fr/man1/fakeroot.1.gz because associated file /usr/share/man/fr/man1/fakeroot-sysv.1.gz (of link group fakeroot) doesn't exist
+  #6 14.16 update-alternatives: warning: skip creation of /usr/share/man/fr/man1/faked.1.gz because associated file /usr/share/man/fr/man1/faked-sysv.1.gz (of link group fakeroot) doesn't exist
+  #6 14.16 update-alternatives: warning: skip creation of /usr/share/man/sv/man1/fakeroot.1.gz because associated file /usr/share/man/sv/man1/fakeroot-sysv.1.gz (of link group fakeroot) doesn't exist
+  #6 14.16 update-alternatives: warning: skip creation of /usr/share/man/sv/man1/faked.1.gz because associated file /usr/share/man/sv/man1/faked-sysv.1.gz (of link group fakeroot) doesn't exist
+  #6 14.16 Setting up libglib2.0-data (2.66.8-1+deb11u6) ...
+  #6 14.16 Setting up libx11-data (2:1.7.2-1+deb11u2) ...
+  #6 14.17 Setting up make (4.3-4.1) ...
+  #6 14.17 Setting up gnupg-l10n (2.2.27-2+deb11u2) ...
+  #6 14.17 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+  #6 14.17 Setting up xz-utils (5.2.5-2.1~deb11u1) ...
+  #6 14.17 update-alternatives: using /usr/bin/xz to provide /usr/bin/lzma (lzma) in auto mode
+  #6 14.17 update-alternatives: warning: skip creation of /usr/share/man/man1/lzma.1.gz because associated file /usr/share/man/man1/xz.1.gz (of link group lzma) doesn't exist
+  #6 14.17 update-alternatives: warning: skip creation of /usr/share/man/man1/unlzma.1.gz because associated file /usr/share/man/man1/unxz.1.gz (of link group lzma) doesn't exist
+  #6 14.17 update-alternatives: warning: skip creation of /usr/share/man/man1/lzcat.1.gz because associated file /usr/share/man/man1/xzcat.1.gz (of link group lzma) doesn't exist
+  #6 14.17 update-alternatives: warning: skip creation of /usr/share/man/man1/lzmore.1.gz because associated file /usr/share/man/man1/xzmore.1.gz (of link group lzma) doesn't exist
+  #6 14.17 update-alternatives: warning: skip creation of /usr/share/man/man1/lzless.1.gz because associated file /usr/share/man/man1/xzless.1.gz (of link group lzma) doesn't exist
+  #6 14.18 update-alternatives: warning: skip creation of /usr/share/man/man1/lzdiff.1.gz because associated file /usr/share/man/man1/xzdiff.1.gz (of link group lzma) doesn't exist
+  #6 14.18 update-alternatives: warning: skip creation of /usr/share/man/man1/lzcmp.1.gz because associated file /usr/share/man/man1/xzcmp.1.gz (of link group lzma) doesn't exist
+  #6 14.18 update-alternatives: warning: skip creation of /usr/share/man/man1/lzgrep.1.gz because associated file /usr/share/man/man1/xzgrep.1.gz (of link group lzma) doesn't exist
+  #6 14.18 update-alternatives: warning: skip creation of /usr/share/man/man1/lzegrep.1.gz because associated file /usr/share/man/man1/xzegrep.1.gz (of link group lzma) doesn't exist
+  #6 14.18 update-alternatives: warning: skip creation of /usr/share/man/man1/lzfgrep.1.gz because associated file /usr/share/man/man1/xzfgrep.1.gz (of link group lzma) doesn't exist
+  #6 14.18 Setting up libssl-dev:amd64 (1.1.1w-0+deb11u3) ...
+  #6 14.18 Setting up patch (2.7.6-7) ...
+  #6 14.18 Setting up libncursesw6:amd64 (6.2+20201114-2+deb11u2) ...
+  #6 14.19 Setting up libsasl2-2:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+  #6 14.19 Setting up g++ (4:10.2.1-1) ...
+  #6 14.20 update-alternatives: using /usr/bin/g++ to provide /usr/bin/c++ (c++) in auto mode
+  #6 14.21 Setting up libmd0:amd64 (1.0.3-3) ...
+  #6 14.21 Setting up git-man (1:2.30.2-1+deb11u4) ...
+  #6 14.21 Setting up libssh2-1:amd64 (1.9.0-2+deb11u1) ...
+  #6 14.21 Setting up netbase (6.3) ...
+  #6 14.22 Setting up libfido2-1:amd64 (1.6.0-2) ...
+  #6 14.23 Setting up libbsd0:amd64 (0.11.3-1+deb11u1) ...
+  #6 14.23 Setting up readline-common (8.1-1) ...
+  #6 14.23 Setting up publicsuffix (20220811.1734-0+deb11u1) ...
+  #6 14.24 Setting up libxml2:amd64 (2.9.10+dfsg-6.7+deb11u8) ...
+  #6 14.24 Setting up liblocale-gettext-perl (1.07-4+b1) ...
+  #6 14.24 Setting up libgdbm6:amd64 (1.19-2) ...
+  #6 14.24 Setting up pinentry-curses (1.1.0-4) ...
+  #6 14.25 Setting up libxdmcp6:amd64 (1:1.1.2-3) ...
+  #6 14.25 Setting up libxcb1:amd64 (1.14-3) ...
+  #6 14.25 Setting up libedit2:amd64 (3.1-20191231-2+b1) ...
+  #6 14.26 Setting up libreadline8:amd64 (8.1-1) ...
+  #6 14.26 Setting up libldap-2.4-2:amd64 (2.4.57+dfsg-3+deb11u1) ...
+  #6 14.26 Setting up libcurl3-gnutls:amd64 (7.74.0-1.3+deb11u15) ...
+  #6 14.26 Setting up shared-mime-info (2.0-1) ...
+  #6 14.95 Setting up libgdbm-compat4:amd64 (1.19-2) ...
+  #6 14.96 Setting up libperl5.32:amd64 (5.32.1-4+deb11u4) ...
+  #6 14.96 Setting up gpgconf (2.2.27-2+deb11u2) ...
+  #6 14.96 Setting up libcurl4:amd64 (7.74.0-1.3+deb11u15) ...
+  #6 14.97 Setting up libx11-6:amd64 (2:1.7.2-1+deb11u2) ...
+  #6 14.97 Setting up curl (7.74.0-1.3+deb11u15) ...
+  #6 14.97 Setting up libxmuu1:amd64 (2:1.1.2-2+b3) ...
+  #6 14.97 Setting up gpg (2.2.27-2+deb11u2) ...
+  #6 14.98 Setting up gnupg-utils (2.2.27-2+deb11u2) ...
+  #6 14.98 Setting up gpg-agent (2.2.27-2+deb11u2) ...
+  #6 15.40 Setting up openssh-client (1:8.4p1-5+deb11u5) ...
+  #6 15.46 Setting up gpgsm (2.2.27-2+deb11u2) ...
+  #6 15.46 Setting up libxext6:amd64 (2:1.3.3-1.1) ...
+  #6 15.47 Setting up dirmngr (2.2.27-2+deb11u2) ...
+  #6 15.58 Setting up perl (5.32.1-4+deb11u4) ...
+  #6 15.59 Setting up libdpkg-perl (1.20.13) ...
+  #6 15.59 Setting up gpg-wks-server (2.2.27-2+deb11u2) ...
+  #6 15.59 Setting up xauth (1:1.1-1) ...
+  #6 15.60 Setting up gpg-wks-client (2.2.27-2+deb11u2) ...
+  #6 15.60 Setting up libfile-fcntllock-perl (0.22-3+b7) ...
+  #6 15.60 Setting up libalgorithm-diff-perl (1.201-1) ...
+  #6 15.60 Setting up dpkg-dev (1.20.13) ...
+  #6 15.61 Setting up liberror-perl (0.17029-1) ...
+  #6 15.61 Setting up pkg-config (0.29.2-1) ...
+  #6 15.65 Setting up git (1:2.30.2-1+deb11u4) ...
+  #6 15.66 Setting up gnupg (2.2.27-2+deb11u2) ...
+  #6 15.66 Setting up build-essential (12.9) ...
+  #6 15.67 Setting up libalgorithm-diff-xs-perl (0.04-6+b1) ...
+  #6 15.67 Setting up libalgorithm-merge-perl (0.08-3) ...
+  #6 15.67 Processing triggers for libc-bin (2.31-13+deb11u13) ...
+  #6 DONE 16.2s
+  #7 [builder 3/6] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y     && rustup default stable     && rustup update     && rustup toolchain install nightly-2025-01-25     && rustup target add x86_64-unknown-linux-gnu
+  #7 0.288 info: downloading installer
+  #7 2.225 warn: It looks like you have an existing installation of Rust at:
+  #7 2.225 warn: /usr/local/cargo/bin
+  #7 2.225 warn: It is recommended that rustup be the primary Rust installation.
+  #7 2.225 warn: Otherwise you may have confusion unless you are careful with your PATH.
+  #7 2.225 warn: If you are sure that you want both rustup and your already installed Rust
+  #7 2.225 warn: then please reply `y' or `yes' or set RUSTUP_INIT_SKIP_PATH_CHECK to yes
+  #7 2.225 warn: or pass `-y' to ignore all ignorable checks.
+  #7 2.225 error: cannot install while Rust is installed
+  #7 2.225 warn: continuing (because the -y flag is set and the error is ignorable)
+  #7 2.225 warn: It looks like you have an existing rustup settings file at:
+  #7 2.225 warn: /usr/local/rustup/settings.toml
+  #7 2.225 warn: Rustup will install the default toolchain as specified in the settings file,
+  #7 2.225 warn: instead of the one inferred from the default host triple.
+  #7 2.246 info: profile set to 'default'
+  #7 2.246 info: default host triple is x86_64-unknown-linux-gnu
+  #7 2.246 warn: Updating existing toolchain, profile choice will be ignored
+  #7 2.325 info: syncing channel updates for '1.89.0-x86_64-unknown-linux-gnu'
+  #7 2.382 info: default toolchain set to '1.89.0-x86_64-unknown-linux-gnu'
+  #7 2.382 
+  #7 2.394   1.89.0-x86_64-unknown-linux-gnu unchanged - rustc 1.89.0 (29483883e 2025-08-04)
+  #7 2.394 
+  #7 2.394 
+  #7 2.394 Rust is installed now. Great!
+  #7 2.394 
+  #7 2.394 To get started you may need to restart your current shell.
+  #7 2.394 This would reload your PATH environment variable to include
+  #7 2.394 Cargo's bin directory (/usr/local/cargo/bin).
+  #7 2.394 
+  #7 2.394 To configure your current shell, you need to source
+  #7 2.394 the corresponding env file under /usr/local/cargo.
+  #7 2.394 
+  #7 2.394 This is usually done by running one of the following (note the leading DOT):
+  #7 2.394 . "/usr/local/cargo/env"            # For sh/bash/zsh/ash/dash/pdksh
+  #7 2.394 source "/usr/local/cargo/env.fish"  # For fish
+  #7 2.394 source $"/usr/local/cargo/env.nu"  # For nushell
+  #7 2.414 info: syncing channel updates for 'stable-x86_64-unknown-linux-gnu'
+  #7 2.634 info: latest update on 2025-08-07, rust version 1.89.0 (29483883e 2025-08-04)
+  #7 2.634 info: downloading component 'cargo'
+  #7 3.244 info: downloading component 'clippy'
+  #7 3.348 info: downloading component 'rust-docs'
+  #7 5.323 info: downloading component 'rust-std'
+  #7 7.707 info: downloading component 'rustc'
+  #7 15.52 info: downloading component 'rustfmt'
+  #7 15.65 info: installing component 'cargo'
+  #7 16.54 info: installing component 'clippy'
+  #7 17.01 info: installing component 'rust-docs'
+  #7 19.20 info: installing component 'rust-std'
+  #7 21.72 info: installing component 'rustc'
+  #7 27.99 info: installing component 'rustfmt'
+  #7 28.37 
+  #7 28.37 info: default toolchain set to 'stable-x86_64-unknown-linux-gnu'
+  #7 28.38   stable-x86_64-unknown-linux-gnu installed - rustc 1.89.0 (29483883e 2025-08-04)
+  #7 28.38 
+  #7 28.48 info: syncing channel updates for 'stable-x86_64-unknown-linux-gnu'
+  #7 28.53 info: checking for self-update
+  #7 28.58 
+  #7 28.59   stable-x86_64-unknown-linux-gnu unchanged - rustc 1.89.0 (29483883e 2025-08-04)
+  #7 28.59 
+  #7 28.59 info: cleaning up downloads & tmp directories
+  #7 28.61 info: syncing channel updates for 'nightly-2025-01-25-x86_64-unknown-linux-gnu'
+  #7 28.71 info: latest update on 2025-01-25, rust version 1.86.0-nightly (1e9b0177d 2025-01-24)
+  #7 28.71 info: downloading component 'cargo'
+  #7 28.96 info: downloading component 'clippy'
+  #7 29.67 info: downloading component 'rust-docs'
+  #7 32.51 info: downloading component 'rust-std'
+  #7 35.13 info: downloading component 'rustc'
+  #7 42.16 info: downloading component 'rustfmt'
+  #7 42.87 info: installing component 'cargo'
+  #7 43.68 info: installing component 'clippy'
+  #7 44.02 info: installing component 'rust-docs'
+  #7 46.21 info: installing component 'rust-std'
+  #7 48.69 info: installing component 'rustc'
+  #7 54.33 info: installing component 'rustfmt'
+  #7 54.72 
+  #7 54.73   nightly-2025-01-25-x86_64-unknown-linux-gnu installed - rustc 1.86.0-nightly (1e9b0177d 2025-01-24)
+  #7 54.73 
+  #7 54.73 info: checking for self-update
+  #7 54.90 info: component 'rust-std' for target 'x86_64-unknown-linux-gnu' is up to date
+  #7 DONE 59.0s
+  #8 [builder 4/6] WORKDIR /home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio
+  #8 DONE 0.0s
+  #9 [builder 5/6] COPY . .
+  #9 DONE 0.2s
+  #10 [builder 6/6] RUN cargo build --release --target x86_64-unknown-linux-gnu
+  #10 0.287     Updating crates.io index
+  #10 1.055      Locking 212 packages to latest compatible versions
+  #10 1.059       Adding criterion v0.5.1 (available: v0.7.0)
+  #10 1.061       Adding hashbrown v0.15.5 (available: v0.16.0)
+  #10 1.061       Adding http v0.2.12 (available: v1.3.1)
+  #10 1.064       Adding nix v0.29.0 (available: v0.30.1)
+  #10 1.083       Adding windows-sys v0.59.0 (available: v0.60.2)
+  #10 1.093  Downloading crates ...
+  #10 1.180   Downloaded ciborium-io v0.2.2
+  #10 1.182   Downloaded cfg-if v1.0.3
+  #10 1.184   Downloaded autocfg v1.5.0
+  #10 1.187   Downloaded ciborium v0.2.2
+  #10 1.191   Downloaded walkdir v2.5.0
+  #10 1.194   Downloaded regex-syntax v0.8.6
+  #10 1.205   Downloaded lock_api v0.4.13
+  #10 1.207   Downloaded is-terminal v0.4.16
+  #10 1.210   Downloaded rand v0.9.2
+  #10 1.217   Downloaded socket2 v0.6.0
+  #10 1.221   Downloaded regex v1.11.2
+  #10 1.231   Downloaded unicode-ident v1.0.18
+  #10 1.234   Downloaded syn v2.0.106
+  #10 1.248   Downloaded plotters v0.3.7
+  #10 1.260   Downloaded tinytemplate v1.2.1
+  #10 1.262   Downloaded serde v1.0.219
+  #10 1.266   Downloaded serde_json v1.0.143
+  #10 1.274   Downloaded futures-io v0.3.31
+  #10 1.275   Downloaded rayon v1.11.0
+  #10 1.287   Downloaded clap v4.5.46
+  #10 1.297   Downloaded zerocopy v0.8.26
+  #10 1.325   Downloaded futures-util v0.3.31
+  #10 1.340   Downloaded getrandom v0.3.3
+  #10 1.344   Downloaded futures-sink v0.3.31
+  #10 1.345   Downloaded either v1.15.0
+  #10 1.347   Downloaded crossbeam-deque v0.8.6
+  #10 1.349   Downloaded rand_chacha v0.9.0
+  #10 1.350   Downloaded half v2.6.0
+  #10 1.353   Downloaded futures-macro v0.3.31
+  #10 1.354   Downloaded regex-automata v0.4.10
+  #10 1.374   Downloaded doc-comment v0.3.3
+  #10 1.375   Downloaded rayon-core v1.13.0
+  #10 1.380   Downloaded hashbrown v0.15.5
+  #10 1.386   Downloaded crossbeam-utils v0.8.21
+  #10 1.389   Downloaded crossbeam-epoch v0.9.18
+  #10 1.392   Downloaded clap_builder v4.5.46
+  #10 1.400   Downloaded futures v0.3.31
+  #10 1.405   Downloaded smallvec v1.15.1
+  #10 1.407   Downloaded serde_derive v1.0.219
+  #10 1.410   Downloaded scopeguard v1.2.0
+  #10 1.412   Downloaded ryu v1.0.20
+  #10 1.415   Downloaded pin-utils v0.1.0
+  #10 1.416   Downloaded futures-core v0.3.31
+  #10 1.418   Downloaded futures-channel v0.3.31
+  #10 1.420   Downloaded criterion-plot v0.5.0
+  #10 1.422   Downloaded criterion v0.5.1
+  #10 1.430   Downloaded plotters-svg v0.3.7
+  #10 1.431   Downloaded once_cell v1.21.3
+  #10 1.434   Downloaded num-traits v0.2.19
+  #10 1.437   Downloaded mio v1.0.4
+  #10 1.444   Downloaded memchr v2.7.5
+  #10 1.450   Downloaded futures-task v0.3.31
+  #10 1.451   Downloaded signal-hook-registry v1.4.6
+  #10 1.452   Downloaded same-file v1.0.6
+  #10 1.454   Downloaded rand_core v0.9.3
+  #10 1.455   Downloaded proc-macro2 v1.0.101
+  #10 1.459   Downloaded pin-project-lite v0.2.16
+  #10 1.465   Downloaded parking_lot_core v0.9.11
+  #10 1.467   Downloaded parking_lot v0.12.4
+  #10 1.470   Downloaded oorandom v11.1.5
+  #10 1.471   Downloaded num_cpus v1.17.0
+  #10 1.475   Downloaded log v0.4.27
+  #10 1.477   Downloaded libc v0.2.175
+  #10 1.512   Downloaded itoa v1.0.15
+  #10 1.513   Downloaded ppv-lite86 v0.2.21
+  #10 1.515   Downloaded itertools v0.10.5
+  #10 1.522   Downloaded ciborium-ll v0.2.2
+  #10 1.523   Downloaded quote v1.0.40
+  #10 1.526   Downloaded cast v0.3.0
+  #10 1.527   Downloaded bytes v1.10.1
+  #10 1.532   Downloaded aho-corasick v1.1.3
+  #10 1.538   Downloaded slab v0.4.11
+  #10 1.540   Downloaded plotters-backend v0.3.7
+  #10 1.541   Downloaded futures-executor v0.3.31
+  #10 1.542   Downloaded clap_lex v0.7.5
+  #10 1.544   Downloaded anes v0.1.6
+  #10 1.547   Downloaded anstyle v1.0.11
+  #10 1.581    Compiling proc-macro2 v1.0.101
+  #10 1.581    Compiling unicode-ident v1.0.18
+  #10 1.581    Compiling libc v0.2.175
+  #10 1.581    Compiling autocfg v1.5.0
+  #10 1.581    Compiling futures-core v0.3.31
+  #10 1.581    Compiling pin-project-lite v0.2.16
+  #10 1.581    Compiling parking_lot_core v0.9.11
+  #10 1.581    Compiling smallvec v1.15.1
+  #10 1.581    Compiling scopeguard v1.2.0
+  #10 1.584    Compiling cfg-if v1.0.3
+  #10 1.586    Compiling futures-sink v0.3.31
+  #10 1.587    Compiling bytes v1.10.1
+  #10 1.589    Compiling slab v0.4.11
+  #10 1.591    Compiling futures-task v0.3.31
+  #10 1.593    Compiling futures-io v0.3.31
+  #10 1.595    Compiling pin-utils v0.1.0
+  #10 1.599    Compiling memchr v2.7.5
+  #10 1.603    Compiling doc-comment v0.3.3
+  #10 1.603    Compiling tests-build v0.1.0 (/home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/tests-build)
+  #10 1.640    Compiling futures-channel v0.3.31
+  #10 1.774    Compiling lock_api v0.4.13
+  #10 2.118    Compiling quote v1.0.40
+  #10 2.233    Compiling syn v2.0.106
+  #10 2.316    Compiling signal-hook-registry v1.4.6
+  #10 2.316    Compiling mio v1.0.4
+  #10 2.316    Compiling socket2 v0.6.0
+  #10 2.449    Compiling parking_lot v0.12.4
+  #10 4.178    Compiling tokio-macros v2.5.0 (/home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/tokio-macros)
+  #10 4.178    Compiling futures-macro v0.3.31
+  #10 4.673    Compiling tokio v1.47.1 (/home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/tokio)
+  #10 4.735    Compiling futures-util v0.3.31
+  #10 6.916    Compiling futures-executor v0.3.31
+  #10 7.005    Compiling futures v0.3.31
+  #10 8.457    Compiling tokio-stream v0.1.17 (/home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/tokio-stream)
+  #10 8.457    Compiling tests-integration v0.1.0 (/home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/tests-integration)
+  #10 8.457    Compiling tokio-util v0.7.16 (/home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/tokio-util)
+  #10 8.767    Compiling tokio-test v0.4.4 (/home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/tokio-test)
+  #10 9.758     Finished `release` profile [optimized] target(s) in 9.51s
+  #10 DONE 10.1s
+  #11 [stage-1 2/4] COPY --from=builder /home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/target/x86_64-unknown-linux-gnu/release/app /usr/local/bin/app
+  #11 ERROR: failed to calculate checksum of ref 111b0f74-95ac-4c4c-99e1-f8e374feb237::zfs0p3jv31acyoodmrl2aptx1: "/home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/target/x86_64-unknown-linux-gnu/release/app": not found
+  ------
+   > [stage-1 2/4] COPY --from=builder /home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/target/x86_64-unknown-linux-gnu/release/app /usr/local/bin/app:
+  ------
+  envgym.dockerfile:38
+  --------------------
+    36 |     
+    37 |     # Copy build artifacts from builder stage
+    38 | >>> COPY --from=builder /home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/target/x86_64-unknown-linux-gnu/release/app /usr/local/bin/app
+    39 |     
+    40 |     # Install runtime dependencies
+  --------------------
+  ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref 111b0f74-95ac-4c4c-99e1-f8e374feb237::zfs0p3jv31acyoodmrl2aptx1: "/home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/target/x86_64-unknown-linux-gnu/release/app": not found
+  === Runtime Log ===  
+  Runtime Status: Failed
+  Runtime Output:
+  Runtime Error:
+  === Execution End ===
+DOCKERFILE:
+  FROM rust:slim-bullseye AS builder
+  # Set environment variables
+  ENV RUSTUP_HOME=/usr/local/rustup \
+      CARGO_HOME=/usr/local/cargo \
+      PATH=/usr/local/cargo/bin:$PATH \
+      RUST_VERSION=1.70.0
+  # Install system dependencies
+  RUN apt-get update && apt-get install -y \
+      build-essential \
+      git \
+      pkg-config \
+      libssl-dev \
+      curl \
+      && rm -rf /var/lib/apt/lists/*
+  # Install Rust toolchain
+  RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+      && rustup default stable \
+      && rustup update \
+      && rustup toolchain install nightly-2025-01-25 \
+      && rustup target add x86_64-unknown-linux-gnu
+  # Set working directory
+  WORKDIR /home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio
+  # Copy project files
+  COPY . .
+  # Build the project in release mode
+  RUN cargo build --release --target x86_64-unknown-linux-gnu
+  # Final stage
+  FROM rust:slim-bullseye
+  # Copy build artifacts from builder stage
+  COPY --from=builder /home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio/target/x86_64-unknown-linux-gnu/release/app /usr/local/bin/app
+  # Install runtime dependencies
+  RUN apt-get update && apt-get install -y \
+      build-essential \
+      git \
+      pkg-config \
+      libssl-dev \
+      && rm -rf /var/lib/apt/lists/*
+  # Set working directory
+  WORKDIR /home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio
+  # Default command
+  CMD ["/bin/bash"]
+--- End of Iteration 1 ---
+
+=== Iteration 2 - [2025-09-02 08:59:23] ===
+PLAN:
+  === ADJUSTED ENVIRONMENT SETUP PLAN ===
+  1. DOWNLOADS NEEDED:
+     - Rust Programming Language (rustc & cargo)
+       * Version: 1.70 or higher (confirmed x86_64 compatibility)
+       * Nightly version support for documentation
+       * Specific nightly version: nightly-2025-01-25
+       * Download from: https://rustup.rs/
+     - Git (for version control)
+       * Latest stable version compatible with x86_64
+     - Visual Studio Code or Rust-compatible IDE
+     - Docker Configuration
+       * Base Image: rust:slim-bullseye (optimized for x86_64)
+       * Platform: linux/amd64
+       * Multi-stage build support
+       * Use .dockerignore for optimization
+     - Development Tools
+       * Standard x86_64 Linux development packages
+       * Build-essential
+       * pkg-config
+       * libssl-dev
+  2. SYSTEM REQUIREMENTS ADJUSTMENTS:
+     - Minimum RAM: 8GB (recommended for Rust compilation)
+     - Storage: 20GB free space
+     - CPU: x86_64 architecture optimization
+     - Operating System: Ubuntu 22.04 LTS or Debian-based Linux
+  3. TOOLCHAIN CONFIGURATION:
+     - Rust Toolchain
+       * Target: x86_64-unknown-linux-gnu
+       * Use rustup for multi-toolchain management
+       * Configure nightly and stable channels
+     - Cross-Compilation
+       * Limit to x86_64 and compatible architectures
+       * Remove FreeBSD 32-bit support
+       * Focus on 64-bit Linux and compatible platforms
+  4. DOCKER OPTIMIZATION:
+     - Dockerfile Recommendations:
+       * Use rust:slim-bullseye as base image
+       * Implement multi-stage build
+       * Minimize layer count
+       * Use BuildKit features
+       * Optimize caching strategies
+     - Container Configuration
+       * Platform: linux/amd64
+       * No GPU-specific configurations needed
+  5. DEVELOPMENT ENVIRONMENT:
+     - Working Directory: /home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio
+     - Path Configurations
+       * Ensure consistent path handling
+       * Use absolute paths in configurations
+       * Set up proper volume mounting for Docker
+  6. DEPENDENCY MANAGEMENT:
+     - Keep all previously listed dependencies
+     - Prioritize x86_64 compatible versions
+     - Remove architecture-specific dependencies
+     - Validate package compatibility with x86_64
+  7. PERFORMANCE CONSIDERATIONS:
+     - Use cargo build --release for optimized builds
+     - Enable LTO (Link Time Optimization)
+     - Configure CPU-specific optimizations
+     - Leverage x86_64 instruction set features
+  8. TESTING STRATEGY:
+     - Focus on x86_64 Linux testing
+     - Use GitHub Actions for CI/CD
+     - Implement comprehensive test matrix
+     - Validate cross-platform compatibility
+  9. DOCUMENTATION:
+     - Generate documentation for x86_64 platform
+     - Use rustdoc with nightly toolchain
+     - Ensure cross-platform documentation generation
+  10. ADDITIONAL RECOMMENDATIONS:
+      - Use cargo-audit for security checks
+      - Implement comprehensive error handling
+      - Create detailed documentation
+      - Use semantic versioning
+  Compatibility Summary:
+  - Primary Platform: x86_64 Linux
+  - Recommended Base Image: rust:slim-bullseye
+  - Docker Support: Full compatibility
+  - Architecture Optimization: x86_64
+  - Minimal External Dependencies
+  - Streamlined Build Process
+  The plan maintains the original comprehensive approach while optimizing for the specific x86_64 Linux environment, ensuring efficient development, testing, and deployment strategies.
+NEXT:
+  current progress
+  Docker setup successfully configured for x86_64 Linux environment with Rust 1.70, multi-stage build implemented, system dependencies installed, and initial build process established. Previous Docker execution was successful with no reported errors.
+  next step
+  Optimize multi-stage build by reducing layer count, implement more aggressive caching strategies, add explicit error handling in build process, and include explicit volume mounting configuration for improved development workflow.
+STATUS:
+  SUCCESS
+LOG:
+  === Docker Execution Log - 20250902_085919 ===
+  Dockerfile: envgym/envgym.dockerfile
+  Image Name: envgym_test_1756803539
+  === Build Log ===
+  Build Status: Success
+  Build Output:
+  Build Error:
+  #0 building with "default" instance using docker driver
+  #1 [internal] load build definition from envgym.dockerfile
+  #1 transferring dockerfile: 1.39kB done
+  #1 DONE 0.0s
+  #2 [internal] load metadata for docker.io/library/rust:slim-bullseye
+  #2 DONE 0.1s
+  #3 [internal] load .dockerignore
+  #3 transferring context: 2B done
+  #3 DONE 0.0s
+  #4 [builder 2/8] RUN apt-get update && apt-get install -y     build-essential     git     pkg-config     libssl-dev     curl     && rm -rf /var/lib/apt/lists/*
+  #4 CACHED
+  #5 [builder 1/8] FROM docker.io/library/rust:slim-bullseye@sha256:1bf538b6b2931ea86c4761e7f979dc85ebab6af2ac905b039fd36e6a23436365
+  #5 CACHED
+  #6 [builder 3/8] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y     && rustup default stable     && rustup update     && rustup toolchain install nightly-2025-01-25     && rustup target add x86_64-unknown-linux-gnu
+  #6 CACHED
+  #7 [internal] load build context
+  #7 transferring context: 208.59kB 0.0s done
+  #7 DONE 0.1s
+  #8 [builder 4/8] WORKDIR /tokio-rs_tokio
+  #8 DONE 0.1s
+  #9 [builder 5/8] COPY . .
+  #9 DONE 0.2s
+  #10 [stage-1 2/5] RUN apt-get update && apt-get install -y     build-essential     git     pkg-config     libssl-dev     && rm -rf /var/lib/apt/lists/*
+  #10 0.308 Get:1 http://deb.debian.org/debian bullseye InRelease [75.1 kB]
+  #10 0.318 Get:2 http://deb.debian.org/debian-security bullseye-security InRelease [27.2 kB]
+  #10 0.318 Get:3 http://deb.debian.org/debian bullseye-updates InRelease [44.0 kB]
+  #10 0.399 Get:4 http://deb.debian.org/debian bullseye/main amd64 Packages [8066 kB]
+  #10 ...
+  #11 [builder 6/8] RUN ls -R target || true
+  #11 0.196 ls: cannot access 'target': No such file or directory
+  #11 DONE 0.2s
+  #10 [stage-1 2/5] RUN apt-get update && apt-get install -y     build-essential     git     pkg-config     libssl-dev     && rm -rf /var/lib/apt/lists/*
+  #10 0.573 Get:5 http://deb.debian.org/debian-security bullseye-security/main amd64 Packages [393 kB]
+  #10 0.587 Get:6 http://deb.debian.org/debian bullseye-updates/main amd64 Packages [18.8 kB]
+  #10 1.564 Fetched 8624 kB in 1s (6760 kB/s)
+  #10 1.564 Reading package lists...
+  #10 2.038 Reading package lists...
+  #10 2.542 Building dependency tree...
+  #10 2.654 Reading state information...
+  #10 2.779 The following additional packages will be installed:
+  #10 2.779   bzip2 dirmngr dpkg-dev fakeroot g++ g++-10 git-man gnupg gnupg-l10n
+  #10 2.780   gnupg-utils gpg gpg-agent gpg-wks-client gpg-wks-server gpgconf gpgsm less
+  #10 2.780   libalgorithm-diff-perl libalgorithm-diff-xs-perl libalgorithm-merge-perl
+  #10 2.780   libassuan0 libbrotli1 libbsd0 libcbor0 libcurl3-gnutls libdpkg-perl libedit2
+  #10 2.780   liberror-perl libexpat1 libfakeroot libfido2-1 libfile-fcntllock-perl
+  #10 2.780   libgdbm-compat4 libgdbm6 libglib2.0-0 libglib2.0-data libgpm2 libicu67
+  #10 2.780   libksba8 libldap-2.4-2 libldap-common liblocale-gettext-perl libmd0
+  #10 2.780   libncursesw6 libnghttp2-14 libnpth0 libperl5.32 libpsl5 libreadline8
+  #10 2.780   librtmp1 libsasl2-2 libsasl2-modules libsasl2-modules-db libsqlite3-0
+  #10 2.780   libssh2-1 libstdc++-10-dev libx11-6 libx11-data libxau6 libxcb1 libxdmcp6
+  #10 2.780   libxext6 libxml2 libxmuu1 make netbase openssh-client patch perl
+  #10 2.780   perl-modules-5.32 pinentry-curses publicsuffix readline-common
+  #10 2.780   shared-mime-info xauth xdg-user-dirs xz-utils
+  #10 2.781 Suggested packages:
+  #10 2.781   bzip2-doc dbus-user-session libpam-systemd pinentry-gnome3 tor
+  #10 2.781   debian-keyring g++-multilib g++-10-multilib gcc-10-doc gettext-base
+  #10 2.781   git-daemon-run | git-daemon-sysvinit git-doc git-el git-email git-gui gitk
+  #10 2.781   gitweb git-cvs git-mediawiki git-svn parcimonie xloadimage scdaemon
+  #10 2.781   sensible-utils bzr gdbm-l10n gpm libsasl2-modules-gssapi-mit
+  #10 2.781   | libsasl2-modules-gssapi-heimdal libsasl2-modules-ldap libsasl2-modules-otp
+  #10 2.781   libsasl2-modules-sql libssl-doc libstdc++-10-doc make-doc keychain
+  #10 2.781   libpam-ssh monkeysphere ssh-askpass ed diffutils-doc perl-doc
+  #10 2.781   libterm-readline-gnu-perl | libterm-readline-perl-perl
+  #10 2.781   libtap-harness-archive-perl pinentry-doc readline-doc
+  #10 3.152 The following NEW packages will be installed:
+  #10 3.152   build-essential bzip2 dirmngr dpkg-dev fakeroot g++ g++-10 git git-man gnupg
+  #10 3.152   gnupg-l10n gnupg-utils gpg gpg-agent gpg-wks-client gpg-wks-server gpgconf
+  #10 3.152   gpgsm less libalgorithm-diff-perl libalgorithm-diff-xs-perl
+  #10 3.152   libalgorithm-merge-perl libassuan0 libbrotli1 libbsd0 libcbor0
+  #10 3.152   libcurl3-gnutls libdpkg-perl libedit2 liberror-perl libexpat1 libfakeroot
+  #10 3.152   libfido2-1 libfile-fcntllock-perl libgdbm-compat4 libgdbm6 libglib2.0-0
+  #10 3.152   libglib2.0-data libgpm2 libicu67 libksba8 libldap-2.4-2 libldap-common
+  #10 3.152   liblocale-gettext-perl libmd0 libncursesw6 libnghttp2-14 libnpth0
+  #10 3.152   libperl5.32 libpsl5 libreadline8 librtmp1 libsasl2-2 libsasl2-modules
+  #10 3.152   libsasl2-modules-db libsqlite3-0 libssh2-1 libssl-dev libstdc++-10-dev
+  #10 3.152   libx11-6 libx11-data libxau6 libxcb1 libxdmcp6 libxext6 libxml2 libxmuu1
+  #10 3.152   make netbase openssh-client patch perl perl-modules-5.32 pinentry-curses
+  #10 3.153   pkg-config publicsuffix readline-common shared-mime-info xauth xdg-user-dirs
+  #10 3.153   xz-utils
+  #10 3.185 0 upgraded, 81 newly installed, 0 to remove and 0 not upgraded.
+  #10 3.185 Need to get 58.8 MB of archives.
+  #10 3.185 After this operation, 236 MB of additional disk space will be used.
+  #10 3.185 Get:1 http://deb.debian.org/debian-security bullseye-security/main amd64 perl-modules-5.32 all 5.32.1-4+deb11u4 [2824 kB]
+  #10 3.211 Get:2 http://deb.debian.org/debian bullseye/main amd64 libgdbm6 amd64 1.19-2 [64.9 kB]
+  #10 3.211 Get:3 http://deb.debian.org/debian bullseye/main amd64 libgdbm-compat4 amd64 1.19-2 [44.7 kB]
+  #10 3.212 Get:4 http://deb.debian.org/debian-security bullseye-security/main amd64 libperl5.32 amd64 5.32.1-4+deb11u4 [4132 kB]
+  #10 3.290 Get:5 http://deb.debian.org/debian-security bullseye-security/main amd64 perl amd64 5.32.1-4+deb11u4 [293 kB]
+  #10 3.299 Get:6 http://deb.debian.org/debian bullseye/main amd64 liblocale-gettext-perl amd64 1.07-4+b1 [19.0 kB]
+  #10 3.299 Get:7 http://deb.debian.org/debian bullseye/main amd64 less amd64 551-2+deb11u2 [136 kB]
+  #10 3.304 Get:8 http://deb.debian.org/debian bullseye/main amd64 readline-common all 8.1-1 [73.7 kB]
+  #10 3.307 Get:9 http://deb.debian.org/debian bullseye/main amd64 libreadline8 amd64 8.1-1 [169 kB]
+  #10 3.313 Get:10 http://deb.debian.org/debian bullseye/main amd64 netbase all 6.3 [19.9 kB]
+  #10 3.313 Get:11 http://deb.debian.org/debian bullseye/main amd64 bzip2 amd64 1.0.8-4 [49.3 kB]
+  #10 3.315 Get:12 http://deb.debian.org/debian bullseye/main amd64 libmd0 amd64 1.0.3-3 [28.0 kB]
+  #10 3.316 Get:13 http://deb.debian.org/debian bullseye/main amd64 libbsd0 amd64 0.11.3-1+deb11u1 [108 kB]
+  #10 3.322 Get:14 http://deb.debian.org/debian bullseye/main amd64 libedit2 amd64 3.1-20191231-2+b1 [96.7 kB]
+  #10 3.324 Get:15 http://deb.debian.org/debian bullseye/main amd64 libcbor0 amd64 0.5.0+dfsg-2 [24.0 kB]
+  #10 3.325 Get:16 http://deb.debian.org/debian bullseye/main amd64 libfido2-1 amd64 1.6.0-2 [53.3 kB]
+  #10 3.326 Get:17 http://deb.debian.org/debian-security bullseye-security/main amd64 openssh-client amd64 1:8.4p1-5+deb11u5 [932 kB]
+  #10 3.360 Get:18 http://deb.debian.org/debian bullseye/main amd64 xz-utils amd64 5.2.5-2.1~deb11u1 [220 kB]
+  #10 3.372 Get:19 http://deb.debian.org/debian bullseye/main amd64 libstdc++-10-dev amd64 10.2.1-6 [1741 kB]
+  #10 3.468 Get:20 http://deb.debian.org/debian bullseye/main amd64 g++-10 amd64 10.2.1-6 [9380 kB]
+  #10 4.530 Get:21 http://deb.debian.org/debian bullseye/main amd64 g++ amd64 4:10.2.1-1 [1644 B]
+  #10 4.531 Get:22 http://deb.debian.org/debian bullseye/main amd64 make amd64 4.3-4.1 [396 kB]
+  #10 4.564 Get:23 http://deb.debian.org/debian bullseye/main amd64 libdpkg-perl all 1.20.13 [1552 kB]
+  #10 4.692 Get:24 http://deb.debian.org/debian bullseye/main amd64 patch amd64 2.7.6-7 [128 kB]
+  #10 4.704 Get:25 http://deb.debian.org/debian bullseye/main amd64 dpkg-dev all 1.20.13 [2314 kB]
+  #10 4.912 Get:26 http://deb.debian.org/debian bullseye/main amd64 build-essential amd64 12.9 [7704 B]
+  #10 4.912 Get:27 http://deb.debian.org/debian bullseye/main amd64 libassuan0 amd64 2.5.3-7.1 [50.5 kB]
+  #10 4.917 Get:28 http://deb.debian.org/debian bullseye/main amd64 gpgconf amd64 2.2.27-2+deb11u2 [548 kB]
+  #10 4.974 Get:29 http://deb.debian.org/debian bullseye/main amd64 libksba8 amd64 1.5.0-3+deb11u2 [123 kB]
+  #10 4.984 Get:30 http://deb.debian.org/debian bullseye/main amd64 libsasl2-modules-db amd64 2.1.27+dfsg-2.1+deb11u1 [69.1 kB]
+  #10 4.990 Get:31 http://deb.debian.org/debian bullseye/main amd64 libsasl2-2 amd64 2.1.27+dfsg-2.1+deb11u1 [106 kB]
+  #10 4.998 Get:32 http://deb.debian.org/debian bullseye/main amd64 libldap-2.4-2 amd64 2.4.57+dfsg-3+deb11u1 [232 kB]
+  #10 5.018 Get:33 http://deb.debian.org/debian bullseye/main amd64 libnpth0 amd64 1.6-3 [19.0 kB]
+  #10 5.019 Get:34 http://deb.debian.org/debian bullseye/main amd64 dirmngr amd64 2.2.27-2+deb11u2 [763 kB]
+  #10 5.089 Get:35 http://deb.debian.org/debian bullseye/main amd64 libfakeroot amd64 1.25.3-1.1 [47.0 kB]
+  #10 5.092 Get:36 http://deb.debian.org/debian bullseye/main amd64 fakeroot amd64 1.25.3-1.1 [87.0 kB]
+  #10 5.102 Get:37 http://deb.debian.org/debian bullseye/main amd64 libbrotli1 amd64 1.0.9-2+b2 [279 kB]
+  #10 5.122 Get:38 http://deb.debian.org/debian-security bullseye-security/main amd64 libnghttp2-14 amd64 1.43.0-1+deb11u2 [77.0 kB]
+  #10 5.128 Get:39 http://deb.debian.org/debian bullseye/main amd64 libpsl5 amd64 0.21.0-1.2 [57.3 kB]
+  #10 5.134 Get:40 http://deb.debian.org/debian bullseye/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2+b2 [60.8 kB]
+  #10 5.138 Get:41 http://deb.debian.org/debian bullseye/main amd64 libssh2-1 amd64 1.9.0-2+deb11u1 [156 kB]
+  #10 5.150 Get:42 http://deb.debian.org/debian-security bullseye-security/main amd64 libcurl3-gnutls amd64 7.74.0-1.3+deb11u15 [344 kB]
+  #10 5.184 Get:43 http://deb.debian.org/debian-security bullseye-security/main amd64 libexpat1 amd64 2.2.10-2+deb11u7 [99.2 kB]
+  #10 5.195 Get:44 http://deb.debian.org/debian bullseye/main amd64 liberror-perl all 0.17029-1 [31.0 kB]
+  #10 5.198 Get:45 http://deb.debian.org/debian-security bullseye-security/main amd64 git-man all 1:2.30.2-1+deb11u4 [1831 kB]
+  #10 5.528 Get:46 http://deb.debian.org/debian-security bullseye-security/main amd64 git amd64 1:2.30.2-1+deb11u4 [5566 kB]
+  #10 6.110 Get:47 http://deb.debian.org/debian bullseye/main amd64 gnupg-l10n all 2.2.27-2+deb11u2 [1086 kB]
+  #10 6.192 Get:48 http://deb.debian.org/debian bullseye/main amd64 gnupg-utils amd64 2.2.27-2+deb11u2 [905 kB]
+  #10 6.263 Get:49 http://deb.debian.org/debian-security bullseye-security/main amd64 libsqlite3-0 amd64 3.34.1-3+deb11u1 [797 kB]
+  #10 6.346 Get:50 http://deb.debian.org/debian bullseye/main amd64 gpg amd64 2.2.27-2+deb11u2 [928 kB]
+  #10 6.427 Get:51 http://deb.debian.org/debian bullseye/main amd64 libncursesw6 amd64 6.2+20201114-2+deb11u2 [132 kB]
+  #10 6.437 Get:52 http://deb.debian.org/debian bullseye/main amd64 pinentry-curses amd64 1.1.0-4 [64.9 kB]
+  #10 6.445 Get:53 http://deb.debian.org/debian bullseye/main amd64 gpg-agent amd64 2.2.27-2+deb11u2 [669 kB]
+  #10 6.508 Get:54 http://deb.debian.org/debian bullseye/main amd64 gpg-wks-client amd64 2.2.27-2+deb11u2 [524 kB]
+  #10 6.553 Get:55 http://deb.debian.org/debian bullseye/main amd64 gpg-wks-server amd64 2.2.27-2+deb11u2 [516 kB]
+  #10 6.595 Get:56 http://deb.debian.org/debian bullseye/main amd64 gpgsm amd64 2.2.27-2+deb11u2 [645 kB]
+  #10 6.664 Get:57 http://deb.debian.org/debian bullseye/main amd64 gnupg all 2.2.27-2+deb11u2 [825 kB]
+  #10 6.758 Get:58 http://deb.debian.org/debian bullseye/main amd64 libalgorithm-diff-perl all 1.201-1 [43.3 kB]
+  #10 6.763 Get:59 http://deb.debian.org/debian bullseye/main amd64 libalgorithm-diff-xs-perl amd64 0.04-6+b1 [12.0 kB]
+  #10 6.765 Get:60 http://deb.debian.org/debian bullseye/main amd64 libalgorithm-merge-perl all 0.08-3 [12.7 kB]
+  #10 6.766 Get:61 http://deb.debian.org/debian bullseye/main amd64 libfile-fcntllock-perl amd64 0.22-3+b7 [35.5 kB]
+  #10 6.771 Get:62 http://deb.debian.org/debian-security bullseye-security/main amd64 libglib2.0-0 amd64 2.66.8-1+deb11u6 [1377 kB]
+  #10 6.952 Get:63 http://deb.debian.org/debian-security bullseye-security/main amd64 libglib2.0-data all 2.66.8-1+deb11u6 [1177 kB]
+  #10 7.035 Get:64 http://deb.debian.org/debian bullseye/main amd64 libgpm2 amd64 1.20.7-8 [35.6 kB]
+  #10 7.038 Get:65 http://deb.debian.org/debian-security bullseye-security/main amd64 libicu67 amd64 67.1-7+deb11u1 [8624 kB]
+  #10 7.599 Get:66 http://deb.debian.org/debian bullseye/main amd64 libldap-common all 2.4.57+dfsg-3+deb11u1 [95.8 kB]
+  #10 7.602 Get:67 http://deb.debian.org/debian bullseye/main amd64 libsasl2-modules amd64 2.1.27+dfsg-2.1+deb11u1 [104 kB]
+  #10 7.605 Get:68 http://deb.debian.org/debian-security bullseye-security/main amd64 libssl-dev amd64 1.1.1w-0+deb11u3 [1821 kB]
+  #10 7.675 Get:69 http://deb.debian.org/debian bullseye/main amd64 libxau6 amd64 1:1.0.9-1 [19.7 kB]
+  #10 7.676 Get:70 http://deb.debian.org/debian bullseye/main amd64 libxdmcp6 amd64 1:1.1.2-3 [26.3 kB]
+  #10 7.677 Get:71 http://deb.debian.org/debian bullseye/main amd64 libxcb1 amd64 1.14-3 [140 kB]
+  #10 7.686 Get:72 http://deb.debian.org/debian bullseye/main amd64 libx11-data all 2:1.7.2-1+deb11u2 [311 kB]
+  #10 7.708 Get:73 http://deb.debian.org/debian bullseye/main amd64 libx11-6 amd64 2:1.7.2-1+deb11u2 [772 kB]
+  #10 7.755 Get:74 http://deb.debian.org/debian bullseye/main amd64 libxext6 amd64 2:1.3.3-1.1 [52.7 kB]
+  #10 7.758 Get:75 http://deb.debian.org/debian-security bullseye-security/main amd64 libxml2 amd64 2.9.10+dfsg-6.7+deb11u8 [694 kB]
+  #10 7.804 Get:76 http://deb.debian.org/debian bullseye/main amd64 libxmuu1 amd64 2:1.1.2-2+b3 [23.9 kB]
+  #10 7.806 Get:77 http://deb.debian.org/debian bullseye/main amd64 pkg-config amd64 0.29.2-1 [65.1 kB]
+  #10 7.812 Get:78 http://deb.debian.org/debian bullseye/main amd64 publicsuffix all 20220811.1734-0+deb11u1 [127 kB]
+  #10 7.824 Get:79 http://deb.debian.org/debian bullseye/main amd64 shared-mime-info amd64 2.0-1 [701 kB]
+  #10 7.906 Get:80 http://deb.debian.org/debian bullseye/main amd64 xauth amd64 1:1.1-1 [40.5 kB]
+  #10 7.910 Get:81 http://deb.debian.org/debian bullseye/main amd64 xdg-user-dirs amd64 0.17-2 [53.8 kB]
+  #10 8.073 debconf: delaying package configuration, since apt-utils is not installed
+  #10 8.097 Fetched 58.8 MB in 5s (12.4 MB/s)
+  #10 8.113 Selecting previously unselected package perl-modules-5.32.
+  #10 8.113 (Reading database ... 
+  (Reading database ... 5%
+  (Reading database ... 10%
+  (Reading database ... 15%
+  (Reading database ... 20%
+  (Reading database ... 25%
+  (Reading database ... 30%
+  (Reading database ... 35%
+  (Reading database ... 40%
+  (Reading database ... 45%
+  (Reading database ... 50%
+  (Reading database ... 55%
+  (Reading database ... 60%
+  (Reading database ... 65%
+  (Reading database ... 70%
+  (Reading database ... 75%
+  (Reading database ... 80%
+  (Reading database ... 85%
+  (Reading database ... 90%
+  (Reading database ... 95%
+  (Reading database ... 100%
+  (Reading database ... 9302 files and directories currently installed.)
+  #10 8.117 Preparing to unpack .../00-perl-modules-5.32_5.32.1-4+deb11u4_all.deb ...
+  #10 8.118 Unpacking perl-modules-5.32 (5.32.1-4+deb11u4) ...
+  #10 8.398 Selecting previously unselected package libgdbm6:amd64.
+  #10 8.399 Preparing to unpack .../01-libgdbm6_1.19-2_amd64.deb ...
+  #10 8.401 Unpacking libgdbm6:amd64 (1.19-2) ...
+  #10 8.419 Selecting previously unselected package libgdbm-compat4:amd64.
+  #10 8.420 Preparing to unpack .../02-libgdbm-compat4_1.19-2_amd64.deb ...
+  #10 8.420 Unpacking libgdbm-compat4:amd64 (1.19-2) ...
+  #10 8.438 Selecting previously unselected package libperl5.32:amd64.
+  #10 8.439 Preparing to unpack .../03-libperl5.32_5.32.1-4+deb11u4_amd64.deb ...
+  #10 8.439 Unpacking libperl5.32:amd64 (5.32.1-4+deb11u4) ...
+  #10 8.827 Selecting previously unselected package perl.
+  #10 8.829 Preparing to unpack .../04-perl_5.32.1-4+deb11u4_amd64.deb ...
+  #10 8.833 Unpacking perl (5.32.1-4+deb11u4) ...
+  #10 8.869 Selecting previously unselected package liblocale-gettext-perl.
+  #10 8.871 Preparing to unpack .../05-liblocale-gettext-perl_1.07-4+b1_amd64.deb ...
+  #10 8.871 Unpacking liblocale-gettext-perl (1.07-4+b1) ...
+  #10 8.885 Selecting previously unselected package less.
+  #10 8.886 Preparing to unpack .../06-less_551-2+deb11u2_amd64.deb ...
+  #10 8.888 Unpacking less (551-2+deb11u2) ...
+  #10 8.910 Selecting previously unselected package readline-common.
+  #10 8.911 Preparing to unpack .../07-readline-common_8.1-1_all.deb ...
+  #10 8.912 Unpacking readline-common (8.1-1) ...
+  #10 8.929 Selecting previously unselected package libreadline8:amd64.
+  #10 8.930 Preparing to unpack .../08-libreadline8_8.1-1_amd64.deb ...
+  #10 8.931 Unpacking libreadline8:amd64 (8.1-1) ...
+  #10 8.956 Selecting previously unselected package netbase.
+  #10 8.957 Preparing to unpack .../09-netbase_6.3_all.deb ...
+  #10 8.958 Unpacking netbase (6.3) ...
+  #10 8.970 Selecting previously unselected package bzip2.
+  #10 8.971 Preparing to unpack .../10-bzip2_1.0.8-4_amd64.deb ...
+  #10 8.971 Unpacking bzip2 (1.0.8-4) ...
+  #10 8.987 Selecting previously unselected package libmd0:amd64.
+  #10 8.988 Preparing to unpack .../11-libmd0_1.0.3-3_amd64.deb ...
+  #10 8.989 Unpacking libmd0:amd64 (1.0.3-3) ...
+  #10 9.003 Selecting previously unselected package libbsd0:amd64.
+  #10 9.003 Preparing to unpack .../12-libbsd0_0.11.3-1+deb11u1_amd64.deb ...
+  #10 9.004 Unpacking libbsd0:amd64 (0.11.3-1+deb11u1) ...
+  #10 9.023 Selecting previously unselected package libedit2:amd64.
+  #10 9.023 Preparing to unpack .../13-libedit2_3.1-20191231-2+b1_amd64.deb ...
+  #10 9.024 Unpacking libedit2:amd64 (3.1-20191231-2+b1) ...
+  #10 9.042 Selecting previously unselected package libcbor0:amd64.
+  #10 9.043 Preparing to unpack .../14-libcbor0_0.5.0+dfsg-2_amd64.deb ...
+  #10 9.043 Unpacking libcbor0:amd64 (0.5.0+dfsg-2) ...
+  #10 9.055 Selecting previously unselected package libfido2-1:amd64.
+  #10 9.056 Preparing to unpack .../15-libfido2-1_1.6.0-2_amd64.deb ...
+  #10 9.056 Unpacking libfido2-1:amd64 (1.6.0-2) ...
+  #10 9.073 Selecting previously unselected package openssh-client.
+  #10 9.074 Preparing to unpack .../16-openssh-client_1%3a8.4p1-5+deb11u5_amd64.deb ...
+  #10 9.078 Unpacking openssh-client (1:8.4p1-5+deb11u5) ...
+  #10 9.154 Selecting previously unselected package xz-utils.
+  #10 9.155 Preparing to unpack .../17-xz-utils_5.2.5-2.1~deb11u1_amd64.deb ...
+  #10 9.156 Unpacking xz-utils (5.2.5-2.1~deb11u1) ...
+  #10 9.183 Selecting previously unselected package libstdc++-10-dev:amd64.
+  #10 9.184 Preparing to unpack .../18-libstdc++-10-dev_10.2.1-6_amd64.deb ...
+  #10 9.185 Unpacking libstdc++-10-dev:amd64 (10.2.1-6) ...
+  #10 9.367 Selecting previously unselected package g++-10.
+  #10 9.369 Preparing to unpack .../19-g++-10_10.2.1-6_amd64.deb ...
+  #10 9.369 Unpacking g++-10 (10.2.1-6) ...
+  #10 10.09 Selecting previously unselected package g++.
+  #10 10.09 Preparing to unpack .../20-g++_4%3a10.2.1-1_amd64.deb ...
+  #10 10.09 Unpacking g++ (4:10.2.1-1) ...
+  #10 10.10 Selecting previously unselected package make.
+  #10 10.10 Preparing to unpack .../21-make_4.3-4.1_amd64.deb ...
+  #10 10.10 Unpacking make (4.3-4.1) ...
+  #10 10.15 Selecting previously unselected package libdpkg-perl.
+  #10 10.15 Preparing to unpack .../22-libdpkg-perl_1.20.13_all.deb ...
+  #10 10.15 Unpacking libdpkg-perl (1.20.13) ...
+  #10 10.19 Selecting previously unselected package patch.
+  #10 10.19 Preparing to unpack .../23-patch_2.7.6-7_amd64.deb ...
+  #10 10.19 Unpacking patch (2.7.6-7) ...
+  #10 10.21 Selecting previously unselected package dpkg-dev.
+  #10 10.22 Preparing to unpack .../24-dpkg-dev_1.20.13_all.deb ...
+  #10 10.22 Unpacking dpkg-dev (1.20.13) ...
+  #10 10.31 Selecting previously unselected package build-essential.
+  #10 10.32 Preparing to unpack .../25-build-essential_12.9_amd64.deb ...
+  #10 10.32 Unpacking build-essential (12.9) ...
+  #10 10.33 Selecting previously unselected package libassuan0:amd64.
+  #10 10.33 Preparing to unpack .../26-libassuan0_2.5.3-7.1_amd64.deb ...
+  #10 10.33 Unpacking libassuan0:amd64 (2.5.3-7.1) ...
+  #10 10.34 Selecting previously unselected package gpgconf.
+  #10 10.35 Preparing to unpack .../27-gpgconf_2.2.27-2+deb11u2_amd64.deb ...
+  #10 10.35 Unpacking gpgconf (2.2.27-2+deb11u2) ...
+  #10 10.48 Selecting previously unselected package libksba8:amd64.
+  #10 ...
+  #12 [builder 7/8] RUN cargo build --release
+  #12 0.467     Updating crates.io index
+  #12 1.048      Locking 212 packages to latest compatible versions
+  #12 1.052       Adding criterion v0.5.1 (available: v0.7.0)
+  #12 1.054       Adding hashbrown v0.15.5 (available: v0.16.0)
+  #12 1.055       Adding http v0.2.12 (available: v1.3.1)
+  #12 1.057       Adding nix v0.29.0 (available: v0.30.1)
+  #12 1.076       Adding windows-sys v0.59.0 (available: v0.60.2)
+  #12 1.086  Downloading crates ...
+  #12 1.155   Downloaded autocfg v1.5.0
+  #12 1.158   Downloaded ciborium-io v0.2.2
+  #12 1.159   Downloaded ciborium v0.2.2
+  #12 1.163   Downloaded cfg-if v1.0.3
+  #12 1.164   Downloaded aho-corasick v1.1.3
+  #12 1.172   Downloaded parking_lot_core v0.9.11
+  #12 1.175   Downloaded oorandom v11.1.5
+  #12 1.177   Downloaded is-terminal v0.4.16
+  #12 1.179   Downloaded smallvec v1.15.1
+  #12 1.182   Downloaded once_cell v1.21.3
+  #12 1.187   Downloaded unicode-ident v1.0.18
+  #12 1.192   Downloaded signal-hook-registry v1.4.6
+  #12 1.194   Downloaded serde_derive v1.0.219
+  #12 1.198   Downloaded tinytemplate v1.2.1
+  #12 1.200   Downloaded itoa v1.0.15
+  #12 1.202   Downloaded serde v1.0.219
+  #12 1.206   Downloaded walkdir v2.5.0
+  #12 1.209   Downloaded futures v0.3.31
+  #12 1.214   Downloaded socket2 v0.6.0
+  #12 1.217   Downloaded num-traits v0.2.19
+  #12 1.220   Downloaded serde_json v1.0.143
+  #12 1.229   Downloaded plotters v0.3.7
+  #12 1.240   Downloaded futures-util v0.3.31
+  #12 1.254   Downloaded zerocopy v0.8.26
+  #12 1.283   Downloaded criterion v0.5.1
+  #12 1.291   Downloaded hashbrown v0.15.5
+  #12 1.297   Downloaded clap_builder v4.5.46
+  #12 1.305   Downloaded regex v1.11.2
+  #12 1.314   Downloaded syn v2.0.106
+  #12 1.327   Downloaded rayon v1.11.0
+  #12 1.337   Downloaded itertools v0.10.5
+  #12 1.345   Downloaded clap v4.5.46
+  #12 1.355   Downloaded parking_lot v0.12.4
+  #12 1.358   Downloaded memchr v2.7.5
+  #12 1.364   Downloaded futures-channel v0.3.31
+  #12 1.366   Downloaded crossbeam-utils v0.8.21
+  #12 1.369   Downloaded crossbeam-epoch v0.9.18
+  #12 1.372   Downloaded clap_lex v0.7.5
+  #12 1.373   Downloaded regex-syntax v0.8.6
+  #12 1.382   Downloaded criterion-plot v0.5.0
+  #12 1.384   Downloaded futures-macro v0.3.31
+  #12 1.385   Downloaded either v1.15.0
+  #12 1.387   Downloaded doc-comment v0.3.3
+  #12 1.388   Downloaded scopeguard v1.2.0
+  #12 1.390   Downloaded rand_core v0.9.3
+  #12 1.391   Downloaded quote v1.0.40
+  #12 1.394   Downloaded ppv-lite86 v0.2.21
+  #12 1.395   Downloaded plotters-backend v0.3.7
+  #12 1.397   Downloaded pin-utils v0.1.0
+  #12 1.398   Downloaded futures-sink v0.3.31
+  #12 1.399   Downloaded futures-io v0.3.31
+  #12 1.400   Downloaded futures-core v0.3.31
+  #12 1.401   Downloaded crossbeam-deque v0.8.6
+  #12 1.403   Downloaded ciborium-ll v0.2.2
+  #12 1.404   Downloaded libc v0.2.175
+  #12 1.437   Downloaded same-file v1.0.6
+  #12 1.439   Downloaded rand v0.9.2
+  #12 1.443   Downloaded log v0.4.27
+  #12 1.446   Downloaded futures-task v0.3.31
+  #12 1.447   Downloaded futures-executor v0.3.31
+  #12 1.449   Downloaded regex-automata v0.4.10
+  #12 1.468   Downloaded rayon-core v1.13.0
+  #12 1.472   Downloaded rand_chacha v0.9.0
+  #12 1.474   Downloaded proc-macro2 v1.0.101
+  #12 1.477   Downloaded getrandom v0.3.3
+  #12 1.481   Downloaded slab v0.4.11
+  #12 1.482   Downloaded ryu v1.0.20
+  #12 1.485   Downloaded num_cpus v1.17.0
+  #12 1.489   Downloaded lock_api v0.4.13
+  #12 1.490   Downloaded mio v1.0.4
+  #12 1.497   Downloaded plotters-svg v0.3.7
+  #12 1.498   Downloaded pin-project-lite v0.2.16
+  #12 1.504   Downloaded half v2.6.0
+  #12 1.507   Downloaded cast v0.3.0
+  #12 1.508   Downloaded bytes v1.10.1
+  #12 1.513   Downloaded anstyle v1.0.11
+  #12 1.515   Downloaded anes v0.1.6
+  #12 1.548    Compiling proc-macro2 v1.0.101
+  #12 1.548    Compiling unicode-ident v1.0.18
+  #12 1.548    Compiling libc v0.2.175
+  #12 1.548    Compiling autocfg v1.5.0
+  #12 1.548    Compiling parking_lot_core v0.9.11
+  #12 1.548    Compiling pin-project-lite v0.2.16
+  #12 1.551    Compiling futures-core v0.3.31
+  #12 1.554    Compiling cfg-if v1.0.3
+  #12 1.554    Compiling scopeguard v1.2.0
+  #12 1.556    Compiling smallvec v1.15.1
+  #12 1.559    Compiling futures-sink v0.3.31
+  #12 1.560    Compiling bytes v1.10.1
+  #12 1.564    Compiling futures-task v0.3.31
+  #12 1.567    Compiling slab v0.4.11
+  #12 1.567    Compiling memchr v2.7.5
+  #12 1.572    Compiling futures-io v0.3.31
+  #12 1.580    Compiling pin-utils v0.1.0
+  #12 1.581    Compiling doc-comment v0.3.3
+  #12 1.581    Compiling tests-build v0.1.0 (/tokio-rs_tokio/tests-build)
+  #12 1.615    Compiling futures-channel v0.3.31
+  #12 1.746    Compiling lock_api v0.4.13
+  #12 2.094    Compiling quote v1.0.40
+  #12 2.209    Compiling syn v2.0.106
+  #12 2.291    Compiling mio v1.0.4
+  #12 2.291    Compiling socket2 v0.6.0
+  #12 2.291    Compiling signal-hook-registry v1.4.6
+  #12 2.424    Compiling parking_lot v0.12.4
+  #12 4.153    Compiling tokio-macros v2.5.0 (/tokio-rs_tokio/tokio-macros)
+  #12 4.153    Compiling futures-macro v0.3.31
+  #12 4.654    Compiling tokio v1.47.1 (/tokio-rs_tokio/tokio)
+  #12 4.700    Compiling futures-util v0.3.31
+  #12 6.898    Compiling futures-executor v0.3.31
+  #12 6.984    Compiling futures v0.3.31
+  #12 8.484    Compiling tokio-stream v0.1.17 (/tokio-rs_tokio/tokio-stream)
+  #12 8.484    Compiling tests-integration v0.1.0 (/tokio-rs_tokio/tests-integration)
+  #12 8.484    Compiling tokio-util v0.7.16 (/tokio-rs_tokio/tokio-util)
+  #12 8.795    Compiling tokio-test v0.4.4 (/tokio-rs_tokio/tokio-test)
+  #12 9.783     Finished `release` profile [optimized] target(s) in 9.34s
+  #12 ...
+  #10 [stage-1 2/5] RUN apt-get update && apt-get install -y     build-essential     git     pkg-config     libssl-dev     && rm -rf /var/lib/apt/lists/*
+  #10 10.48 Preparing to unpack .../28-libksba8_1.5.0-3+deb11u2_amd64.deb ...
+  #10 10.49 Unpacking libksba8:amd64 (1.5.0-3+deb11u2) ...
+  #10 10.69 Selecting previously unselected package libsasl2-modules-db:amd64.
+  #10 10.69 Preparing to unpack .../29-libsasl2-modules-db_2.1.27+dfsg-2.1+deb11u1_amd64.deb ...
+  #10 10.71 Unpacking libsasl2-modules-db:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+  #10 10.85 Selecting previously unselected package libsasl2-2:amd64.
+  #10 ...
+  #12 [builder 7/8] RUN cargo build --release
+  #12 DONE 10.4s
+  #10 [stage-1 2/5] RUN apt-get update && apt-get install -y     build-essential     git     pkg-config     libssl-dev     && rm -rf /var/lib/apt/lists/*
+  #10 10.85 Preparing to unpack .../30-libsasl2-2_2.1.27+dfsg-2.1+deb11u1_amd64.deb ...
+  #10 10.85 Unpacking libsasl2-2:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+  #10 10.87 Selecting previously unselected package libldap-2.4-2:amd64.
+  #10 10.87 Preparing to unpack .../31-libldap-2.4-2_2.4.57+dfsg-3+deb11u1_amd64.deb ...
+  #10 10.87 Unpacking libldap-2.4-2:amd64 (2.4.57+dfsg-3+deb11u1) ...
+  #10 10.91 Selecting previously unselected package libnpth0:amd64.
+  #10 10.91 Preparing to unpack .../32-libnpth0_1.6-3_amd64.deb ...
+  #10 10.91 Unpacking libnpth0:amd64 (1.6-3) ...
+  #10 10.92 Selecting previously unselected package dirmngr.
+  #10 10.92 Preparing to unpack .../33-dirmngr_2.2.27-2+deb11u2_amd64.deb ...
+  #10 10.93 Unpacking dirmngr (2.2.27-2+deb11u2) ...
+  #10 10.98 Selecting previously unselected package libfakeroot:amd64.
+  #10 ...
+  #13 [builder 8/8] RUN ls -R target || true
+  #13 0.197 target:
+  #13 0.197 CACHEDIR.TAG
+  #13 0.197 release
+  #13 0.197 
+  #13 0.197 target/release:
+  #13 0.197 build
+  #13 0.197 deps
+  #13 0.197 examples
+  #13 0.197 incremental
+  #13 0.197 libtests_build.d
+  #13 0.197 libtests_build.rlib
+  #13 0.197 libtests_integration.d
+  #13 0.197 libtests_integration.rlib
+  #13 0.197 libtokio.d
+  #13 0.197 libtokio.rlib
+  #13 0.197 libtokio_macros.d
+  #13 0.197 libtokio_macros.so
+  #13 0.197 libtokio_stream.d
+  #13 0.197 libtokio_stream.rlib
+  #13 0.197 libtokio_test.d
+  #13 0.197 libtokio_test.rlib
+  #13 0.197 libtokio_util.d
+  #13 0.197 libtokio_util.rlib
+  #13 0.197 test-cat
+  #13 0.197 test-cat.d
+  #13 0.197 
+  #13 0.197 target/release/build:
+  #13 0.197 doc-comment-5e7bb088159a9eb8
+  #13 0.197 doc-comment-e62ceda6f4912a54
+  #13 0.197 libc-17f25a003fcdc748
+  #13 0.197 libc-3e7315495ba0d9cb
+  #13 0.197 lock_api-35fefe05b44af9f0
+  #13 0.197 lock_api-b5f25316d7c1bab5
+  #13 0.197 parking_lot_core-bd3002631b35e6c4
+  #13 0.197 parking_lot_core-faa25321072ecd33
+  #13 0.197 proc-macro2-701205fd7b46d708
+  #13 0.197 proc-macro2-e3185a444d10e07c
+  #13 0.197 
+  #13 0.197 target/release/build/doc-comment-5e7bb088159a9eb8:
+  #13 0.197 invoked.timestamp
+  #13 0.197 out
+  #13 0.197 output
+  #13 0.197 root-output
+  #13 0.197 stderr
+  #13 0.197 
+  #13 0.197 target/release/build/doc-comment-5e7bb088159a9eb8/out:
+  #13 0.197 
+  #13 0.197 target/release/build/doc-comment-e62ceda6f4912a54:
+  #13 0.197 build-script-build
+  #13 0.197 build_script_build-e62ceda6f4912a54
+  #13 0.197 build_script_build-e62ceda6f4912a54.d
+  #13 0.197 
+  #13 0.197 target/release/build/libc-17f25a003fcdc748:
+  #13 0.197 invoked.timestamp
+  #13 0.197 out
+  #13 0.197 output
+  #13 0.197 root-output
+  #13 0.197 stderr
+  #13 0.197 
+  #13 0.197 target/release/build/libc-17f25a003fcdc748/out:
+  #13 0.197 
+  #13 0.197 target/release/build/libc-3e7315495ba0d9cb:
+  #13 0.197 build-script-build
+  #13 0.197 build_script_build-3e7315495ba0d9cb
+  #13 0.197 build_script_build-3e7315495ba0d9cb.d
+  #13 0.197 
+  #13 0.197 target/release/build/lock_api-35fefe05b44af9f0:
+  #13 0.197 build-script-build
+  #13 0.197 build_script_build-35fefe05b44af9f0
+  #13 0.197 build_script_build-35fefe05b44af9f0.d
+  #13 0.197 
+  #13 0.197 target/release/build/lock_api-b5f25316d7c1bab5:
+  #13 0.197 invoked.timestamp
+  #13 0.197 out
+  #13 0.197 output
+  #13 0.197 root-output
+  #13 0.197 stderr
+  #13 0.197 
+  #13 0.197 target/release/build/lock_api-b5f25316d7c1bab5/out:
+  #13 0.197 
+  #13 0.197 target/release/build/parking_lot_core-bd3002631b35e6c4:
+  #13 0.197 invoked.timestamp
+  #13 0.197 out
+  #13 0.197 output
+  #13 0.197 root-output
+  #13 0.197 stderr
+  #13 0.197 
+  #13 0.197 target/release/build/parking_lot_core-bd3002631b35e6c4/out:
+  #13 0.197 
+  #13 0.197 target/release/build/parking_lot_core-faa25321072ecd33:
+  #13 0.197 build-script-build
+  #13 0.197 build_script_build-faa25321072ecd33
+  #13 0.197 build_script_build-faa25321072ecd33.d
+  #13 0.197 
+  #13 0.197 target/release/build/proc-macro2-701205fd7b46d708:
+  #13 0.197 build-script-build
+  #13 0.197 build_script_build-701205fd7b46d708
+  #13 0.197 build_script_build-701205fd7b46d708.d
+  #13 0.197 
+  #13 0.197 target/release/build/proc-macro2-e3185a444d10e07c:
+  #13 0.197 invoked.timestamp
+  #13 0.197 out
+  #13 0.197 output
+  #13 0.197 root-output
+  #13 0.197 stderr
+  #13 0.197 
+  #13 0.197 target/release/build/proc-macro2-e3185a444d10e07c/out:
+  #13 0.197 
+  #13 0.197 target/release/deps:
+  #13 0.197 autocfg-e0c6e180c1807934.d
+  #13 0.197 bytes-4b95dec0415d7e0a.d
+  #13 0.197 cfg_if-e65585732ad920fa.d
+  #13 0.197 doc_comment-6681157aa811c9e6.d
+  #13 0.197 futures-b14377a527a25032.d
+  #13 0.197 futures_channel-6c2f92f5e450e654.d
+  #13 0.197 futures_core-c808a6196df1d73b.d
+  #13 0.197 futures_executor-ea39da5bb047d681.d
+  #13 0.197 futures_io-0c69a07c43776d34.d
+  #13 0.197 futures_macro-a5fc34d613005946.d
+  #13 0.197 futures_sink-b0a25c9c405988d4.d
+  #13 0.197 futures_task-de38bc30813d53ad.d
+  #13 0.197 futures_util-5789a4914098297e.d
+  #13 0.197 libautocfg-e0c6e180c1807934.rlib
+  #13 0.197 libautocfg-e0c6e180c1807934.rmeta
+  #13 0.197 libbytes-4b95dec0415d7e0a.rlib
+  #13 0.197 libbytes-4b95dec0415d7e0a.rmeta
+  #13 0.197 libc-ec79f31f8811feeb.d
+  #13 0.197 libcfg_if-e65585732ad920fa.rlib
+  #13 0.197 libcfg_if-e65585732ad920fa.rmeta
+  #13 0.197 libdoc_comment-6681157aa811c9e6.rlib
+  #13 0.197 libdoc_comment-6681157aa811c9e6.rmeta
+  #13 0.197 libfutures-b14377a527a25032.rlib
+  #13 0.197 libfutures-b14377a527a25032.rmeta
+  #13 0.197 libfutures_channel-6c2f92f5e450e654.rlib
+  #13 0.197 libfutures_channel-6c2f92f5e450e654.rmeta
+  #13 0.197 libfutures_core-c808a6196df1d73b.rlib
+  #13 0.197 libfutures_core-c808a6196df1d73b.rmeta
+  #13 0.197 libfutures_executor-ea39da5bb047d681.rlib
+  #13 0.197 libfutures_executor-ea39da5bb047d681.rmeta
+  #13 0.197 libfutures_io-0c69a07c43776d34.rlib
+  #13 0.197 libfutures_io-0c69a07c43776d34.rmeta
+  #13 0.197 libfutures_macro-a5fc34d613005946.so
+  #13 0.197 libfutures_sink-b0a25c9c405988d4.rlib
+  #13 0.197 libfutures_sink-b0a25c9c405988d4.rmeta
+  #13 0.197 libfutures_task-de38bc30813d53ad.rlib
+  #13 0.197 libfutures_task-de38bc30813d53ad.rmeta
+  #13 0.197 libfutures_util-5789a4914098297e.rlib
+  #13 0.197 libfutures_util-5789a4914098297e.rmeta
+  #13 0.197 liblibc-ec79f31f8811feeb.rlib
+  #13 0.197 liblibc-ec79f31f8811feeb.rmeta
+  #13 0.197 liblock_api-733a87d4d0237591.rlib
+  #13 0.197 liblock_api-733a87d4d0237591.rmeta
+  #13 0.197 libmemchr-bfb7117de9063818.rlib
+  #13 0.197 libmemchr-bfb7117de9063818.rmeta
+  #13 0.197 libmio-4aab5dff1ece8598.rlib
+  #13 0.197 libmio-4aab5dff1ece8598.rmeta
+  #13 0.197 libparking_lot-3d953366804ca8b5.rlib
+  #13 0.197 libparking_lot-3d953366804ca8b5.rmeta
+  #13 0.197 libparking_lot_core-6a42e789e30f5055.rlib
+  #13 0.197 libparking_lot_core-6a42e789e30f5055.rmeta
+  #13 0.197 libpin_project_lite-f8d8932d926df9e6.rlib
+  #13 0.197 libpin_project_lite-f8d8932d926df9e6.rmeta
+  #13 0.197 libpin_utils-c39051354cc9e53e.rlib
+  #13 0.197 libpin_utils-c39051354cc9e53e.rmeta
+  #13 0.197 libproc_macro2-9896442883c29485.rlib
+  #13 0.197 libproc_macro2-9896442883c29485.rmeta
+  #13 0.197 libquote-8ec1d3d5fac827d8.rlib
+  #13 0.197 libquote-8ec1d3d5fac827d8.rmeta
+  #13 0.197 libscopeguard-81ac818d244aecf5.rlib
+  #13 0.197 libscopeguard-81ac818d244aecf5.rmeta
+  #13 0.197 libsignal_hook_registry-3a140240cef73648.rlib
+  #13 0.197 libsignal_hook_registry-3a140240cef73648.rmeta
+  #13 0.197 libslab-4e64946bfdcc4ddf.rlib
+  #13 0.197 libslab-4e64946bfdcc4ddf.rmeta
+  #13 0.197 libsmallvec-7a90f6d6012bd9cd.rlib
+  #13 0.197 libsmallvec-7a90f6d6012bd9cd.rmeta
+  #13 0.197 libsocket2-b4a7ec25cd5741a2.rlib
+  #13 0.197 libsocket2-b4a7ec25cd5741a2.rmeta
+  #13 0.197 libsyn-0f091c1bafa273c4.rlib
+  #13 0.197 libsyn-0f091c1bafa273c4.rmeta
+  #13 0.197 libtests_build-d2c217477fc9895d.rlib
+  #13 0.197 libtests_build-d2c217477fc9895d.rmeta
+  #13 0.197 libtests_integration-32ffd770b2dfe2f5.rlib
+  #13 0.197 libtests_integration-32ffd770b2dfe2f5.rmeta
+  #13 0.197 libtokio-9316b2c7bc5494b1.rlib
+  #13 0.197 libtokio-9316b2c7bc5494b1.rmeta
+  #13 0.197 libtokio_macros-488a701f4b7cb615.so
+  #13 0.197 libtokio_macros-d2453826ef7a279e.so
+  #13 0.197 libtokio_stream-bc239b8195f0457f.rlib
+  #13 0.197 libtokio_stream-bc239b8195f0457f.rmeta
+  #13 0.197 libtokio_test-a7557d2ac4207b1c.rlib
+  #13 0.197 libtokio_test-a7557d2ac4207b1c.rmeta
+  #13 0.197 libtokio_util-a22f93cdf65c5bfd.rlib
+  #13 0.197 libtokio_util-a22f93cdf65c5bfd.rmeta
+  #13 0.197 libunicode_ident-1cf4f389b3b3ef11.rlib
+  #13 0.197 libunicode_ident-1cf4f389b3b3ef11.rmeta
+  #13 0.197 lock_api-733a87d4d0237591.d
+  #13 0.197 memchr-bfb7117de9063818.d
+  #13 0.197 mio-4aab5dff1ece8598.d
+  #13 0.197 parking_lot-3d953366804ca8b5.d
+  #13 0.197 parking_lot_core-6a42e789e30f5055.d
+  #13 0.197 pin_project_lite-f8d8932d926df9e6.d
+  #13 0.197 pin_utils-c39051354cc9e53e.d
+  #13 0.197 proc_macro2-9896442883c29485.d
+  #13 0.197 quote-8ec1d3d5fac827d8.d
+  #13 0.197 scopeguard-81ac818d244aecf5.d
+  #13 0.197 signal_hook_registry-3a140240cef73648.d
+  #13 0.197 slab-4e64946bfdcc4ddf.d
+  #13 0.197 smallvec-7a90f6d6012bd9cd.d
+  #13 0.197 socket2-b4a7ec25cd5741a2.d
+  #13 0.197 syn-0f091c1bafa273c4.d
+  #13 0.197 test_cat-9027ded325a6f71f
+  #13 0.197 test_cat-9027ded325a6f71f.d
+  #13 0.197 tests_build-d2c217477fc9895d.d
+  #13 0.197 tests_integration-32ffd770b2dfe2f5.d
+  #13 0.197 tokio-9316b2c7bc5494b1.d
+  #13 0.197 tokio_macros-488a701f4b7cb615.d
+  #13 0.197 tokio_macros-d2453826ef7a279e.d
+  #13 0.197 tokio_stream-bc239b8195f0457f.d
+  #13 0.197 tokio_test-a7557d2ac4207b1c.d
+  #13 0.197 tokio_util-a22f93cdf65c5bfd.d
+  #13 0.197 unicode_ident-1cf4f389b3b3ef11.d
+  #13 0.197 
+  #13 0.197 target/release/examples:
+  #13 0.197 
+  #13 0.197 target/release/incremental:
+  #13 DONE 0.2s
+  #10 [stage-1 2/5] RUN apt-get update && apt-get install -y     build-essential     git     pkg-config     libssl-dev     && rm -rf /var/lib/apt/lists/*
+  #10 10.99 Preparing to unpack .../34-libfakeroot_1.25.3-1.1_amd64.deb ...
+  #10 10.99 Unpacking libfakeroot:amd64 (1.25.3-1.1) ...
+  #10 11.00 Selecting previously unselected package fakeroot.
+  #10 11.00 Preparing to unpack .../35-fakeroot_1.25.3-1.1_amd64.deb ...
+  #10 11.01 Unpacking fakeroot (1.25.3-1.1) ...
+  #10 11.03 Selecting previously unselected package libbrotli1:amd64.
+  #10 11.03 Preparing to unpack .../36-libbrotli1_1.0.9-2+b2_amd64.deb ...
+  #10 11.03 Unpacking libbrotli1:amd64 (1.0.9-2+b2) ...
+  #10 11.07 Selecting previously unselected package libnghttp2-14:amd64.
+  #10 11.07 Preparing to unpack .../37-libnghttp2-14_1.43.0-1+deb11u2_amd64.deb ...
+  #10 11.07 Unpacking libnghttp2-14:amd64 (1.43.0-1+deb11u2) ...
+  #10 11.09 Selecting previously unselected package libpsl5:amd64.
+  #10 11.09 Preparing to unpack .../38-libpsl5_0.21.0-1.2_amd64.deb ...
+  #10 11.09 Unpacking libpsl5:amd64 (0.21.0-1.2) ...
+  #10 11.11 Selecting previously unselected package librtmp1:amd64.
+  #10 11.11 Preparing to unpack .../39-librtmp1_2.4+20151223.gitfa8646d.1-2+b2_amd64.deb ...
+  #10 11.11 Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+  #10 11.12 Selecting previously unselected package libssh2-1:amd64.
+  #10 11.12 Preparing to unpack .../40-libssh2-1_1.9.0-2+deb11u1_amd64.deb ...
+  #10 11.12 Unpacking libssh2-1:amd64 (1.9.0-2+deb11u1) ...
+  #10 11.15 Selecting previously unselected package libcurl3-gnutls:amd64.
+  #10 11.15 Preparing to unpack .../41-libcurl3-gnutls_7.74.0-1.3+deb11u15_amd64.deb ...
+  #10 11.15 Unpacking libcurl3-gnutls:amd64 (7.74.0-1.3+deb11u15) ...
+  #10 11.19 Selecting previously unselected package libexpat1:amd64.
+  #10 11.19 Preparing to unpack .../42-libexpat1_2.2.10-2+deb11u7_amd64.deb ...
+  #10 11.19 Unpacking libexpat1:amd64 (2.2.10-2+deb11u7) ...
+  #10 11.20 Selecting previously unselected package liberror-perl.
+  #10 11.21 Preparing to unpack .../43-liberror-perl_0.17029-1_all.deb ...
+  #10 11.21 Unpacking liberror-perl (0.17029-1) ...
+  #10 11.22 Selecting previously unselected package git-man.
+  #10 11.22 Preparing to unpack .../44-git-man_1%3a2.30.2-1+deb11u4_all.deb ...
+  #10 11.22 Unpacking git-man (1:2.30.2-1+deb11u4) ...
+  #10 11.31 Selecting previously unselected package git.
+  #10 11.31 Preparing to unpack .../45-git_1%3a2.30.2-1+deb11u4_amd64.deb ...
+  #10 11.33 Unpacking git (1:2.30.2-1+deb11u4) ...
+  #10 11.75 Selecting previously unselected package gnupg-l10n.
+  #10 11.75 Preparing to unpack .../46-gnupg-l10n_2.2.27-2+deb11u2_all.deb ...
+  #10 11.75 Unpacking gnupg-l10n (2.2.27-2+deb11u2) ...
+  #10 11.83 Selecting previously unselected package gnupg-utils.
+  #10 11.83 Preparing to unpack .../47-gnupg-utils_2.2.27-2+deb11u2_amd64.deb ...
+  #10 11.83 Unpacking gnupg-utils (2.2.27-2+deb11u2) ...
+  #10 11.88 Selecting previously unselected package libsqlite3-0:amd64.
+  #10 11.88 Preparing to unpack .../48-libsqlite3-0_3.34.1-3+deb11u1_amd64.deb ...
+  #10 11.88 Unpacking libsqlite3-0:amd64 (3.34.1-3+deb11u1) ...
+  #10 11.94 Selecting previously unselected package gpg.
+  #10 11.95 Preparing to unpack .../49-gpg_2.2.27-2+deb11u2_amd64.deb ...
+  #10 11.95 Unpacking gpg (2.2.27-2+deb11u2) ...
+  #10 12.00 Selecting previously unselected package libncursesw6:amd64.
+  #10 12.00 Preparing to unpack .../50-libncursesw6_6.2+20201114-2+deb11u2_amd64.deb ...
+  #10 12.00 Unpacking libncursesw6:amd64 (6.2+20201114-2+deb11u2) ...
+  #10 12.02 Selecting previously unselected package pinentry-curses.
+  #10 12.02 Preparing to unpack .../51-pinentry-curses_1.1.0-4_amd64.deb ...
+  #10 12.02 Unpacking pinentry-curses (1.1.0-4) ...
+  #10 12.04 Selecting previously unselected package gpg-agent.
+  #10 12.04 Preparing to unpack .../52-gpg-agent_2.2.27-2+deb11u2_amd64.deb ...
+  #10 12.04 Unpacking gpg-agent (2.2.27-2+deb11u2) ...
+  #10 12.08 Selecting previously unselected package gpg-wks-client.
+  #10 12.08 Preparing to unpack .../53-gpg-wks-client_2.2.27-2+deb11u2_amd64.deb ...
+  #10 12.08 Unpacking gpg-wks-client (2.2.27-2+deb11u2) ...
+  #10 12.10 Selecting previously unselected package gpg-wks-server.
+  #10 12.10 Preparing to unpack .../54-gpg-wks-server_2.2.27-2+deb11u2_amd64.deb ...
+  #10 12.10 Unpacking gpg-wks-server (2.2.27-2+deb11u2) ...
+  #10 12.12 Selecting previously unselected package gpgsm.
+  #10 12.12 Preparing to unpack .../55-gpgsm_2.2.27-2+deb11u2_amd64.deb ...
+  #10 12.13 Unpacking gpgsm (2.2.27-2+deb11u2) ...
+  #10 12.16 Selecting previously unselected package gnupg.
+  #10 12.16 Preparing to unpack .../56-gnupg_2.2.27-2+deb11u2_all.deb ...
+  #10 12.16 Unpacking gnupg (2.2.27-2+deb11u2) ...
+  #10 12.19 Selecting previously unselected package libalgorithm-diff-perl.
+  #10 12.19 Preparing to unpack .../57-libalgorithm-diff-perl_1.201-1_all.deb ...
+  #10 12.20 Unpacking libalgorithm-diff-perl (1.201-1) ...
+  #10 12.21 Selecting previously unselected package libalgorithm-diff-xs-perl.
+  #10 12.21 Preparing to unpack .../58-libalgorithm-diff-xs-perl_0.04-6+b1_amd64.deb ...
+  #10 12.21 Unpacking libalgorithm-diff-xs-perl (0.04-6+b1) ...
+  #10 12.22 Selecting previously unselected package libalgorithm-merge-perl.
+  #10 12.22 Preparing to unpack .../59-libalgorithm-merge-perl_0.08-3_all.deb ...
+  #10 12.22 Unpacking libalgorithm-merge-perl (0.08-3) ...
+  #10 12.23 Selecting previously unselected package libfile-fcntllock-perl.
+  #10 12.23 Preparing to unpack .../60-libfile-fcntllock-perl_0.22-3+b7_amd64.deb ...
+  #10 12.23 Unpacking libfile-fcntllock-perl (0.22-3+b7) ...
+  #10 12.25 Selecting previously unselected package libglib2.0-0:amd64.
+  #10 12.25 Preparing to unpack .../61-libglib2.0-0_2.66.8-1+deb11u6_amd64.deb ...
+  #10 12.25 Unpacking libglib2.0-0:amd64 (2.66.8-1+deb11u6) ...
+  #10 12.36 Selecting previously unselected package libglib2.0-data.
+  #10 12.36 Preparing to unpack .../62-libglib2.0-data_2.66.8-1+deb11u6_all.deb ...
+  #10 12.36 Unpacking libglib2.0-data (2.66.8-1+deb11u6) ...
+  #10 12.47 Selecting previously unselected package libgpm2:amd64.
+  #10 12.48 Preparing to unpack .../63-libgpm2_1.20.7-8_amd64.deb ...
+  #10 12.48 Unpacking libgpm2:amd64 (1.20.7-8) ...
+  #10 12.49 Selecting previously unselected package libicu67:amd64.
+  #10 12.50 Preparing to unpack .../64-libicu67_67.1-7+deb11u1_amd64.deb ...
+  #10 12.50 Unpacking libicu67:amd64 (67.1-7+deb11u1) ...
+  #10 13.18 Selecting previously unselected package libldap-common.
+  #10 13.18 Preparing to unpack .../65-libldap-common_2.4.57+dfsg-3+deb11u1_all.deb ...
+  #10 13.18 Unpacking libldap-common (2.4.57+dfsg-3+deb11u1) ...
+  #10 13.20 Selecting previously unselected package libsasl2-modules:amd64.
+  #10 13.21 Preparing to unpack .../66-libsasl2-modules_2.1.27+dfsg-2.1+deb11u1_amd64.deb ...
+  #10 13.21 Unpacking libsasl2-modules:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+  #10 13.23 Selecting previously unselected package libssl-dev:amd64.
+  #10 13.23 Preparing to unpack .../67-libssl-dev_1.1.1w-0+deb11u3_amd64.deb ...
+  #10 13.23 Unpacking libssl-dev:amd64 (1.1.1w-0+deb11u3) ...
+  #10 13.37 Selecting previously unselected package libxau6:amd64.
+  #10 13.37 Preparing to unpack .../68-libxau6_1%3a1.0.9-1_amd64.deb ...
+  #10 13.38 Unpacking libxau6:amd64 (1:1.0.9-1) ...
+  #10 13.39 Selecting previously unselected package libxdmcp6:amd64.
+  #10 13.39 Preparing to unpack .../69-libxdmcp6_1%3a1.1.2-3_amd64.deb ...
+  #10 13.39 Unpacking libxdmcp6:amd64 (1:1.1.2-3) ...
+  #10 13.41 Selecting previously unselected package libxcb1:amd64.
+  #10 13.41 Preparing to unpack .../70-libxcb1_1.14-3_amd64.deb ...
+  #10 13.41 Unpacking libxcb1:amd64 (1.14-3) ...
+  #10 13.42 Selecting previously unselected package libx11-data.
+  #10 13.43 Preparing to unpack .../71-libx11-data_2%3a1.7.2-1+deb11u2_all.deb ...
+  #10 13.43 Unpacking libx11-data (2:1.7.2-1+deb11u2) ...
+  #10 13.47 Selecting previously unselected package libx11-6:amd64.
+  #10 13.47 Preparing to unpack .../72-libx11-6_2%3a1.7.2-1+deb11u2_amd64.deb ...
+  #10 13.47 Unpacking libx11-6:amd64 (2:1.7.2-1+deb11u2) ...
+  #10 13.53 Selecting previously unselected package libxext6:amd64.
+  #10 13.53 Preparing to unpack .../73-libxext6_2%3a1.3.3-1.1_amd64.deb ...
+  #10 13.53 Unpacking libxext6:amd64 (2:1.3.3-1.1) ...
+  #10 13.55 Selecting previously unselected package libxml2:amd64.
+  #10 13.55 Preparing to unpack .../74-libxml2_2.9.10+dfsg-6.7+deb11u8_amd64.deb ...
+  #10 13.55 Unpacking libxml2:amd64 (2.9.10+dfsg-6.7+deb11u8) ...
+  #10 13.61 Selecting previously unselected package libxmuu1:amd64.
+  #10 13.61 Preparing to unpack .../75-libxmuu1_2%3a1.1.2-2+b3_amd64.deb ...
+  #10 13.61 Unpacking libxmuu1:amd64 (2:1.1.2-2+b3) ...
+  #10 13.62 Selecting previously unselected package pkg-config.
+  #10 13.62 Preparing to unpack .../76-pkg-config_0.29.2-1_amd64.deb ...
+  #10 13.62 Unpacking pkg-config (0.29.2-1) ...
+  #10 13.64 Selecting previously unselected package publicsuffix.
+  #10 13.64 Preparing to unpack .../77-publicsuffix_20220811.1734-0+deb11u1_all.deb ...
+  #10 13.64 Unpacking publicsuffix (20220811.1734-0+deb11u1) ...
+  #10 13.66 Selecting previously unselected package shared-mime-info.
+  #10 13.66 Preparing to unpack .../78-shared-mime-info_2.0-1_amd64.deb ...
+  #10 13.67 Unpacking shared-mime-info (2.0-1) ...
+  #10 13.73 Selecting previously unselected package xauth.
+  #10 13.74 Preparing to unpack .../79-xauth_1%3a1.1-1_amd64.deb ...
+  #10 13.74 Unpacking xauth (1:1.1-1) ...
+  #10 13.75 Selecting previously unselected package xdg-user-dirs.
+  #10 13.75 Preparing to unpack .../80-xdg-user-dirs_0.17-2_amd64.deb ...
+  #10 13.76 Unpacking xdg-user-dirs (0.17-2) ...
+  #10 13.78 Setting up libksba8:amd64 (1.5.0-3+deb11u2) ...
+  #10 13.79 Setting up libexpat1:amd64 (2.2.10-2+deb11u7) ...
+  #10 13.79 Setting up libxau6:amd64 (1:1.0.9-1) ...
+  #10 13.79 Setting up libpsl5:amd64 (0.21.0-1.2) ...
+  #10 13.79 Setting up libstdc++-10-dev:amd64 (10.2.1-6) ...
+  #10 13.80 Setting up libgpm2:amd64 (1.20.7-8) ...
+  #10 13.80 Setting up g++-10 (10.2.1-6) ...
+  #10 13.80 Setting up libicu67:amd64 (67.1-7+deb11u1) ...
+  #10 13.80 Setting up xdg-user-dirs (0.17-2) ...
+  #10 13.81 Setting up libglib2.0-0:amd64 (2.66.8-1+deb11u6) ...
+  #10 13.82 No schema files found: doing nothing.
+  #10 13.83 Setting up perl-modules-5.32 (5.32.1-4+deb11u4) ...
+  #10 13.83 Setting up libbrotli1:amd64 (1.0.9-2+b2) ...
+  #10 13.83 Setting up libsqlite3-0:amd64 (3.34.1-3+deb11u1) ...
+  #10 13.83 Setting up libcbor0:amd64 (0.5.0+dfsg-2) ...
+  #10 13.84 Setting up libsasl2-modules:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+  #10 13.84 Setting up libnghttp2-14:amd64 (1.43.0-1+deb11u2) ...
+  #10 13.84 Setting up less (551-2+deb11u2) ...
+  #10 13.85 Setting up libnpth0:amd64 (1.6-3) ...
+  #10 13.85 Setting up libassuan0:amd64 (2.5.3-7.1) ...
+  #10 13.85 Setting up bzip2 (1.0.8-4) ...
+  #10 13.85 Setting up libldap-common (2.4.57+dfsg-3+deb11u1) ...
+  #10 13.85 Setting up libfakeroot:amd64 (1.25.3-1.1) ...
+  #10 13.86 Setting up libsasl2-modules-db:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+  #10 13.86 Setting up fakeroot (1.25.3-1.1) ...
+  #10 13.86 update-alternatives: using /usr/bin/fakeroot-sysv to provide /usr/bin/fakeroot (fakeroot) in auto mode
+  #10 13.86 update-alternatives: warning: skip creation of /usr/share/man/man1/fakeroot.1.gz because associated file /usr/share/man/man1/fakeroot-sysv.1.gz (of link group fakeroot) doesn't exist
+  #10 13.86 update-alternatives: warning: skip creation of /usr/share/man/man1/faked.1.gz because associated file /usr/share/man/man1/faked-sysv.1.gz (of link group fakeroot) doesn't exist
+  #10 13.86 update-alternatives: warning: skip creation of /usr/share/man/es/man1/fakeroot.1.gz because associated file /usr/share/man/es/man1/fakeroot-sysv.1.gz (of link group fakeroot) doesn't exist
+  #10 13.86 update-alternatives: warning: skip creation of /usr/share/man/es/man1/faked.1.gz because associated file /usr/share/man/es/man1/faked-sysv.1.gz (of link group fakeroot) doesn't exist
+  #10 13.86 update-alternatives: warning: skip creation of /usr/share/man/fr/man1/fakeroot.1.gz because associated file /usr/share/man/fr/man1/fakeroot-sysv.1.gz (of link group fakeroot) doesn't exist
+  #10 13.86 update-alternatives: warning: skip creation of /usr/share/man/fr/man1/faked.1.gz because associated file /usr/share/man/fr/man1/faked-sysv.1.gz (of link group fakeroot) doesn't exist
+  #10 13.86 update-alternatives: warning: skip creation of /usr/share/man/sv/man1/fakeroot.1.gz because associated file /usr/share/man/sv/man1/fakeroot-sysv.1.gz (of link group fakeroot) doesn't exist
+  #10 13.86 update-alternatives: warning: skip creation of /usr/share/man/sv/man1/faked.1.gz because associated file /usr/share/man/sv/man1/faked-sysv.1.gz (of link group fakeroot) doesn't exist
+  #10 13.87 Setting up libglib2.0-data (2.66.8-1+deb11u6) ...
+  #10 13.87 Setting up libx11-data (2:1.7.2-1+deb11u2) ...
+  #10 13.87 Setting up make (4.3-4.1) ...
+  #10 13.87 Setting up gnupg-l10n (2.2.27-2+deb11u2) ...
+  #10 13.88 Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+  #10 13.88 Setting up xz-utils (5.2.5-2.1~deb11u1) ...
+  #10 13.88 update-alternatives: using /usr/bin/xz to provide /usr/bin/lzma (lzma) in auto mode
+  #10 13.88 update-alternatives: warning: skip creation of /usr/share/man/man1/lzma.1.gz because associated file /usr/share/man/man1/xz.1.gz (of link group lzma) doesn't exist
+  #10 13.88 update-alternatives: warning: skip creation of /usr/share/man/man1/unlzma.1.gz because associated file /usr/share/man/man1/unxz.1.gz (of link group lzma) doesn't exist
+  #10 13.88 update-alternatives: warning: skip creation of /usr/share/man/man1/lzcat.1.gz because associated file /usr/share/man/man1/xzcat.1.gz (of link group lzma) doesn't exist
+  #10 13.88 update-alternatives: warning: skip creation of /usr/share/man/man1/lzmore.1.gz because associated file /usr/share/man/man1/xzmore.1.gz (of link group lzma) doesn't exist
+  #10 13.88 update-alternatives: warning: skip creation of /usr/share/man/man1/lzless.1.gz because associated file /usr/share/man/man1/xzless.1.gz (of link group lzma) doesn't exist
+  #10 13.88 update-alternatives: warning: skip creation of /usr/share/man/man1/lzdiff.1.gz because associated file /usr/share/man/man1/xzdiff.1.gz (of link group lzma) doesn't exist
+  #10 13.88 update-alternatives: warning: skip creation of /usr/share/man/man1/lzcmp.1.gz because associated file /usr/share/man/man1/xzcmp.1.gz (of link group lzma) doesn't exist
+  #10 13.88 update-alternatives: warning: skip creation of /usr/share/man/man1/lzgrep.1.gz because associated file /usr/share/man/man1/xzgrep.1.gz (of link group lzma) doesn't exist
+  #10 13.88 update-alternatives: warning: skip creation of /usr/share/man/man1/lzegrep.1.gz because associated file /usr/share/man/man1/xzegrep.1.gz (of link group lzma) doesn't exist
+  #10 13.88 update-alternatives: warning: skip creation of /usr/share/man/man1/lzfgrep.1.gz because associated file /usr/share/man/man1/xzfgrep.1.gz (of link group lzma) doesn't exist
+  #10 13.88 Setting up libssl-dev:amd64 (1.1.1w-0+deb11u3) ...
+  #10 13.89 Setting up patch (2.7.6-7) ...
+  #10 13.89 Setting up libncursesw6:amd64 (6.2+20201114-2+deb11u2) ...
+  #10 13.89 Setting up libsasl2-2:amd64 (2.1.27+dfsg-2.1+deb11u1) ...
+  #10 13.89 Setting up g++ (4:10.2.1-1) ...
+  #10 13.90 update-alternatives: using /usr/bin/g++ to provide /usr/bin/c++ (c++) in auto mode
+  #10 13.91 Setting up libmd0:amd64 (1.0.3-3) ...
+  #10 13.91 Setting up git-man (1:2.30.2-1+deb11u4) ...
+  #10 13.91 Setting up libssh2-1:amd64 (1.9.0-2+deb11u1) ...
+  #10 13.91 Setting up netbase (6.3) ...
+  #10 13.92 Setting up libfido2-1:amd64 (1.6.0-2) ...
+  #10 13.92 Setting up libbsd0:amd64 (0.11.3-1+deb11u1) ...
+  #10 13.92 Setting up readline-common (8.1-1) ...
+  #10 13.93 Setting up publicsuffix (20220811.1734-0+deb11u1) ...
+  #10 13.93 Setting up libxml2:amd64 (2.9.10+dfsg-6.7+deb11u8) ...
+  #10 13.93 Setting up liblocale-gettext-perl (1.07-4+b1) ...
+  #10 13.93 Setting up libgdbm6:amd64 (1.19-2) ...
+  #10 13.93 Setting up pinentry-curses (1.1.0-4) ...
+  #10 13.94 Setting up libxdmcp6:amd64 (1:1.1.2-3) ...
+  #10 13.94 Setting up libxcb1:amd64 (1.14-3) ...
+  #10 13.94 Setting up libedit2:amd64 (3.1-20191231-2+b1) ...
+  #10 13.94 Setting up libreadline8:amd64 (8.1-1) ...
+  #10 13.95 Setting up libldap-2.4-2:amd64 (2.4.57+dfsg-3+deb11u1) ...
+  #10 13.95 Setting up libcurl3-gnutls:amd64 (7.74.0-1.3+deb11u15) ...
+  #10 13.95 Setting up shared-mime-info (2.0-1) ...
+  #10 14.57 Setting up libgdbm-compat4:amd64 (1.19-2) ...
+  #10 14.58 Setting up libperl5.32:amd64 (5.32.1-4+deb11u4) ...
+  #10 14.58 Setting up gpgconf (2.2.27-2+deb11u2) ...
+  #10 14.58 Setting up libx11-6:amd64 (2:1.7.2-1+deb11u2) ...
+  #10 14.58 Setting up libxmuu1:amd64 (2:1.1.2-2+b3) ...
+  #10 14.58 Setting up gpg (2.2.27-2+deb11u2) ...
+  #10 14.59 Setting up gnupg-utils (2.2.27-2+deb11u2) ...
+  #10 14.59 Setting up gpg-agent (2.2.27-2+deb11u2) ...
+  #10 15.00 Setting up openssh-client (1:8.4p1-5+deb11u5) ...
+  #10 15.06 Setting up gpgsm (2.2.27-2+deb11u2) ...
+  #10 15.06 Setting up libxext6:amd64 (2:1.3.3-1.1) ...
+  #10 15.07 Setting up dirmngr (2.2.27-2+deb11u2) ...
+  #10 15.18 Setting up perl (5.32.1-4+deb11u4) ...
+  #10 15.19 Setting up libdpkg-perl (1.20.13) ...
+  #10 15.19 Setting up gpg-wks-server (2.2.27-2+deb11u2) ...
+  #10 15.19 Setting up xauth (1:1.1-1) ...
+  #10 15.19 Setting up gpg-wks-client (2.2.27-2+deb11u2) ...
+  #10 15.19 Setting up libfile-fcntllock-perl (0.22-3+b7) ...
+  #10 15.19 Setting up libalgorithm-diff-perl (1.201-1) ...
+  #10 15.20 Setting up dpkg-dev (1.20.13) ...
+  #10 15.20 Setting up liberror-perl (0.17029-1) ...
+  #10 15.20 Setting up pkg-config (0.29.2-1) ...
+  #10 15.23 Setting up git (1:2.30.2-1+deb11u4) ...
+  #10 15.25 Setting up gnupg (2.2.27-2+deb11u2) ...
+  #10 15.26 Setting up build-essential (12.9) ...
+  #10 15.26 Setting up libalgorithm-diff-xs-perl (0.04-6+b1) ...
+  #10 15.26 Setting up libalgorithm-merge-perl (0.08-3) ...
+  #10 15.27 Processing triggers for libc-bin (2.31-13+deb11u13) ...
+  #10 DONE 15.5s
+  #14 [stage-1 3/5] WORKDIR /tokio-rs_tokio
+  #14 DONE 0.0s
+  #15 [stage-1 4/5] COPY . .
+  #15 DONE 0.2s
+  #16 [stage-1 5/5] COPY --from=builder /tokio-rs_tokio/target /tokio-rs_tokio/target
+  #16 DONE 0.3s
+  #17 exporting to image
+  #17 exporting layers
+  #17 exporting layers 3.0s done
+  #17 writing image sha256:c921ee4d54b3a746ae340844a2887b57cfa5170057420a61e0b67509c6413c69 done
+  #17 naming to docker.io/library/envgym_test_1756803539 done
+  #17 DONE 3.0s
+  === Runtime Log ===  
+  Runtime Status: Success
+  Runtime Output:
+  Runtime Error:
+  === Execution End ===
+DOCKERFILE:
+  FROM rust:slim-bullseye AS builder
+  # Set environment variables
+  ENV RUSTUP_HOME=/usr/local/rustup \
+      CARGO_HOME=/usr/local/cargo \
+      PATH=/usr/local/cargo/bin:$PATH \
+      RUST_VERSION=1.70.0
+  # Install system dependencies
+  RUN apt-get update && apt-get install -y \
+      build-essential \
+      git \
+      pkg-config \
+      libssl-dev \
+      curl \
+      && rm -rf /var/lib/apt/lists/*
+  # Install Rust toolchain
+  RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+      && rustup default stable \
+      && rustup update \
+      && rustup toolchain install nightly-2025-01-25 \
+      && rustup target add x86_64-unknown-linux-gnu
+  # Set working directory
+  WORKDIR /tokio-rs_tokio
+  # Copy project files
+  COPY . .
+  # Print contents of target directory before build
+  RUN ls -R target || true
+  # Build the project
+  RUN cargo build --release
+  # Print contents of target directory after build
+  RUN ls -R target || true
+  # Final stage
+  FROM rust:slim-bullseye
+  # Install runtime dependencies
+  RUN apt-get update && apt-get install -y \
+      build-essential \
+      git \
+      pkg-config \
+      libssl-dev \
+      && rm -rf /var/lib/apt/lists/*
+  # Set working directory
+  WORKDIR /tokio-rs_tokio
+  # Copy project files
+  COPY . .
+  # Copy build artifacts
+  COPY --from=builder /tokio-rs_tokio/target /tokio-rs_tokio/target
+  # Set default shell
+  CMD ["/bin/bash"]
+--- End of Iteration 2 ---
+

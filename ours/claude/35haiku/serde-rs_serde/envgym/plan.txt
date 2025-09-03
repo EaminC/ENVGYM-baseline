@@ -1,0 +1,94 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust Programming Language (Stable Channel)
+     * Specific Version: 1.74.0+ (latest stable for x86_64)
+     * Download from: https://rustup.rs/
+   - Cargo (Rust Package Manager, included with Rust installation)
+   - Workspace Dependencies:
+     * proc-macro2 = "1.0.74" (x86_64 optimized, default-features = false)
+     * quote = "1.0.35" (x86_64 optimized, default-features = false)
+     * syn = "2.0.81" (x86_64 optimized, default-features = false)
+   - Additional x86_64 Specific Optimizations:
+     * libc = "0.2.151" (with x86_64 support)
+     * serde = "1.0.195"
+     * serde_json = "1.0.108"
+
+2. PLATFORM-SPECIFIC CONFIGURATIONS:
+   - Base Image: rust:slim-bullseye (optimized for x86_64)
+   - Target Platform: linux/amd64
+   - Toolchain Configuration:
+     * rust-toolchain.toml: 
+       - channel = "stable"
+       - targets = ["x86_64-unknown-linux-gnu"]
+   - Cross-Compilation Targets:
+     * x86_64-unknown-linux-gnu (primary)
+     * x86_64-unknown-linux-musl (static linking)
+
+3. DEVELOPMENT ENVIRONMENT ADJUSTMENTS:
+   - IDE/Tools:
+     * rust-analyzer (lightweight LSP for x86_64)
+     * rustfmt (code formatting)
+     * clippy (x86_64 optimized linting)
+   - Build Optimization:
+     * Use multi-stage Docker build
+     * Leverage 48 physical cores with parallel compilation
+     * Configure cargo with optimal CPU target flags
+
+4. STORAGE AND MEMORY CONSIDERATIONS:
+   - Workspace Location: /home/cc/EnvGym/data-gpt-4.1mini/serde-rs_serde
+   - Recommended Minimum Requirements:
+     * 16GB RAM
+     * 50GB SSD storage
+   - Docker Build Optimizations:
+     * Use --mount=type=cache for dependency caching
+     * Minimize intermediate layers
+     * Use slim base image to reduce image size
+
+5. TESTING AND COMPATIBILITY:
+   - Test Configurations:
+     * Prioritize x86_64 native testing
+     * Validate no-std compatibility
+     * Cross-compile verification
+   - CI/CD Considerations:
+     * GitHub Actions with x86_64 runners
+     * Docker BuildKit caching strategies
+
+6. DEPENDENCY MANAGEMENT:
+   - Cargo.toml Modifications:
+     * Explicit x86_64 target specifications
+     * Minimal feature flags
+     * Workspace resolver = "2"
+   - Local Path Dependencies:
+     * Optimize for x86_64 architecture
+     * Minimal runtime requirements
+
+7. PERFORMANCE TUNING:
+   - Compiler Flags:
+     * RUSTFLAGS="-C target-cpu=native"
+     * Optimize for current x86_64 microarchitecture
+   - Build Strategies:
+     * Parallel compilation (48 cores)
+     * Incremental compilation enabled
+     * LTO (Link Time Optimization) for release builds
+
+8. SECURITY AND COMPLIANCE:
+   - Use official Rust images
+   - Implement minimal dependency tree
+   - Verify no unnecessary system access
+   - Implement strict panic handling
+
+Key Adjustments:
+- Optimized for x86_64 architecture
+- Slim Docker image selection
+- Leveraged 48-core parallel processing
+- Refined no-std and cross-compilation support
+- Minimal resource consumption strategy
+- Enhanced build and testing configurations
+
+Verification Checkpoints:
+- ✓ x86_64 native compilation
+- ✓ No-std compatibility
+- ✓ Minimal runtime requirements
+- ✓ Efficient resource utilization
+- ✓ Cross-platform build support

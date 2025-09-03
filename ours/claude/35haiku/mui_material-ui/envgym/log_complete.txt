@@ -1,0 +1,77 @@
+=== Docker Execution Log - 20250902_064855 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756795725
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 277B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/debian:bullseye-slim
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/6] FROM docker.io/library/debian:bullseye-slim@sha256:849d9d34d5fe0bf88b5fb3d09eb9684909ac4210488b52f4f7bbe683eedcb851
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 3.79MB 1.9s done
+#5 DONE 2.0s
+
+#6 [2/6] WORKDIR /app
+#6 CACHED
+
+#7 [3/6] RUN apt-get update && apt-get install -y     build-essential     nodejs     npm     git     curl     bash
+#7 CACHED
+
+#8 [4/6] COPY . .
+#8 DONE 7.0s
+
+#9 [5/6] RUN npm ci
+#9 0.553 npm ERR! The `npm ci` command can only install with an existing package-lock.json or
+#9 0.553 npm ERR! npm-shrinkwrap.json with lockfileVersion >= 1. Run an install with npm@5 or
+#9 0.553 npm ERR! later to generate a package-lock.json file, then try again.
+#9 0.559 
+#9 0.559 npm ERR! A complete log of this run can be found in:
+#9 0.559 npm ERR!     /root/.npm/_logs/2025-09-02T06_48_55_127Z-debug.log
+#9 ERROR: process "/bin/sh -c npm ci" did not complete successfully: exit code: 1
+------
+ > [5/6] RUN npm ci:
+ ERR! The `npm ci` command can only install with an existing package-lock.json or
+0.553 npm ERR! npm-shrinkwrap.json with lockfileVersion >= 1. Run an install with npm@5 or
+0.553 npm ERR! later to generate a package-lock.json file, then try again.
+0.559 
+0.559 npm ERR! A complete log of this run can be found in:
+0.559 npm ERR!     /root/.npm/_logs/2025-09-02T06_48_55_127Z-debug.log
+------
+envgym.dockerfile:15
+--------------------
+  13 |     COPY . .
+  14 |     
+  15 | >>> RUN npm ci
+  16 |     
+  17 |     RUN npm run build
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c npm ci" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

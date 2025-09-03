@@ -1,0 +1,94 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust (version 1.74.0, x86_64 specific build)
+   - Cargo (Rust's package manager)
+   - Git (version control)
+   - Clang/LLVM (x86_64 compatible version)
+   - Development tools:
+     * Build essentials for x86_64
+     * GCC/G++ (Linux x86_64 version)
+     * pkg-config
+     * cargo-audit
+     * rustfmt
+
+   - Platform-specific build tools:
+     * Ubuntu/Debian build-essential package
+     * Linux x86_64 development libraries
+
+   - Optimization for large memory (187.5GB):
+     * Enable parallel compilation
+     * Increase cargo build threads
+     * Configure memory-efficient builds
+
+2. FILES TO CREATE:
+   - Configuration files:
+     * `rust-toolchain.toml` (x86_64 specific)
+     * `.cargo/config.toml` (Linux/x86_64 optimizations)
+     * `.cargo/audit.toml`
+     * `rustfmt.toml`
+
+   - Adjusted for limited disk space (17.6% free):
+     * Minimize intermediate build artifacts
+     * Use multi-stage Docker builds
+     * Implement aggressive cache cleaning
+
+3. BUILD STRATEGY:
+   - Primary Platform: Linux x86_64
+   - Docker Configuration:
+     * Base image: ubuntu:22.04
+     * Platform: linux/amd64
+     * Multi-stage build to minimize final image size
+     * Optimize layer caching
+
+4. PERFORMANCE CONSIDERATIONS:
+   - Leverage available 187.5GB RAM:
+     * Increase cargo build parallelism
+     * Enable aggressive compilation optimization
+     * Configure memory-mapped builds
+
+5. DEPENDENCY MANAGEMENT:
+   - Focus on x86_64 compatible libraries
+   - Prioritize lightweight, efficient dependencies
+   - Use static linking where possible
+   - Minimize external library dependencies
+
+6. TESTING ADJUSTMENTS:
+   - Prioritize x86_64 specific test cases
+   - Validate build on Ubuntu 22.04
+   - Test with limited disk space scenarios
+   - Verify memory-efficient compilation
+
+7. OPTIMIZATION COMMANDS:
+   ```bash
+   # Rust installation
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.74.0
+   
+   # Build with optimizations
+   CARGO_BUILD_JOBS=$(nproc) cargo build --release --target x86_64-unknown-linux-gnu
+   
+   # Efficient testing
+   cargo test --no-run  # Compile tests without running
+   cargo test --release  # Release mode testing
+   ```
+
+8. DISK SPACE MANAGEMENT:
+   - Implement aggressive cleanup:
+     * `cargo clean` after builds
+     * Remove unnecessary build artifacts
+     * Use `--no-install` for temporary builds
+
+9. DOCKER OPTIMIZATION:
+   ```dockerfile
+   FROM ubuntu:22.04 AS builder
+   # Minimal dependencies
+   # Multi-stage build
+   # Aggressive cleanup
+   ```
+
+Key Adjustments:
+- Tailored for x86_64 architecture
+- Optimized for 187.5GB RAM
+- Disk space conservation strategy
+- Ubuntu 22.04 LTS compatibility
+- Efficient multi-stage Docker builds

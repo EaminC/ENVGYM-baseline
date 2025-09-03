@@ -1,0 +1,81 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   [Optimized for x86_64 architecture and high-performance hardware]
+   - Node.js (v22+ with x86_64 binary)
+   - nvm (Node Version Manager, x86_64 compatible)
+   - npm (comes with Node.js)
+   - Git (latest version for x86_64)
+   - Vercel CLI 
+   - Docker (28.x+ version, confirmed x86_64 support)
+   - Lightweight API testing tool (curl/httpie as alternative to Postman)
+   - Development Tools:
+     * ESLint (flat config, optimized for 96-core environment)
+     * Prettier 
+     * Husky
+     * Jest (with parallel test execution)
+   
+2. HARDWARE-OPTIMIZED CONFIGURATION ADJUSTMENTS:
+   - Leverage 96-core CPU for:
+     * Parallel builds
+     * Concurrent testing
+     * Optimized Docker multi-stage builds
+   - Utilize 187.5GB RAM for:
+     * Comprehensive dependency caching
+     * In-memory build processes
+     * Complex testing scenarios
+   - Storage Optimization:
+     * Implement aggressive layer caching
+     * Use .dockerignore to minimize build context
+     * Prefer slim/alpine base images
+
+3. DOCKER CONFIGURATION:
+   - Base Image: Ubuntu 22.04 LTS (x86_64)
+   - Platform: linux/amd64
+   - BuildKit Features:
+     * Multi-stage builds
+     * Cached dependency layers
+     * Minimal image size
+
+4. PERFORMANCE CONSIDERATIONS:
+   - Modify `.devcontainer/devcontainer.json`:
+     * Specify x86_64 platform
+     * Configure resource limits
+     * Optimize VSCode extension installations
+   - Update `package.json` scripts:
+     * Add `--max-old-space-size` for Node.js
+     * Configure Jest for parallel test execution
+     * Add performance profiling scripts
+
+5. STORAGE MANAGEMENT:
+   - Implement aggressive `.dockerignore`
+   - Use multi-stage builds to minimize final image size
+   - Configure npm/Docker cache management
+   - Periodic cleanup scripts in DevContainer
+
+6. DEVELOPMENT ENVIRONMENT VALIDATION:
+   - Create comprehensive compatibility tests
+   - Verify x86_64 specific configurations
+   - Test cross-architecture compatibility
+   - Performance benchmark scripts
+   - Resource utilization monitoring
+
+7. ADDITIONAL HARDWARE-SPECIFIC RECOMMENDATIONS:
+   - Use `node:22-slim` as base image
+   - Configure Node.js with V8 optimization flags
+   - Implement efficient caching strategies
+   - Parallel build and test configurations
+
+8. VERIFICATION METHOD:
+   - `npm run test:parallel`
+   - `npm run lint:performance`
+   - Docker build time optimization checks
+   - Resource utilization monitoring
+   - Comprehensive architecture compatibility tests
+
+Key Modifications:
+- Optimized for x86_64 architecture
+- Leveraged high-performance hardware
+- Implemented storage-efficient configurations
+- Added multi-core/high-memory performance scripts
+- Ensured compatibility with 96-core, 187.5GB RAM environment

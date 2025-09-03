@@ -1,0 +1,79 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust Programming Language (rustc 1.80.0 or greater) [CONFIRMED]
+   - Cargo Package Manager
+   - Git (for version control and cloning)
+   - Optional: Visual Studio Code or Rust-compatible IDE
+
+   HARDWARE-SPECIFIC ADJUSTMENTS:
+   - Ensure x86_64 compatible Rust toolchain
+   - Use slim base image (rust:slim-bullseye) for minimal footprint
+   - Verify all dependencies support x86_64 Linux architecture
+
+2. DOCKER CONFIGURATION:
+   - Use multi-stage build to optimize image size
+   - Leverage BuildKit cache for dependency management
+   - Dockerfile optimization:
+     ```dockerfile
+     FROM rust:slim-bullseye AS builder
+     WORKDIR /app
+     COPY . .
+     RUN cargo build --release
+     
+     FROM debian:bullseye-slim
+     COPY --from=builder /app/target/release/rayon-demo /usr/local/bin/
+     ```
+
+3. FILES TO CREATE:
+   - Existing Cargo.toml files (unchanged)
+   - Update rayon-demo/Cargo.toml
+     - Remove Windows-specific dependencies if not needed
+     - Ensure all dependencies are x86_64 compatible
+     - Simplify platform-specific configurations
+
+4. DEPENDENCY MANAGEMENT:
+   - Prioritize Linux/x86_64 compatible dependencies
+   - Remove or conditionally include Windows-specific packages
+   - Verify libc and system-level dependencies for x86_64 Linux
+
+5. TEST STRATEGY:
+   - Focus on x86_64 Linux compatibility tests
+   - Simplify cross-platform testing
+   - Prioritize Linux-specific test cases
+   - Use GitHub Actions or similar CI for comprehensive testing
+
+6. PERFORMANCE CONSIDERATIONS:
+   - Optimize for x86_64 architecture
+   - Leverage native CPU instructions
+   - Minimize runtime overhead
+   - Use native Linux performance tools
+
+7. STORAGE AND MEMORY OPTIMIZATION:
+   - Target minimal image size (<500MB)
+   - Use slim base images
+   - Implement multi-stage builds
+   - Minimize unnecessary dependencies
+
+8. DEVELOPMENT ENVIRONMENT:
+   - Use VSCode with rust-analyzer
+   - Configure dev container for consistent environment
+   - Leverage Docker for reproducible setup
+
+9. CONTINUOUS INTEGRATION:
+   - GitHub Actions workflow for x86_64 Linux
+   - Automated dependency checks
+   - Performance and compatibility testing
+
+VERIFICATION METHOD:
+- Successful build on x86_64 Linux
+- All tests pass on target architecture
+- Minimal image size and footprint
+- Consistent performance on x86_64 platform
+- No Windows or non-Linux dependencies
+
+CRITICAL ADJUSTMENTS:
+- Remove Windows-specific configurations
+- Optimize for Linux/x86_64 environment
+- Minimize external dependencies
+- Ensure lightweight, performant setup

@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250902_081057",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756800657",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 1.34kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/rust:slim-bullseye\n#2 DONE 0.1s\n\n#3 [internal] load .dockerignore\n#3 transferring context:\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [builder  2/10] WORKDIR /workspace\n#4 CACHED\n\n#5 [builder  1/10] FROM docker.io/library/rust:slim-bullseye@sha256:1bf538b6b2931ea86c4761e7f979dc85ebab6af2ac905b039fd36e6a23436365\n#5 CACHED\n\n#6 [stage-1 2/5] WORKDIR /workspace/serde-rs_serde\n#6 DONE 0.0s\n\n#7 [internal] load build context\n#7 transferring context: 41.31kB 0.0s done\n#7 DONE 0.0s\n\n#8 [builder  4/10] RUN rustup default stable     && rustup target add x86_64-unknown-linux-gnu     && rustup target add x86_64-unknown-linux-musl     && rustup component add rust-src rustfmt clippy rust-analyzer\n#8 CACHED\n\n#9 [builder  8/10] COPY serde_derive_internals/src/ ./serde_derive_internals/src/\n#9 CACHED\n\n#10 [builder  6/10] COPY serde/src/ ./serde/src/\n#10 CACHED\n\n#11 [builder  7/10] COPY serde_derive/src/ ./serde_derive/src/\n#11 CACHED\n\n#12 [builder  5/10] COPY Cargo.toml Cargo.lock ./\n#12 ERROR: failed to calculate checksum of ref 111b0f74-95ac-4c4c-99e1-f8e374feb237::7wiqj1bcrvxytbpwi8cusdkux: \"/Cargo.lock\": not found\n\n#13 [builder  9/10] COPY test_suite/src/ ./test_suite/src/\n#13 ERROR: failed to calculate checksum of ref 111b0f74-95ac-4c4c-99e1-f8e374feb237::7wiqj1bcrvxytbpwi8cusdkux: \"/test_suite/src\": not found\n\n#14 [builder  3/10] RUN apt-get update && apt-get install -y     build-essential     curl     git     pkg-config     libssl-dev     && rm -rf /var/lib/apt/lists/*\n#14 CANCELED\n------\n > [builder  5/10] COPY Cargo.toml Cargo.lock ./:\n------\n------\n > [builder  9/10] COPY test_suite/src/ ./test_suite/src/:\n------\nenvgym.dockerfile:31\n--------------------\n  29 |     COPY serde_derive/src/ ./serde_derive/src/\n  30 |     COPY serde_derive_internals/src/ ./serde_derive_internals/src/\n  31 | >>> COPY test_suite/src/ ./test_suite/src/\n  32 |     \n  33 |     RUN cargo build --release \\\n--------------------\nERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref 111b0f74-95ac-4c4c-99e1-f8e374feb237::7wiqj1bcrvxytbpwi8cusdkux: \"/test_suite/src\": not found\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

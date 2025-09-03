@@ -1,0 +1,76 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Go (version 1.21+ for x86_64 architecture)
+   - Git (compatible with x86_64)
+   - goctl (go-zero CLI tool, latest version, x86_64 build)
+   - Docker (version 28.3.2, with BuildKit support)
+   - Visual Studio Code (x86_64 version)
+   - GOPROXY configuration tool
+   - Linters and formatters (golangci-lint, gofmt for x86_64)
+   - Protocol Buffers compiler (protoc, x86_64 build)
+
+2. DOCKER CONFIGURATION:
+   - Base Image: golang:alpine (optimized for x86_64)
+   - Multi-stage build strategy
+   - Platform specification: --platform linux/amd64
+   - Optimize for 96 logical cores
+   - Minimize Docker image layers
+
+3. DIRECTORY STRUCTURE:
+   - Base Working Directory: /home/cc/EnvGym/data-gpt-4.1mini/zeromicro_go-zero
+   - Ensure consistent path references
+   - Create subdirectories with clear namespacing:
+     * /mcp
+     * /gateway
+     * /tools
+     * /config
+     * /tests
+
+4. PERFORMANCE OPTIMIZATIONS:
+   - Use alpine-based images for minimal footprint
+   - Configure Go build with CGO_ENABLED=0 for static linking
+   - Leverage multi-stage builds to reduce final image size
+   - Implement build caching strategies
+
+5. DEPENDENCY MANAGEMENT:
+   - Use go mod for dependency tracking
+   - Set GOPROXY to speed up module downloads
+   - Pin dependency versions for consistency
+   - Focus on x86_64 compatible libraries
+
+6. TESTING AND VALIDATION:
+   - Create comprehensive test suites
+   - Use GitHub Actions for CI/CD on x86_64 architecture
+   - Implement cross-platform compatibility checks
+   - Performance testing with 96-core environment simulation
+
+7. SECURITY CONSIDERATIONS:
+   - Use non-root containers
+   - Implement least-privilege principles
+   - Scan dependencies for vulnerabilities
+   - Use official, verified base images
+
+8. SPECIFIC ADJUSTMENTS:
+   - Remove ARM-specific configurations
+   - Optimize for x86_64 instruction set
+   - Ensure all tools support 64-bit architecture
+   - Configure for standard Linux environment
+
+9. RESOURCE ALLOCATION:
+   - Design for efficient memory usage
+   - Implement graceful degradation for resource-constrained environments
+   - Use lightweight alternatives where possible
+   - Configure timeouts and resource limits
+
+10. MONITORING AND LOGGING:
+    - Implement structured logging
+    - Use lightweight tracing solutions
+    - Configure log rotation and management
+    - Ensure minimal performance overhead
+
+CRITICAL NOTES:
+- Confirm all downloaded tools are x86_64 compatible
+- Use static linking where possible
+- Leverage BuildKit features for efficient builds
+- Optimize for 64-bit Linux environments

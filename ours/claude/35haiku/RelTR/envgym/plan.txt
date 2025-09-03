@@ -1,0 +1,94 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Miniconda (Python 3.8 compatible version)
+   - Python 3.8 (instead of 3.6)
+   - PyTorch (CPU version)
+   - torchvision 
+   - matplotlib
+   - scipy
+   - pycocotools
+   - Git
+
+2. FILES TO CREATE:
+   - `environment.yml` (Conda environment configuration)
+   - `.env` (Environment variables file)
+   - `requirements.txt` (Python package dependencies)
+   - `config.py` (Project configuration settings)
+   - `data/vg/images/` (Visual Genome image directory)
+   - `data/oi/images/` (Open Images image directory)
+   - `data/oi/` (Open Images annotation directory)
+
+3. MODIFIED TODO LIST:
+   a. Prerequisite Checks
+      - Verify Python 3.8 compatibility
+      - Confirm CPU-only environment setup
+      - Validate x86_64 system architecture
+
+   b. Conda Environment Setup
+      - Create conda environment: `conda create -n reltr python=3.8`
+      - Activate environment: `conda activate reltr`
+      - Install PyTorch (CPU version): 
+        `conda install pytorch torchvision cpuonly -c pytorch`
+      - Install matplotlib: `conda install matplotlib`
+      - Install scipy: `conda install scipy`
+
+   c. Additional Package Installations
+      - Install pycocotools: `pip install pycocotools`
+      - Clone RelTR repository: `git clone https://github.com/yrcong/RelTR.git`
+      - Navigate to project: `cd RelTR`
+
+   d. Dataset Preparation
+      - Use same download process as original plan
+      - Ensure image processing scripts are CPU-compatible
+
+   e. Dockerfile Considerations
+      ```dockerfile
+      FROM python:3.8-slim-bullseye
+      
+      # Set working directory
+      WORKDIR /app
+
+      # Install system dependencies
+      RUN apt-get update && apt-get install -y \
+          git \
+          wget \
+          && rm -rf /var/lib/apt/lists/*
+
+      # Install Miniconda
+      RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+          && bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda \
+          && rm Miniconda3-latest-Linux-x86_64.sh
+
+      # Add conda to path
+      ENV PATH /opt/conda/bin:$PATH
+
+      # Create conda environment
+      RUN conda create -n reltr python=3.8
+      
+      # Activate environment and install dependencies
+      RUN conda run -n reltr pip install \
+          torch \
+          torchvision \
+          matplotlib \
+          scipy \
+          pycocotools
+      ```
+
+4. PERFORMANCE OPTIMIZATIONS:
+   - Use lightweight base image (python:3.8-slim-bullseye)
+   - Minimize layer count in Dockerfile
+   - Use multi-stage build if possible
+   - Implement .dockerignore to reduce build context
+
+5. TESTING MODIFICATIONS:
+   - Update test cases for CPU-only environment
+   - Verify no CUDA-dependent operations
+   - Test image processing on standard CPU
+
+Key Adjustments:
+- Upgraded Python to 3.8
+- Switched to CPU-only PyTorch
+- Modified Dockerfile for x86_64 architecture
+- Simplified package installation
+- Removed CUDA-specific configurations

@@ -1,0 +1,70 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.10.12 (CPU-compatible version)
+   - Git for repository cloning
+   - Required Python packages (CPU-only versions):
+     * PyTorch (CPU version)
+     * Other packages with CPU compatibility
+     * Ensure no CUDA-specific dependencies
+   - Alternative libraries for computational tasks
+
+2. CONFIGURATION MODIFICATIONS:
+   - Update `/conf/defaults.yaml`
+     * Set default device to "cpu"
+     * Adjust dtype to optimize for CPU performance
+     * Reduce number of workers to match CPU cores
+   - Modify `/conf/evaluate.yaml`
+     * Remove CUDA-specific settings
+     * Configure for CPU-only model evaluation
+   - Update `requirements.txt`
+     * Specify CPU-compatible package versions
+     * Remove CUDA and GPU-specific dependencies
+
+3. PERFORMANCE OPTIMIZATION STRATEGIES:
+   - Implement multi-processing for computational tasks
+   - Use numpy and scipy for efficient CPU computations
+   - Optimize memory usage due to large available RAM (187.5GB)
+   - Consider using lightweight model variants
+   - Implement efficient data loading techniques
+
+4. HARDWARE-SPECIFIC ADJUSTMENTS:
+   - Use x86_64 optimized Python packages
+   - Leverage large memory for in-memory computations
+   - Configure multi-stage Docker build
+   - Use Ubuntu 22.04 LTS base image
+   - Optimize Dockerfile for x86_64 architecture
+
+5. MODIFIED TODO LIST:
+   1. Clone repository
+   2. Create Python 3.10.12 virtual environment
+   3. Install CPU-compatible dependencies
+   4. Download dataset
+   5. Configure CPU-specific settings
+   6. Implement CPU-optimized computational strategies
+   7. Run tests with CPU-only configuration
+   8. Validate performance and accuracy
+   9. Set up logging and error tracking
+   10. Create documentation for CPU-based reproduction
+
+6. VERIFICATION METHODS:
+   - Validate CPU compatibility
+   - Check package installations
+   - Verify computational performance
+   - Test model training on CPU
+   - Confirm result accuracy
+   - Validate memory usage optimization
+   - Verify multi-processing efficiency
+
+7. CRITICAL CONSIDERATIONS:
+   - Potential performance limitations without GPU
+   - Longer computational times
+   - Need for algorithmic optimizations
+   - Careful memory management
+   - Potential model complexity restrictions
+
+Recommended Next Steps:
+- Confirm CPU compatibility of all libraries
+- Test computational feasibility
+- Prepare alternative computational strategies
+- Design efficient data processing pipelines

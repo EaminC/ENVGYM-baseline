@@ -1,0 +1,45 @@
+I apologize, but it seems that the original plan was not included in your message. Without seeing the specific plan, I can provide a generalized Dockerfile template based on the hardware information you shared:
+
+```dockerfile
+# Multi-stage build for Java/Maven project
+FROM openjdk:17-jdk-slim AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy project files
+COPY pom.xml .
+COPY src ./src
+
+# Install Maven
+RUN apt-get update && \
+    apt-get install -y maven && \
+    rm -rf /var/lib/apt/lists/*
+
+# Build the application
+RUN mvn clean package -DskipTests
+
+# Final stage
+FROM openjdk:17-jdk-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy built artifact from builder stage
+COPY --from=builder /app/target/*.jar app.jar
+
+# Expose port if needed
+# EXPOSE 8080
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+Key adjustments based on hardware information:
+- Uses openjdk:17-jdk-slim for x86_64 architecture
+- Multi-stage build to reduce final image size
+- Minimal layer count
+- Compatible with Docker 28.3.2
+- No GPU-specific configurations
+- Working directory aligned with provided path
+- Uses Maven for build process

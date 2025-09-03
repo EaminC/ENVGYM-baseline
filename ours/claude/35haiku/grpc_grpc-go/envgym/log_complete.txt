@@ -1,0 +1,96 @@
+=== Docker Execution Log - 20250902_055328 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756792407
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.25kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/alpine:3.19
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/golang:1.21-alpine3.19
+#3 DONE 0.1s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [builder 1/7] FROM docker.io/library/golang:1.21-alpine3.19@sha256:05a0855f995505bd8832ac8d5132ed097c08bf7e46119818e8c774cda954b04b
+#5 DONE 0.0s
+
+#6 [stage-1 1/6] FROM docker.io/library/alpine:3.19@sha256:3be987e6cde1d07e873c012bf6cfe941e6e85d16ca5fc5b8bedc675451d2de67
+#6 CACHED
+
+#7 [internal] load build context
+#7 transferring context: 283.89kB 0.1s done
+#7 DONE 0.1s
+
+#8 [builder 3/7] WORKDIR /app
+#8 CACHED
+
+#9 [builder 2/7] RUN apk add --no-cache     git     make     protoc     protobuf-dev     gcc     musl-dev     curl
+#9 CACHED
+
+#10 [builder 4/7] COPY go.mod go.sum ./
+#10 CACHED
+
+#11 [builder 5/7] RUN mkdir -p /go/pkg/mod/cache &&     go mod tidy &&     go mod download -v &&     go mod verify || true
+#11 CACHED
+
+#12 [stage-1 2/6] RUN apk add --no-cache     bash     ca-certificates     git     curl     wget     protoc     go
+#12 0.231 fetch https://dl-cdn.alpinelinux.org/alpine/v3.19/main/x86_64/APKINDEX.tar.gz
+#12 0.363 fetch https://dl-cdn.alpinelinux.org/alpine/v3.19/community/x86_64/APKINDEX.tar.gz
+#12 ...
+
+#13 [builder 6/7] COPY . .
+#13 DONE 0.4s
+
+#14 [builder 7/7] RUN cd cmd/protoc-gen-go-grpc &&     go build -v     -ldflags="-s -w"     -o /bin/protoc-gen-go-grpc     main.go     && echo "Build completed successfully"     || (echo "Build failed with error" && exit 1)
+#14 0.198 go: go.mod requires go >= 1.24.0 (running go 1.21.13; GOTOOLCHAIN=local)
+#14 0.198 Build failed with error
+#14 ERROR: process "/bin/sh -c cd cmd/protoc-gen-go-grpc &&     go build -v     -ldflags=\"-s -w\"     -o /bin/protoc-gen-go-grpc     main.go     && echo \"Build completed successfully\"     || (echo \"Build failed with error\" && exit 1)" did not complete successfully: exit code: 1
+
+#12 [stage-1 2/6] RUN apk add --no-cache     bash     ca-certificates     git     curl     wget     protoc     go
+#12 0.657 (1/79) Installing ncurses-terminfo-base (6.4_p20231125-r0)
+#12 0.664 (2/79) Installing libncursesw (6.4_p20231125-r0)
+#12 0.676 (3/79) Installing readline (8.2.1-r2)
+#12 CANCELED
+------
+ > [builder 7/7] RUN cd cmd/protoc-gen-go-grpc &&     go build -v     -ldflags="-s -w"     -o /bin/protoc-gen-go-grpc     main.go     && echo "Build completed successfully"     || (echo "Build failed with error" && exit 1):
+0.198 go: go.mod requires go >= 1.24.0 (running go 1.21.13; GOTOOLCHAIN=local)
+0.198 Build failed with error
+------
+envgym.dockerfile:32
+--------------------
+  31 |     
+  32 | >>> RUN cd cmd/protoc-gen-go-grpc && \
+  33 | >>>     go build -v \
+  34 | >>>     -ldflags="-s -w" \
+  35 | >>>     -o /bin/protoc-gen-go-grpc \
+  36 | >>>     main.go \
+  37 | >>>     && echo "Build completed successfully" \
+  38 | >>>     || (echo "Build failed with error" && exit 1)
+  39 |     
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c cd cmd/protoc-gen-go-grpc &&     go build -v     -ldflags=\"-s -w\"     -o /bin/protoc-gen-go-grpc     main.go     && echo \"Build completed successfully\"     || (echo \"Build failed with error\" && exit 1)" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

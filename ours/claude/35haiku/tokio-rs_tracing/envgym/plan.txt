@@ -1,0 +1,100 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust (stable and nightly versions, minimum 1.74)
+     * Use x86_64 architecture-specific rustup installation
+     * `rustc --version` to verify
+   - Cargo (comes with Rust installation)
+   - Git (for version control)
+   - Optional: Visual Studio Code or Rust-compatible IDE
+   - Optional: Discord (for community support)
+
+2. SYSTEM OPTIMIZATIONS:
+   - Leverage 96 logical cores for parallel builds
+     * Configure Cargo with increased parallelism
+     * Use BuildKit for efficient multi-stage builds
+   - Use Ubuntu 22.04 LTS as base development environment
+   - Recommended Docker image: rust:1.74-slim-bullseye
+     * Optimized for x86_64 architecture
+     * Minimal image size
+     * Built-in Rust and Cargo support
+
+3. TOOLCHAIN CONFIGURATION:
+   - Install Rust Toolchain
+     * `rustup install stable-x86_64-unknown-linux-gnu`
+     * `rustup install nightly-x86_64-unknown-linux-gnu`
+     * Verify with `rustc --version`
+     * Install additional tools:
+       - `cargo install cargo-audit`
+       - `cargo install cargo-nextest`
+       - `rustup component add clippy`
+       - `npm install netlify-cli -g`
+
+4. DOCKER CONFIGURATION:
+   ```dockerfile
+   FROM rust:1.74-slim-bullseye
+
+   # Set environment for x86_64
+   ENV CARGO_HOME=/usr/local/cargo
+   ENV PATH=/usr/local/cargo/bin:$PATH
+
+   # Optimize for 96 cores
+   ENV CARGO_BUILD_JOBS=96
+   ENV RUST_BACKTRACE=1
+
+   # Install dependencies
+   RUN apt-get update && apt-get install -y \
+       git \
+       npm \
+       && rm -rf /var/lib/apt/lists/*
+
+   WORKDIR /app
+   ```
+
+5. WORKSPACE SETUP:
+   - Modify `Cargo.toml` for x86_64 optimization
+     * Add platform-specific configuration
+     * Configure for high-performance builds
+   - Adjust `.cargo/config.toml`:
+     ```toml
+     [build]
+     jobs = 96  # Utilize all available cores
+     rustflags = ["-C", "target-cpu=native"]
+     ```
+
+6. PERFORMANCE CONSIDERATIONS:
+   - Use SSD-optimized storage for faster builds
+   - Allocate sufficient RAM (recommended 32GB+ for 96-core builds)
+   - Configure Docker to use BuildKit for efficient caching
+   - Enable incremental compilation
+
+7. DEVELOPMENT WORKFLOW:
+   - Use `cargo nextest` for parallel test execution
+   - Implement CI/CD with GitHub Actions or GitLab CI
+   - Configure Netlify deployment for documentation
+
+8. SECURITY AND COMPATIBILITY:
+   - Regular security audits with `cargo-audit`
+   - Cross-version compatibility testing
+   - Linting with `clippy`
+   - Nightly Rust compatibility checks
+
+9. DOCUMENTATION:
+   - Configure Netlify documentation generation
+   - Optimize documentation builds for x86_64
+   - Use nightly Rust for advanced documentation features
+
+VERIFICATION STEPS:
+- Confirm x86_64 architecture compatibility
+- Validate Rust toolchain installation
+- Test parallel build capabilities
+- Verify Docker image build
+- Check documentation generation
+- Perform security vulnerability scanning
+
+Key Adjustments:
+- Optimized for x86_64 architecture
+- Leveraged 96 logical cores
+- Minimal Docker image selection
+- Performance-focused configuration
+- Maintained original workspace structure and goals

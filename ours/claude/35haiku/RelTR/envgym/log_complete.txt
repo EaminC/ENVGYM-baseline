@@ -1,0 +1,113 @@
+=== Docker Execution Log - 20250902_022639 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756779997
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.22kB done
+#1 WARN: LegacyKeyValueFormat: "ENV key=value" should be used instead of legacy "ENV key value" format (line 17)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.8-slim-bullseye
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/python:3.8-slim-bullseye@sha256:e191a71397fd61fbddb6712cd43ef9a2c17df0b5e7ba67607128554cd6bff267
+#4 DONE 0.0s
+
+#5 [2/8] WORKDIR /app
+#5 CACHED
+
+#6 [3/8] RUN apt-get update && apt-get install -y     git     wget     build-essential     libgl1-mesa-glx     libglib2.0-0     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [4/8] RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh     && bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda     && rm Miniconda3-latest-Linux-x86_64.sh
+#7 CACHED
+
+#8 [5/8] RUN source /opt/conda/etc/profile.d/conda.sh     && conda init bash     && conda create -n reltr python=3.8 --no-default-packages -y     && conda activate reltr     && pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu     && pip install         matplotlib         scipy         pycocotools         numpy         tqdm         opencv-python
+#8 0.656 no change     /opt/conda/condabin/conda
+#8 0.656 no change     /opt/conda/bin/conda
+#8 0.656 no change     /opt/conda/bin/conda-env
+#8 0.656 no change     /opt/conda/bin/activate
+#8 0.656 no change     /opt/conda/bin/deactivate
+#8 0.656 no change     /opt/conda/etc/profile.d/conda.sh
+#8 0.656 no change     /opt/conda/etc/fish/conf.d/conda.fish
+#8 0.656 no change     /opt/conda/shell/condabin/Conda.psm1
+#8 0.656 no change     /opt/conda/shell/condabin/conda-hook.ps1
+#8 0.656 no change     /opt/conda/lib/python3.13/site-packages/xontrib/conda.xsh
+#8 0.656 no change     /opt/conda/etc/profile.d/conda.csh
+#8 0.656 modified      /root/.bashrc
+#8 0.656 
+#8 0.656 ==> For changes to take effect, close and re-open your current shell. <==
+#8 0.656 
+#8 1.734 
+#8 1.734 CondaToSNonInteractiveError: Terms of Service have not been accepted for the following channels. Please accept or remove them before proceeding:
+#8 1.734     - https://repo.anaconda.com/pkgs/main
+#8 1.734     - https://repo.anaconda.com/pkgs/r
+#8 1.734 
+#8 1.734 To accept these channels' Terms of Service, run the following commands:
+#8 1.734     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+#8 1.734     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+#8 1.734 
+#8 1.734 For information on safely removing channels from your conda configuration,
+#8 1.734 please see the official documentation:
+#8 1.734 
+#8 1.734     https://www.anaconda.com/docs/tools/working-with-conda/channels
+#8 1.734 
+#8 ERROR: process "/bin/bash -c source /opt/conda/etc/profile.d/conda.sh     && conda init bash     && conda create -n reltr python=3.8 --no-default-packages -y     && conda activate reltr     && pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu     && pip install         matplotlib         scipy         pycocotools         numpy         tqdm         opencv-python" did not complete successfully: exit code: 1
+------
+ > [5/8] RUN source /opt/conda/etc/profile.d/conda.sh     && conda init bash     && conda create -n reltr python=3.8 --no-default-packages -y     && conda activate reltr     && pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu     && pip install         matplotlib         scipy         pycocotools         numpy         tqdm         opencv-python:
+1.734 
+1.734 To accept these channels' Terms of Service, run the following commands:
+1.734     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+1.734     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+1.734 
+1.734 For information on safely removing channels from your conda configuration,
+1.734 please see the official documentation:
+1.734 
+1.734     https://www.anaconda.com/docs/tools/working-with-conda/channels
+1.734 
+------
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - LegacyKeyValueFormat: "ENV key=value" should be used instead of legacy "ENV key value" format (line 17)
+envgym.dockerfile:20
+--------------------
+  19 |     
+  20 | >>> RUN source /opt/conda/etc/profile.d/conda.sh \
+  21 | >>>     && conda init bash \
+  22 | >>>     && conda create -n reltr python=3.8 --no-default-packages -y \
+  23 | >>>     && conda activate reltr \
+  24 | >>>     && pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu \
+  25 | >>>     && pip install \
+  26 | >>>         matplotlib \
+  27 | >>>         scipy \
+  28 | >>>         pycocotools \
+  29 | >>>         numpy \
+  30 | >>>         tqdm \
+  31 | >>>         opencv-python
+  32 |     
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/bash -c source /opt/conda/etc/profile.d/conda.sh     && conda init bash     && conda create -n reltr python=3.8 --no-default-packages -y     && conda activate reltr     && pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu     && pip install         matplotlib         scipy         pycocotools         numpy         tqdm         opencv-python" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

@@ -1,0 +1,85 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Miniconda (lighter weight than Anaconda, suitable for x86_64 architecture)
+   - Python 3.8 (updated for better compatibility with Ubuntu 22.04)
+   - Git 
+   - System dependencies:
+     * gcc/g++ compiler (latest version)
+     * python3-dev
+     * build-essential
+     * libffi-dev (for additional library compatibility)
+
+2. FILES TO CREATE:
+   - `environment.yml` (Conda environment specification)
+   - `.gitignore`
+   - `requirements.txt` 
+   - `config.json`
+   - `environment_requirements.txt`
+   - `install.sh` (Updated for Ubuntu 22.04)
+
+3. HARDWARE-OPTIMIZED CONFIGURATION:
+   - Leverage 96-core processor for parallel builds
+   - Utilize 187.5GB RAM for memory-intensive tasks
+   - Configure for CPU-only processing
+   - Optimize for x86_64 architecture
+   - Use multi-stage Docker build techniques
+
+4. MODIFIED TODO LIST:
+   a. System Preparation
+      - Install Miniconda for x86_64
+      - Verify Python 3.8 installation
+      - Install system development tools
+      - Configure Docker multi-stage build
+
+   b. Repository Setup
+      - Clone repository to /home/cc/EnvGym/data-gpt-4.1mini/sixthsense
+      - Set executable permissions:
+        `chmod +x install.sh`
+
+   c. Environment Configuration
+      - Create conda environment with specific optimizations:
+        `conda create -n ssense -y python=3.8 --no-default-packages`
+      - Activate environment:
+        `conda activate ssense`
+
+   d. Dependency Installation
+      - Use pip with CPU-optimized packages
+      - Install requirements:
+        `pip install --no-cache-dir -r requirements.txt`
+      - Generate comprehensive requirements:
+        `pip freeze > environment_requirements.txt`
+      - Create project directories:
+        `mkdir -p plots models results csvs`
+
+   e. Performance Considerations
+      - Disable GPU-specific libraries
+      - Use CPU-optimized numpy/scipy
+      - Configure scikit-learn for multi-core processing
+      - Set environment variables for parallel processing
+
+5. COMPATIBILITY ADJUSTMENTS:
+   - Confirm x86_64 package compatibility
+   - Verify Ubuntu 22.04 LTS support
+   - Test with Docker 28.3.2
+   - Ensure BuildKit compatibility
+   - Use multi-stage Dockerfile for efficient builds
+
+6. VERIFICATION STEPS:
+   - Run system compatibility checks
+   - Validate multi-core processing
+   - Test memory-intensive operations
+   - Verify library imports
+   - Confirm CPU-only machine learning workflows
+
+Compatibility Notes:
+- Optimized for x86_64 architecture
+- Ubuntu 22.04 LTS base image
+- Python 3.8 as primary version
+- CPU-only processing configuration
+- Leveraging 96-core, 187.5GB RAM environment
+
+Potential Optimization Flags:
+- OPENBLAS_NUM_THREADS=96
+- MKL_NUM_THREADS=96
+- OMP_NUM_THREADS=96

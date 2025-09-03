@@ -1,0 +1,94 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust Programming Language (rustc & cargo)
+     * Version: 1.70 or higher (confirmed x86_64 compatibility)
+     * Nightly version support for documentation
+     * Specific nightly version: nightly-2025-01-25
+     * Download from: https://rustup.rs/
+   - Git (for version control)
+     * Latest stable version compatible with x86_64
+   - Visual Studio Code or Rust-compatible IDE
+   - Docker Configuration
+     * Base Image: rust:slim-bullseye (optimized for x86_64)
+     * Platform: linux/amd64
+     * Multi-stage build support
+     * Use .dockerignore for optimization
+   - Development Tools
+     * Standard x86_64 Linux development packages
+     * Build-essential
+     * pkg-config
+     * libssl-dev
+
+2. SYSTEM REQUIREMENTS ADJUSTMENTS:
+   - Minimum RAM: 8GB (recommended for Rust compilation)
+   - Storage: 20GB free space
+   - CPU: x86_64 architecture optimization
+   - Operating System: Ubuntu 22.04 LTS or Debian-based Linux
+
+3. TOOLCHAIN CONFIGURATION:
+   - Rust Toolchain
+     * Target: x86_64-unknown-linux-gnu
+     * Use rustup for multi-toolchain management
+     * Configure nightly and stable channels
+   - Cross-Compilation
+     * Limit to x86_64 and compatible architectures
+     * Remove FreeBSD 32-bit support
+     * Focus on 64-bit Linux and compatible platforms
+
+4. DOCKER OPTIMIZATION:
+   - Dockerfile Recommendations:
+     * Use rust:slim-bullseye as base image
+     * Implement multi-stage build
+     * Minimize layer count
+     * Use BuildKit features
+     * Optimize caching strategies
+   - Container Configuration
+     * Platform: linux/amd64
+     * No GPU-specific configurations needed
+
+5. DEVELOPMENT ENVIRONMENT:
+   - Working Directory: /home/cc/EnvGym/data-gpt-4.1mini/tokio-rs_tokio
+   - Path Configurations
+     * Ensure consistent path handling
+     * Use absolute paths in configurations
+     * Set up proper volume mounting for Docker
+
+6. DEPENDENCY MANAGEMENT:
+   - Keep all previously listed dependencies
+   - Prioritize x86_64 compatible versions
+   - Remove architecture-specific dependencies
+   - Validate package compatibility with x86_64
+
+7. PERFORMANCE CONSIDERATIONS:
+   - Use cargo build --release for optimized builds
+   - Enable LTO (Link Time Optimization)
+   - Configure CPU-specific optimizations
+   - Leverage x86_64 instruction set features
+
+8. TESTING STRATEGY:
+   - Focus on x86_64 Linux testing
+   - Use GitHub Actions for CI/CD
+   - Implement comprehensive test matrix
+   - Validate cross-platform compatibility
+
+9. DOCUMENTATION:
+   - Generate documentation for x86_64 platform
+   - Use rustdoc with nightly toolchain
+   - Ensure cross-platform documentation generation
+
+10. ADDITIONAL RECOMMENDATIONS:
+    - Use cargo-audit for security checks
+    - Implement comprehensive error handling
+    - Create detailed documentation
+    - Use semantic versioning
+
+Compatibility Summary:
+- Primary Platform: x86_64 Linux
+- Recommended Base Image: rust:slim-bullseye
+- Docker Support: Full compatibility
+- Architecture Optimization: x86_64
+- Minimal External Dependencies
+- Streamlined Build Process
+
+The plan maintains the original comprehensive approach while optimizing for the specific x86_64 Linux environment, ensuring efficient development, testing, and deployment strategies.

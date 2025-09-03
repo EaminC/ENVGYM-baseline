@@ -1,0 +1,97 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python (3.9 - 3.11, due to x86_64 architecture and Ubuntu 22.04 compatibility)
+   - pip (latest version)
+   - git
+   - NO CUDA Toolkit (No GPU detected)
+   - PyTorch (CPU-only version >=2.1,<3)
+   - Pre-commit (v4.1.0+)
+   - Virtual environment: venv (recommended due to slim system)
+   - Development tools:
+     - ruff (0.8.6)
+     - mypy (1.17.1)
+     - pytest
+     - black
+     - mkdocs
+     - onnx
+
+2. DOCKER CONSIDERATIONS:
+   - Use multi-stage build to minimize image size
+   - Leverage large memory (187.5GB) for complex builds
+   - Optimize for x86_64 architecture
+   - Use ubuntu:22.04 or python:3.8-slim-bullseye base image
+   - Ensure BuildKit compatibility
+
+3. ENVIRONMENT CONFIGURATION:
+   - Create virtual environment in `/home/cc/EnvGym/data-gpt-4.1mini/TabPFN/venv`
+   - Set Python version to 3.10 (stable compromise)
+   - Configure CPU-only PyTorch installation
+   - Adjust paths to match x86_64 standard locations
+
+4. MODIFIED INSTALLATION STEPS:
+   ```bash
+   # Create virtual environment
+   python3.10 -m venv /home/cc/EnvGym/data-gpt-4.1mini/TabPFN/venv
+   source /home/cc/EnvGym/data-gpt-4.1mini/TabPFN/venv/bin/activate
+
+   # Install CPU-only PyTorch
+   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+   # Install other dependencies with CPU optimization
+   pip install -r requirements.txt
+   ```
+
+5. TEST MODIFICATIONS:
+   - Remove GPU-specific performance tests
+   - Add more comprehensive CPU performance benchmarks
+   - Ensure cross-compilation compatibility for x86_64
+
+6. DOCKER OPTIMIZATION:
+   ```dockerfile
+   # Multi-stage build
+   FROM ubuntu:22.04 AS builder
+   
+   # Minimize layers, use efficient package management
+   RUN apt-get update && apt-get install -y \
+       python3.10 \
+       python3-pip \
+       python3-venv \
+       && rm -rf /var/lib/apt/lists/*
+
+   # Create minimal, efficient environment
+   WORKDIR /app
+   COPY . /app
+   RUN python3.10 -m venv /opt/venv
+   ENV PATH="/opt/venv/bin:$PATH"
+   
+   # Install dependencies efficiently
+   RUN pip install --no-cache-dir -r requirements.txt
+   ```
+
+7. PERFORMANCE CONSIDERATIONS:
+   - Leverage large RAM (187.5GB) for in-memory processing
+   - Configure memory-efficient data loading
+   - Use multiprocessing for CPU-bound tasks
+   - Implement intelligent caching strategies
+
+8. CONSISTENCY TESTING:
+   - Focus on x86_64 platform compatibility
+   - Create platform-specific reference predictions
+   - Validate cross-version Python compatibility (3.9-3.11)
+
+Key Adjustments:
+- Removed GPU-specific configurations
+- Optimized for CPU performance
+- Tailored to x86_64 architecture
+- Minimized Docker image complexity
+- Leveraged available system memory
+- Ensured flexible, lightweight setup
+
+Verification Method:
+- Successful CPU-only environment setup
+- All tests passing on x86_64
+- Minimal Docker image size
+- Efficient memory utilization
+- No unnecessary dependencies
+- Cross-version Python compatibility

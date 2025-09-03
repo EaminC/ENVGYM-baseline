@@ -1,0 +1,80 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust programming language (version 1.64 minimum, recommended 1.77.2 for x86_64)
+   - Cargo (Rust's package manager)
+   - make
+   - git
+   - rustfmt (for code formatting)
+   - Cross-compilation targets:
+     * x86_64-unknown-linux-gnu (primary target)
+     * x86_64-unknown-linux-musl (for slim builds)
+
+2. HARDWARE-SPECIFIC MODIFICATIONS:
+   - Leverage large memory (187.5GB) for:
+     * Parallel compilation
+     * Comprehensive testing
+     * Caching build artifacts
+   - Use multi-stage Docker builds
+   - Optimize for x86_64 architecture
+   - Prefer slim/alpine-based images for smaller footprint
+
+3. ENVIRONMENT CONFIGURATION:
+   - Dockerfile Recommendations:
+     * Base image: ubuntu:22.04-slim or debian:bullseye-slim
+     * Use multi-stage builds
+     * Implement BuildKit cache mounts
+     * Set explicit platform: linux/amd64
+
+4. DEVELOPMENT DEPENDENCIES:
+   - Prioritize x86_64 native packages
+   - Install development tools:
+     * build-essential
+     * pkg-config
+     * libssl-dev
+   - Rust toolchain configuration:
+     * Target: x86_64-unknown-linux-gnu
+     * Default profile: release
+     * Use rustup for toolchain management
+
+5. BUILD AND TEST STRATEGY:
+   - Leverage large memory for:
+     * Parallel test execution
+     * Comprehensive cross-compilation tests
+     * Performance benchmarking
+   - Optimization flags:
+     * -C target-cpu=native
+     * -C lto=thin
+     * Enable CPU-specific optimizations
+
+6. CROSS-COMPILATION ADJUSTMENTS:
+   - Focus on x86_64 targets
+   - Remove ARM-specific configurations
+   - Validate x86_64 GNU and MUSL builds
+
+7. DOCKER BUILD CONSIDERATIONS:
+   - Use Docker 28.3.2 BuildKit features
+   - Implement multi-stage builds
+   - Use cache mounts for dependency management
+   - Minimize image size with slim variants
+
+8. PATHS AND DIRECTORIES:
+   - Confirm working directory: /home/cc/EnvGym/data-gpt-4.1mini/sharkdp_fd
+   - Use consistent, absolute paths
+   - Ensure compatibility with Ubuntu/Debian filesystem hierarchy
+
+9. PERFORMANCE OPTIMIZATIONS:
+   - Utilize full RAM for:
+     * Compilation caching
+     * Parallel build processes
+     * Comprehensive testing
+   - Configure Cargo for optimal x86_64 performance
+   - Enable link-time optimization (LTO)
+
+10. SECURITY AND COMPATIBILITY:
+    - Use official Rust images as base
+    - Implement comprehensive security scanning
+    - Validate package integrity
+    - Ensure compatibility with Ubuntu 22.04 LTS ecosystem
+
+The rest of the original plan remains largely unchanged, with focus on x86_64 architecture, leveraging large memory, and using multi-stage Docker builds with slim images.

@@ -1,0 +1,86 @@
+=== Docker Execution Log - 20250902_033724 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756784206
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 2.38kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/13] FROM docker.io/library/ubuntu:22.04@sha256:5e14404dbc9df30fef8460020b99a3c0034241283912189fd4650e446d8d6c92
+#4 DONE 0.0s
+
+#5 [ 3/13] RUN apt-get update && apt-get install -y     build-essential     curl     git     wget     software-properties-common     python3     python3-pip     libssl-dev     pkg-config     zlib1g-dev     ca-certificates     && apt-get clean     && rm -rf /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [ 4/13] RUN wget https://golang.org/dl/go1.20.14.linux-amd64.tar.gz &&     tar -C /usr/local -xzf go1.20.14.linux-amd64.tar.gz &&     rm go1.20.14.linux-amd64.tar.gz
+#6 CACHED
+
+#7 [ 5/13] RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain 1.88.0
+#7 CACHED
+
+#8 [ 7/13] RUN pip3 install tabulate
+#8 CACHED
+
+#9 [ 8/13] RUN apt-get update && apt-get install -y z3     && apt-get clean     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [10/13] RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" &&     chmod +x kubectl &&     mv kubectl /usr/local/bin/
+#10 CACHED
+
+#11 [ 2/13] WORKDIR /anvil
+#11 CACHED
+
+#12 [ 6/13] RUN cargo install cargo-watch cargo-verify
+#12 CACHED
+
+#13 [ 9/13] RUN curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64 &&     chmod +x ./kind &&     mv ./kind /usr/local/bin/kind
+#13 CACHED
+
+#14 [11/13] RUN mkdir -p /anvil/verus &&     cd /anvil/verus &&     git clone https://github.com/verus-lang/verus.git . 2>&1 | tee git_clone.log &&     git fetch origin 3b6b805ac86cd6640d59468341055c7fa14cff07 2>&1 | tee git_fetch.log &&     git checkout 3b6b805ac86cd6640d59468341055c7fa14cff07 2>&1 | tee git_checkout.log &&     cargo build --release 2>&1 | tee cargo_build.log
+#14 CACHED
+
+#15 [12/13] RUN mkdir -p /anvil/repository &&     cd /anvil/repository &&     (for i in 1 2 3; do         git clone https://github.com/microsoft/anvil.git . && break ||         echo "Clone attempt $i failed, retrying..." &&         sleep 5;     done) 2>&1 | tee git_clone_log.txt
+#15 0.187 fatal: destination path '.' already exists and is not an empty directory.
+#15 0.188 Clone attempt 1 failed, retrying...
+#15 5.189 fatal: destination path '.' already exists and is not an empty directory.
+#15 5.189 Clone attempt 2 failed, retrying...
+#15 10.19 fatal: destination path '.' already exists and is not an empty directory.
+#15 10.19 Clone attempt 3 failed, retrying...
+#15 DONE 15.2s
+
+#16 [13/13] WORKDIR /anvil/repository
+#16 DONE 0.0s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 21.6s done
+#17 writing image sha256:f4308292317d3b9945aaa4b5aac8e0ba98a68334fafcedfb1974d53a3f2989eb done
+#17 naming to docker.io/library/envgym_test_1756784206 done
+#17 DONE 21.6s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

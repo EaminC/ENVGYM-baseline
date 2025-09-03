@@ -1,0 +1,94 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 2.7 (compatible with x86_64 architecture)
+   - Python pip package manager (for x86_64)
+   - Java Development Kit (Oracle Java 8, x86_64 version)
+   - System utilities:
+     * bc (basic calculator)
+     * antlr4
+     * wget
+     * git
+   - Python libraries (x86_64 compatible):
+     * antlr4-python2-runtime
+     * six
+     * astunparse
+     * ast
+     * pystan
+     * edward
+     * pyro-ppl (version 0.2.1, CPU-specific)
+     * tensorflow (version 1.5.0, CPU build)
+     * pandas
+     * torch (version 0.4.0, CPU-specific wheel for x86_64)
+   - Additional dependencies:
+     * Stan probabilistic programming framework (x86_64 build)
+     * Edward (TensorFlow-based probabilistic library)
+     * Pyro (PyTorch-based probabilistic programming language)
+     * Venture probabilistic programming language
+     * Psi probabilistic programming framework
+
+2. MODIFICATIONS FOR HARDWARE:
+   - Dockerfile Considerations:
+     * Use ubuntu:22.04 as base image
+     * Multi-stage build to optimize image size
+     * Leverage large memory (187.5GB) for complex compilations
+     * Ensure x86_64 architecture compatibility
+     * No NVIDIA GPU support - use CPU-only configurations
+
+3. STORAGE AND PATH ADJUSTMENTS:
+   - Working Directory: /home/cc/EnvGym/data-gpt-4.1mini/probfuzz
+   - Ensure sufficient disk space for:
+     * Python 2.7 installation
+     * Java Development Kit
+     * Multiple probabilistic programming libraries
+   - Create dedicated volumes for:
+     * Library installations
+     * Temporary compilation spaces
+     * Persistent configuration storage
+
+4. ENVIRONMENT CONFIGURATION:
+   - Docker Build Optimizations:
+     * Use BuildKit for efficient layer caching
+     * Minimize image size
+     * Optimize for x86_64 CPU instructions
+   - Memory Allocation:
+     * Leverage 187.5GB RAM for:
+       - Parallel library compilations
+       - Complex probabilistic model testing
+       - Extensive test suite execution
+
+5. COMPATIBILITY CHECKLIST:
+   - Verify x86_64 package compatibility
+   - Confirm Ubuntu 22.04 LTS support
+   - Test CPU-only library configurations
+   - Validate Python 2.7 runtime on modern Ubuntu
+   - Ensure no ARM-specific dependencies
+
+6. RECOMMENDED DOCKER BUILD STRATEGY:
+   ```dockerfile
+   FROM ubuntu:22.04 AS base
+   # x86_64 specific configurations
+   # Multi-stage build for optimization
+   # CPU-only library installations
+   ```
+
+7. KEY ADJUSTMENTS:
+   - Remove GPU-specific configurations
+   - Optimize for x86_64 CPU architecture
+   - Leverage large memory capabilities
+   - Ensure Ubuntu 22.04 compatibility
+   - Use Docker BuildKit features
+   - Focus on CPU-based probabilistic computing
+
+8. TESTING PRIORITIES:
+   - x86_64 architecture compatibility
+   - CPU-only library performance
+   - Ubuntu 22.04 system integration
+   - Python 2.7 runtime validation
+   - Probabilistic programming framework tests
+
+Verification Method:
+- Successful Docker image build
+- Complete library installations
+- Comprehensive test suite execution
+- No architecture-related compatibility issues

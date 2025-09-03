@@ -1,0 +1,88 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.7.x (compatible with x86_64 architecture)
+   - pip3 (package manager)
+   - Git (version control)
+   - NO CUDA Toolkit (CPU-only configuration)
+   - Confirmed Dependencies:
+     * torch==1.2.0 (CPU version)
+     * torchvision==0.4.0 (CPU version)
+     * matplotlib==3.1.1
+     * numpy==1.17.2
+     * pandas==0.25.1
+     * scipy==1.3.1
+     * seaborn==0.9.0
+     * tensorboardX==1.8
+     * tqdm==4.36.1
+   - Additional Tools:
+     * Pillow (image processing)
+     * protobuf
+     * Virtual environment: venv recommended
+
+2. FILES TO CREATE:
+   - Virtual Environment: 
+     * `venv/` directory in /home/cc/EnvGym/data-gpt-4.1mini/Lottory
+   - Configuration Files:
+     * `.env` for environment variables
+     * `.gitignore` (exclude `dumps/`, `saves/`, `plots/`)
+     * `requirements.txt` (CPU-specific)
+   - Development Setup:
+     * `setup.py` for package installation
+     * Dockerfile for containerization
+
+3. HARDWARE-SPECIFIC MODIFICATIONS:
+   - Use multi-stage Docker build
+   - Optimize for x86_64 architecture
+   - Minimize image size
+   - Use Ubuntu 22.04 LTS slim base image
+   - Ensure CPU-only PyTorch installation
+   - Allocate minimal RAM (4-8GB recommended)
+
+4. ADJUSTED TODO LIST:
+   a. Prepare Development Environment
+      - Install Python 3.7 via pyenv or system package
+      - Create virtual environment in project directory
+      - Use `python3.7 -m venv venv`
+      - Activate virtual environment
+   
+   b. Install Dependencies
+      - Install CPU-only torch variants
+      - Run `pip install torch==1.2.0+cpu torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html`
+      - Install other requirements via `pip3 install -r requirements.txt`
+   
+   c. Docker Configuration
+      - Create multi-stage Dockerfile
+      - Use `--platform linux/amd64`
+      - Leverage BuildKit caching
+      - Minimize layer count
+   
+   d. Repository Setup
+      - Clone repository
+      - Initialize git submodules
+      - Set up remote tracking
+   
+   e. Configuration Verification
+      - Verify CPU-only PyTorch installation
+      - Test library imports
+      - Validate dataset download paths
+   
+   f. Initial Test Run
+      - Execute `python3 main.py` with CPU-specific parameters
+      - Verify basic functionality
+      - Check error logs
+      - Test data processing capabilities
+
+5. STORAGE AND PERFORMANCE CONSIDERATIONS:
+   - Minimum 10GB free disk space
+   - Allocate swap space if RAM is limited
+   - Use lightweight base image
+   - Optimize pip and package installations
+
+Verification Method:
+- Successful CPU-only dependency installation
+- No errors during initial execution
+- Correct model and dataset loading
+- Performance metrics generation on CPU
+- Minimal resource consumption
+- Successful Docker image build

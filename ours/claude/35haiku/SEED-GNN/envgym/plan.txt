@@ -1,0 +1,104 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.8+ (Confirmed compatibility with x86_64)
+   - PyTorch with CPU-only support
+   - pip package manager
+   - Git for repository cloning
+   - torch-geometric with CPU support
+   - torchvision
+   - torchaudio
+   - ogb
+   - scipy
+   - pandas
+   - numpy
+   - Additional lightweight libraries for data processing
+
+2. FILES TO CREATE:
+   [Remains the same as original plan]
+
+3. NECESSARY TEST CASES:
+   [Remains the same as original plan, with additional CPU-specific compatibility tests]
+
+4. COMPLETE TODO LIST:
+
+   a. System Preparation
+      - Verify Python 3.8+ installation
+      - Install CPU-compatible machine learning libraries
+      - Set up timezone library (zoneinfo)
+      - Configure logging infrastructure
+      - Confirm constants.py configuration
+
+   b. Repository Setup
+      - Clone repository 
+      - Navigate to /home/cc/EnvGym/data-gpt-4.1mini/SEED-GNN
+      - Create necessary configuration directories
+      - Confirm path compatibility
+
+   c. Virtual Environment Configuration
+      - Create Python virtual environment
+      - Use python:3.8-slim-bullseye as base image
+      - Activate virtual environment
+      - Verify Python and pip versions
+
+   d. Dependency Installation
+      ```
+      pip install torch==2.0.0 --extra-index-url https://download.pytorch.org/whl/cpu
+      pip install torch-geometric==2.3.1
+      pip install torchvision==0.15.1 --extra-index-url https://download.pytorch.org/whl/cpu
+      pip install torchaudio==2.0.1 --extra-index-url https://download.pytorch.org/whl/cpu
+      pip install numpy==1.24.4
+      pip install pandas==2.0.3
+      pip install scipy==1.10.1
+      pip install ogb==1.3.6
+      ```
+
+   e. Docker Configuration
+      - Use multi-stage build
+      - Minimize image layers
+      - Create .dockerignore file
+      - Optimize build context
+      - Use BuildKit for efficient caching
+
+   f. Configuration Files Preparation
+      [Remains similar to original plan]
+
+   g. Dataset Preparation
+      - Prioritize lightweight datasets
+      - Implement efficient data loading for CPU
+      - Optimize memory usage
+      - Use sparse tensor operations
+
+   h. Performance Optimization
+      - Implement CPU-specific performance tuning
+      - Use numpy and scipy for numerical operations
+      - Minimize memory-intensive computations
+      - Implement efficient data preprocessing
+
+   i. Final Validation
+      ```
+      python main.py --task pretrain --dataset cora --device cpu
+      python main.py --task edit --dataset amazoncomputers --device cpu
+      ```
+
+   j. Troubleshooting
+      - Monitor CPU memory usage
+      - Optimize computational graphs
+      - Implement fallback mechanisms for complex operations
+      - Ensure graceful performance on CPU-only environment
+
+Additional Considerations:
+- Use lightweight base image (python:3.8-slim-bullseye)
+- Configure for x86_64 architecture
+- Optimize for limited RAM scenarios
+- Implement CPU-friendly data processing techniques
+
+Recommended Docker Build Strategy:
+```dockerfile
+FROM python:3.8-slim-bullseye as builder
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+CMD ["python", "main.py"]
+```

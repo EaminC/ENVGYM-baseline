@@ -1,0 +1,84 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   [Unchanged, but with specific version considerations for x86_64 architecture]
+   - Node.js (v14+ LTS version, x86_64 compatible)
+   - npm (bundled with Node.js)
+   - Git (x86_64 version)
+   - VSCode (x86_64 binary)
+   - Chrome/Firefox (x86_64 builds)
+
+2. DOCKER CONFIGURATION:
+   - Base Image: `node:alpine` (lightweight, x86_64 compatible)
+   - Multi-stage build recommended
+   - Create `.dockerignore` to optimize build context
+   - Dockerfile optimizations:
+     * Use `--platform=linux/amd64`
+     * Minimize layer count
+     * Use Alpine Linux for smaller image size
+     * Leverage BuildKit features
+
+3. ENVIRONMENT ADJUSTMENTS:
+   - Working Directory: `/home/cc/EnvGym/data-gpt-4.1mini/iamkun_dayjs`
+   - Ensure all paths are absolute
+   - Use volume mounting for persistent data
+   - Configure CPU-based testing (no GPU acceleration)
+
+4. PERFORMANCE CONSIDERATIONS:
+   - Use lightweight testing frameworks
+   - Optimize Rollup and Babel configurations for x86_64
+   - Disable GPU-specific plugins
+   - Configure memory limits in Docker (recommend 2-4GB)
+
+5. TOOLCHAIN UPDATES:
+   - Verify x86_64 compatibility of:
+     * Karma
+     * Rollup
+     * TypeScript
+     * Babel
+     * ESLint
+   - Use npm or Yarn for package management
+   - Prefer Alpine-compatible global installations
+
+6. TESTING STRATEGY:
+   - Focus on CPU-based cross-browser testing
+   - Use Sauce Labs with x86_64 browser configurations
+   - Implement lightweight CI/CD pipeline
+   - Optimize test matrix for x86_64 architecture
+
+7. DOCUMENTATION:
+   - Ensure documentation tools are x86_64 compatible
+   - Use static site generators optimized for performance
+   - Configure day.js.org deployment for x86_64 environments
+
+8. SECURITY AND OPTIMIZATION:
+   - Use `node:alpine` slim images
+   - Implement multi-stage Docker builds
+   - Minimize container image size
+   - Use `.dockerignore` to exclude unnecessary files
+   - Configure non-root user in Docker container
+
+9. CONTINUOUS INTEGRATION:
+   - Travis CI configuration updated for x86_64
+   - Leverage Docker BuildKit features
+   - Optimize CI/CD pipeline for x86_64 architecture
+
+10. STORAGE AND PERFORMANCE:
+    - Allocate sufficient disk space (10-20GB recommended)
+    - Use Docker volume management
+    - Configure caching strategies for npm/Yarn
+    - Implement efficient build caching
+
+KEY MODIFICATIONS:
+- Switched to `node:alpine` base image
+- Optimized for x86_64 architecture
+- Lightweight, minimalist approach
+- Enhanced Docker configuration
+- CPU-focused testing strategy
+- Reduced image and build complexity
+
+Verification Method:
+- `docker build --platform=linux/amd64 .`
+- `npm run test:ci`
+- `npm run docs:build`
+- Comprehensive architecture compatibility checks

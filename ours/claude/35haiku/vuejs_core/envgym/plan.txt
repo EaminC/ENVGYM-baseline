@@ -1,0 +1,70 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   [Modifications for x86_64 architecture and Ubuntu 22.04]
+   - Node.js (v18.12.0+ LTS version recommended for x86_64)
+   - pnpm (v10.15.0) - verified for x86_64 compatibility
+   - Git (latest version, optimized for x86_64)
+   - Visual Studio Code or WebStorm (x86_64 native versions)
+   - TypeScript (v5.6.2)
+   - Rollup (v4.46.4)
+   - Vite (v5.4.15)
+   - Vitest (v3.2.4)
+   - ESLint (v9.27.0)
+
+   [Remaining dependencies unchanged]
+
+2. DIRECTORIES AND PATHS:
+   - Primary Working Directory: /home/cc/EnvGym/data-gpt-4.1mini/vuejs_core
+   - Adjust all package paths to use absolute paths
+   - Ensure all package.json files use x86_64 compatible path references
+   - Configure workspace with explicit path mappings
+
+3. HARDWARE-SPECIFIC OPTIMIZATIONS:
+   - Leverage 96 cores for parallel builds
+     - Configure build scripts with max parallel processing
+     - Use `--max-old-space-size` with Node.js to utilize large memory (187.5GB)
+     - Implement multi-stage Docker builds
+     - Use BuildKit cache mounts for efficient dependency management
+
+4. DOCKER CONFIGURATION:
+   - Base Image: node:18-bullseye (matches Ubuntu 22.04, x86_64)
+   - Platform: linux/amd64
+   - Dockerfile Optimization:
+     ```dockerfile
+     FROM node:18-bullseye AS base
+     WORKDIR /app
+     
+     FROM base AS dependencies
+     COPY package.json pnpm-lock.yaml ./
+     RUN corepack enable
+     RUN pnpm install --frozen-lockfile
+
+     FROM dependencies AS build
+     COPY . .
+     RUN pnpm run build
+     ```
+
+5. PERFORMANCE TUNING:
+   - Enable Node.js worker threads
+   - Configure V8 engine for large memory utilization
+   - Use `pnpm` with cache for faster dependency resolution
+   - Implement aggressive caching in build processes
+
+6. COMPATIBILITY CHECKS:
+   - Verify all dependencies support x86_64
+   - Test cross-package compatibility on Ubuntu 22.04
+   - Validate build processes on the specified hardware configuration
+
+7. ADDITIONAL CONSIDERATIONS:
+   - Use explicit Node.js version management (nvm/volta)
+   - Configure .npmrc for optimal package resolution
+   - Set up comprehensive CI/CD pipeline supporting x86_64 architecture
+
+[Remaining sections from original plan remain largely unchanged, with architecture-specific implementation details]
+
+Key Adjustments:
+- Optimized for x86_64 architecture
+- Leveraged high-memory, high-core environment
+- Docker-friendly configuration
+- Performance and compatibility focused

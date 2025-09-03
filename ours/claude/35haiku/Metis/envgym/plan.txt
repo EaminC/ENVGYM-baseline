@@ -1,0 +1,106 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Ubuntu 22.04 Linux Distribution (matches hardware platform)
+   - Linux Kernel versions: 5.15.0, 6.2.12, 6.3.0 (optimized for x86_64)
+   - Git
+   - Python 3.8+ (verified for x86_64)
+   - GCC/G++ compiler (version 11.x with C++17 support)
+   - Make
+   - CMake (version 3.22+)
+   - FUSE libraries
+   - MTD utilities
+
+   Adjustments:
+   - Reduced kernel version list for storage efficiency
+   - Focused on stable, recent kernel versions
+   - Prioritized x86_64 compatible packages
+
+2. DEPENDENCY INSTALLATION STRATEGY:
+   - Use apt-get for efficient package management
+   - Leverage multi-stage Docker builds
+   - Minimize image size using .dockerignore
+   - Optimize build context for 58.2GB storage
+
+   Specific Package Groups:
+   - Core Development:
+     * build-essential
+     * cmake
+     * gcc
+     * g++
+     * make
+     * python3-pip
+
+   - System Libraries:
+     * libfuse-dev
+     * libnfs-dev
+     * libattr1-dev
+     * libacl1-dev
+     * libcap-dev
+     * libaio-dev
+     * librdmacm-dev
+     * libssl-dev
+     * zlib1g-dev
+
+   - Python Dependencies:
+     * numpy
+     * scipy
+     * matplotlib
+     * virtualenv
+
+3. STORAGE AND MEMORY OPTIMIZATION:
+   - Use lightweight verification tools
+   - Implement selective component installation
+   - Create slim Docker images
+   - Leverage 187.5GB RAM for compilation processes
+
+4. CONFIGURATION ADJUSTMENTS:
+   - Paths: Confirm all paths relative to /home/cc/EnvGym/data-gpt-4.1mini/Metis
+   - Use Docker volume mounts for persistent data
+   - Create .dockerignore to exclude unnecessary files
+   - Implement multi-stage builds to reduce final image size
+
+5. DEVELOPMENT ENVIRONMENT:
+   - Use Visual Studio Code Remote Containers
+   - Configure development extensions for x86_64
+   - Set up Python virtual environments
+   - Implement lightweight IDE configurations
+
+6. TESTING STRATEGY:
+   - Automated CI/CD pipeline
+   - Kernel compatibility tests
+   - Performance benchmarks
+   - Minimal resource consumption tests
+
+7. SECURITY CONSIDERATIONS:
+   - Use official Ubuntu base images
+   - Regular security updates
+   - Minimal exposed ports
+   - Non-root container execution
+
+8. PERFORMANCE TUNING:
+   - Use BuildKit for efficient caching
+   - Parallel compilation options
+   - Optimize compiler flags for x86_64
+   - Leverage large memory for compilation
+
+9. TOOLCHAIN VERSIONS:
+   - GCC: 11.x
+   - CMake: 3.22+
+   - Python: 3.8.10+
+   - Docker: 28.3.2
+
+10. RECOMMENDED DOCKER BUILD APPROACH:
+    - Multi-stage builds
+    - Use .dockerignore
+    - Minimize layer count
+    - Leverage build cache
+    - Create slim final image
+
+Key Adaptations:
+- Tailored for x86_64 architecture
+- Optimized for 58.2GB storage
+- Leveraged 187.5GB RAM
+- Focused on Ubuntu 22.04 ecosystem
+- Reduced unnecessary package installations
+- Implemented efficient build strategies

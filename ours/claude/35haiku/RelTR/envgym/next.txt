@@ -1,0 +1,5 @@
+current progress
+Docker build failed during conda environment creation and package installation. Dockerfile attempts to create a conda environment and install dependencies in multiple RUN steps, which is causing build complexity. Current implementation uses source and conda activate commands that are not compatible with Docker's layer-based build process.
+
+next step
+Refactor Dockerfile to use a single RUN step for conda environment creation and package installation. Replace shell sourcing and activation commands with conda run commands. Simplify dependency installation by consolidating pip install commands. Ensure all commands can be executed in a single layer to improve build reliability and reduce layer complexity.

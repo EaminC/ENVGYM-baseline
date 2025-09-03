@@ -1,0 +1,102 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Pony Programming Language Compiler (via ponyup)
+     * Nightly builds support
+     * Corral package manager
+   - Git (for source code management)
+   - Build tools:
+     * Clang (Ubuntu/Debian compatible version)
+     * GCC (version >= 9.0, optimized for x86_64)
+     * Make
+     * CMake (version 3.22 or higher)
+   - Programming Languages:
+     * Python 3.10+ (required for LLVM build)
+     * Python 3 pip
+   - Compiler and Development Dependencies:
+     * LLVM (with x86_64 target optimization)
+     * Google Test
+     * Google Benchmark
+     * binutils-gold
+     * libatomic
+     * libstdc++-static
+     * zlib-dev
+     * Ubuntu/Debian build base
+   - Platform-specific requirements:
+     * Linux: 
+       - Ubuntu 22.04 specific packages
+       - build-essential
+       - linux-headers
+       - coreutils
+   - Optional Development Tools:
+     * Valgrind
+     * Address/Thread/Undefined Behavior Sanitizers
+     * Coverage tools
+     * GDB
+     * LLDB
+   - Docker (for containerized development)
+     * Docker Engine 28.3.2+
+     * BuildKit support
+     * Docker Compose
+   - Recommended IDEs/Editors with Pony support:
+     * Visual Studio Code
+     * Sublime Text
+
+2. MODIFICATIONS FOR x86_64 ARCHITECTURE:
+   - Optimize build configurations for 96 logical cores
+   - Use multi-stage Docker builds
+   - Adjust compilation flags for x86_64 architecture
+   - Configure parallel compilation strategies
+   - Implement core-aware build processes
+
+3. DOCKER CONFIGURATION:
+   - Create multi-stage Dockerfile
+   - Optimize build caching
+   - Use BuildKit features
+   - Implement multi-arch support for x86_64
+   - Configure non-root user with sudo access
+
+4. TEST CASE PRIORITIES:
+   - Focus on x86_64 architecture validation
+   - Optimize for 96-core parallel testing
+   - Implement distributed testing strategies
+   - Validate Ubuntu 22.04 LTS compatibility
+   - Test with high-concurrency scenarios
+
+5. PERFORMANCE OPTIMIZATION:
+   - Configure build with -j$(nproc) for max core utilization
+   - Implement ccache for faster rebuilds
+   - Use link-time optimization (LTO)
+   - Configure memory-aware compilation flags
+   - Implement distributed compilation support
+
+6. STORAGE AND MEMORY CONSIDERATIONS:
+   - Allocate minimum 32GB RAM for compilation
+   - Use multi-stage builds to minimize final image size
+   - Implement efficient caching strategies
+   - Configure swap space if needed
+   - Optimize Docker layer caching
+
+7. DEVELOPMENT ENVIRONMENT:
+   - Use Ubuntu 22.04 as base development image
+   - Configure system-wide compiler settings
+   - Set up development user with sudo privileges
+   - Implement secure, reproducible build environment
+   - Create standardized development container
+
+8. VERIFICATION METHOD:
+   - Validate x86_64 specific build configurations
+   - Test parallel compilation on 96 cores
+   - Verify Docker build with BuildKit
+   - Run comprehensive test suite with high concurrency
+   - Validate Ubuntu 22.04 compatibility
+   - Test multi-stage build process
+   - Confirm non-root user functionality
+
+Key Adjustments:
+- Optimized for x86_64 architecture
+- Ubuntu 22.04 LTS focus
+- 96-core compilation support
+- BuildKit and multi-stage Docker builds
+- Enhanced performance configurations
+- Simplified dependency management

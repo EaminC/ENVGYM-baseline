@@ -1,0 +1,79 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Docker (Latest stable version compatible with x86_64)
+   - Golang (Version 1.20 or higher, x86_64 build)
+   - Python (Version 3.10 or higher, preferably 3.12, x86_64 package)
+   - Kind (v0.20.0, x86_64 binary)
+   - kubectl (Latest stable version, x86_64 build)
+   - [Optional] Helm (Latest stable version)
+   - pip-tools
+   - pre-commit
+   - ansible-core (Version 2.17.5+)
+   - Jinja2 (Version 3.1.4+)
+   - CloudLab Account
+   - xmlstarlet (for CloudLab profile configuration)
+   - SSH Key Generation Tools
+   - gocovmerge (for code coverage merging)
+   - go tools cover (for code coverage analysis)
+
+   [Rest of dependencies remain the same]
+
+2. HARDWARE-SPECIFIC MODIFICATIONS:
+   - Leverage 96 logical cores for parallel builds and testing
+   - Optimize Docker builds for x86_64 architecture
+   - Configure build processes to utilize large memory (187.5GB)
+   - Implement storage-efficient build strategies
+   - Use --platform linux/amd64 for container builds
+   - Configure Docker BuildKit for efficient multi-stage builds
+
+3. STORAGE OPTIMIZATION:
+   - Implement aggressive cache cleaning in Docker builds
+   - Use multi-stage builds to minimize final image size
+   - Configure temporary build directories on larger partitions
+   - Implement automated cleanup scripts for build artifacts
+   - Set up disk usage monitoring in build scripts
+
+4. DEVELOPMENT ENVIRONMENT PATH ADJUSTMENTS:
+   - Base working directory: /home/cc/EnvGym/data-gpt-4.1mini/acto
+   - Ensure all script paths are relative to this base directory
+   - Configure environment variables to reflect actual paths
+   - Update all script references to use absolute paths
+   - Create symlinks if necessary for tool accessibility
+
+5. SYSTEM CONFIGURATION:
+   - Configure inotify limits to match high-performance environment
+   - Set up Docker daemon to utilize multiple cores
+   - Optimize Python and Go runtime settings for 96-core system
+   - Configure memory allocation for Kubernetes and Kind clusters
+   - Set up swap space management for complex builds
+
+6. SECURITY AND ACCESS:
+   - Generate SSH keys with strong encryption
+   - Configure SSH config for CloudLab access
+   - Set up secure, performance-optimized SSH connections
+   - Implement key-based authentication
+   - Configure firewall rules for development environment
+
+7. PERFORMANCE TUNING:
+   - Use parallel execution for pip and go package installations
+   - Configure make and build tools for multi-core processing
+   - Set up distributed caching for build artifacts
+   - Implement concurrent testing strategies
+   - Optimize CI/CD pipeline for high-core-count environment
+
+8. COMPATIBILITY VERIFICATION:
+   - Test all tools on x86_64 architecture
+   - Verify cross-compilation support
+   - Check binary compatibility with Ubuntu 22.04 LTS
+   - Validate tool versions against system capabilities
+   - Perform comprehensive environment compatibility tests
+
+9. ADDITIONAL RECOMMENDATIONS:
+   - Use Docker BuildKit for efficient builds
+   - Implement aggressive caching strategies
+   - Configure Docker to use overlay2 storage driver
+   - Set up container registry for internal artifact storage
+   - Create development container with pre-configured environment
+
+The rest of the original plan remains substantially unchanged, with these architectural and performance-specific modifications tailored to the x86_64 high-performance environment with 96 cores and 187.5GB RAM.
