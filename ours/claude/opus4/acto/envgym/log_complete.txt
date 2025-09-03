@@ -1,0 +1,449 @@
+=== Docker Execution Log - 20250902_140740 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756821989
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 4.02kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/30] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [ 4/30] RUN wget https://go.dev/dl/go1.21.5.linux-amd64.tar.gz &&     tar -C /usr/local -xzf go1.21.5.linux-amd64.tar.gz &&     rm go1.21.5.linux-amd64.tar.gz
+#5 CACHED
+
+#6 [ 5/30] RUN mkdir -p /go/bin /go/src /go/pkg
+#6 CACHED
+
+#7 [ 9/30] RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+#7 CACHED
+
+#8 [ 8/30] RUN curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64 &&     chmod +x ./kind &&     mv ./kind /usr/local/bin/kind
+#8 CACHED
+
+#9 [ 2/30] RUN apt-get update && apt-get install -y     software-properties-common     && add-apt-repository ppa:deadsnakes/ppa     && apt-get update && apt-get install -y     build-essential     gcc     g++     make     git     curl     wget     ssh     xmlstarlet     jq     python3.10     python3.10-dev     python3.10-venv     python3.10-distutils     python3-pip     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [ 6/30] RUN go version &&     go env -w GO111MODULE=on &&     go env -w GOPROXY=https://proxy.golang.org,direct
+#10 CACHED
+
+#11 [ 3/30] RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1 &&     update-alternatives --set python3 /usr/bin/python3.10
+#11 CACHED
+
+#12 [ 7/30] RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" &&     chmod +x kubectl &&     mv kubectl /usr/local/bin/
+#12 CACHED
+
+#13 [10/30] RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash &&     mv kustomize /usr/local/bin/
+#13 CACHED
+
+#14 [11/30] RUN curl https://bootstrap.pypa.io/get-pip.py | python3.10
+#14 0.235   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+#14 0.235                                  Dload  Upload   Total   Spent    Left  Speed
+#14 0.235 
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+ 17 2098k   17  368k    0     0  5111k      0 --:--:-- --:--:-- --:--:-- 5041k
+100 2098k  100 2098k    0     0  8967k      0 --:--:-- --:--:-- --:--:-- 8929k
+#14 1.708 Collecting pip
+#14 1.759   Downloading pip-25.2-py3-none-any.whl.metadata (4.7 kB)
+#14 1.767 Downloading pip-25.2-py3-none-any.whl (1.8 MB)
+#14 1.860    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 20.5 MB/s  0:00:00
+#14 1.878 Installing collected packages: pip
+#14 1.878   Attempting uninstall: pip
+#14 1.879     Found existing installation: pip 20.0.2
+#14 1.880     Uninstalling pip-20.0.2:
+#14 1.907       Successfully uninstalled pip-20.0.2
+#14 2.479 Successfully installed pip-25.2
+#14 2.479 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#14 DONE 2.6s
+
+#15 [12/30] WORKDIR /home/cc
+#15 DONE 0.0s
+
+#16 [13/30] RUN mkdir -p /home/cc/EnvGym/data
+#16 DONE 0.3s
+
+#17 [14/30] WORKDIR /home/cc/EnvGym/data
+#17 DONE 0.0s
+
+#18 [15/30] RUN git clone https://github.com/xlab-uiuc/acto.git
+#18 0.254 Cloning into 'acto'...
+#18 DONE 4.0s
+
+#19 [16/30] WORKDIR /home/cc/EnvGym/data/acto
+#19 DONE 0.0s
+
+#20 [17/30] RUN go install github.com/wadey/gocovmerge@latest || true
+#20 0.641 go: downloading github.com/wadey/gocovmerge v0.0.0-20160331181800-b5bfa59ec0ad
+#20 0.798 go: finding module for package golang.org/x/tools/cover
+#20 1.048 go: downloading golang.org/x/tools v0.36.0
+#20 1.561 go: toolchain upgrade needed to resolve golang.org/x/tools/cover
+#20 1.561 go: golang.org/x/tools@v0.36.0 requires go >= 1.23.0 (running go 1.21.5)
+#20 DONE 1.7s
+
+#21 [18/30] RUN python3 -m venv .venv &&     . .venv/bin/activate &&     python3 -m pip install --upgrade pip &&     python3 -m pip install pip-tools==7.3.0 wheel==0.42.0
+#21 3.078 Requirement already satisfied: pip in ./.venv/lib/python3.10/site-packages (23.0.1)
+#21 3.171 Collecting pip
+#21 3.220   Downloading pip-25.2-py3-none-any.whl (1.8 MB)
+#21 3.307      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 20.9 MB/s eta 0:00:00
+#21 3.348 Installing collected packages: pip
+#21 3.348   Attempting uninstall: pip
+#21 3.349     Found existing installation: pip 23.0.1
+#21 3.511     Uninstalling pip-23.0.1:
+#21 3.517       Successfully uninstalled pip-23.0.1
+#21 4.110 Successfully installed pip-25.2
+#21 4.592 Collecting pip-tools==7.3.0
+#21 6.855   Downloading pip_tools-7.3.0-py3-none-any.whl.metadata (23 kB)
+#21 6.883 Collecting wheel==0.42.0
+#21 6.888   Downloading wheel-0.42.0-py3-none-any.whl.metadata (2.2 kB)
+#21 6.905 Collecting build (from pip-tools==7.3.0)
+#21 6.910   Downloading build-1.3.0-py3-none-any.whl.metadata (5.6 kB)
+#21 6.942 Collecting click>=8 (from pip-tools==7.3.0)
+#21 6.946   Downloading click-8.2.1-py3-none-any.whl.metadata (2.5 kB)
+#21 6.949 Requirement already satisfied: pip>=22.2 in ./.venv/lib/python3.10/site-packages (from pip-tools==7.3.0) (25.2)
+#21 6.949 Requirement already satisfied: setuptools in ./.venv/lib/python3.10/site-packages (from pip-tools==7.3.0) (65.5.0)
+#21 6.965 Collecting tomli (from pip-tools==7.3.0)
+#21 6.969   Downloading tomli-2.2.1-py3-none-any.whl.metadata (10 kB)
+#21 6.989 Collecting packaging>=19.1 (from build->pip-tools==7.3.0)
+#21 6.995   Downloading packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+#21 7.005 Collecting pyproject_hooks (from build->pip-tools==7.3.0)
+#21 7.010   Downloading pyproject_hooks-1.2.0-py3-none-any.whl.metadata (1.3 kB)
+#21 7.030 Downloading pip_tools-7.3.0-py3-none-any.whl (57 kB)
+#21 7.036 Downloading wheel-0.42.0-py3-none-any.whl (65 kB)
+#21 7.043 Downloading click-8.2.1-py3-none-any.whl (102 kB)
+#21 7.051 Downloading build-1.3.0-py3-none-any.whl (23 kB)
+#21 7.058 Downloading packaging-25.0-py3-none-any.whl (66 kB)
+#21 7.074 Downloading tomli-2.2.1-py3-none-any.whl (14 kB)
+#21 7.082 Downloading pyproject_hooks-1.2.0-py3-none-any.whl (10 kB)
+#21 7.102 Installing collected packages: wheel, tomli, pyproject_hooks, packaging, click, build, pip-tools
+#21 7.260 
+#21 7.262 Successfully installed build-1.3.0 click-8.2.1 packaging-25.0 pip-tools-7.3.0 pyproject_hooks-1.2.0 tomli-2.2.1 wheel-0.42.0
+#21 DONE 7.4s
+
+#22 [19/30] RUN . .venv/bin/activate &&     python3 -m pip install pre-commit==3.6.0     black==24.10.0     isort==5.13.2     mypy==1.7.1     pylint==3.0.3     pytest==7.4.3     pytest-cov==4.1.0     ansible-core==2.17.5     kubernetes==31.0.0     pydantic==2.5.2     docker==6.1.3     deepdiff==6.3.1     jsonschema==4.17.3     pandas==2.0.3     prometheus-client==0.19.0     PyYAML     openapi-spec-validator     openapi-schema-validator
+#22 0.639 Collecting pre-commit==3.6.0
+#22 0.682   Downloading pre_commit-3.6.0-py2.py3-none-any.whl.metadata (1.3 kB)
+#22 0.742 Collecting black==24.10.0
+#22 0.748   Downloading black-24.10.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+#22 0.796 Collecting isort==5.13.2
+#22 0.801   Downloading isort-5.13.2-py3-none-any.whl.metadata (12 kB)
+#22 0.898 Collecting mypy==1.7.1
+#22 0.907   Downloading mypy-1.7.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.8 kB)
+#22 0.945 Collecting pylint==3.0.3
+#22 0.951   Downloading pylint-3.0.3-py3-none-any.whl.metadata (12 kB)
+#22 0.987 Collecting pytest==7.4.3
+#22 0.994   Downloading pytest-7.4.3-py3-none-any.whl.metadata (7.9 kB)
+#22 1.013 Collecting pytest-cov==4.1.0
+#22 1.018   Downloading pytest_cov-4.1.0-py3-none-any.whl.metadata (26 kB)
+#22 1.062 Collecting ansible-core==2.17.5
+#22 1.068   Downloading ansible_core-2.17.5-py3-none-any.whl.metadata (6.9 kB)
+#22 1.093 Collecting kubernetes==31.0.0
+#22 1.099   Downloading kubernetes-31.0.0-py2.py3-none-any.whl.metadata (1.5 kB)
+#22 1.212 Collecting pydantic==2.5.2
+#22 1.219   Downloading pydantic-2.5.2-py3-none-any.whl.metadata (65 kB)
+#22 1.241 Collecting docker==6.1.3
+#22 1.247   Downloading docker-6.1.3-py3-none-any.whl.metadata (3.5 kB)
+#22 1.274 Collecting deepdiff==6.3.1
+#22 1.279   Downloading deepdiff-6.3.1-py3-none-any.whl.metadata (5.9 kB)
+#22 1.305 Collecting jsonschema==4.17.3
+#22 1.310   Downloading jsonschema-4.17.3-py3-none-any.whl.metadata (7.9 kB)
+#22 1.439 Collecting pandas==2.0.3
+#22 1.446   Downloading pandas-2.0.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (18 kB)
+#22 1.486 Collecting prometheus-client==0.19.0
+#22 1.493   Downloading prometheus_client-0.19.0-py3-none-any.whl.metadata (1.8 kB)
+#22 1.530 Collecting PyYAML
+#22 1.535   Downloading PyYAML-6.0.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+#22 1.553 Collecting openapi-spec-validator
+#22 1.558   Downloading openapi_spec_validator-0.7.2-py3-none-any.whl.metadata (5.7 kB)
+#22 1.575 Collecting openapi-schema-validator
+#22 1.580   Downloading openapi_schema_validator-0.6.3-py3-none-any.whl.metadata (5.4 kB)
+#22 1.594 Collecting cfgv>=2.0.0 (from pre-commit==3.6.0)
+#22 1.599   Downloading cfgv-3.4.0-py2.py3-none-any.whl.metadata (8.5 kB)
+#22 1.645 Collecting identify>=1.0.0 (from pre-commit==3.6.0)
+#22 1.650   Downloading identify-2.6.13-py2.py3-none-any.whl.metadata (4.4 kB)
+#22 1.669 Collecting nodeenv>=0.11.1 (from pre-commit==3.6.0)
+#22 1.674   Downloading nodeenv-1.9.1-py2.py3-none-any.whl.metadata (21 kB)
+#22 1.720 Collecting virtualenv>=20.10.0 (from pre-commit==3.6.0)
+#22 1.724   Downloading virtualenv-20.34.0-py3-none-any.whl.metadata (4.6 kB)
+#22 1.731 Requirement already satisfied: click>=8.0.0 in ./.venv/lib/python3.10/site-packages (from black==24.10.0) (8.2.1)
+#22 1.740 Collecting mypy-extensions>=0.4.3 (from black==24.10.0)
+#22 1.744   Downloading mypy_extensions-1.1.0-py3-none-any.whl.metadata (1.1 kB)
+#22 1.747 Requirement already satisfied: packaging>=22.0 in ./.venv/lib/python3.10/site-packages (from black==24.10.0) (25.0)
+#22 1.760 Collecting pathspec>=0.9.0 (from black==24.10.0)
+#22 1.765   Downloading pathspec-0.12.1-py3-none-any.whl.metadata (21 kB)
+#22 1.787 Collecting platformdirs>=2 (from black==24.10.0)
+#22 1.792   Downloading platformdirs-4.4.0-py3-none-any.whl.metadata (12 kB)
+#22 1.797 Requirement already satisfied: tomli>=1.1.0 in ./.venv/lib/python3.10/site-packages (from black==24.10.0) (2.2.1)
+#22 1.816 Collecting typing-extensions>=4.0.1 (from black==24.10.0)
+#22 1.821   Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+#22 1.879 Collecting astroid<=3.1.0-dev0,>=3.0.1 (from pylint==3.0.3)
+#22 1.885   Downloading astroid-3.0.3-py3-none-any.whl.metadata (4.5 kB)
+#22 1.904 Collecting mccabe<0.8,>=0.6 (from pylint==3.0.3)
+#22 1.909   Downloading mccabe-0.7.0-py2.py3-none-any.whl.metadata (5.0 kB)
+#22 1.929 Collecting tomlkit>=0.10.1 (from pylint==3.0.3)
+#22 1.935   Downloading tomlkit-0.13.3-py3-none-any.whl.metadata (2.8 kB)
+#22 1.950 Collecting dill>=0.2 (from pylint==3.0.3)
+#22 1.955   Downloading dill-0.4.0-py3-none-any.whl.metadata (10 kB)
+#22 1.968 Collecting iniconfig (from pytest==7.4.3)
+#22 1.973   Downloading iniconfig-2.1.0-py3-none-any.whl.metadata (2.7 kB)
+#22 1.990 Collecting pluggy<2.0,>=0.12 (from pytest==7.4.3)
+#22 1.995   Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+#22 2.012 Collecting exceptiongroup>=1.0.0rc8 (from pytest==7.4.3)
+#22 2.017   Downloading exceptiongroup-1.3.0-py3-none-any.whl.metadata (6.7 kB)
+#22 2.403 Collecting coverage>=5.2.1 (from coverage[toml]>=5.2.1->pytest-cov==4.1.0)
+#22 2.409   Downloading coverage-7.10.6-cp310-cp310-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (8.9 kB)
+#22 2.428 Collecting jinja2>=3.0.0 (from ansible-core==2.17.5)
+#22 2.433   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+#22 2.636 Collecting cryptography (from ansible-core==2.17.5)
+#22 2.641   Downloading cryptography-45.0.7-cp37-abi3-manylinux_2_28_x86_64.whl.metadata (5.7 kB)
+#22 2.662 Collecting resolvelib<1.1.0,>=0.5.3 (from ansible-core==2.17.5)
+#22 2.667   Downloading resolvelib-1.0.1-py2.py3-none-any.whl.metadata (4.0 kB)
+#22 2.698 Collecting certifi>=14.05.14 (from kubernetes==31.0.0)
+#22 2.703   Downloading certifi-2025.8.3-py3-none-any.whl.metadata (2.4 kB)
+#22 2.752 Collecting six>=1.9.0 (from kubernetes==31.0.0)
+#22 2.757   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+#22 2.773 Collecting python-dateutil>=2.5.3 (from kubernetes==31.0.0)
+#22 2.778   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+#22 2.833 Collecting google-auth>=1.0.1 (from kubernetes==31.0.0)
+#22 2.840   Downloading google_auth-2.40.3-py2.py3-none-any.whl.metadata (6.2 kB)
+#22 2.888 Collecting websocket-client!=0.40.0,!=0.41.*,!=0.42.*,>=0.32.0 (from kubernetes==31.0.0)
+#22 2.893   Downloading websocket_client-1.8.0-py3-none-any.whl.metadata (8.0 kB)
+#22 2.933 Collecting requests (from kubernetes==31.0.0)
+#22 2.938   Downloading requests-2.32.5-py3-none-any.whl.metadata (4.9 kB)
+#22 2.954 Collecting requests-oauthlib (from kubernetes==31.0.0)
+#22 2.959   Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl.metadata (11 kB)
+#22 2.975 Collecting oauthlib>=3.2.2 (from kubernetes==31.0.0)
+#22 2.981   Downloading oauthlib-3.3.1-py3-none-any.whl.metadata (7.9 kB)
+#22 3.014 Collecting urllib3>=1.24.2 (from kubernetes==31.0.0)
+#22 3.020   Downloading urllib3-2.5.0-py3-none-any.whl.metadata (6.5 kB)
+#22 3.031 Collecting durationpy>=0.7 (from kubernetes==31.0.0)
+#22 3.037   Downloading durationpy-0.10-py3-none-any.whl.metadata (340 bytes)
+#22 3.050 Collecting annotated-types>=0.4.0 (from pydantic==2.5.2)
+#22 3.056   Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+#22 3.924 Collecting pydantic-core==2.14.5 (from pydantic==2.5.2)
+#22 3.930   Downloading pydantic_core-2.14.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.5 kB)
+#22 3.960 Collecting ordered-set<4.2.0,>=4.0.2 (from deepdiff==6.3.1)
+#22 3.965   Downloading ordered_set-4.1.0-py3-none-any.whl.metadata (5.3 kB)
+#22 3.984 Collecting attrs>=17.4.0 (from jsonschema==4.17.3)
+#22 3.990   Downloading attrs-25.3.0-py3-none-any.whl.metadata (10 kB)
+#22 4.027 Collecting pyrsistent!=0.17.0,!=0.17.1,!=0.17.2,>=0.14.0 (from jsonschema==4.17.3)
+#22 4.035   Downloading pyrsistent-0.20.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (27 kB)
+#22 4.085 Collecting pytz>=2020.1 (from pandas==2.0.3)
+#22 4.090   Downloading pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
+#22 4.105 Collecting tzdata>=2022.1 (from pandas==2.0.3)
+#22 4.111   Downloading tzdata-2025.2-py2.py3-none-any.whl.metadata (1.4 kB)
+#22 4.387 Collecting numpy>=1.21.0 (from pandas==2.0.3)
+#22 4.392   Downloading numpy-2.2.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (62 kB)
+#22 4.421 INFO: pip is looking at multiple versions of openapi-spec-validator to determine which version is compatible with other requirements. This could take a while.
+#22 4.421 Collecting openapi-spec-validator
+#22 4.426   Downloading openapi_spec_validator-0.7.1-py3-none-any.whl.metadata (5.7 kB)
+#22 4.436   Downloading openapi_spec_validator-0.7.0-py3-none-any.whl.metadata (5.7 kB)
+#22 4.446   Downloading openapi_spec_validator-0.6.0-py3-none-any.whl.metadata (5.3 kB)
+#22 4.456   Downloading openapi_spec_validator-0.5.7-py3-none-any.whl.metadata (5.4 kB)
+#22 4.481 Collecting jsonschema-spec<0.2.0,>=0.1.1 (from openapi-spec-validator)
+#22 4.487   Downloading jsonschema_spec-0.1.6-py3-none-any.whl.metadata (4.4 kB)
+#22 4.539 Collecting lazy-object-proxy<2.0.0,>=1.7.1 (from openapi-spec-validator)
+#22 4.543   Downloading lazy_object_proxy-1.12.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.1 kB)
+#22 4.548 Collecting openapi-schema-validator
+#22 4.555   Downloading openapi_schema_validator-0.4.4-py3-none-any.whl.metadata (5.7 kB)
+#22 4.568 Collecting rfc3339-validator (from openapi-schema-validator)
+#22 4.573   Downloading rfc3339_validator-0.1.4-py2.py3-none-any.whl.metadata (1.5 kB)
+#22 4.589 Collecting pathable<0.5.0,>=0.4.1 (from jsonschema-spec<0.2.0,>=0.1.1->openapi-spec-validator)
+#22 4.593   Downloading pathable-0.4.4-py3-none-any.whl.metadata (1.8 kB)
+#22 4.706 Collecting charset_normalizer<4,>=2 (from requests->kubernetes==31.0.0)
+#22 4.711   Downloading charset_normalizer-3.4.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (36 kB)
+#22 4.728 Collecting idna<4,>=2.5 (from requests->kubernetes==31.0.0)
+#22 4.733   Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+#22 4.784 Collecting cachetools<6.0,>=2.0.0 (from google-auth>=1.0.1->kubernetes==31.0.0)
+#22 4.789   Downloading cachetools-5.5.2-py3-none-any.whl.metadata (5.4 kB)
+#22 4.814 Collecting pyasn1-modules>=0.2.1 (from google-auth>=1.0.1->kubernetes==31.0.0)
+#22 4.819   Downloading pyasn1_modules-0.4.2-py3-none-any.whl.metadata (3.5 kB)
+#22 4.836 Collecting rsa<5,>=3.1.4 (from google-auth>=1.0.1->kubernetes==31.0.0)
+#22 4.841   Downloading rsa-4.9.1-py3-none-any.whl.metadata (5.6 kB)
+#22 4.872 Collecting pyasn1>=0.1.3 (from rsa<5,>=3.1.4->google-auth>=1.0.1->kubernetes==31.0.0)
+#22 4.876   Downloading pyasn1-0.6.1-py3-none-any.whl.metadata (8.4 kB)
+#22 4.944 Collecting MarkupSafe>=2.0 (from jinja2>=3.0.0->ansible-core==2.17.5)
+#22 4.949   Downloading MarkupSafe-3.0.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.0 kB)
+#22 4.994 Collecting distlib<1,>=0.3.7 (from virtualenv>=20.10.0->pre-commit==3.6.0)
+#22 4.998   Downloading distlib-0.4.0-py2.py3-none-any.whl.metadata (5.2 kB)
+#22 5.024 Collecting filelock<4,>=3.12.2 (from virtualenv>=20.10.0->pre-commit==3.6.0)
+#22 5.029   Downloading filelock-3.19.1-py3-none-any.whl.metadata (2.1 kB)
+#22 5.182 Collecting cffi>=1.14 (from cryptography->ansible-core==2.17.5)
+#22 5.186   Downloading cffi-1.17.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.5 kB)
+#22 5.200 Collecting pycparser (from cffi>=1.14->cryptography->ansible-core==2.17.5)
+#22 5.205   Downloading pycparser-2.22-py3-none-any.whl.metadata (943 bytes)
+#22 5.234 Downloading pre_commit-3.6.0-py2.py3-none-any.whl (204 kB)
+#22 5.249 Downloading black-24.10.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_28_x86_64.whl (1.8 MB)
+#22 5.268    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 92.7 MB/s  0:00:00
+#22 5.273 Downloading isort-5.13.2-py3-none-any.whl (92 kB)
+#22 5.281 Downloading mypy-1.7.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.5 MB)
+#22 5.407    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.5/12.5 MB 100.8 MB/s  0:00:00
+#22 5.416 Downloading pylint-3.0.3-py3-none-any.whl (510 kB)
+#22 5.436 Downloading pytest-7.4.3-py3-none-any.whl (325 kB)
+#22 5.450 Downloading pytest_cov-4.1.0-py3-none-any.whl (21 kB)
+#22 5.459 Downloading ansible_core-2.17.5-py3-none-any.whl (2.2 MB)
+#22 5.546    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 24.6 MB/s  0:00:00
+#22 5.555 Downloading kubernetes-31.0.0-py2.py3-none-any.whl (1.9 MB)
+#22 5.674    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 14.9 MB/s  0:00:00
+#22 5.680 Downloading pydantic-2.5.2-py3-none-any.whl (381 kB)
+#22 5.713 Downloading docker-6.1.3-py3-none-any.whl (148 kB)
+#22 5.730 Downloading deepdiff-6.3.1-py3-none-any.whl (70 kB)
+#22 5.742 Downloading jsonschema-4.17.3-py3-none-any.whl (90 kB)
+#22 5.754 Downloading pandas-2.0.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.3 MB)
+#22 6.546    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.3/12.3 MB 15.5 MB/s  0:00:00
+#22 6.552 Downloading prometheus_client-0.19.0-py3-none-any.whl (54 kB)
+#22 6.562 Downloading pydantic_core-2.14.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+#22 6.694    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 15.4 MB/s  0:00:00
+#22 6.700 Downloading astroid-3.0.3-py3-none-any.whl (275 kB)
+#22 6.728 Downloading mccabe-0.7.0-py2.py3-none-any.whl (7.3 kB)
+#22 6.736 Downloading ordered_set-4.1.0-py3-none-any.whl (7.6 kB)
+#22 6.743 Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+#22 6.751 Downloading resolvelib-1.0.1-py2.py3-none-any.whl (17 kB)
+#22 6.758 Downloading PyYAML-6.0.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (751 kB)
+#22 6.812    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 751.2/751.2 kB 14.3 MB/s  0:00:00
+#22 6.822 Downloading openapi_spec_validator-0.5.7-py3-none-any.whl (32 kB)
+#22 6.830 Downloading openapi_schema_validator-0.4.4-py3-none-any.whl (9.0 kB)
+#22 6.842 Downloading jsonschema_spec-0.1.6-py3-none-any.whl (12 kB)
+#22 6.851 Downloading lazy_object_proxy-1.12.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (67 kB)
+#22 6.863 Downloading pathable-0.4.4-py3-none-any.whl (9.6 kB)
+#22 6.871 Downloading requests-2.32.5-py3-none-any.whl (64 kB)
+#22 6.883 Downloading charset_normalizer-3.4.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (152 kB)
+#22 6.901 Downloading idna-3.10-py3-none-any.whl (70 kB)
+#22 6.913 Downloading urllib3-2.5.0-py3-none-any.whl (129 kB)
+#22 6.930 Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+#22 6.938 Downloading attrs-25.3.0-py3-none-any.whl (63 kB)
+#22 6.949 Downloading certifi-2025.8.3-py3-none-any.whl (161 kB)
+#22 6.967 Downloading cfgv-3.4.0-py2.py3-none-any.whl (7.2 kB)
+#22 6.976 Downloading coverage-7.10.6-cp310-cp310-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (245 kB)
+#22 7.013 Downloading dill-0.4.0-py3-none-any.whl (119 kB)
+#22 7.036 Downloading durationpy-0.10-py3-none-any.whl (3.9 kB)
+#22 7.044 Downloading exceptiongroup-1.3.0-py3-none-any.whl (16 kB)
+#22 7.052 Downloading google_auth-2.40.3-py2.py3-none-any.whl (216 kB)
+#22 7.081 Downloading cachetools-5.5.2-py3-none-any.whl (10 kB)
+#22 7.089 Downloading rsa-4.9.1-py3-none-any.whl (34 kB)
+#22 7.098 Downloading identify-2.6.13-py2.py3-none-any.whl (99 kB)
+#22 7.115 Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+#22 7.140 Downloading MarkupSafe-3.0.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (20 kB)
+#22 7.150 Downloading mypy_extensions-1.1.0-py3-none-any.whl (5.0 kB)
+#22 7.157 Downloading nodeenv-1.9.1-py2.py3-none-any.whl (22 kB)
+#22 7.165 Downloading numpy-2.2.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.8 MB)
+#22 8.645    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.8/16.8 MB 11.3 MB/s  0:00:01
+#22 8.651 Downloading oauthlib-3.3.1-py3-none-any.whl (160 kB)
+#22 8.669 Downloading pathspec-0.12.1-py3-none-any.whl (31 kB)
+#22 8.678 Downloading platformdirs-4.4.0-py3-none-any.whl (18 kB)
+#22 8.685 Downloading pyasn1-0.6.1-py3-none-any.whl (83 kB)
+#22 8.698 Downloading pyasn1_modules-0.4.2-py3-none-any.whl (181 kB)
+#22 8.720 Downloading pyrsistent-0.20.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (117 kB)
+#22 8.733 Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+#22 8.761 Downloading pytz-2025.2-py2.py3-none-any.whl (509 kB)
+#22 8.817 Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+#22 8.825 Downloading tomlkit-0.13.3-py3-none-any.whl (38 kB)
+#22 8.835 Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+#22 8.845 Downloading tzdata-2025.2-py2.py3-none-any.whl (347 kB)
+#22 8.877 Downloading virtualenv-20.34.0-py3-none-any.whl (6.0 MB)
+#22 9.338    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.0/6.0 MB 12.9 MB/s  0:00:00
+#22 9.344 Downloading distlib-0.4.0-py2.py3-none-any.whl (469 kB)
+#22 9.385 Downloading filelock-3.19.1-py3-none-any.whl (15 kB)
+#22 9.393 Downloading websocket_client-1.8.0-py3-none-any.whl (58 kB)
+#22 9.403 Downloading cryptography-45.0.7-cp37-abi3-manylinux_2_28_x86_64.whl (4.5 MB)
+#22 9.710    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 14.4 MB/s  0:00:00
+#22 9.716 Downloading cffi-1.17.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (446 kB)
+#22 9.766 Downloading iniconfig-2.1.0-py3-none-any.whl (6.0 kB)
+#22 9.773 Downloading pycparser-2.22-py3-none-any.whl (117 kB)
+#22 9.790 Downloading requests_oauthlib-2.0.0-py2.py3-none-any.whl (24 kB)
+#22 9.797 Downloading rfc3339_validator-0.1.4-py2.py3-none-any.whl (3.5 kB)
+#22 10.19 Installing collected packages: resolvelib, pytz, durationpy, distlib, websocket-client, urllib3, tzdata, typing-extensions, tomlkit, six, PyYAML, pyrsistent, pycparser, pyasn1, prometheus-client, pluggy, platformdirs, pathspec, pathable, ordered-set, oauthlib, numpy, nodeenv, mypy-extensions, mccabe, MarkupSafe, lazy-object-proxy, isort, iniconfig, idna, identify, filelock, dill, coverage, charset_normalizer, cfgv, certifi, cachetools, attrs, annotated-types, virtualenv, rsa, rfc3339-validator, requests, python-dateutil, pydantic-core, pyasn1-modules, mypy, jsonschema, jinja2, exceptiongroup, deepdiff, cffi, black, astroid, requests-oauthlib, pytest, pylint, pydantic, pre-commit, pandas, openapi-schema-validator, jsonschema-spec, google-auth, docker, cryptography, pytest-cov, openapi-spec-validator, kubernetes, ansible-core
+#22 19.92 
+#22 19.93 Successfully installed MarkupSafe-3.0.2 PyYAML-6.0.2 annotated-types-0.7.0 ansible-core-2.17.5 astroid-3.0.3 attrs-25.3.0 black-24.10.0 cachetools-5.5.2 certifi-2025.8.3 cffi-1.17.1 cfgv-3.4.0 charset_normalizer-3.4.3 coverage-7.10.6 cryptography-45.0.7 deepdiff-6.3.1 dill-0.4.0 distlib-0.4.0 docker-6.1.3 durationpy-0.10 exceptiongroup-1.3.0 filelock-3.19.1 google-auth-2.40.3 identify-2.6.13 idna-3.10 iniconfig-2.1.0 isort-5.13.2 jinja2-3.1.6 jsonschema-4.17.3 jsonschema-spec-0.1.6 kubernetes-31.0.0 lazy-object-proxy-1.12.0 mccabe-0.7.0 mypy-1.7.1 mypy-extensions-1.1.0 nodeenv-1.9.1 numpy-2.2.6 oauthlib-3.3.1 openapi-schema-validator-0.4.4 openapi-spec-validator-0.5.7 ordered-set-4.1.0 pandas-2.0.3 pathable-0.4.4 pathspec-0.12.1 platformdirs-4.4.0 pluggy-1.6.0 pre-commit-3.6.0 prometheus-client-0.19.0 pyasn1-0.6.1 pyasn1-modules-0.4.2 pycparser-2.22 pydantic-2.5.2 pydantic-core-2.14.5 pylint-3.0.3 pyrsistent-0.20.0 pytest-7.4.3 pytest-cov-4.1.0 python-dateutil-2.9.0.post0 pytz-2025.2 requests-2.32.5 requests-oauthlib-2.0.0 resolvelib-1.0.1 rfc3339-validator-0.1.4 rsa-4.9.1 six-1.17.0 tomlkit-0.13.3 typing-extensions-4.15.0 tzdata-2025.2 urllib3-2.5.0 virtualenv-20.34.0 websocket-client-1.8.0
+#22 DONE 21.1s
+
+#23 [20/30] RUN . .venv/bin/activate &&     ansible-galaxy collection install ansible.posix community.general
+#23 6.893 Starting galaxy collection install process
+#23 6.893 Process install dependency map
+#23 6.893 Starting collection install process
+#23 6.893 Downloading https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/ansible-posix-2.1.0.tar.gz to /root/.ansible/tmp/ansible-local-7iivltml8/tmpdbzxsu3t/ansible-posix-2.1.0-dlj3te6u
+#23 6.893 Installing 'ansible.posix:2.1.0' to '/root/.ansible/collections/ansible_collections/ansible/posix'
+#23 6.893 ansible.posix:2.1.0 was installed successfully
+#23 6.893 Downloading https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/community-general-11.2.1.tar.gz to /root/.ansible/tmp/ansible-local-7iivltml8/tmpdbzxsu3t/community-general-11.2.1-ui1gt9nw
+#23 6.893 Installing 'community.general:11.2.1' to '/root/.ansible/collections/ansible_collections/community/general'
+#23 6.893 community.general:11.2.1 was installed successfully
+#23 DONE 7.1s
+
+#24 [21/30] RUN mkdir -p /home/cc/.kube     /home/cc/EnvGym/data/acto/test     /home/cc/EnvGym/data/acto/data     /home/cc/EnvGym/data/acto/.mypy_cache     /home/cc/EnvGym/data/acto/.pytest_cache     /home/cc/EnvGym/data/acto/htmlcov     /home/cc/EnvGym/data/acto/ssa/taint_analysis_results     /home/cc/EnvGym/data/acto/scripts/field_count/output     /home/cc/EnvGym/data/acto/scripts/field_count/test     /home/cc/EnvGym/data/acto/scripts/pruning_analysis     /home/cc/EnvGym/data/acto/scripts/csv_reports     /home/cc/workdir/acto     /home/cc/.ansible     /home/cc/.ssh
+#24 DONE 0.3s
+
+#25 [22/30] RUN echo "fs.inotify.max_user_watches=524288" >> /etc/sysctl.conf &&     echo "fs.inotify.max_user_instances=512" >> /etc/sysctl.conf
+#25 DONE 0.4s
+
+#26 [23/30] WORKDIR /home/cc/EnvGym/data/acto/acto/k8s_util/lib
+#26 DONE 0.0s
+
+#27 [24/30] RUN if [ -f Makefile ]; then make clean && make; fi
+#27 0.271 rm -f ./k8sutil.so
+#27 0.272 rm -f ./test
+#27 0.276 go build -buildmode=c-shared -o k8sutil.so k8sutil.go
+#27 0.282 go: downloading k8s.io/apimachinery v0.24.0
+#27 0.283 go: downloading gopkg.in/inf.v0 v0.9.1
+#27 0.525 go: downloading github.com/gogo/protobuf v1.3.2
+#27 5.843 gcc test.c -o test ./k8sutil.so
+#27 DONE 6.1s
+
+#28 [25/30] WORKDIR /home/cc/EnvGym/data/acto/ssa
+#28 DONE 0.0s
+
+#29 [26/30] RUN if [ -f Makefile ]; then make clean && make; fi
+#29 0.215 rm -f ./analysis.so
+#29 0.219 go build -buildmode=c-shared -o libanalysis.so ssa.go
+#29 0.226 go: downloading golang.org/x/tools v0.22.0
+#29 0.240 go: downloading github.com/goki/ki v1.1.17
+#29 0.240 go: downloading golang.org/x/tools/go/pointer v0.1.0-deprecated
+#29 0.499 go: downloading github.com/jinzhu/copier v0.4.0
+#29 0.815 go: downloading golang.org/x/sync v0.7.0
+#29 0.815 go: downloading golang.org/x/mod v0.18.0
+#29 0.926 go: downloading golang.org/x/sys v0.21.0
+#29 DONE 6.1s
+
+#30 [27/30] WORKDIR /home/cc/EnvGym/data/acto/scripts/field_count
+#30 DONE 0.0s
+
+#31 [28/30] RUN if [ -f go.mod ]; then go mod download && go build -o field_count .; fi
+#31 DONE 8.1s
+
+#32 [29/30] WORKDIR /home/cc/EnvGym/data/acto
+#32 DONE 0.0s
+
+#33 [30/30] RUN touch /home/cc/EnvGym/data/acto/.env &&     echo "export PATH=/home/cc/EnvGym/data/acto/.venv/bin:$PATH" >> ~/.bashrc &&     echo "source /home/cc/EnvGym/data/acto/.venv/bin/activate" >> ~/.bashrc
+#33 DONE 0.3s
+
+#34 exporting to image
+#34 exporting layers
+#34 exporting layers 4.3s done
+#34 writing image sha256:f13c359839e1bba8588faf14cd8531bc5eaadc4508ce7b2c95c1b4f85e2d526d done
+#34 naming to docker.io/library/envgym_test_1756821989 done
+#34 DONE 4.3s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

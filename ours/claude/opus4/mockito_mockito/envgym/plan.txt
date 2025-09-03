@@ -1,0 +1,133 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Java Development Kit (JDK) 11 or higher (Mockito 5 requires Java 11, with Java 21 support for testing) - Linux x86_64 version
+   - Java Development Kit (JDK) 17 or higher (required for GraalVM native image tests and inline mocks tests) - Linux x86_64 version
+   - Java Development Kit (JDK) 21 (required for Java 21 specific tests with dynamic agent loading features) - Linux x86_64 version
+   - Git (latest stable version for Linux x86_64)
+   - IDE: IntelliJ IDEA Community/Ultimate, Eclipse IDE for Java Developers, Visual Studio Code, or JetBrains Fleet - Linux x86_64 versions
+   - Android Studio (required for Android development and testing - separate from IntelliJ for Android subproject) - Linux x86_64 version
+   - Maven (optional, for dependency management reference) - Linux x86_64 version
+   - Android SDK (required for Android module testing) - Linux x86_64 version with x86_64 system images for emulator
+   - Kotlin compiler 2.2.0 (required for Kotlin integration tests, Kotlin DSL support, kotlin-release-coroutines-tests module, and kotlin-tests module)
+   - Kotlin Coroutines library (required for kotlin-release-coroutines-tests module and kotlin-tests module)
+   - Kotlin Standard Library (required for kotlin-tests module)
+   - Groovy 3.0.25 (required for Groovy integration tests, groovy-inline-tests module, and groovy-tests module)
+   - GraalVM 21 (required for GraalVM native image tests) - Linux x86_64 version
+   - GraalVM Native Build Tools 0.11.0 (Gradle plugin for native image building) - Linux x86_64 native compiler
+   - Gradle 8.14.2 (will be automatically downloaded by wrapper)
+   - Foojay Toolchains Plugin compatible JDK distributions - Linux x86_64 versions
+   - Google Cloud SDK (optional, for Android plugin repository access) - Linux x86_64 version
+   - POSIX-compliant shell (available on Linux system)
+   - ByteBuddy 1.17.7 (will be downloaded as dependency, version can be overridden in Android tests)
+   - ByteBuddy Agent 1.17.7 (will be downloaded as dependency, required for Java 21 dynamic agent tests)
+   - ByteBuddy Android (will be downloaded as dependency for Android module)
+   - Error Prone 2.41.0 (for static analysis)
+   - Error Prone Javac (for Error Prone compiler integration)
+   - Error Prone Test API (for Error Prone plugin testing)
+   - JaCoCo 0.8.13 (for code coverage)
+   - JUnit 4.13.2 and JUnit Jupiter 5.13.4 (for testing)
+   - JUnit Platform Launcher 1.13.4 (for JUnit 5 test execution)
+   - JUnit Jupiter Engine (for JUnit 5 runtime)
+   - JUnit Vintage Engine (for JUnit 4 compatibility in JUnit 5 platform)
+   - AndroidX Test libraries (for Android testing)
+   - OSGi framework 8.0.0 (for OSGi compatibility testing)
+   - Zulu JDK distribution (for CI compatibility) - Linux x86_64 version
+   - Android Emulator (for Android integration tests) - x86_64 system images, no hardware acceleration without KVM
+   - KVM support (check availability with `kvm-ok` command for Android emulator acceleration on Linux)
+   - Codecov CLI (optional, for local coverage report testing) - Linux x86_64 binary
+   - GitHub CLI (optional, for Dependabot interaction) - Linux x86_64 binary
+   - ASM 9.x (for bytecode manipulation in module-info processing)
+   - Objenesis 3.3 (for object instantiation)
+   - Hamcrest 3.0 (optional, for test matchers - note: extensions-tests may exclude this)
+   - OpenTest4J 1.3.0 (optional, for test framework compatibility)
+   - AssertJ 3.27.4 (for test assertions)
+   - BND 7.1.0 (for OSGi bundle generation and resolution)
+   - Gradle Test Logger Plugin (for test output formatting)
+   - Animal Sniffer Gradle Plugin (for API compatibility checks)
+   - Spotless Gradle Plugin 7.2.1 (for code formatting)
+   - Google Java Format 1.28.0 (for Spotless formatting)
+   - License Gradle Plugin (for license header management)
+   - Nexus Publish Plugin 2.0.0 (for Maven Central publishing)
+   - Shipkit Changelog Plugin 2.0.1 (for changelog generation)
+   - Shipkit Auto Version Plugin 2.1.2 (for automatic versioning)
+   - Auto Service (for annotation processing in Error Prone plugins)
+   - BND Resolve Plugin (for OSGi metadata verification)
+   - API Guardian Annotations (for API documentation and stability marking)
+   - Kotlin Android Plugin (for Android Kotlin development)
+   - AndroidX Test Runner 1.7.0 (for Android instrumentation tests)
+   - AndroidX JUnit extensions 1.2.1 (for Android JUnit integration)
+   - Android Build Tools 33.0.x (for compileSdk 33) - Linux x86_64 version
+   - Android Platform Tools (for ADB and device management) - Linux x86_64 version
+   - Native Build Tools (for GraalVM native compilation) - Linux x86_64 toolchain
+   - Groovy Gradle Plugin (for Groovy module compilation in both groovy-tests and groovy-inline-tests)
+   - Kotlin Gradle Plugin (for Kotlin module compilation in kotlin-release-coroutines-tests and kotlin-tests)
+   - Memory profiling tools (optional, for memory-tests module analysis) - Linux x86_64 tools
+   - JVM monitoring tools (optional, for heap usage verification in memory-tests) - Linux x86_64 tools
+   - Equinox OSGi runtime (for OSGi tests execution)
+   - BND Gradle Plugin (for OSGi bundle creation and management)
+   - asdf version manager (optional, for managing tool versions via .tool-versions) - Linux x86_64 version
+
+2. FILES TO CREATE:
+   - `.gitignore` - Standard Java/Gradle gitignore patterns (already exists in /home/cc/EnvGym/data/mockito_mockito, verify content matches provided configuration)
+   - `gradle.properties` - Gradle configuration properties (already exists in /home/cc/EnvGym/data/mockito_mockito, verify content)
+   - `settings.gradle.kts` - Root project settings in Kotlin DSL (already exists in /home/cc/EnvGym/data/mockito_mockito, verify content)
+   - `build.gradle.kts` - Main build configuration in Kotlin DSL (already exists in /home/cc/EnvGym/data/mockito_mockito, verify content)
+   - `gradlew` - Gradle wrapper Unix script (already exists in /home/cc/EnvGym/data/mockito_mockito, verify executable permissions with chmod +x)
+   - `gradlew.bat` - Gradle wrapper Windows batch script (already exists in /home/cc/EnvGym/data/mockito_mockito, verify content matches Apache 2.0 licensed version)
+   - `gradle/wrapper/gradle-wrapper.properties` - Gradle wrapper configuration (already exists in /home/cc/EnvGym/data/mockito_mockito/gradle/wrapper/, verify contains correct Gradle 8.14.2 configuration)
+   - `gradle/wrapper/gradle-wrapper.jar` - Gradle wrapper JAR file
+   - `gradle/libs.versions.toml` - Version catalog for dependency management (already exists in /home/cc/EnvGym/data/mockito_mockito/gradle/, verify content matches provided configuration)
+   - `.editorconfig` - Code style configuration (already exists in /home/cc/EnvGym/data/mockito_mockito, verify content matches project standards)
+   - `config/checkstyle/checkstyle.xml` - Code style rules
+   - `config/javadoc/resources/org/mockito/logo.png` - Project logo resources
+   - `config/javadoc/resources/org/mockito/logo@2x.png` - High resolution logo
+   - `.github/workflows/ci.yml` - CI workflow configuration (already exists in /home/cc/EnvGym/data/mockito_mockito/.github/workflows/, verify content matches provided configuration)
+   - `.github/dependabot.yml` - Dependabot configuration (already exists in /home/cc/EnvGym/data/mockito_mockito/.github/, verify content matches provided configuration)
+   - `.github/CONTRIBUTING.md` - Contribution guidelines
+   - `LICENSE` - Apache 2.0 license file
+   - `local.properties` - Android SDK location configuration (create with sdk.dir=/home/cc/Android/Sdk or appropriate Linux path)
+   - `buildSrc/build.gradle.kts` - Build conventions configuration (already exists in /home/cc/EnvGym/data/mockito_mockito/buildSrc/, verify content matches provided configuration with kotlin-dsl plugin and gradle plugin dependencies)
+   - `buildSrc/settings.gradle.kts` - BuildSrc settings configuration (already exists in /home/cc/EnvGym/data/mockito_mockito/buildSrc/, verify content matches provided configuration with dependency resolution management and version catalog)
+   - `buildSrc/src/main/kotlin/mockito-conventions.gradle.kts` - Shared build conventions
+   - `buildSrc/src/main/kotlin/mockito.library-conventions.gradle.kts` - Library module conventions
+   - `buildSrc/src/main/kotlin/mockito.java-backward-compatibility-checks-conventions.gradle.kts` - Backward compatibility conventions
+   - `buildSrc/src/main/kotlin/mockito.javadoc-conventions.gradle.kts` - Javadoc generation conventions
+   - `buildSrc/src/main/kotlin/mockito.publication-conventions.gradle.kts` - Publication conventions for BOM and other artifacts
+   - `buildSrc/src/main/kotlin/mockito.java-library-conventions.gradle.kts` - Java library conventions
+   - `buildSrc/src/main/kotlin/mockito.test-conventions.gradle.kts` - Test conventions for integration test modules
+   - `buildSrc/src/main/kotlin/mockito.osgi-conventions.gradle.kts` - OSGi bundle conventions
+   - Animal Sniffer signature files configuration
+   - `check_reproducibility.sh` - Script to check artifact reproducibility (ensure Unix line endings and executable permissions)
+   - `mockito-integration-tests/graalvm-tests/build.gradle.kts` - GraalVM tests module build configuration (already exists in /home/cc/EnvGym/data/mockito_mockito/mockito-integration-tests/graalvm-tests/, verify content matches provided configuration)
+   - `mockito-integration-tests/graalvm-tests/src/test/resources/META-INF/native-image/org.mockito/graalvm-tests/reflect-config.json` - GraalVM reflection configuration
+   - `mockito-integration-tests/graalvm-tests/src/test/resources/META-INF/native-image/org.mockito/graalvm-tests/resource-config.json` - GraalVM resource configuration (generated by tracing agent if enabled)
+   - `mockito-integration-tests/graalvm-tests/src/test/resources/META-INF/native-image/org.mockito/graalvm-tests/jni-config.json` - GraalVM JNI configuration (generated by tracing agent if enabled)
+   - `mockito-integration-tests/graalvm-tests/src/test/resources/META-INF/native-image/org.mockito/graalvm-tests/proxy-config.json` - GraalVM proxy configuration (generated by tracing agent if enabled)
+   - `mockito-integration-tests/graalvm-tests/src/test/resources/META-INF/native-image/org.mockito/graalvm-tests/serialization-config.json` - GraalVM serialization configuration (generated by tracing agent if enabled)
+   - `mockito-integration-tests/graalvm-tests/src/test/java/` - GraalVM test source files
+   - `mockito-integration-tests/graalvm-tests/src/main/java/` - GraalVM main source files (if needed)
+   - Environment variable configuration files for mock-maker and member-accessor settings
+   - `.github/codecov.yml` - Codecov configuration (optional)
+   - `emulator.log` - Android emulator output log (generated during tests in /home/cc/EnvGym/data/mockito_mockito)
+   - `emulator-startup.log` - Android emulator startup log (generated during tests in /home/cc/EnvGym/data/mockito_mockito)
+   - `logcat_file.pid` - Process ID file for logcat capture (temporary, created during Android tests in /home/cc/EnvGym/data/mockito_mockito)
+   - `logcat_console.pid` - Process ID file for console logcat output (temporary, created during Android tests in /home/cc/EnvGym/data/mockito_mockito)
+   - `gradle.exit` - Exit code file for Android test execution (temporary in /home/cc/EnvGym/data/mockito_mockito)
+   - `mockito-core/build.gradle.kts` - Core module build configuration (already exists in /home/cc/EnvGym/data/mockito_mockito/mockito-core/, verify content matches provided configuration)
+   - `mockito-core/src/main/java/module-info.java` - Java module descriptor
+   - `mockito-core/src/main/resources/org/mockito/internal/creation/bytebuddy/inject-MockMethodDispatcher.raw` - Generated bytecode resource
+   - `gradle/coverage.gradle` - Coverage configuration applied from root project
+   - `mockito-core/build/generated/resources/inline/java/org/mockito/internal/creation/bytebuddy/inject-MockMethodDispatcher.raw` - Build-generated resource
+   - `mockito-core/build/generated/resources/ext-config/test/mockito-extensions/org.mockito.plugins.MockMaker` - Generated MockMaker configuration
+   - `mockito-core/build/generated/resources/ext-config/test/mockito-extensions/org.mockito.plugins.MemberAccessor` - Generated MemberAccessor configuration
+   - `mockito-bom/build.gradle.kts` - Bill of Materials module build configuration (already exists in /home/cc/EnvGym/data/mockito_mockito/mockito-bom/, verify content matches provided configuration)
+   - `mockito-extensions/` - Directory containing extension modules
+   - `mockito-extensions/mockito-android/build.gradle.kts` - Android extension module build configuration (already exists in /home/cc/EnvGym/data/mockito_mockito/mockito-extensions/mockito-android/, verify content matches provided configuration)
+   - `mockito-extensions/mockito-errorprone/build.gradle.kts` - Error Prone extension module build configuration (already exists in /home/cc/EnvGym/data/mockito_mockito/mockito-extensions/mockito-errorprone/, verify content matches provided configuration)
+   - `mockito-extensions/mockito-errorprone/src/main/resources/META-INF/services/com.google.errorprone.bugpattern.BugChecker` - Service provider configuration for Error Prone plugins
+   - `mockito-extensions/mockito-errorprone/src/main/java/` - Error Prone plugin source files
+   - `mockito-extensions/mockito-errorprone/src/test/java/` - Error Prone plugin test files
+   - `mockito-extensions/mockito-junit-jupiter/build.gradle.kts` - JUnit Jupiter extension module build configuration (already exists in /home/cc/EnvGym/data/mockito_mockito/mockito-extensions/mockito-junit-jupiter/, verify content matches provided configuration)
+   - `mockito-extensions/mockito-junit-jupiter/src/main/java/` - JUnit Jupiter extension source files
+   - `mockito-extensions

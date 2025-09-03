@@ -1,0 +1,111 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Pony compiler (ponyc) - version 0.59.0 or compatible
+   - Ponyup - Pony toolchain installer (recommended for prebuilt binaries)
+   - Git - version 2.0 or higher (with submodule support)
+   - CMake - version 3.21 or higher (required by CMakeLists.txt and BUILD.md)
+   - Python 3 - any version (required for building LLVM and documentation)
+   - pip/pip3 - Python package installer
+   - MkDocs - static site generator for documentation
+   - MkDocs Material theme - Material Design theme for MkDocs
+   - MkDocs Material Insiders - premium features for documentation (optional)
+   - markdownlint-cli - Markdown linter for enforcing style consistency (with .markdownlintignore support)
+   - markdownlint-cli2 - alternative Markdown linter with YAML config support (with .markdownlintignore support)
+   - yamllint - YAML linter for validating YAML syntax and style
+   - actionlint - GitHub Actions workflow linter (required for .github/actionlint.yaml)
+   - Node.js - version 14.0 or higher (required for markdownlint-cli)
+   - npm - Node.js package manager (for installing markdownlint)
+   - PyYAML - Python YAML parser (dependency for yamllint)
+   - Compiler toolchain:
+     * Clang >= 3.4 (preferred on Unix, default for prebuilt installations, required for FFI examples)
+     * GCC >= 4.7 (alternative on Unix)
+     * G++ - GNU C++ compiler (Ubuntu 20.04)
+   - Make - GNU Make 3.81 or higher (Linux)
+   - LLVM development libraries - built from lib/llvm/src submodule
+   - LLVM 15 - for Ubuntu 20.04 (from apt.llvm.org)
+   - LLVM 18.1.8 - latest supported version (as of 0.59.0)
+   - LLVM tools:
+     * llc - LLVM static compiler (required for libponyrt)
+     * llvm-link - LLVM bitcode linker (for runtime-bitcode builds)
+     * llvm-profdata - for merging coverage profile data
+     * llvm-cov - for code coverage reporting
+     * llvm-symbolizer - for sanitizer stack trace symbolization
+   - Google Test framework - version 1.17.0 (https://github.com/google/googletest/releases/download/v1.17.0/googletest-1.17.0.tar.gz)
+   - Google Benchmark - version 1.9.1 (https://github.com/google/benchmark/archive/v1.9.1.tar.gz) (required for runtime benchmarks)
+   - Blake2 library - blake2b-ref.c implementation (included in source)
+   - libffi - Foreign Function Interface library
+   - libffi-dev - FFI development headers
+   - libressl - LibreSSL cryptographic library (for Alpine)
+   - libressl-dev - LibreSSL development headers (for Alpine)
+   - libssl-dev - OpenSSL development headers (for Ubuntu/Debian)
+   - tar - archive utility for package extraction
+   - CA certificates - certificate authority bundle
+   - LSB Release - Linux Standard Base release information tool
+   - findutils - for find command (Linux)
+   - xargs - for command line processing (Linux)
+   - SystemTap - DTrace alternative for Linux (for runtime event collection)
+     * SystemTap >= 2.6 (required for Linux DTrace probe support)
+     * SystemTap runtime - required for executing SystemTap scripts
+     * systemtap-sdt-dev - SystemTap development headers (Ubuntu 20.04)
+   - Linux kernel requirements for SystemTap:
+     * Linux kernel >= 3.5 with CONFIG_UPROBES=y (native UPROBES support)
+     * Linux kernel < 3.5 with CONFIG_UTRACE=y (UTRACE kernel extensions)
+     * Kernel headers matching current kernel version (for SystemTap module compilation)
+     * Kernel debug symbols (optional, for enhanced SystemTap functionality)
+   - dtrace command-line tool - for generating header and object files (Linux SystemTap)
+   - netcat (nc) - network utility for testing TCP/UDP connections (required for echo example, net example, async/tcp_sender tests, under_pressure example, tcp-open-close stress test)
+   - ImageMagick - image manipulation tools (for convert command)
+     * convert - command-line tool for image format conversion (PBM to PNG)
+   - Netpbm viewer - for viewing PBM files directly (optional)
+     * feh - lightweight image viewer with PBM support (Linux)
+     * GIMP - GNU Image Manipulation Program with PBM support
+   - Terminal libraries and tools:
+     * readline library - GNU readline library for interactive line editing (optional, for enhanced readline example)
+     * libedit - BSD editline library (alternative to GNU readline)
+     * termcap/terminfo - terminal capability databases
+     * ncurses - terminal control library (dependency for readline)
+   - Network monitoring tools (optional):
+     * tcpdump - packet analyzer for monitoring net example traffic, async/tcp_sender tests, under_pressure TCP connections, tcp-open-close connection patterns
+     * Wireshark - GUI network protocol analyzer
+     * netstat - network statistics utility (for monitoring tcp-open-close connection states)
+     * ss - socket statistics (modern netstat replacement, for tcp-open-close socket monitoring)
+     * lsof - list open files (including network sockets, for tcp-open-close file descriptor monitoring)
+     * iftop - real-time network bandwidth monitoring
+   - Performance monitoring tools:
+     * time - command execution time measurement (for fan-in example, gups_basic benchmark, gups_opt benchmark, mailbox stress test, mandelbrot performance testing, message-ubench runtime measurement, mixed actor ring simulation, n-body simulation benchmarking, net example performance, overload backpressure testing, pony_bench benchmarking, PonyCheck property test performance, producer-consumer throughput measurement, readline interactive performance, ring actor message passing performance, runtime_info performance analysis, spreader actor tree creation performance, timers example execution time, under_pressure backpressure response time, yield behavior benchmarking, libponyc benchmarks, libponyrt benchmarks, runtime benchmarks, tcp-open-close stress test duration)
+     * perf - Linux performance analysis tool (optional, for detailed profiling of benchmarks including gups_opt, mailbox stress test, mandelbrot divide-and-conquer analysis, message-ubench throughput analysis, mixed actor ring performance, n-body computational profiling, net client-server performance, overload actor scheduling analysis, pony_bench micro-benchmarks, PonyCheck test generation profiling, producer-consumer actor scheduling analysis, ring actor communication patterns, runtime_info stats collection overhead, spreader actor tree creation profiling, timers behavior scheduling profiling, under_pressure backpressure behavior analysis, yield behavior overhead analysis, libponyc compiler performance profiling, libponyrt runtime performance profiling, Google Benchmark runtime profiling, tcp-open-close ASIO performance profiling)
+     * htop/top - process monitoring (optional, for runtime observation, memory usage monitoring during mailbox stress test, mandelbrot computation monitoring, message-ubench CPU utilization, mixed actor ring resource usage, n-body CPU usage monitoring, net example resource usage, overload memory growth monitoring, pony_bench CPU usage, PonyCheck test execution monitoring, producer-consumer actor resource usage, readline memory usage, ring actor creation and message passing overhead, runtime_info memory allocation tracking, spreader actor tree memory usage, timers example CPU usage, under_pressure CPU usage during backpressure, yield behavior CPU usage patterns, libponyc compilation resource usage, libponyrt runtime resource usage, runtime benchmark resource usage, tcp-open-close actor creation/destruction overhead)
+     * vmstat - virtual memory statistics (optional, for monitoring mailbox memory pressure, message-ubench memory patterns, mixed actor ring memory behavior, n-body memory allocation patterns, overload backpressure memory behavior, pony_bench memory patterns, PonyCheck memory usage during property generation, producer-consumer buffer memory usage, ring actor memory allocation patterns, runtime_info memory stats correlation, spreader actor allocation patterns, timers memory allocation patterns, under_pressure memory behavior during backpressure, yield behavior memory allocation patterns, libponyc compiler memory usage, libponyrt memory allocation patterns, runtime benchmark memory patterns, tcp-open-close actor memory churn)
+     * iostat - I/O statistics (optional, for monitoring mailbox I/O patterns, message-ubench I/O behavior, net example socket I/O, async/tcp_sender I/O patterns, producer-consumer message passing I/O, readline terminal I/O, runtime_info I/O impact, timers console output I/O, under_pressure TCP socket I/O patterns, yield console output I/O, libponyc file I/O during compilation, libponyrt I/O behavior, runtime benchmark I/O patterns, tcp-open-close heavy ASIO activity)
+     * mpstat - multiprocessor statistics (optional, for monitoring message-ubench per-CPU utilization, mixed actor ring CPU distribution, n-body multi-core utilization, overload sender/receiver CPU distribution, pony_bench CPU distribution, PonyCheck parallel test execution, producer-consumer actor CPU distribution, ring actor distribution across cores, runtime_info scheduler stats per CPU, spreader actor tree distribution across cores, timers scheduler CPU usage, under_pressure actor scheduling during backpressure, yield behavior actor scheduling distribution, libponyc parallel compilation, libponyrt scheduler CPU distribution, runtime benchmark CPU distribution, tcp-open-close ASIO thread CPU distribution)
+     * pidstat - process statistics (optional, for monitoring message-ubench thread behavior, mixed actor ring thread activity, n-body thread performance, overload actor thread scheduling, pony_bench thread behavior, PonyCheck test runner threads, producer-consumer actor thread behavior, ring actor thread scheduling, runtime_info thread-level stats, spreader actor creation thread behavior, timers thread scheduling behavior, under_pressure thread activity during backpressure, yield behavior thread scheduling patterns, libponyc compiler thread behavior, libponyrt runtime thread behavior, runtime benchmark thread behavior, tcp-open-close ASIO thread activity)
+     * sar - system activity reporter (optional, for comprehensive message-ubench system metrics, mixed actor ring system impact, n-body system resource usage, overload system-wide impact analysis, pony_bench system impact, PonyCheck test suite system impact, producer-consumer system impact, ring example system-wide metrics, runtime_info system-wide correlation, spreader actor tree system impact, timers system-wide timer subsystem impact, under_pressure system-wide backpressure impact, yield behavior system-wide impact, libponyc compilation system impact, libponyrt runtime system impact, runtime benchmark system impact, tcp-open-close system-wide ASIO impact)
+   - CSV processing tools (optional):
+     * csvkit - CSV command-line toolkit for analyzing message-ubench output, libponyc benchmark results, libponyrt benchmark results, Google Benchmark CSV output
+     * gnuplot - plotting tool for visualizing message-ubench performance data, libponyc performance trends, libponyrt performance trends, runtime benchmark trends
+     * Python pandas - for advanced analysis of message-ubench CSV output, libponyc benchmark data, libponyrt benchmark data, Google Benchmark results
+     * R - statistical computing environment for message-ubench data analysis, libponyc performance statistics, libponyrt performance statistics, runtime benchmark statistics
+   - Numerical computation profiling tools (optional):
+     * Intel VTune Profiler - for detailed n-body performance analysis, libponyc optimization profiling, libponyrt runtime optimization profiling, runtime benchmark optimization
+     * AMD uProf - for AMD processor performance profiling
+     * valgrind --tool=cachegrind - for cache performance analysis of n-body calculations, libponyc cache behavior, libponyrt cache behavior, runtime benchmark cache analysis
+     * gprof - GNU profiler for n-body function-level profiling, libponyc function performance, libponyrt function performance, runtime benchmark function profiling
+   - Benchmarking analysis tools (optional):
+     * Python matplotlib - for visualizing pony_bench results, yield behavior benchmark results, libponyc benchmark graphs, libponyrt benchmark graphs, Google Benchmark result visualization
+     * Jupyter Notebook - for interactive benchmark data analysis
+     * Excel/LibreOffice Calc - for benchmark result comparison
+     * jq - JSON processor for parsing benchmark output (if JSON format added)
+     * Google Benchmark compare.py - for comparing benchmark results between runs
+     * Google Benchmark tools - additional analysis scripts from lib/gbenchmark/tools
+   - Testing frameworks and tools:
+     * PonyTest - Pony unit testing framework (included in standard library)
+     * PonyCheck - Property-based testing framework for Pony (included in standard library)
+   - CLI package dependencies:
+     * Pony cli package - command-line interface parsing library (included in standard library, required for ring example modification, spreader command-line argument parsing, yield example command-line options and subcommands)
+     * Pony term package - terminal control and readline functionality (included in standard library)
+   - Environment variable tools:
+     * env - command-line utility for displaying environment variables (Linux)
+     * printenv - print all or part of environment (Linux)
+   - Concurrency analysis tools (optional):
+     * ThreadSanitizer (TSan) - for detecting data races in producer-consumer implementation, ring actor message passing, spreader actor

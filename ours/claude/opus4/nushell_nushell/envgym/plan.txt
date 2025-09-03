@@ -1,0 +1,273 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust toolchain (version 1.87.0 as specified in rust-toolchain.toml)
+   - Cargo (comes with Rust, default profile)
+   - Rustfmt and Clippy (included in default profile)
+   - Git for version control
+   - Docker (already installed - version 28.1.1)
+   - cross-rs (cargo install cross)
+   - Platform-specific package managers:
+     - Linux (Ubuntu 20.04): apt-get
+   - Build essentials:
+     - Linux: build-essential, pkg-config, libssl-dev, perl (for OpenSSL static linking), clang, libgtk-3-dev, libxcb-render0-dev, libxcb-shape0-dev, libxcb-xfixes0-dev
+   - Cross-compilation toolchains:
+     - aarch64-unknown-linux-gnu
+     - aarch64-unknown-linux-musl
+   - Optional linkers for performance:
+     - mold linker (Linux x86_64) for faster linking
+     - lld linker as alternative
+   - Optional development tools:
+     - rust-analyzer for IDE support
+     - cargo-binstall for binary installation support
+     - cargo-audit for security vulnerability checking
+     - cargo-outdated for dependency update checking
+   - Testing and benchmarking tools:
+     - tango-bench for performance benchmarking
+     - serial_test for serialized test execution
+   - Documentation tools:
+     - mdbook for building documentation
+     - simplelog for logging
+   - Additional system dependencies (from Cargo.lock):
+     - SQLite development libraries (for rusqlite)
+     - Git2 development libraries (for git2)
+     - X11 development libraries (Linux only, for clipboard support)
+     - Wayland development libraries (Linux only, for wl-clipboard-rs)
+
+2. FILES TO CREATE:
+   - /home/cc/.config/nushell/config.nu (main configuration file)
+   - /home/cc/.config/nushell/env.nu (environment variables configuration)
+   - /home/cc/.config/nushell/login.nu (login shell configuration)
+   - /home/cc/EnvGym/data/nushell_nushell/.cargo/config.toml (already exists - contains platform-specific build configurations)
+   - /home/cc/EnvGym/data/nushell_nushell/Cross.toml (cross-compilation configuration - already exists)
+   - /home/cc/EnvGym/data/nushell_nushell/.vscode/settings.json or .idea/ configurations (IDE-specific settings)
+   - /home/cc/EnvGym/data/nushell_nushell/.env (local environment variables for development)
+   - /home/cc/EnvGym/data/nushell_nushell/scripts/setup.nu (automated setup script)
+   - /home/cc/EnvGym/data/nushell_nushell/scripts/test-all.nu (comprehensive test runner)
+   - /home/cc/EnvGym/data/nushell_nushell/scripts/build.rs (custom build script - already exists)
+   - /home/cc/EnvGym/data/nushell_nushell/scripts/bench.nu (benchmark runner script)
+   - /home/cc/EnvGym/data/nushell_nushell/scripts/cross-build.nu (cross-compilation build script)
+   - /home/cc/EnvGym/data/nushell_nushell/scripts/check-deps.nu (dependency verification script)
+   - /home/cc/EnvGym/data/nushell_nushell/scripts/test-stack-size.nu (stack size verification script)
+   - /home/cc/EnvGym/data/nushell_nushell/.github/workflows/ci.yml (CI configuration for profile builds)
+   - /home/cc/EnvGym/data/nushell_nushell/.github/workflows/cross-compile.yml (CI configuration for cross-compilation)
+   - /home/cc/EnvGym/data/nushell_nushell/.github/dependabot.yml (automated dependency updates)
+   - /home/cc/EnvGym/data/nushell_nushell/Cargo.lock (already exists - version control tracking)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Core pipeline functionality tests
+   - Command parsing and execution tests
+   - Data structure conversion tests (structured data handling)
+   - Plugin loading and communication tests (nu-plugin-engine, nu-plugin-protocol)
+   - Cross-platform compatibility tests (focus on Linux x86_64)
+   - Cross-architecture compatibility tests (x86_64 native, aarch64 via cross-compilation)
+   - File opening and parsing tests (.toml, .json, .yaml, .csv, .xml, .ini, .eml, .ical)
+   - Performance benchmarks for large data operations
+   - Error handling and edge case tests
+   - Integration tests for third-party tool support
+   - Configuration loading and validation tests
+   - LSP server functionality tests (nu-lsp)
+   - SQLite integration tests (when sqlite feature enabled)
+   - System clipboard tests (when system-clipboard feature enabled)
+   - Trash operations tests (when trash-support feature enabled)
+   - TLS tests (both rustls and native-tls)
+   - Plugin protocol serialization tests
+   - Unix-specific signal handling tests
+   - Large data processing tests (stack overflow prevention)
+   - Feature matrix combination tests
+   - Rust toolchain compatibility tests
+   - Dependency version compatibility tests
+   - Cross-compiled binary functionality tests
+   - Static linking tests (OpenSSL with musl)
+   - ARM64 specific optimization tests (via emulation)
+   - Polars plugin functionality tests (dataframe operations)
+   - Git integration tests (via git2)
+   - Clipboard integration tests (arboard, wl-clipboard-rs, x11rb)
+   - Async/await functionality tests (tokio runtime)
+   - HTTP/HTTPS client tests (reqwest, ureq)
+   - Compression/decompression tests (zstd, brotli, flate2)
+   - Plugin custom values tests (nu_plugin_custom_values)
+   - Query plugin tests (XPath, JSON path)
+   - Incremental compilation tests
+   - Memory safety tests with different allocators
+   - Linker performance tests (mold vs default)
+
+4. COMPLETE TODO LIST:
+   - Change to working directory:
+     - Run: cd /home/cc/EnvGym/data/nushell_nushell
+   - Install Rust toolchain:
+     - Run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+     - Run: source $HOME/.cargo/env
+     - Run: rustup toolchain install 1.87.0
+     - Run: rustup default 1.87.0
+     - Run: rustup component add rustfmt clippy rust-docs
+     - Verify: rustc --version (should be 1.87.0)
+     - Verify: cargo --version
+     - Verify: rustfmt --version
+     - Verify: clippy-driver --version
+   - Install cross-compilation targets:
+     - Run: rustup target add aarch64-unknown-linux-gnu
+     - Run: rustup target add aarch64-unknown-linux-musl
+     - Run: rustup target add x86_64-pc-windows-gnu
+     - Verify: rustup target list --installed
+   - Verify Docker installation:
+     - Verify: docker --version (should show 28.1.1)
+     - Verify: docker run hello-world
+   - Install cross-rs:
+     - Run: cargo install cross --git https://github.com/cross-rs/cross
+     - Verify: cross --version
+   - Install platform-specific dependencies (Ubuntu 20.04):
+     - Run: sudo apt-get update
+     - Run: sudo apt-get install -y build-essential pkg-config libssl-dev perl clang libsqlite3-dev libgit2-dev libgtk-3-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libwayland-dev
+   - Install optional performance linkers:
+     - Run: wget -qO- https://github.com/rui314/mold/releases/latest/download/mold-$(uname -m)-linux.tar.gz | tar xz
+     - Run: sudo mv mold*/bin/mold /usr/local/bin/
+     - Run: sudo chmod +x /usr/local/bin/mold
+     - Verify: mold --version
+   - Verify rust-toolchain.toml:
+     - Check: cat rust-toolchain.toml
+     - Confirm channel is "1.87.0" and profile is "default"
+   - Verify .cargo/config.toml configuration:
+     - Check: cat .cargo/config.toml
+     - Note x86_64-unknown-linux-gnu specific settings
+   - Verify Cross.toml configuration:
+     - Check: cat Cross.toml
+     - Confirm aarch64-unknown-linux-gnu configuration
+     - Confirm aarch64-unknown-linux-musl configuration
+   - Verify Cargo.lock integrity:
+     - Run: cargo verify-project
+     - Run: cargo check --locked
+   - Build Nushell from source with default features:
+     - Run: cargo build --release --locked
+     - Verify: ./target/release/nu --version
+   - Build with different feature combinations:
+     - Full features: cargo build --release --features full --locked
+     - Minimal: cargo build --release --no-default-features --locked
+     - Static OpenSSL: cargo build --release --features static-link-openssl --locked
+   - Test cross-compilation builds using Docker:
+     - ARM64 GNU: cross build --target aarch64-unknown-linux-gnu --release --locked
+     - ARM64 musl: cross build --target aarch64-unknown-linux-musl --release --features=static-link-openssl --locked
+     - Windows: cross build --target x86_64-pc-windows-gnu --release --locked
+     - Verify builds in target/aarch64-unknown-linux-gnu/release/
+     - Verify builds in target/aarch64-unknown-linux-musl/release/
+     - Verify builds in target/x86_64-pc-windows-gnu/release/
+   - Install development tools:
+     - Run: cargo install cargo-binstall
+     - Run: cargo install cargo-audit
+     - Run: cargo install cargo-outdated
+     - Run: cargo binstall nu
+     - Verify: nu --version
+   - Create configuration directories:
+     - Run: mkdir -p /home/cc/.config/nushell
+   - Initialize default configuration:
+     - Run: nu (first run will create default configs)
+     - Verify: ls /home/cc/.config/nushell/
+   - Set up development environment with mold:
+     - Create .cargo/config.toml.local with mold configuration:
+       ```
+       [target.x86_64-unknown-linux-gnu]
+       linker = "clang"
+       rustflags = ["-C", "link-arg=-fuse-ld=/usr/local/bin/mold"]
+       ```
+     - Test build with mold: cargo build --release
+   - Configure IDE:
+     - Install rust-analyzer extension
+     - Configure workspace settings for Rust development
+     - Enable clippy warnings from workspace lints
+     - Set rust-analyzer to use toolchain from rust-toolchain.toml
+     - Configure rust-analyzer to respect Cargo.lock
+   - Run dependency audit:
+     - Run: cargo audit
+     - Fix any security vulnerabilities found
+     - Run: cargo outdated
+     - Document any outdated dependencies
+   - Run initial tests:
+     - Run: cargo test --workspace --locked
+     - Run: cargo test --workspace --features full --locked
+     - Verify: All tests pass
+   - Build and test plugins:
+     - Run: cargo build --workspace --features plugin --locked
+     - Test individual plugins:
+       - nu_plugin_example: cargo test -p nu_plugin_example --locked
+       - nu_plugin_formats: cargo test -p nu_plugin_formats --locked
+       - nu_plugin_polars: cargo test -p nu_plugin_polars --locked
+       - nu_plugin_query: cargo test -p nu_plugin_query --locked
+       - nu_plugin_gstat: cargo test -p nu_plugin_gstat --locked
+       - nu_plugin_inc: cargo test -p nu_plugin_inc --locked
+   - Run benchmarks:
+     - Run: cargo bench
+     - Run specific benchmarks: cargo bench -- parse
+     - Compare build times with and without mold
+   - Set up shell integration:
+     - Add nu to /etc/shells: echo "/home/cc/.cargo/bin/nu" | sudo tee -a /etc/shells
+     - Configure terminal to use nu as default shell (optional)
+   - Install supported third-party tools:
+     - Run: cargo install zoxide starship atuin
+     - Configure integrations in config.nu
+   - Verify plugin functionality:
+     - Build example plugin: cargo build --package nu_plugin_example --locked
+     - Register plugin: nu -c "plugin add ./target/debug/nu_plugin_example"
+     - Test plugin: nu -c "plugin list"
+   - Set up development scripts:
+     - Create scripts/setup.nu for automated setup
+     - Create scripts/test-all.nu for comprehensive testing
+     - Create scripts/bench.nu for running benchmarks
+     - Create scripts/cross-build.nu with:
+       ```nu
+       #!/usr/bin/env nu
+       # Build for ARM64 GNU
+       cross build --target aarch64-unknown-linux-gnu --release --locked
+       # Build for ARM64 musl with static OpenSSL
+       cross build --target aarch64-unknown-linux-musl --release --features=static-link-openssl --locked
+       # Build for Windows
+       cross build --target x86_64-pc-windows-gnu --release --locked
+       ```
+     - Create scripts/check-deps.nu with:
+       ```nu
+       #!/usr/bin/env nu
+       cargo verify-project
+       cargo check --locked
+       cargo audit
+       cargo outdated
+       ```
+     - Create scripts/test-stack-size.nu with:
+       ```nu
+       #!/usr/bin/env nu
+       # Test stack-intensive operations
+       let large_data = 1..1000000 | each { |i| { index: $i, data: ($i * $i) } }
+       $large_data | where index > 500000 | length
+       ```
+   - Configure environment variables:
+     - Edit /home/cc/.config/nushell/env.nu
+     - Add PATH modifications for cargo binaries
+     - Set RUST_BACKTRACE=1 for development
+     - Set CARGO_INCREMENTAL=1 for faster rebuilds
+   - Test cross-architecture compatibility:
+     - Test cross-compiled ARM64 binaries using QEMU:
+       - Run: docker run --rm -v $(pwd):/workspace -w /workspace arm64v8/ubuntu ./target/aarch64-unknown-linux-gnu/release/nu --version
+     - Test Windows cross-compiled binaries with Wine:
+       - Install Wine: sudo apt-get install -y wine64
+       - Test: wine ./target/x86_64-pc-windows-gnu/release/nu.exe --version
+   - Build with different profiles:
+     - Debug: cargo build --locked
+     - Release: cargo build --release --locked
+     - Profiling: cargo build --profile profiling --locked
+     - CI: cargo build --profile ci --locked
+   - Test feature combinations:
+     - SQLite: cargo test --features sqlite --locked
+     - System clipboard: cargo test --features system-clipboard --locked
+     - No default features: cargo test --no-default-features --locked
+     - Polars: cargo test --features dataframe --locked
+   - Set up LSP development:
+     - Build LSP: cargo build -p nu-lsp --locked
+     - Test LSP functionality
+   - Create Docker images for testing:
+     - Create Dockerfile for x86_64 builds using ubuntu:20.04 base
+     - Create multi-stage Dockerfile for optimized builds
+     - Test BuildKit features: DOCKER_BUILDKIT=1 docker build .
+   - Verify disk space requirements:
+     - Check available space: df -h /home/cc/EnvGym/data/nushell_nushell
+     - Ensure at least 10GB free for builds and dependencies
+   - Set up CI environment variables:
+     - Export CARGO_HOME=/home/cc/.cargo
+     - Export RUSTUP_HOME

@@ -1,0 +1,238 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - GCC compiler (version 7 or higher, tested with GCC 8, 9, 10, 11, 12, 13)
+   - GCC 8 Docker image (gcc:8) for ARM64 builds
+   - GCC 8 (gcc-8, g++-8) for PowerPC64 Little Endian builds
+   - GCC 9 Docker image (gcc:9) for x86_64 builds
+   - GCC 9 (gcc-9, g++-9) for PowerPC64 Little Endian builds
+   - GCC 10 Docker image (gcc:10) for containerized testing
+   - GCC 10 (gcc-10, g++-10) for PowerPC64 Little Endian builds
+   - Clang compiler (version 6 or higher, tested with Clang 6, 7, 8, 9, 10, 11, 13, 14, 16, 19)
+   - Clang 6.0 (clang-6.0, clang++-6.0) for legacy builds and PowerPC64 Little Endian
+   - Clang 7 (clang-7, clang++-7) for libc++ builds and PowerPC64 Little Endian
+   - Clang 8 (clang-8, clang++-8) for PowerPC64 Little Endian builds
+   - Clang 9 (clang-9, clang++-9) for sanitizer and libc++ builds and PowerPC64 Little Endian
+   - Clang 10 (clang-10, clang++-10) for PowerPC64 Little Endian builds
+   - Clang 11 (clang-11, clang++-11) for C++20 builds
+   - Apple Clang (for macOS builds)
+   - LLVM toolchain (version 19 for fuzzing workflow)
+   - LLVM 11 Docker image (pauldreik/llvm-11) for C++20 libc++ builds
+   - Bloomberg Clang P2996 fork (latest from p2996 branch at https://github.com/bloomberg/clang-p2996.git)
+   - LLVM with P2996 static reflection support
+   - clang-format (LLVM code formatter, same version as Clang compiler)
+   - clangd (Clang language server for IDE integration)
+   - clangd configuration support (version 12 or higher for .clangd file support)
+   - Git (latest stable version)
+   - GitHub CLI (gh) for GitHub integration
+   - CMake (version 3.14 or higher, 3.25+ for static reflection support)
+   - CMake from Debian buster-backports repository
+   - CMake from simdjson Debian PPA repository
+   - Python 3.x (for running benchmarks, tests, and release tools)
+   - Python 3 development headers (python3-dev)
+   - wget or curl (for downloading files and uploading fuzz data)
+   - Doxygen (for generating documentation)
+   - Graphviz (for Doxygen diagram generation)
+   - Google Test framework (via CPM package manager)
+   - Google Benchmark (via CPM package manager)
+   - cxxopts (command line parsing library, via CPM)
+   - Threads library (pthreads or platform equivalent)
+   - pkg-config (for library discovery and .pc file generation)
+   - find, file, grep utilities (for ASCII validation tests)
+   - nm utility (for symbol checking)
+   - simdjson library files:
+     - Source files from src/ directory
+     - Header files from include/ directory
+     - Single header from singleheader/ directory (simdjson.h and simdjson.cpp amalgamated files)
+     - Sample JSON files from jsonexamples/ (including twitter.json and amazon_cellphones.ndjson)
+   - libc++ (if using static reflection with C++26 or SIMDJSON_USE_LIBCPP)
+   - libc++abi (C++ ABI library for libc++)
+   - libunwind (stack unwinding library for libc++)
+   - libstdc++6 (GNU Standard C++ Library v3)
+   - CPack (for package generation)
+   - Docker (for containerized builds and static reflection development)
+   - Docker Desktop or OrbStack (for macOS users)
+   - Podman (alternative to Docker for RedHat-based systems)
+   - WSL (Windows Subsystem for Linux for Windows users)
+   - CircleCI CLI (optional, for local testing of CI pipelines)
+   - Cirrus CI (for FreeBSD continuous integration)
+   - Drone CI (for multi-architecture continuous integration)
+   - Travis CI (for PowerPC64 Little Endian continuous integration)
+   - Valgrind (for memory sanitization and corpus validation)
+   - AddressSanitizer/ThreadSanitizer support in compiler
+   - UndefinedBehaviorSanitizer support in compiler
+   - ThreadSanitizer runtime library (for thread safety testing)
+   - apt-get (for Docker image package management)
+   - apt-key (for managing APT repository keys)
+   - apt-add-repository (for adding APT repositories)
+   - QEMU user-mode emulation (for cross-architecture testing)
+   - run-on-arch-action (GitHub Action for multi-architecture testing)
+   - uraimo/run-on-arch-action@v3 (GitHub Action for PowerPC64, RISC-V 64, and s390x architecture testing)
+   - Alpine Linux Docker image (alpine:latest)
+   - Alpine Linux packages:
+     - build-base (Alpine build essentials)
+     - linux-headers (for Alpine Linux builds)
+     - bash (for Alpine test scripts)
+   - apk (Alpine package manager)
+   - FreeBSD 13.0 snapshot image (freebsd-13-0-snap)
+   - FreeBSD pkg package manager
+   - FreeBSD packages:
+     - bash (Bourne Again Shell for FreeBSD)
+     - cmake (build system for FreeBSD)
+     - git (version control for FreeBSD)
+   - FreeBSD build tools (make, compiler toolchain)
+   - Debian Testing Docker image (debian:testing)
+   - Debian 12 Docker image (debian:12)
+   - Debian Buster Docker image (with buster-backports repository)
+   - Debian Buster Backports Docker image (debian:buster-backports)
+   - Debian packages:
+     - g++ (GNU C++ compiler)
+     - cmake (build system)
+     - make (build tool)
+     - pkg-config (library configuration tool)
+     - ca-certificates (certificate authority certificates)
+     - gnupg (GNU Privacy Guard)
+     - zlib1g (compression library)
+     - subversion (version control system)
+     - unzip (archive extraction utility)
+     - linux-perf (Linux performance analysis tools)
+     - rust-all (Rust programming language toolchain)
+     - libcurl4-openssl-dev (curl development files)
+     - binutils (binary utilities)
+     - vim (text editor)
+     - clang-format (code formatter)
+     - clangd (language server)
+   - Ubuntu 18.04 Docker image (ubuntu:18.04) for style checking
+   - Ubuntu 20.04 Docker image (ubuntu:20.04)
+   - Ubuntu 22.04 Docker image (ubuntu:22.04)
+   - Ubuntu 24.04 Docker image (ubuntu:24.04)
+   - Ubuntu Bionic (18.04) for Travis CI builds
+   - Ubuntu latest Docker image for ppc64le architecture
+   - Ubuntu latest Docker image for riscv64 architecture
+   - Ubuntu latest Docker image for s390x architecture
+   - Ubuntu 20.04 packages:
+     - g++-9 (GCC 9 C++ compiler)
+     - build-essential (Ubuntu build tools)
+     - clang-format-9 (Clang format tool version 9)
+   - Ubuntu 22.04 packages:
+     - g++-11 (GCC 11 C++ compiler - default on Ubuntu 22.04)
+     - clang-13 (Clang 13 compiler)
+     - clang++-13 (Clang++ 13 C++ compiler)
+     - clang-format-13 (Clang format tool version 13)
+     - clangd-13 (Clang language server version 13)
+     - clang-14 (Clang 14 compiler)
+     - clang++-14 (Clang++ 14 C++ compiler)
+     - clang-format-14 (Clang format tool version 14)
+     - clangd-14 (Clang language server version 14)
+     - g++-12 (GCC 12 C++ compiler)
+     - build-essential (Ubuntu build tools)
+   - Ubuntu 24.04 packages:
+     - g++ (default GCC C++ compiler on Ubuntu 24.04)
+     - g++-9 (GCC 9 C++ compiler for Ubuntu 24.04 no-exception, no-thread, and sanitizer builds)
+     - g++-13 (GCC 13 C++ compiler)
+     - clang++-16 (Clang++ 16 C++ compiler)
+     - clang-format-16 (Clang format tool version 16)
+     - clangd-16 (Clang language server version 16)
+     - build-essential (Ubuntu build tools)
+   - Ubuntu Bionic packages:
+     - g++-8 (GCC 8 C++ compiler)
+     - g++-9 (GCC 9 C++ compiler)
+     - g++-10 (GCC 10 C++ compiler)
+     - clang-6.0 (Clang 6.0 compiler)
+     - clang-format-6.0 (Clang format tool version 6.0)
+     - clang-7 (Clang 7 compiler)
+     - clang-format-7 (Clang format tool version 7)
+     - clang-8 (Clang 8 compiler)
+     - clang-format-8 (Clang format tool version 8)
+     - clang-9 (Clang 9 compiler)
+     - clang-format-9 (Clang format tool version 9)
+     - clang-10 (Clang 10 compiler)
+     - clang-format-10 (Clang format tool version 10)
+   - Ubuntu Toolchain Test PPA (ubuntu-toolchain-r-test)
+   - LLVM APT repository for Ubuntu Bionic:
+     - llvm-toolchain-bionic-6.0
+     - llvm-toolchain-bionic-7
+     - llvm-toolchain-bionic-8
+     - llvm-toolchain-bionic-9
+     - llvm-toolchain-bionic-10
+   - LLVM APT repository GPG key (https://apt.llvm.org/llvm-snapshot.gpg.key)
+   - PowerPC64 Little Endian (ppc64le) cross-compilation support
+   - PowerPC64 Little Endian build flags (-maltivec -mcpu=power9 -mtune=power9)
+   - RISC-V 64-bit (riscv64) cross-compilation support
+   - s390x architecture support
+   - s390x-linux-gnu-gcc (s390x cross-compiler)
+   - s390x-linux-gnu-g++ (s390x C++ cross-compiler)
+   - OSS-Fuzz infrastructure components:
+     - google/oss-fuzz/infra/cifuzz/actions/build_fuzzers@master
+     - google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@master
+   - LibFuzzer (LLVM fuzzing library)
+   - Clang with fuzzing support (for building fuzz targets)
+   - actions/upload-artifact@v4 (GitHub Action for artifact upload)
+   - actions/checkout@v4 (GitHub Action for repository checkout)
+   - actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 (GitHub Action v4.1.6 for repository checkout)
+   - actions/cache@v4 (GitHub Action for caching corpus and dependencies)
+   - actions/cache/restore@v4 (GitHub Action for cache restoration)
+   - actions/cache/save@v3 (GitHub Action for cache saving)
+   - peaceiris/actions-gh-pages@v3 (GitHub Action for GitHub Pages deployment)
+   - Doxygen theme files (via prepare_doxygen.sh)
+   - Node.js (latest LTS version for Emscripten workflow, JavaScript tools, and generatelargejson.js)
+   - npm (Node Package Manager, comes with Node.js, required for JavaScript dependencies)
+   - Emscripten SDK (EMSDK) for WebAssembly compilation
+   - emcc (Emscripten C++ compiler)
+   - emcmake (Emscripten CMake wrapper)
+   - actions/setup-node@v4.4.0 (GitHub Action for Node.js setup)
+   - mymindstorm/setup-emsdk@v14 (GitHub Action for Emscripten SDK setup)
+   - sed utility (for text processing and whitespace removal)
+   - diff utility (for file comparison)
+   - wc utility (for character/line counting)
+   - ninja-build (Ninja build system for faster builds)
+   - zip/unzip utilities (for corpus management)
+   - lsb-release (for Linux distribution information)
+   - software-properties-common (for managing software repositories)
+   - gnupg (for package verification)
+   - LLVM APT repository script (llvm.sh)
+   - xargs utility (for parallel command execution)
+   - tar utility (for archiving corpus and artifacts)
+   - gzip utility (for compression)
+   - sort utility (for corpus file sorting)
+   - head utility (for selecting corpus subset)
+   - LoongArch64 cross-compilation toolchain:
+     - loongarch64-unknown-linux-gnu-gcc
+     - loongarch64-unknown-linux-gnu-g++
+     - LoongArch64 gcc+glibc toolchain (version 2023.08.08 or later)
+   - RISC-V 64-bit toolchain:
+     - riscv64-linux-gnu-gcc
+     - riscv64-linux-gnu-g++
+     - RISC-V GCC 11 or later
+   - xz-utils (for extracting .tar.xz archives)
+   - macOS development tools:
+     - Xcode Command Line Tools
+     - macOS SDK
+     - Homebrew (optional, for package management)
+     - clang-format (via Homebrew or Xcode)
+     - clangd (via Homebrew or LLVM)
+   - macOS dynamic linker tools (for -rpath support)
+   - macOS standard C++ library (libc++ or libstdc++)
+   - MSYS2 (Windows Unix-like environment)
+   - msys2/setup-msys2@v2 (GitHub Action for MSYS2 setup)
+   - MSYS2 packages:
+     - mingw-w64-x86_64-libxml2
+     - mingw-w64-x86_64-cmake
+     - mingw-w64-x86_64-ninja
+     - mingw-w64-x86_64-clang
+     - mingw-w64-x86_64-gcc
+     - mingw-w64-x86_64-clang-tools-extra (includes clang-format and clangd)
+   - MinGW-w64 toolchain (for Windows builds)
+   - Windows SDK (for native Windows development)
+   - C++17/C++20/C++26 standard library support
+   - ctest (CMake test driver)
+   - echo command (for generating example code)
+   - GCC 12 with libstdc++ debug mode support (for GLIBCXX_ASSERTIONS)
+   - GCC 13 with C++20 support
+   - Clang 16 with C++20 support
+   - libstdc++ debug headers (for assertion checking)
+   - c++ command (C++ compiler wrapper)
+   - Performance monitoring tools (for checkperf target)
+   - AddressSanitizer runtime library (for memory error detection)
+   - UndefinedBehaviorSanitizer runtime library (for undefined behavior detection)
+   - Visual Studio 2022 (VS17)

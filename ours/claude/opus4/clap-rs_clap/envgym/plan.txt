@@ -1,0 +1,119 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust programming language (latest stable version, minimum 1.74.0, with 1.89.0 stable for UI tests) - x86_64-unknown-linux-gnu target
+   - Cargo (comes with Rust installation)
+   - Git (latest stable version)
+   - Visual Studio Code or alternative IDE with Rust support
+   - rust-analyzer extension for IDE
+   - cargo-edit (for cargo add command support)
+   - cargo-tarpaulin or cargo-llvm-cov (for code coverage) - x86_64 Linux binary
+   - rustfmt (for code formatting)
+   - clippy (for linting)
+   - cargo-release (for release management with release.toml support)
+   - cargo-workspaces (for workspace management)
+   - cargo-deny (for dependency auditing and license checking)
+   - rustversion (for version-specific compilation)
+   - trybuild (for compile-fail tests)
+   - trycmd (for CLI testing and .md file verification)
+   - snapbox (for snapshot testing with diff, dir, and examples features)
+   - automod (for automatic module discovery)
+   - divan 0.1.14 (for benchmarking)
+   - lazy_static 1.4.0 (for benchmark support)
+   - jiff (for date/time handling)
+   - completest (for shell completion testing)
+   - completest-pty (for PTY-based completion testing)
+   - completest-nu (for Nushell completion testing)
+   - GNU Make (for Makefile support) - available via apt/package manager
+   - wasm32-unknown-unknown target (for WASM builds)
+   - wasm32-wasip2 target (for WASM WASI builds)
+   - elvish shell (for shell integration tests) - x86_64 Linux binary
+   - fish shell (for shell integration tests) - available via apt/package manager
+   - zsh shell (for shell integration tests) - available via apt/package manager
+   - bash shell (for shell integration tests) - pre-installed on Linux
+   - nushell (for Nushell completion testing and generation) - x86_64 Linux binary
+   - nightly Rust toolchain (for minimal-versions testing and unstable cargo features) - x86_64-unknown-linux-gnu
+   - Node.js and npm (for Renovate bot local testing) - x86_64 Linux binary
+   - Renovate CLI (for dependency update automation testing)
+   - GitHub Settings App (Probot app for repository settings sync)
+   - Typos CLI (for spell checking in CI) - x86_64 Linux binary
+   - committed (for conventional commit validation) - x86_64 Linux binary
+   - Python 3.x (for pre-commit framework) - available via apt/package manager
+   - pre-commit (for Git hooks management)
+   - is_executable crate (for dynamic completion support)
+   - shlex crate (for shell lexing in dynamic completions)
+   - syn crate (version 2.0.8 with full features for proc-macro)
+   - quote crate (version 1.0.9 for proc-macro)
+   - proc-macro2 crate (version 1.0.69 for proc-macro)
+   - heck crate (version 0.5.0 for case conversion)
+   - pulldown-cmark crate (version 0.13.0 for markdown parsing)
+   - anstyle crate (version 1.0.10 for styling)
+   - roff crate (version 0.2.1 for man page generation)
+   - cargo-xtask (for build task automation)
+
+2. FILES TO CREATE:
+   - `/home/cc/EnvGym/data/clap-rs_clap/Cargo.toml` - Workspace root manifest with workspace configuration
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_builder/Cargo.toml` - Core builder crate manifest with features: default, debug, unstable-doc, std, color, help, usage, error-context, suggestions, deprecated, cargo, wrap_help, env, unicode, string, unstable-v5, unstable-ext, unstable-styles
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_builder/README.md` - Builder implementation documentation with links to docs.rs tutorials and references
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_derive/Cargo.toml` - Derive macro crate manifest (version 4.5.45) with features: default (empty), debug, unstable-v5, deprecated, raw-deprecated, unstable-markdown
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_derive/CONTRIBUTING.md` - clap_derive specific contribution guidelines with derive gotchas: __clap_ prefix for generated variables, prefer clap over ::clap path, variable name substitution, prefer ::std::result::Result and ::std::option::Option, whitespace between quoted variables, magic attributes documentation in derive reference, doc aliases for attributes without builder methods
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_derive/README.md` - Derive macro documentation with docs.rs badges, links to Derive Tutorial and Derive Reference, dual licensing (Apache 2.0/MIT), contribution section referencing CONTRIBUTING.md
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_derive/LICENSE-MIT` - MIT license file for clap_derive
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_derive/LICENSE-APACHE` - Apache 2.0 license file for clap_derive
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_lex/Cargo.toml` - Lexer crate manifest (version 0.7.5)
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_lex/CHANGELOG.md` - clap_lex specific changelog
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_lex/README.md` - Minimal, flexible command line parser documentation with badges, dual licensing (Apache 2.0/MIT), sections for About, API Reference, Questions & Discussions, CONTRIBUTING, and Sponsors
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_lex/LICENSE-MIT` - MIT license file for clap_lex
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_lex/LICENSE-APACHE` - Apache 2.0 license file for clap_lex
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_lex/CONTRIBUTING.md` - clap_lex specific contribution guidelines referencing clap-wide CONTRIBUTING.md
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_complete/Cargo.toml` - Shell completion crate manifest (version 4.5.57) with features: default (empty), unstable-doc, unstable-dynamic, unstable-shell-tests, debug
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_complete/README.md` - Shell completion generation documentation with badges, dual licensing (Apache 2.0/MIT), sections for About, API Reference, Q&A, Contributing, Sponsors, and Related Projects (clap_complete_nushell)
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_complete/LICENSE-MIT` - MIT license file for clap_complete
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_complete/LICENSE-APACHE` - Apache 2.0 license file for clap_complete
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_complete/CONTRIBUTING.md` - clap_complete specific contribution guidelines with scope section explaining core generators maintained by clap maintainers and additional contributor-maintained generators in clap_complete_<name> crates
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_complete_nushell/Cargo.toml` - Nushell completion crate manifest (version 4.5.8) with unstable-shell-tests feature
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_complete_nushell/README.md` - Nushell completion documentation with badges, example code showing Nushell module generation, dual licensing (Apache 2.0/MIT), links to Questions & Discussions and CONTRIBUTING
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_complete_nushell/LICENSE-MIT` - MIT license file for clap_complete_nushell
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_complete_nushell/LICENSE-APACHE` - Apache 2.0 license file for clap_complete_nushell
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_mangen/Cargo.toml` - Man page generation crate manifest (version 0.2.29) with features: default (empty), debug
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_mangen/CHANGELOG.md` - clap_mangen specific changelog
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_mangen/README.md` - Man page generation documentation with badges, ROFF generation example using build.rs, dual licensing (Apache 2.0/MIT), sections for About, API Reference, Questions & Discussions, CONTRIBUTING, and Sponsors
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_mangen/LICENSE-MIT` - MIT license file for clap_mangen
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_mangen/LICENSE-APACHE` - Apache 2.0 license file for clap_mangen
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_mangen/CONTRIBUTING.md` - clap_mangen specific contribution guidelines referencing clap-wide CONTRIBUTING.md with content: "# How to Contribute\n\nSee the [clap-wide CONTRIBUTING.md](../CONTRIBUTING.md). This will contain `clap_mangen` specific notes.\n"
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_mangen/build.rs` - Example build script for man page generation
+   - `/home/cc/EnvGym/data/clap-rs_clap/clap_bench/Cargo.toml` - Benchmarking crate manifest (version 0.0.0, publish = false, with divan 0.1.14 and lazy_static 1.4.0 dependencies)
+   - `/home/cc/EnvGym/data/clap-rs_clap/src/lib.rs` - Main library entry point re-exporting clap_builder
+   - `/home/cc/EnvGym/data/clap-rs_clap/src/_derive.rs` - Derive reference documentation for magic attributes
+   - `/home/cc/EnvGym/data/clap-rs_clap/.gitignore` - Git ignore file with target directory
+   - `/home/cc/EnvGym/data/clap-rs_clap/rustfmt.toml` - Rust formatting configuration
+   - `/home/cc/EnvGym/data/clap-rs_clap/.clippy.toml` - Clippy linting configuration with test allowances and disallowed methods
+   - `/home/cc/EnvGym/data/clap-rs_clap/.github/workflows/ci.yml` - GitHub Actions CI configuration with matrix builds and shell integration tests
+   - `/home/cc/EnvGym/data/clap-rs_clap/.github/workflows/rust-next.yml` - GitHub Actions workflow for testing against next Rust version
+   - `/home/cc/EnvGym/data/clap-rs_clap/.github/renovate.json5` - Renovate bot configuration for automated dependency updates
+   - `/home/cc/EnvGym/data/clap-rs_clap/.github/settings.yml` - GitHub repository settings configuration for Probot Settings app
+   - `/home/cc/EnvGym/data/clap-rs_clap/.cargo/config.toml` - Cargo configuration with resolver fallback settings and unstable options
+   - `/home/cc/EnvGym/data/clap-rs_clap/rust-toolchain.toml` - Rust toolchain specification file
+   - `/home/cc/EnvGym/data/clap-rs_clap/CHANGELOG.md` - Version history and changes
+   - `/home/cc/EnvGym/data/clap-rs_clap/CITATION.cff` - Citation file format for academic references
+   - `/home/cc/EnvGym/data/clap-rs_clap/LICENSE-MIT` - MIT license file
+   - `/home/cc/EnvGym/data/clap-rs_clap/LICENSE-APACHE` - Apache 2.0 license file
+   - `/home/cc/EnvGym/data/clap-rs_clap/CONTRIBUTING.md` - Project contribution guidelines with goals, overview, and specific tasks
+   - `/home/cc/EnvGym/data/clap-rs_clap/examples/` - Directory containing all example files
+   - `/home/cc/EnvGym/data/clap-rs_clap/examples/README.md` - Examples documentation explaining structure (Cookbook/How-To Guides, Tutorials), contribution guidelines (add to Cargo.toml for required-features, document with .md file verified by trycmd, pull .rs and .md into module doc comments)
+   - `/home/cc/EnvGym/data/clap-rs_clap/examples/tutorial_builder/` - Builder tutorial directory
+   - `/home/cc/EnvGym/data/clap-rs_clap/examples/tutorial_builder/README.md` - Builder tutorial documentation with contributing section
+   - `/home/cc/EnvGym/data/clap-rs_clap/examples/tutorial_derive/` - Derive tutorial directory
+   - `/home/cc/EnvGym/data/clap-rs_clap/examples/tutorial_derive/README.md` - Derive tutorial documentation with contributing section
+   - `/home/cc/EnvGym/data/clap-rs_clap/examples/dynamic.rs` - Dynamic completion example (requires unstable-dynamic feature)
+   - `/home/cc/EnvGym/data/clap-rs_clap/tests/` - Integration tests directory
+   - `/home/cc/EnvGym/data/clap-rs_clap/tests/derive_ui/` - Directory for derive UI tests
+   - `/home/cc/EnvGym/data/clap-rs_clap/tests/derive_ui.rs` - Derive UI test runner
+   - `/home/cc/EnvGym/data/clap-rs_clap/benches/` - Benchmarking tests directory
+   - `/home/cc/EnvGym/data/clap-rs_clap/benches/empty.rs` - Empty benchmark harness
+   - `/home/cc/EnvGym/data/clap-rs_clap/benches/simple.rs` - Simple benchmark harness
+   - `/home/cc/EnvGym/data/clap-rs_clap/benches/complex.rs` - Complex benchmark harness
+   - `/home/cc/EnvGym/data/clap-rs_clap/benches/rustup.rs` - Rustup-style CLI benchmark harness
+   - `/home/cc/EnvGym/data/clap-rs_clap/benches/ripgrep.rs` - Ripgrep-style CLI benchmark harness
+   - `/home/cc/EnvGym/data/clap-rs_clap/deny.toml` - cargo-deny configuration for dependency auditing, license checking, and source validation
+   - `/home/cc/EnvGym/data/clap-rs_clap/

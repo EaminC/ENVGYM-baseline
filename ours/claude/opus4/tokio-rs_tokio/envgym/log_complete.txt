@@ -1,0 +1,2537 @@
+=== Docker Execution Log - 20250903_144057 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756910102
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 2.97kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:22.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.io/library/ubuntu:22.04@sha256:4e0171b9275e12d375863f2b3ae9ce00a4c53ddda176bd55868df97ac6f21a6e
+#4 resolve docker.io/library/ubuntu:22.04@sha256:4e0171b9275e12d375863f2b3ae9ce00a4c53ddda176bd55868df97ac6f21a6e done
+#4 DONE 0.0s
+
+#5 [2/8] RUN apt-get update && apt-get install -y     build-essential     curl     git     wget     jq     grep     sed     cpio     xz-utils     busybox-static     libssl-dev     libelf-dev     bison     flex     valgrind     llvm     gcc-multilib     g++-multilib     libc6-dev-i386     liburing-dev     hunspell     hunspell-en-us     qemu-system-x86     pkg-config     && rm -rf /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [3/8] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.82.0
+#6 CACHED
+
+#7 [4/8] RUN rustup toolchain install 1.82.0 &&     rustup toolchain install nightly-2025-01-25 &&     rustup toolchain install nightly-2025-06-02 &&     rustup component add rustfmt --toolchain 1.82.0 &&     rustup component add clippy --toolchain 1.82.0 &&     rustup component add rust-src --toolchain 1.82.0 &&     rustup component add rust-src --toolchain nightly-2025-01-25 &&     rustup component add miri --toolchain nightly-2025-06-02 &&     rustup target add x86_64-unknown-linux-musl --toolchain 1.82.0 &&     rustup target add i686-unknown-linux-gnu --toolchain 1.82.0 &&     rustup target add wasm32-unknown-unknown --toolchain 1.82.0 &&     rustup target add wasm32-wasi --toolchain 1.82.0
+#7 CACHED
+
+#8 [internal] load build context
+#8 transferring context: 322.21kB 0.1s done
+#8 DONE 0.1s
+
+#9 [5/8] RUN cargo install cargo-edit || true &&     cargo install cargo-watch || true &&     cargo install cargo-spellcheck || true &&     cargo install cargo-deny || true &&     cargo install cross || true &&     cargo install cargo-workspaces || true &&     cargo install cargo-audit || true &&     cargo install cargo-tarpaulin || true &&     cargo install cargo-nextest || true &&     cargo install cargo-hack || true &&     cargo install cargo-semver-checks || true &&     cargo install cargo-fuzz || true &&     cargo install cargo-check-external-types || true &&     cargo install cargo-docs-rs || true &&     cargo install wasm-pack || true &&     cargo install wasmtime-cli || true &&     cargo install wasm-bindgen-cli || true &&     cargo install act || true
+#9 0.297     Updating crates.io index
+#9 0.359  Downloading crates ...
+#9 0.410   Downloaded cargo-edit v0.13.7
+#9 0.429 error: failed to parse manifest at `/root/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cargo-edit-0.13.7/Cargo.toml`
+#9 0.429 
+#9 0.429 Caused by:
+#9 0.429   feature `edition2024` is required
+#9 0.429 
+#9 0.429   The package requires the Cargo feature called `edition2024`, but that feature is not stabilized in this version of Cargo (1.82.0 (8f40fc59f 2024-08-21)).
+#9 0.429   Consider trying a newer version of Cargo (this may require the nightly release).
+#9 0.429   See https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#edition-2024 for more information about the status of this feature.
+#9 0.500     Updating crates.io index
+#9 0.579  Downloading crates ...
+#9 0.676   Downloaded cargo-watch v8.5.3
+#9 0.709   Installing cargo-watch v8.5.3
+#9 0.749     Updating crates.io index
+#9 1.305      Locking 239 packages to latest compatible versions
+#9 1.305       Adding aho-corasick v0.7.20 (latest: v1.1.3)
+#9 1.306       Adding bitflags v1.3.2 (latest: v2.9.4)
+#9 1.306       Adding bstr v0.2.17 (latest: v1.12.0)
+#9 1.306       Adding cargo-platform v0.1.9 (latest: v0.3.0)
+#9 1.312       Adding cargo_metadata v0.18.1 (latest: v0.22.0)
+#9 1.312       Adding cfg-if v0.1.10 (latest: v1.0.3)
+#9 1.314       Adding clap v2.34.0 (latest: v4.5.47)
+#9 1.314       Adding clearscreen v1.0.11 (latest: v4.0.2)
+#9 1.314       Adding command-group v1.0.8 (latest: v5.0.1)
+#9 1.314       Adding darling v0.12.4 (latest: v0.21.3)
+#9 1.315       Adding darling_core v0.12.4 (latest: v0.21.3)
+#9 1.315       Adding darling_macro v0.12.4 (latest: v0.21.3)
+#9 1.315       Adding derive_builder v0.10.2 (latest: v0.20.2)
+#9 1.315       Adding derive_builder_core v0.10.2 (latest: v0.20.2)
+#9 1.315       Adding derive_builder_macro v0.10.2 (latest: v0.20.2)
+#9 1.315       Adding dirs v4.0.0 (latest: v6.0.0)
+#9 1.315       Adding dirs-sys v0.3.7 (latest: v0.5.0)
+#9 1.315       Adding fsevent v0.4.0 (latest: v2.1.2)
+#9 1.315       Adding fsevent-sys v2.0.1 (latest: v4.1.0)
+#9 1.316       Adding getrandom v0.2.16 (latest: v0.3.3)
+#9 1.316       Adding globset v0.4.6 (latest: v0.4.16)
+#9 1.316       Adding hashbrown v0.15.5 (latest: v0.16.0)
+#9 1.316       Adding hermit-abi v0.1.19 (latest: v0.5.2)
+#9 1.317       Adding inotify v0.7.1 (latest: v0.11.0)
+#9 1.317       Adding linux-raw-sys v0.4.15 (latest: v0.10.0)
+#9 1.317       Adding linux-raw-sys v0.9.4 (latest: v0.10.0)
+#9 1.318       Adding memoffset v0.6.5 (latest: v0.9.1)
+#9 1.320       Adding mio v0.6.23 (latest: v1.0.4)
+#9 1.320       Adding miow v0.2.2 (latest: v0.6.0)
+#9 1.320       Adding nix v0.22.3 (latest: v0.30.1)
+#9 1.320       Adding nix v0.24.3 (latest: v0.30.1)
+#9 1.321       Adding nom v5.1.3 (latest: v8.0.0)
+#9 1.321       Adding notify v4.0.18 (latest: v8.2.0)
+#9 1.321       Adding num-conv v0.1.0 (latest: v0.2.0)
+#9 1.322       Adding phf v0.11.3 (latest: v0.13.1)
+#9 1.322       Adding phf_codegen v0.11.3 (latest: v0.13.1)
+#9 1.322       Adding phf_generator v0.11.3 (latest: v0.13.1)
+#9 1.322       Adding phf_shared v0.11.3 (latest: v0.13.1)
+#9 1.323       Adding quick-xml v0.37.5 (latest: v0.38.3)
+#9 1.323       Adding rand v0.8.5 (latest: v0.9.2)
+#9 1.323       Adding rand_core v0.6.4 (latest: v0.9.3)
+#9 1.323       Adding redox_users v0.4.6 (latest: v0.5.2)
+#9 1.327       Adding rustix v0.38.44 (latest: v1.0.8)
+#9 1.331       Adding strsim v0.8.0 (latest: v0.11.1)
+#9 1.331       Adding strsim v0.10.0 (latest: v0.11.1)
+#9 1.332       Adding syn v1.0.109 (latest: v2.0.106)
+#9 1.332       Adding termcolor v1.1.3 (latest: v1.4.1)
+#9 1.332       Adding terminfo v0.7.5 (latest: v0.9.0)
+#9 1.333       Adding textwrap v0.11.0 (latest: v0.16.2)
+#9 1.333       Adding thiserror v1.0.69 (latest: v2.0.16)
+#9 1.333       Adding thiserror-impl v1.0.69 (latest: v2.0.16)
+#9 1.333       Adding toml_datetime v0.6.11 (latest: v0.7.0)
+#9 1.334       Adding toml_edit v0.22.27 (latest: v0.23.4)
+#9 1.334       Adding unicode-width v0.1.14 (latest: v0.2.1)
+#9 1.334       Adding wasi v0.11.1+wasi-snapshot-preview1 (latest: v0.14.3+wasi-0.2.4)
+#9 1.336       Adding watchexec v1.17.2 (latest: v8.0.1)
+#9 1.336       Adding which v4.4.2 (latest: v8.0.0)
+#9 1.336       Adding winapi v0.2.8 (latest: v0.3.9)
+#9 1.336       Adding windows-sys v0.59.0 (latest: v0.60.2)
+#9 1.337       Adding windows-targets v0.52.6 (latest: v0.53.3)
+#9 1.337       Adding windows_aarch64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 1.337       Adding windows_aarch64_msvc v0.52.6 (latest: v0.53.0)
+#9 1.337       Adding windows_i686_gnu v0.52.6 (latest: v0.53.0)
+#9 1.337       Adding windows_i686_gnullvm v0.52.6 (latest: v0.53.0)
+#9 1.337       Adding windows_i686_msvc v0.52.6 (latest: v0.53.0)
+#9 1.337       Adding windows_x86_64_gnu v0.52.6 (latest: v0.53.0)
+#9 1.337       Adding windows_x86_64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 1.337       Adding windows_x86_64_msvc v0.52.6 (latest: v0.53.0)
+#9 1.340  Downloading crates ...
+#9 1.404   Downloaded async-broadcast v0.7.2
+#9 1.407   Downloaded async-lock v3.4.1
+#9 1.411   Downloaded async-io v2.5.0
+#9 1.416   Downloaded same-file v1.0.6
+#9 1.418   Downloaded regex v1.11.2
+#9 1.426   Downloaded ryu v1.0.20
+#9 1.429   Downloaded strsim v0.8.0
+#9 1.430   Downloaded semver v1.0.26
+#9 1.432   Downloaded zvariant_utils v3.2.1
+#9 1.433   Downloaded unicode-ident v1.0.18
+#9 1.436   Downloaded futures-core v0.3.31
+#9 1.438   Downloaded siphasher v1.0.1
+#9 1.439   Downloaded serde_repr v0.1.20
+#9 1.441   Downloaded shell-escape v0.1.5
+#9 1.441   Downloaded rustix v1.0.8
+#9 1.465   Downloaded watchexec v1.17.2
+#9 1.466   Downloaded async-process v2.4.0
+#9 1.468   Downloaded zbus v5.10.0
+#9 1.477   Downloaded toml_datetime v0.6.11
+#9 1.478   Downloaded equivalent v1.0.2
+#9 1.479   Downloaded enumflags2_derive v0.7.12
+#9 1.479   Downloaded thread_local v1.1.9
+#9 1.481   Downloaded phf_shared v0.11.3
+#9 1.482   Downloaded phf v0.11.3
+#9 1.483   Downloaded mio-extras v2.0.6
+#9 1.484   Downloaded globset v0.4.6
+#9 1.486   Downloaded zbus_names v4.2.0
+#9 1.487   Downloaded zvariant_derive v5.7.0
+#9 1.488   Downloaded version_check v0.9.5
+#9 1.489   Downloaded slab v0.4.11
+#9 1.491   Downloaded thiserror-impl v1.0.69
+#9 1.492   Downloaded textwrap v0.11.0
+#9 1.493   Downloaded either v1.15.0
+#9 1.495   Downloaded zvariant v5.7.0
+#9 1.501   Downloaded walkdir v2.5.0
+#9 1.502   Downloaded tracing v0.1.41
+#9 1.506   Downloaded zbus_macros v5.10.0
+#9 1.508   Downloaded which v4.4.2
+#9 1.509   Downloaded tracing-attributes v0.1.30
+#9 1.512   Downloaded thiserror v1.0.69
+#9 1.516   Downloaded terminfo v0.7.5
+#9 1.518   Downloaded termcolor v1.1.3
+#9 1.519   Downloaded strsim v0.10.0
+#9 1.521   Downloaded stderrlog v0.6.0
+#9 1.523   Downloaded serde_derive v1.0.219
+#9 1.526   Downloaded derive_builder_macro v0.10.2
+#9 1.526   Downloaded toml_edit v0.22.27
+#9 1.531   Downloaded serde v1.0.219
+#9 1.534   Downloaded regex-syntax v0.8.6
+#9 1.544   Downloaded winnow v0.7.13
+#9 1.552   Downloaded iovec v0.1.4
+#9 1.553   Downloaded rustix v0.38.44
+#9 1.574   Downloaded serde_json v1.0.143
+#9 1.581   Downloaded ident_case v1.0.1
+#9 1.581   Downloaded cfg-if v0.1.10
+#9 1.582   Downloaded inotify-sys v0.1.5
+#9 1.583   Downloaded cfg_aliases v0.2.1
+#9 1.584   Downloaded async-executor v1.13.3
+#9 1.586   Downloaded vec_map v0.8.2
+#9 1.586   Downloaded tracing-core v0.1.34
+#9 1.589   Downloaded static_assertions v1.1.0
+#9 1.591   Downloaded async-signal v0.2.12
+#9 1.592   Downloaded async-trait v0.1.89
+#9 1.595   Downloaded memoffset v0.6.5
+#9 1.596   Downloaded lazy_static v1.5.0
+#9 1.597   Downloaded endi v1.1.0
+#9 1.598   Downloaded errno v0.3.13
+#9 1.599   Downloaded fnv v1.0.7
+#9 1.600   Downloaded async-channel v2.5.0
+#9 1.601   Downloaded syn v1.0.109
+#9 1.611   Downloaded unicode-width v0.1.14
+#9 1.618   Downloaded proc-macro-crate v3.3.0
+#9 1.619   Downloaded syn v2.0.106
+#9 1.631   Downloaded concurrent-queue v2.5.0
+#9 1.632   Downloaded enumflags2 v0.7.12
+#9 1.633   Downloaded filetime v0.2.26
+#9 1.635   Downloaded darling v0.12.4
+#9 1.637   Downloaded regex-automata v0.4.10
+#9 1.654   Downloaded dotenvy v0.15.7
+#9 1.656   Downloaded net2 v0.2.39
+#9 1.658   Downloaded home v0.5.11
+#9 1.659   Downloaded itoa v1.0.15
+#9 1.660   Downloaded event-listener-strategy v0.5.4
+#9 1.661   Downloaded signal-hook-registry v1.4.6
+#9 1.662   Downloaded piper v0.2.4
+#9 1.663   Downloaded autocfg v1.5.0
+#9 1.665   Downloaded rand_core v0.6.4
+#9 1.668   Downloaded ansi_term v0.12.1
+#9 1.672   Downloaded bitflags v2.9.4
+#9 1.683   Downloaded cargo-platform v0.1.9
+#9 1.692   Downloaded phf_generator v0.11.3
+#9 1.694   Downloaded parking v2.2.1
+#9 1.699   Downloaded dirs-sys v0.3.7
+#9 1.704   Downloaded fastrand v2.3.0
+#9 1.707   Downloaded glob v0.3.3
+#9 1.710   Downloaded atty v0.2.14
+#9 1.712   Downloaded bitflags v1.3.2
+#9 1.724   Downloaded lazycell v1.3.0
+#9 1.726   Downloaded hex v0.4.3
+#9 1.746   Downloaded blocking v1.6.2
+#9 1.748   Downloaded atomic-waker v1.1.2
+#9 1.749   Downloaded derive_builder v0.10.2
+#9 1.754   Downloaded inotify v0.7.1
+#9 1.756   Downloaded darling_macro v0.12.4
+#9 1.759   Downloaded is-terminal v0.4.16
+#9 1.761   Downloaded dirs v4.0.0
+#9 1.762   Downloaded cfg-if v1.0.3
+#9 1.770   Downloaded memoffset v0.9.1
+#9 1.777   Downloaded futures-io v0.3.31
+#9 1.778   Downloaded event-listener v5.4.1
+#9 1.782   Downloaded derive_builder_core v0.10.2
+#9 1.784   Downloaded camino v1.1.12
+#9 1.803   Downloaded phf_codegen v0.11.3
+#9 1.806   Downloaded quote v1.0.40
+#9 1.813   Downloaded ordered-stream v0.2.0
+#9 1.820   Downloaded pin-project-lite v0.2.16
+#9 1.826   Downloaded iana-time-zone v0.1.63
+#9 1.830   Downloaded async-task v4.7.1
+#9 1.834   Downloaded futures-lite v2.6.1
+#9 1.836   Downloaded cargo_metadata v0.18.1
+#9 1.837   Downloaded num-traits v0.2.19
+#9 1.840   Downloaded crossbeam-utils v0.8.21
+#9 1.845   Downloaded notify v4.0.18
+#9 1.856   Downloaded proc-macro2 v1.0.101
+#9 1.860   Downloaded once_cell v1.21.3
+#9 1.863   Downloaded darling_core v0.12.4
+#9 1.868   Downloaded log v0.4.27
+#9 1.876   Downloaded indexmap v2.11.0
+#9 1.884   Downloaded notify-rust v4.11.7
+#9 1.887   Downloaded polling v3.10.0
+#9 1.927   Downloaded rand v0.8.5
+#9 1.935   Downloaded memchr v2.7.5
+#9 1.949   Downloaded aho-corasick v0.7.20
+#9 1.954   Downloaded mio v0.6.23
+#9 1.982   Downloaded aho-corasick v1.1.3
+#9 1.998   Downloaded nom v5.1.3
+#9 2.013   Downloaded clearscreen v1.0.11
+#9 2.024   Downloaded hashbrown v0.15.5
+#9 2.031   Downloaded command-group v1.0.8
+#9 2.035   Downloaded clap v2.34.0
+#9 2.045   Downloaded chrono v0.4.41
+#9 2.062   Downloaded nix v0.24.3
+#9 2.086   Downloaded nix v0.22.3
+#9 2.126   Downloaded bstr v0.2.17
+#9 2.149   Downloaded nix v0.30.1
+#9 2.307   Downloaded libc v0.2.175
+#9 2.597   Downloaded linux-raw-sys v0.4.15
+#9 2.668   Downloaded linux-raw-sys v0.9.4
+#9 2.799    Compiling proc-macro2 v1.0.101
+#9 2.799    Compiling unicode-ident v1.0.18
+#9 2.799    Compiling libc v0.2.175
+#9 2.799    Compiling serde v1.0.219
+#9 2.799    Compiling autocfg v1.5.0
+#9 2.799    Compiling cfg-if v1.0.3
+#9 2.799    Compiling pin-project-lite v0.2.16
+#9 2.799    Compiling crossbeam-utils v0.8.21
+#9 2.799    Compiling parking v2.2.1
+#9 2.799    Compiling bitflags v2.9.4
+#9 2.805    Compiling memchr v2.7.5
+#9 2.805    Compiling equivalent v1.0.2
+#9 2.805    Compiling winnow v0.7.13
+#9 2.807    Compiling hashbrown v0.15.5
+#9 2.810    Compiling futures-core v0.3.31
+#9 2.813    Compiling toml_datetime v0.6.11
+#9 2.818    Compiling slab v0.4.11
+#9 2.818    Compiling fastrand v2.3.0
+#9 2.819    Compiling futures-io v0.3.31
+#9 2.822    Compiling syn v1.0.109
+#9 2.829    Compiling siphasher v1.0.1
+#9 2.832    Compiling rustix v1.0.8
+#9 2.832    Compiling bitflags v1.3.2
+#9 2.832    Compiling rand_core v0.6.4
+#9 2.832    Compiling strsim v0.10.0
+#9 2.832    Compiling log v0.4.27
+#9 2.832    Compiling fnv v1.0.7
+#9 2.832    Compiling ident_case v1.0.1
+#9 2.832    Compiling linux-raw-sys v0.9.4
+#9 2.833    Compiling version_check v0.9.5
+#9 2.833    Compiling endi v1.1.0
+#9 2.833    Compiling cfg-if v0.1.10
+#9 2.833    Compiling cfg_aliases v0.2.1
+#9 2.833    Compiling thiserror v1.0.69
+#9 2.833    Compiling async-task v4.7.1
+#9 2.833    Compiling rustix v0.38.44
+#9 2.833    Compiling linux-raw-sys v0.4.15
+#9 2.833    Compiling regex-syntax v0.8.6
+#9 2.834    Compiling atomic-waker v1.1.2
+#9 2.834    Compiling once_cell v1.21.3
+#9 2.834    Compiling static_assertions v1.1.0
+#9 2.834    Compiling home v0.5.11
+#9 2.834    Compiling serde_json v1.0.143
+#9 2.834    Compiling lazycell v1.3.0
+#9 2.834    Compiling either v1.15.0
+#9 2.835    Compiling same-file v1.0.6
+#9 2.835    Compiling semver v1.0.26
+#9 2.835    Compiling camino v1.1.12
+#9 2.835    Compiling unicode-width v0.1.14
+#9 2.835    Compiling hex v0.4.3
+#9 2.835    Compiling iana-time-zone v0.1.63
+#9 2.835    Compiling ryu v1.0.20
+#9 2.835    Compiling itoa v1.0.15
+#9 2.835    Compiling termcolor v1.1.3
+#9 2.836    Compiling strsim v0.8.0
+#9 2.836    Compiling vec_map v0.8.2
+#9 2.836    Compiling glob v0.3.3
+#9 2.836    Compiling lazy_static v1.5.0
+#9 2.836    Compiling ansi_term v0.12.1
+#9 2.836    Compiling shell-escape v0.1.5
+#9 2.836    Compiling dotenvy v0.15.7
+#9 2.839    Compiling thread_local v1.1.9
+#9 2.970    Compiling walkdir v2.5.0
+#9 3.016    Compiling ordered-stream v0.2.0
+#9 3.026    Compiling phf_shared v0.11.3
+#9 3.043    Compiling memoffset v0.9.1
+#9 3.044    Compiling memoffset v0.6.5
+#9 3.047    Compiling num-traits v0.2.19
+#9 3.050    Compiling nix v0.30.1
+#9 3.073    Compiling tracing-core v0.1.34
+#9 3.096    Compiling nom v5.1.3
+#9 3.131    Compiling rand v0.8.5
+#9 3.137    Compiling futures-lite v2.6.1
+#9 3.137    Compiling piper v0.2.4
+#9 3.177    Compiling phf v0.11.3
+#9 3.188    Compiling textwrap v0.11.0
+#9 3.360    Compiling aho-corasick v1.1.3
+#9 3.360    Compiling bstr v0.2.17
+#9 3.360    Compiling aho-corasick v0.7.20
+#9 3.374    Compiling concurrent-queue v2.5.0
+#9 3.450    Compiling indexmap v2.11.0
+#9 3.453    Compiling quote v1.0.40
+#9 3.498    Compiling event-listener v5.4.1
+#9 3.520    Compiling phf_generator v0.11.3
+#9 3.589    Compiling syn v2.0.106
+#9 3.596    Compiling phf_codegen v0.11.3
+#9 3.651    Compiling event-listener-strategy v0.5.4
+#9 3.667    Compiling terminfo v0.7.5
+#9 3.719    Compiling async-lock v3.4.1
+#9 3.719    Compiling async-channel v2.5.0
+#9 3.719    Compiling async-broadcast v0.7.2
+#9 3.730    Compiling async-executor v1.13.3
+#9 3.801    Compiling chrono v0.4.41
+#9 3.866    Compiling blocking v1.6.2
+#9 4.206    Compiling toml_edit v0.22.27
+#9 4.211    Compiling regex-automata v0.4.10
+#9 4.348    Compiling signal-hook-registry v1.4.6
+#9 4.348    Compiling dirs-sys v0.3.7
+#9 4.348    Compiling iovec v0.1.4
+#9 4.348    Compiling net2 v0.2.39
+#9 4.351    Compiling inotify-sys v0.1.5
+#9 4.355    Compiling nix v0.22.3
+#9 4.358    Compiling filetime v0.2.26
+#9 4.358    Compiling nix v0.24.3
+#9 4.362    Compiling atty v0.2.14
+#9 4.362    Compiling is-terminal v0.4.16
+#9 4.412    Compiling clap v2.34.0
+#9 4.416    Compiling inotify v0.7.1
+#9 4.437    Compiling dirs v4.0.0
+#9 4.543    Compiling mio v0.6.23
+#9 4.655    Compiling which v4.4.2
+#9 4.770    Compiling stderrlog v0.6.0
+#9 4.976    Compiling mio-extras v2.0.6
+#9 5.097    Compiling notify v4.0.18
+#9 5.327    Compiling proc-macro-crate v3.3.0
+#9 5.526    Compiling darling_core v0.12.4
+#9 6.001    Compiling regex v1.11.2
+#9 6.255    Compiling globset v0.4.6
+#9 6.400    Compiling serde_derive v1.0.219
+#9 6.400    Compiling enumflags2_derive v0.7.12
+#9 6.401    Compiling thiserror-impl v1.0.69
+#9 6.401    Compiling tracing-attributes v0.1.30
+#9 6.401    Compiling serde_repr v0.1.20
+#9 6.401    Compiling async-trait v0.1.89
+#9 6.457    Compiling darling_macro v0.12.4
+#9 6.620    Compiling command-group v1.0.8
+#9 6.652    Compiling polling v3.10.0
+#9 6.768    Compiling async-io v2.5.0
+#9 6.948    Compiling darling v0.12.4
+#9 6.982    Compiling derive_builder_core v0.10.2
+#9 7.081    Compiling async-signal v0.2.12
+#9 7.180    Compiling async-process v2.4.0
+#9 7.251    Compiling tracing v0.1.41
+#9 7.269    Compiling clearscreen v1.0.11
+#9 7.396    Compiling derive_builder_macro v0.10.2
+#9 7.796    Compiling derive_builder v0.10.2
+#9 7.835    Compiling watchexec v1.17.2
+#9 10.07    Compiling zvariant_utils v3.2.1
+#9 10.07    Compiling enumflags2 v0.7.12
+#9 10.19    Compiling cargo-platform v0.1.9
+#9 10.29    Compiling zvariant_derive v5.7.0
+#9 10.84    Compiling cargo_metadata v0.18.1
+#9 11.03    Compiling zvariant v5.7.0
+#9 12.35    Compiling zbus_names v4.2.0
+#9 12.75    Compiling zbus_macros v5.10.0
+#9 14.22    Compiling zbus v5.10.0
+#9 17.48    Compiling notify-rust v4.11.7
+#9 34.50    Compiling cargo-watch v8.5.3
+#9 68.42     Finished `release` profile [optimized] target(s) in 1m 07s
+#9 68.48   Installing /root/.cargo/bin/cargo-watch
+#9 68.48    Installed package `cargo-watch v8.5.3` (executable `cargo-watch`)
+#9 68.62     Updating crates.io index
+#9 68.90 error: cannot install package `cargo-spellcheck 0.15.5`, it requires rustc 1.85.0 or newer, while the currently active rustc version is 1.82.0
+#9 68.90 `cargo-spellcheck 0.15.4` supports rustc 1.76.0
+#9 68.97     Updating crates.io index
+#9 69.24 error: cannot install package `cargo-deny 0.18.4`, it requires rustc 1.88.0 or newer, while the currently active rustc version is 1.82.0
+#9 69.24 `cargo-deny 0.17.0` supports rustc 1.81.0
+#9 69.30     Updating crates.io index
+#9 69.38  Downloading crates ...
+#9 69.45   Downloaded cross v0.2.5
+#9 69.49   Installing cross v0.2.5
+#9 69.52     Updating crates.io index
+#9 69.72      Locking 106 packages to latest compatible versions
+#9 69.72       Adding addr2line v0.24.2 (latest: v0.25.0)
+#9 69.72       Adding bitflags v1.3.2 (latest: v2.9.4)
+#9 69.73       Adding clap v3.2.25 (latest: v4.5.47)
+#9 69.74       Adding clap_derive v3.2.25 (latest: v4.5.47)
+#9 69.74       Adding clap_lex v0.2.4 (latest: v0.7.5)
+#9 69.74       Adding const-sha1 v0.2.0 (latest: v0.3.0)
+#9 69.74       Adding directories v4.0.1 (latest: v6.0.0)
+#9 69.74       Adding dirs-sys v0.3.7 (latest: v0.5.0)
+#9 69.74       Adding getrandom v0.2.16 (latest: v0.3.3)
+#9 69.74       Adding gimli v0.31.1 (latest: v0.32.2)
+#9 69.74       Adding hashbrown v0.12.3 (latest: v0.16.0)
+#9 69.74       Adding heck v0.4.1 (latest: v0.5.0)
+#9 69.74       Adding hermit-abi v0.1.19 (latest: v0.5.2)
+#9 69.74       Adding indexmap v1.9.3 (latest: v2.11.0)
+#9 69.75       Adding linux-raw-sys v0.4.15 (latest: v0.10.0)
+#9 69.75       Adding linux-raw-sys v0.9.4 (latest: v0.10.0)
+#9 69.75       Adding nix v0.24.3 (latest: v0.30.1)
+#9 69.75       Adding object v0.36.7 (latest: v0.37.3)
+#9 69.75       Adding os_str_bytes v6.6.1 (latest: v7.1.1)
+#9 69.75       Adding owo-colors v3.5.0 (latest: v4.2.2)
+#9 69.75       Adding redox_users v0.4.6 (latest: v0.5.2)
+#9 69.76       Adding rustix v0.38.44 (latest: v1.0.8)
+#9 69.77       Adding strsim v0.10.0 (latest: v0.11.1)
+#9 69.77       Adding supports-color v1.3.1 (latest: v3.0.2)
+#9 69.77       Adding syn v1.0.109 (latest: v2.0.106)
+#9 69.77       Adding thiserror v1.0.69 (latest: v2.0.16)
+#9 69.77       Adding thiserror-impl v1.0.69 (latest: v2.0.16)
+#9 69.77       Adding toml v0.5.11 (latest: v0.9.5)
+#9 69.77       Adding wasi v0.11.1+wasi-snapshot-preview1 (latest: v0.14.3+wasi-0.2.4)
+#9 69.77       Adding which v4.4.2 (latest: v8.0.0)
+#9 69.78       Adding windows-sys v0.59.0 (latest: v0.60.2)
+#9 69.78       Adding windows-targets v0.52.6 (latest: v0.53.3)
+#9 69.78       Adding windows_aarch64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 69.78       Adding windows_aarch64_msvc v0.52.6 (latest: v0.53.0)
+#9 69.78       Adding windows_i686_gnu v0.52.6 (latest: v0.53.0)
+#9 69.78       Adding windows_i686_gnullvm v0.52.6 (latest: v0.53.0)
+#9 69.78       Adding windows_i686_msvc v0.52.6 (latest: v0.53.0)
+#9 69.78       Adding windows_x86_64_gnu v0.52.6 (latest: v0.53.0)
+#9 69.78       Adding windows_x86_64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 69.78       Adding windows_x86_64_msvc v0.52.6 (latest: v0.53.0)
+#9 69.78  Downloading crates ...
+#9 69.85   Downloaded hashbrown v0.12.3
+#9 69.85   Downloaded clap_derive v3.2.25
+#9 69.86   Downloaded shell-words v1.1.0
+#9 69.86   Downloaded clap v3.2.25
+#9 69.87   Downloaded toml v0.5.11
+#9 69.87   Downloaded is_ci v1.2.0
+#9 69.87   Downloaded heck v0.4.1
+#9 69.87   Downloaded directories v4.0.1
+#9 69.88   Downloaded os_str_bytes v6.6.1
+#9 69.88   Downloaded termcolor v1.4.1
+#9 69.88   Downloaded getrandom v0.3.3
+#9 69.88   Downloaded eyre v0.6.12
+#9 69.88   Downloaded owo-colors v3.5.0
+#9 69.89   Downloaded supports-color v1.3.1
+#9 69.89   Downloaded clap_lex v0.2.4
+#9 69.89   Downloaded proc-macro-error-attr v1.0.4
+#9 69.89   Downloaded owo-colors v4.2.2
+#9 69.89   Downloaded miniz_oxide v0.8.9
+#9 69.89   Downloaded indenter v0.3.4
+#9 69.90   Downloaded backtrace v0.3.75
+#9 69.90   Downloaded adler2 v2.0.1
+#9 69.90   Downloaded addr2line v0.24.2
+#9 69.93   Downloaded serde_ignored v0.1.12
+#9 69.93   Downloaded proc-macro-error v1.0.4
+#9 69.95   Downloaded const-sha1 v0.2.0
+#9 69.95   Downloaded rustc_version v0.4.1
+#9 69.95   Downloaded ctrlc v3.4.7
+#9 69.97   Downloaded rustc-demangle v0.1.26
+#9 69.97   Downloaded textwrap v0.16.2
+#9 69.98   Downloaded indexmap v1.9.3
+#9 69.98   Downloaded tempfile v3.21.0
+#9 70.00   Downloaded object v0.36.7
+#9 70.02   Downloaded gimli v0.31.1
+#9 70.08   Downloaded color-eyre v0.6.5
+#9 70.13    Compiling proc-macro2 v1.0.101
+#9 70.13    Compiling unicode-ident v1.0.18
+#9 70.13    Compiling libc v0.2.175
+#9 70.13    Compiling version_check v0.9.5
+#9 70.13    Compiling cfg-if v1.0.3
+#9 70.13    Compiling bitflags v2.9.4
+#9 70.13    Compiling serde v1.0.219
+#9 70.13    Compiling syn v1.0.109
+#9 70.13    Compiling object v0.36.7
+#9 70.13    Compiling cfg_aliases v0.2.1
+#9 70.13    Compiling memchr v2.7.5
+#9 70.13    Compiling once_cell v1.21.3
+#9 70.14    Compiling autocfg v1.5.0
+#9 70.14    Compiling semver v1.0.26
+#9 70.14    Compiling rustix v1.0.8
+#9 70.14    Compiling owo-colors v4.2.2
+#9 70.14    Compiling rustix v0.38.44
+#9 70.14    Compiling getrandom v0.3.3
+#9 70.14    Compiling adler2 v2.0.1
+#9 70.14    Compiling gimli v0.31.1
+#9 70.14    Compiling eyre v0.6.12
+#9 70.15    Compiling rustc-demangle v0.1.26
+#9 70.15    Compiling heck v0.4.1
+#9 70.15    Compiling hashbrown v0.12.3
+#9 70.15    Compiling thiserror v1.0.69
+#9 70.16    Compiling linux-raw-sys v0.9.4
+#9 70.16    Compiling indenter v0.3.4
+#9 70.16    Compiling bitflags v1.3.2
+#9 70.16    Compiling serde_json v1.0.143
+#9 70.16    Compiling os_str_bytes v6.6.1
+#9 70.16    Compiling is_ci v1.2.0
+#9 70.16    Compiling linux-raw-sys v0.4.15
+#9 70.16    Compiling textwrap v0.16.2
+#9 70.16    Compiling itoa v1.0.15
+#9 70.16    Compiling either v1.15.0
+#9 70.16    Compiling strsim v0.10.0
+#9 70.16    Compiling home v0.5.11
+#9 70.16    Compiling ryu v1.0.20
+#9 70.16    Compiling termcolor v1.4.1
+#9 70.16    Compiling cross v0.2.5
+#9 70.16    Compiling fastrand v2.3.0
+#9 70.16    Compiling const-sha1 v0.2.0
+#9 70.16    Compiling shell-words v1.1.0
+#9 70.16    Compiling shell-escape v0.1.5
+#9 70.27    Compiling nix v0.30.1
+#9 70.29    Compiling miniz_oxide v0.8.9
+#9 70.32    Compiling proc-macro-error-attr v1.0.4
+#9 70.32    Compiling proc-macro-error v1.0.4
+#9 70.40    Compiling clap_lex v0.2.4
+#9 70.41    Compiling indexmap v1.9.3
+#9 70.55    Compiling rustc_version v0.4.1
+#9 70.74    Compiling quote v1.0.40
+#9 70.86    Compiling syn v2.0.106
+#9 71.59    Compiling atty v0.2.14
+#9 71.59    Compiling dirs-sys v0.3.7
+#9 71.59    Compiling nix v0.24.3
+#9 71.63    Compiling supports-color v1.3.1
+#9 71.67    Compiling directories v4.0.1
+#9 71.70    Compiling owo-colors v3.5.0
+#9 71.71    Compiling tempfile v3.21.0
+#9 71.81    Compiling which v4.4.2
+#9 71.82    Compiling addr2line v0.24.2
+#9 72.15    Compiling serde_derive v1.0.219
+#9 72.15    Compiling thiserror-impl v1.0.69
+#9 72.56    Compiling ctrlc v3.4.7
+#9 72.72    Compiling clap_derive v3.2.25
+#9 73.27    Compiling backtrace v0.3.75
+#9 73.58    Compiling color-eyre v0.6.5
+#9 73.78    Compiling clap v3.2.25
+#9 75.68    Compiling serde_ignored v0.1.12
+#9 75.68    Compiling toml v0.5.11
+#9 94.91     Finished `release` profile [optimized] target(s) in 25.62s
+#9 94.95   Installing /root/.cargo/bin/cross
+#9 94.95   Installing /root/.cargo/bin/cross-util
+#9 94.95    Installed package `cross v0.2.5` (executables `cross`, `cross-util`)
+#9 95.05     Updating crates.io index
+#9 95.18  Downloading crates ...
+#9 95.23   Downloaded cargo-workspaces v0.4.0
+#9 95.26   Installing cargo-workspaces v0.4.0
+#9 95.30     Updating crates.io index
+#9 96.25      Locking 317 packages to latest compatible versions
+#9 96.25       Adding addr2line v0.24.2 (latest: v0.25.0)
+#9 96.25       Adding base64 v0.21.7 (latest: v0.22.1)
+#9 96.25       Adding bitflags v1.3.2 (latest: v2.9.4)
+#9 96.25       Adding btoi v0.4.3 (latest: v0.5.0)
+#9 96.25       Adding cargo-platform v0.1.9 (latest: v0.3.0)
+#9 96.26       Adding cargo_metadata v0.13.1 (latest: v0.22.0)
+#9 96.27       Adding clap v3.1.18 (latest: v4.5.47)
+#9 96.28       Adding clap_derive v3.1.18 (latest: v4.5.47)
+#9 96.28       Adding clap_lex v0.2.4 (latest: v0.7.5)
+#9 96.28       Adding console v0.15.11 (latest: v0.16.0)
+#9 96.28       Adding core-foundation v0.9.4 (latest: v0.10.1)
+#9 96.28       Adding dialoguer v0.9.0 (latest: v0.12.0)
+#9 96.28       Adding faster-hex v0.9.0 (latest: v0.10.0)
+#9 96.28       Adding getrandom v0.2.16 (latest: v0.3.3)
+#9 96.28       Adding gimli v0.31.1 (latest: v0.32.2)
+#9 96.28       Adding gix v0.58.0 (latest: v0.73.0)
+#9 96.28       Adding gix-actor v0.30.0 (latest: v0.35.4)
+#9 96.28       Adding gix-attributes v0.22.5 (latest: v0.27.0)
+#9 96.28       Adding gix-command v0.3.11 (latest: v0.6.2)
+#9 96.28       Adding gix-commitgraph v0.24.3 (latest: v0.29.0)
+#9 96.28       Adding gix-config v0.34.0 (latest: v0.46.0)
+#9 96.28       Adding gix-config-value v0.14.12 (latest: v0.15.1)
+#9 96.28       Adding gix-credentials v0.24.5 (latest: v0.30.0)
+#9 96.28       Adding gix-date v0.8.7 (latest: v0.10.5)
+#9 96.28       Adding gix-diff v0.40.0 (latest: v0.53.0)
+#9 96.28       Adding gix-discover v0.29.0 (latest: v0.41.0)
+#9 96.28       Adding gix-features v0.38.2 (latest: v0.43.1)
+#9 96.28       Adding gix-filter v0.9.0 (latest: v0.20.0)
+#9 96.28       Adding gix-fs v0.10.2 (latest: v0.16.1)
+#9 96.28       Adding gix-glob v0.16.5 (latest: v0.21.0)
+#9 96.28       Adding gix-hash v0.14.2 (latest: v0.19.0)
+#9 96.28       Adding gix-hashtable v0.5.2 (latest: v0.9.0)
+#9 96.28       Adding gix-ignore v0.11.4 (latest: v0.16.0)
+#9 96.28       Adding gix-index v0.29.0 (latest: v0.41.0)
+#9 96.28       Adding gix-lock v13.1.1 (latest: v18.0.0)
+#9 96.28       Adding gix-negotiate v0.12.0 (latest: v0.21.0)
+#9 96.28       Adding gix-object v0.41.0 (latest: v0.50.2)
+#9 96.29       Adding gix-odb v0.57.0 (latest: v0.70.0)
+#9 96.29       Adding gix-pack v0.47.0 (latest: v0.60.0)
+#9 96.29       Adding gix-packetline v0.17.6 (latest: v0.19.1)
+#9 96.29       Adding gix-packetline-blocking v0.17.5 (latest: v0.19.1)
+#9 96.29       Adding gix-pathspec v0.6.0 (latest: v0.12.0)
+#9 96.29       Adding gix-prompt v0.8.9 (latest: v0.11.1)
+#9 96.29       Adding gix-protocol v0.44.2 (latest: v0.51.0)
+#9 96.29       Adding gix-quote v0.4.15 (latest: v0.6.0)
+#9 96.29       Adding gix-ref v0.41.0 (latest: v0.53.1)
+#9 96.29       Adding gix-refspec v0.22.0 (latest: v0.31.0)
+#9 96.29       Adding gix-revision v0.26.0 (latest: v0.35.0)
+#9 96.29       Adding gix-revwalk v0.12.0 (latest: v0.21.0)
+#9 96.29       Adding gix-sec v0.10.12 (latest: v0.12.0)
+#9 96.29       Adding gix-submodule v0.8.0 (latest: v0.20.0)
+#9 96.29       Adding gix-tempfile v13.1.1 (latest: v18.0.0)
+#9 96.29       Adding gix-transport v0.41.2 (latest: v0.48.0)
+#9 96.29       Adding gix-traverse v0.37.0 (latest: v0.47.0)
+#9 96.29       Adding gix-url v0.27.5 (latest: v0.32.0)
+#9 96.29       Adding gix-utils v0.1.14 (latest: v0.3.0)
+#9 96.29       Adding gix-validate v0.8.5 (latest: v0.10.0)
+#9 96.29       Adding gix-worktree v0.30.0 (latest: v0.42.0)
+#9 96.29       Adding h2 v0.3.27 (latest: v0.4.12)
+#9 96.29       Adding hashbrown v0.12.3 (latest: v0.16.0)
+#9 96.29       Adding hashbrown v0.14.5 (latest: v0.16.0)
+#9 96.29       Adding hashbrown v0.15.5 (latest: v0.16.0)
+#9 96.29       Adding heck v0.4.1 (latest: v0.5.0)
+#9 96.29       Adding hermit-abi v0.1.19 (latest: v0.5.2)
+#9 96.29       Adding http v0.2.12 (latest: v1.3.1)
+#9 96.29       Adding http-body v0.4.6 (latest: v1.0.1)
+#9 96.29       Adding hyper v0.14.32 (latest: v1.7.0)
+#9 96.29       Adding hyper-rustls v0.24.2 (latest: v0.27.7)
+#9 96.29       Adding indexmap v1.9.3 (latest: v2.11.0)
+#9 96.29       Adding linux-raw-sys v0.4.15 (latest: v0.10.0)
+#9 96.29       Adding linux-raw-sys v0.9.4 (latest: v0.10.0)
+#9 96.30       Adding num-conv v0.1.0 (latest: v0.2.0)
+#9 96.30       Adding object v0.36.7 (latest: v0.37.3)
+#9 96.30       Adding os_str_bytes v6.6.1 (latest: v7.1.1)
+#9 96.30       Adding prodash v28.0.0 (latest: v30.0.1)
+#9 96.31       Adding reqwest v0.11.27 (latest: v0.12.23)
+#9 96.32       Adding rustix v0.38.44 (latest: v1.0.8)
+#9 96.32       Adding rustls v0.21.12 (latest: v0.23.31)
+#9 96.32       Adding rustls-pemfile v1.0.4 (latest: v2.2.0)
+#9 96.32       Adding rustls-webpki v0.101.7 (latest: v0.103.4)
+#9 96.32       Adding semver v0.11.0 (latest: v1.0.26)
+#9 96.32       Adding smol_str v0.2.2 (latest: v0.3.2)
+#9 96.32       Adding socket2 v0.5.10 (latest: v0.6.0)
+#9 96.32       Adding strsim v0.10.0 (latest: v0.11.1)
+#9 96.33       Adding syn v1.0.109 (latest: v2.0.106)
+#9 96.33       Adding sync_wrapper v0.1.2 (latest: v1.0.2)
+#9 96.33       Adding system-configuration v0.5.1 (latest: v0.6.1)
+#9 96.33       Adding system-configuration-sys v0.5.0 (latest: v0.6.0)
+#9 96.33       Adding tame-index v0.9.7 (latest: v0.23.0)
+#9 96.33       Adding terminal_size v0.1.17 (latest: v0.4.3)
+#9 96.33       Adding textwrap v0.15.2 (latest: v0.16.2)
+#9 96.33       Adding thiserror v1.0.69 (latest: v2.0.16)
+#9 96.33       Adding thiserror-impl v1.0.69 (latest: v2.0.16)
+#9 96.33       Adding tokio-rustls v0.24.1 (latest: v0.26.2)
+#9 96.33       Adding toml-span v0.2.1 (latest: v0.5.2)
+#9 96.33       Adding toml_datetime v0.6.11 (latest: v0.7.0)
+#9 96.33       Adding toml_edit v0.19.15 (latest: v0.23.4)
+#9 96.33       Adding twox-hash v1.6.3 (latest: v2.1.1)
+#9 96.34       Adding wasi v0.11.1+wasi-snapshot-preview1 (latest: v0.14.3+wasi-0.2.4)
+#9 96.34       Adding webpki-roots v0.25.4 (latest: v1.0.2)
+#9 96.35       Adding windows-sys v0.48.0 (latest: v0.60.2)
+#9 96.35       Adding windows-sys v0.52.0 (latest: v0.60.2)
+#9 96.35       Adding windows-sys v0.59.0 (latest: v0.60.2)
+#9 96.35       Adding windows-targets v0.48.5 (latest: v0.53.3)
+#9 96.35       Adding windows-targets v0.52.6 (latest: v0.53.3)
+#9 96.35       Adding windows_aarch64_gnullvm v0.48.5 (latest: v0.53.0)
+#9 96.35       Adding windows_aarch64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 96.35       Adding windows_aarch64_msvc v0.48.5 (latest: v0.53.0)
+#9 96.35       Adding windows_aarch64_msvc v0.52.6 (latest: v0.53.0)
+#9 96.35       Adding windows_i686_gnu v0.48.5 (latest: v0.53.0)
+#9 96.35       Adding windows_i686_gnu v0.52.6 (latest: v0.53.0)
+#9 96.35       Adding windows_i686_gnullvm v0.52.6 (latest: v0.53.0)
+#9 96.35       Adding windows_i686_msvc v0.48.5 (latest: v0.53.0)
+#9 96.35       Adding windows_i686_msvc v0.52.6 (latest: v0.53.0)
+#9 96.35       Adding windows_x86_64_gnu v0.48.5 (latest: v0.53.0)
+#9 96.35       Adding windows_x86_64_gnu v0.52.6 (latest: v0.53.0)
+#9 96.35       Adding windows_x86_64_gnullvm v0.48.5 (latest: v0.53.0)
+#9 96.35       Adding windows_x86_64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 96.35       Adding windows_x86_64_msvc v0.48.5 (latest: v0.53.0)
+#9 96.35       Adding windows_x86_64_msvc v0.52.6 (latest: v0.53.0)
+#9 96.35       Adding winnow v0.5.40 (latest: v0.7.13)
+#9 96.35       Adding winnow v0.6.26 (latest: v0.7.13)
+#9 96.35       Adding winreg v0.50.0 (latest: v0.55.0)
+#9 96.35  Downloading crates ...
+#9 96.46   Downloaded cargo_metadata v0.13.1
+#9 96.46   Downloaded cc v1.2.35
+#9 96.47   Downloaded mime v0.3.17
+#9 96.47   Downloaded bstr v1.12.0
+#9 96.48   Downloaded zerofrom-derive v0.1.6
+#9 96.48   Downloaded oclif v0.4.0
+#9 96.48   Downloaded gix-hashtable v0.5.2
+#9 96.48   Downloaded tinyvec v1.10.0
+#9 96.48   Downloaded utf8_iter v1.0.4
+#9 96.49   Downloaded unicode-width v0.2.1
+#9 96.49   Downloaded time-macros v0.2.24
+#9 96.50   Downloaded num-conv v0.1.0
+#9 96.50   Downloaded flate2 v1.1.2
+#9 96.50   Downloaded rustls-webpki v0.101.7
+#9 96.52   Downloaded untrusted v0.9.0
+#9 96.52   Downloaded zerovec v0.11.4
+#9 96.52   Downloaded zeroize v1.8.1
+#9 96.53   Downloaded unicode-normalization v0.1.24
+#9 96.53   Downloaded gix-trace v0.1.13
+#9 96.53   Downloaded futures-task v0.3.31
+#9 96.53   Downloaded crossbeam-channel v0.5.15
+#9 96.54   Downloaded zerovec-derive v0.11.1
+#9 96.54   Downloaded writeable v0.6.1
+#9 96.54   Downloaded sct v0.7.1
+#9 96.54   Downloaded textwrap v0.15.2
+#9 96.55   Downloaded zerotrie v0.2.2
+#9 96.55   Downloaded tame-index v0.9.7
+#9 96.55   Downloaded gix-filter v0.9.0
+#9 96.56   Downloaded rayon v1.11.0
+#9 96.57   Downloaded winnow v0.6.26
+#9 96.57   Downloaded gix-object v0.41.0
+#9 96.58   Downloaded webpki-roots v0.25.4
+#9 96.58   Downloaded httpdate v1.0.3
+#9 96.58   Downloaded gix-worktree v0.30.0
+#9 96.58   Downloaded gix-ignore v0.11.4
+#9 96.58   Downloaded gix-url v0.27.5
+#9 96.58   Downloaded gix-credentials v0.24.5
+#9 96.59   Downloaded gix-quote v0.4.15
+#9 96.59   Downloaded gix-packetline-blocking v0.17.5
+#9 96.59   Downloaded gix-fs v0.10.2
+#9 96.59   Downloaded futures-channel v0.3.31
+#9 96.59   Downloaded winnow v0.5.40
+#9 96.60   Downloaded gix-sec v0.10.12
+#9 96.60   Downloaded gix-lock v13.1.1
+#9 96.60   Downloaded http-body v0.4.6
+#9 96.60   Downloaded gix-validate v0.8.5
+#9 96.60   Downloaded gix-revwalk v0.12.0
+#9 96.60   Downloaded gix-prompt v0.8.9
+#9 96.61   Downloaded gix-diff v0.40.0
+#9 96.61   Downloaded idna_adapter v1.2.1
+#9 96.61   Downloaded gix-submodule v0.8.0
+#9 96.61   Downloaded gix-traverse v0.37.0
+#9 96.61   Downloaded gix-refspec v0.22.0
+#9 96.61   Downloaded gix-packetline v0.17.6
+#9 96.61   Downloaded gix-attributes v0.22.5
+#9 96.61   Downloaded parking_lot v0.12.4
+#9 96.62   Downloaded getrandom v0.2.16
+#9 96.62   Downloaded potential_utf v0.1.3
+#9 96.62   Downloaded gix-negotiate v0.12.0
+#9 96.62   Downloaded gix-macros v0.1.5
+#9 96.62   Downloaded twox-hash v1.6.3
+#9 96.62   Downloaded stable_deref_trait v1.2.0
+#9 96.62   Downloaded want v0.3.1
+#9 96.63   Downloaded unicode-bom v2.0.3
+#9 96.63   Downloaded tower-service v0.3.3
+#9 96.63   Downloaded tinyvec_macros v0.1.1
+#9 96.63   Downloaded tokio v1.47.1
+#9 96.66   Downloaded gix-validate v0.10.0
+#9 96.66   Downloaded gix-utils v0.1.14
+#9 96.67   Downloaded gix-discover v0.29.0
+#9 96.67   Downloaded globset v0.4.16
+#9 96.67   Downloaded gix-tempfile v13.1.1
+#9 96.67   Downloaded gix-config-value v0.14.12
+#9 96.67   Downloaded futures-sink v0.3.31
+#9 96.67   Downloaded tinystr v0.8.1
+#9 96.67   Downloaded socket2 v0.6.0
+#9 96.68   Downloaded serde_urlencoded v0.7.1
+#9 96.68   Downloaded prodash v28.0.0
+#9 96.68   Downloaded ipnet v2.11.0
+#9 96.68   Downloaded hyper-rustls v0.24.2
+#9 96.68   Downloaded gix-path v0.10.20
+#9 96.69   Downloaded gix-pathspec v0.6.0
+#9 96.69   Downloaded powerfmt v0.2.0
+#9 96.69   Downloaded gix-protocol v0.44.2
+#9 96.69   Downloaded percent-encoding v2.3.2
+#9 96.69   Downloaded num_threads v0.1.7
+#9 96.69   Downloaded yoke-derive v0.8.0
+#9 96.69   Downloaded yoke v0.8.0
+#9 96.69   Downloaded gix-revision v0.26.0
+#9 96.70   Downloaded toml_edit v0.19.15
+#9 96.71   Downloaded time-core v0.1.6
+#9 96.71   Downloaded thiserror-impl v2.0.16
+#9 96.71   Downloaded thiserror v2.0.16
+#9 96.72   Downloaded smol_str v0.2.2
+#9 96.72   Downloaded smallvec v1.15.1
+#9 96.72   Downloaded sha1_smol v1.0.1
+#9 96.72   Downloaded icu_provider v2.0.0
+#9 96.72   Downloaded rustls-pemfile v1.0.4
+#9 96.72   Downloaded httparse v1.10.1
+#9 96.73   Downloaded reqwest v0.11.27
+#9 96.73   Downloaded gix-config v0.34.0
+#9 96.74   Downloaded gix-transport v0.41.2
+#9 96.74   Downloaded icu_normalizer_data v2.0.0
+#9 96.74   Downloaded icu_properties v2.0.1
+#9 96.74   Downloaded gix-odb v0.57.0
+#9 96.75   Downloaded ring v0.17.14
+#9 96.79   Downloaded compression-core v0.4.29
+#9 96.79   Downloaded zerofrom v0.1.6
+#9 96.79   Downloaded url v2.5.7
+#9 96.80   Downloaded gix-ref v0.41.0
+#9 96.80   Downloaded icu_collections v2.0.0
+#9 96.80   Downloaded icu_normalizer v2.0.0
+#9 96.81   Downloaded icu_locale_core v2.0.0
+#9 96.81   Downloaded gix-pack v0.47.0
+#9 96.82   Downloaded http v0.2.12
+#9 96.82   Downloaded tokio-util v0.7.16
+#9 96.83   Downloaded time v0.3.43
+#9 96.84   Downloaded sync_wrapper v0.1.2
+#9 96.84   Downloaded socket2 v0.5.10
+#9 96.84   Downloaded rayon-core v1.13.0
+#9 96.84   Downloaded hashbrown v0.14.5
+#9 96.85   Downloaded pin-utils v0.1.0
+#9 96.85   Downloaded pest v2.8.1
+#9 96.85   Downloaded h2 v0.3.27
+#9 96.86   Downloaded parking_lot_core v0.9.11
+#9 96.86   Downloaded form_urlencoded v1.2.2
+#9 96.86   Downloaded displaydoc v0.2.5
+#9 96.87   Downloaded crossbeam-deque v0.8.6
+#9 96.87   Downloaded clru v0.6.2
+#9 96.87   Downloaded clap_derive v3.1.18
+#9 96.87   Downloaded idna v1.1.0
+#9 96.87   Downloaded icu_properties_data v2.0.1
+#9 96.88   Downloaded hyper v0.14.32
+#9 96.89   Downloaded clap v3.1.18
+#9 96.90   Downloaded ucd-trie v0.1.7
+#9 96.90   Downloaded terminal_size v0.1.17
+#9 96.90   Downloaded synstructure v0.13.2
+#9 96.90   Downloaded gix v0.58.0
+#9 96.92   Downloaded shlex v1.3.0
+#9 96.92   Downloaded semver v0.11.0
+#9 96.92   Downloaded litemap v0.8.0
+#9 96.92   Downloaded gix-index v0.29.0
+#9 96.92   Downloaded gix-date v0.8.7
+#9 96.92   Downloaded dialoguer v0.9.0
+#9 96.93   Downloaded crossbeam-epoch v0.9.18
+#9 96.93   Downloaded gix-glob v0.16.5
+#9 96.93   Downloaded gix-actor v0.30.0
+#9 96.93   Downloaded deranged v0.5.3
+#9 96.93   Downloaded console v0.15.11
+#9 96.93   Downloaded gix-hash v0.14.2
+#9 96.93   Downloaded gix-features v0.38.2
+#9 96.94   Downloaded gix-commitgraph v0.24.3
+#9 96.94   Downloaded gix-chunk v0.4.11
+#9 96.94   Downloaded futures-util v0.3.31
+#9 96.95   Downloaded find-msvc-tools v0.1.0
+#9 96.95   Downloaded faster-hex v0.9.0
+#9 96.95   Downloaded compression-codecs v0.4.30
+#9 96.95   Downloaded rustls v0.21.12
+#9 96.96   Downloaded mio v1.0.4
+#9 96.97   Downloaded kstring v2.0.2
+#9 96.97   Downloaded gix-command v0.3.11
+#9 96.97   Downloaded toml-span v0.2.1
+#9 96.97   Downloaded gix-bitmap v0.2.14
+#9 96.97   Downloaded dunce v1.0.5
+#9 96.97   Downloaded encoding_rs v0.8.35
+#9 97.00   Downloaded crc32fast v1.5.0
+#9 97.00   Downloaded maybe-async v0.2.10
+#9 97.00   Downloaded lock_api v0.4.13
+#9 97.00   Downloaded try-lock v0.2.5
+#9 97.01   Downloaded tokio-rustls v0.24.1
+#9 97.01   Downloaded semver-parser v0.10.3
+#9 97.01   Downloaded scopeguard v1.2.0
+#9 97.01   Downloaded paste v1.0.15
+#9 97.01   Downloaded memmap2 v0.9.8
+#9 97.01   Downloaded bytes v1.10.1
+#9 97.02   Downloaded base64 v0.21.7
+#9 97.02   Downloaded async-compression v0.4.30
+#9 97.03   Downloaded arc-swap v1.7.1
+#9 97.03   Downloaded btoi v0.4.3
+#9 97.11    Compiling proc-macro2 v1.0.101
+#9 97.11    Compiling unicode-ident v1.0.18
+#9 97.11    Compiling libc v0.2.175
+#9 97.11    Compiling memchr v2.7.5
+#9 97.11    Compiling cfg-if v1.0.3
+#9 97.11    Compiling once_cell v1.21.3
+#9 97.11    Compiling regex-syntax v0.8.6
+#9 97.11    Compiling bytes v1.10.1
+#9 97.11    Compiling thiserror v1.0.69
+#9 97.11    Compiling thiserror v2.0.16
+#9 97.12    Compiling autocfg v1.5.0
+#9 97.12    Compiling crc32fast v1.5.0
+#9 97.12    Compiling gix-trace v0.1.13
+#9 97.13    Compiling adler2 v2.0.1
+#9 97.13    Compiling smallvec v1.15.1
+#9 97.13    Compiling fastrand v2.3.0
+#9 97.14    Compiling tinyvec_macros v0.1.1
+#9 97.15    Compiling faster-hex v0.9.0
+#9 97.15    Compiling same-file v1.0.6
+#9 97.15    Compiling itoa v1.0.15
+#9 97.15    Compiling prodash v28.0.0
+#9 97.15    Compiling sha1_smol v1.0.1
+#9 97.15    Compiling bitflags v2.9.4
+#9 97.15    Compiling parking_lot_core v0.9.11
+#9 97.15    Compiling scopeguard v1.2.0
+#9 97.15    Compiling powerfmt v0.2.0
+#9 97.15    Compiling time-core v0.1.6
+#9 97.15    Compiling num-conv v0.1.0
+#9 97.15    Compiling home v0.5.11
+#9 97.15    Compiling num_threads v0.1.7
+#9 97.16    Compiling stable_deref_trait v1.2.0
+#9 97.16    Compiling serde v1.0.219
+#9 97.16    Compiling getrandom v0.3.3
+#9 97.16    Compiling rustix v1.0.8
+#9 97.16    Compiling shlex v1.3.0
+#9 97.16    Compiling find-msvc-tools v0.1.0
+#9 97.16    Compiling pin-project-lite v0.2.16
+#9 97.16    Compiling writeable v0.6.1
+#9 97.16    Compiling linux-raw-sys v0.9.4
+#9 97.16    Compiling litemap v0.8.0
+#9 97.16    Compiling icu_normalizer_data v2.0.0
+#9 97.16    Compiling icu_properties_data v2.0.1
+#9 97.16    Compiling hashbrown v0.14.5
+#9 97.16    Compiling futures-core v0.3.31
+#9 97.16    Compiling untrusted v0.9.0
+#9 97.16    Compiling percent-encoding v2.3.2
+#9 97.16    Compiling utf8_iter v1.0.4
+#9 97.16    Compiling fnv v1.0.7
+#9 97.16    Compiling rustix v0.38.44
+#9 97.16    Compiling hashbrown v0.15.5
+#9 97.16    Compiling equivalent v1.0.2
+#9 97.16    Compiling futures-sink v0.3.31
+#9 97.16    Compiling log v0.4.27
+#9 97.16    Compiling slab v0.4.11
+#9 97.16    Compiling pin-utils v0.1.0
+#9 97.16    Compiling static_assertions v1.1.0
+#9 97.16    Compiling futures-task v0.3.31
+#9 97.16    Compiling httparse v1.10.1
+#9 97.16    Compiling linux-raw-sys v0.4.15
+#9 97.16    Compiling rustls v0.21.12
+#9 97.16    Compiling unicode-bom v2.0.3
+#9 97.16    Compiling futures-io v0.3.31
+#9 97.16    Compiling version_check v0.9.5
+#9 97.16    Compiling shell-words v1.1.0
+#9 97.16    Compiling try-lock v0.2.5
+#9 97.16    Compiling crossbeam-utils v0.8.21
+#9 97.16    Compiling ryu v1.0.20
+#9 97.16    Compiling compression-core v0.4.29
+#9 97.16    Compiling tower-service v0.3.3
+#9 97.16    Compiling httpdate v1.0.3
+#9 97.16    Compiling encoding_rs v0.8.35
+#9 97.16    Compiling base64 v0.21.7
+#9 97.16    Compiling syn v1.0.109
+#9 97.16    Compiling webpki-roots v0.25.4
+#9 97.16    Compiling mime v0.3.17
+#9 97.16    Compiling sync_wrapper v0.1.2
+#9 97.16    Compiling ipnet v2.11.0
+#9 97.16    Compiling rayon-core v1.13.0
+#9 97.16    Compiling cfg_aliases v0.2.1
+#9 97.16    Compiling ucd-trie v0.1.7
+#9 97.16    Compiling serde_json v1.0.143
+#9 97.16    Compiling camino v1.1.12
+#9 97.16    Compiling clru v0.6.2
+#9 97.16    Compiling arc-swap v1.7.1
+#9 97.16    Compiling unicode-width v0.2.1
+#9 97.16    Compiling semver v1.0.26
+#9 97.16    Compiling paste v1.0.15
+#9 97.16    Compiling either v1.15.0
+#9 97.16    Compiling os_str_bytes v6.6.1
+#9 97.16    Compiling heck v0.4.1
+#9 97.16    Compiling hashbrown v0.12.3
+#9 97.16    Compiling lazy_static v1.5.0
+#9 97.16    Compiling termcolor v1.4.1
+#9 97.16    Compiling zeroize v1.8.1
+#9 97.16    Compiling strsim v0.10.0
+#9 97.23    Compiling miniz_oxide v0.8.9
+#9 97.27    Compiling bitflags v1.3.2
+#9 97.30    Compiling tracing-core v0.1.34
+#9 97.30    Compiling nix v0.30.1
+#9 97.32    Compiling want v0.3.1
+#9 97.32    Compiling toml_datetime v0.6.11
+#9 97.32    Compiling dunce v1.0.5
+#9 97.32    Compiling glob v0.3.3
+#9 97.36    Compiling tinyvec v1.10.0
+#9 97.39    Compiling toml-span v0.2.1
+#9 97.42    Compiling deranged v0.5.3
+#9 97.42    Compiling form_urlencoded v1.2.2
+#9 97.44    Compiling futures-channel v0.3.31
+#9 97.55    Compiling kstring v2.0.2
+#9 97.56    Compiling twox-hash v1.6.3
+#9 97.57    Compiling lock_api v0.4.13
+#9 97.58    Compiling num-traits v0.2.19
+#9 97.58    Compiling indexmap v1.9.3
+#9 97.62    Compiling http v0.2.12
+#9 97.63    Compiling walkdir v2.5.0
+#9 97.65    Compiling clap_lex v0.2.4
+#9 97.66    Compiling proc-macro-error-attr v1.0.4
+#9 97.66    Compiling proc-macro-error v1.0.4
+#9 97.67    Compiling aho-corasick v1.1.3
+#9 97.67    Compiling winnow v0.5.40
+#9 97.68    Compiling futures-util v0.3.31
+#9 97.68    Compiling winnow v0.6.26
+#9 97.73    Compiling cc v1.2.35
+#9 97.79    Compiling time-macros v0.2.24
+#9 97.85    Compiling rustls-pemfile v1.0.4
+#9 97.89    Compiling flate2 v1.1.2
+#9 97.96    Compiling tracing v0.1.41
+#9 98.01    Compiling indexmap v2.11.0
+#9 98.09    Compiling unicode-normalization v0.1.24
+#9 98.14    Compiling quote v1.0.40
+#9 98.19    Compiling compression-codecs v0.4.30
+#9 98.23    Compiling crossbeam-epoch v0.9.18
+#9 98.23    Compiling crossbeam-channel v0.5.15
+#9 98.28    Compiling syn v2.0.106
+#9 98.41    Compiling crossbeam-deque v0.8.6
+#9 98.46    Compiling http-body v0.4.6
+#9 98.47    Compiling gix-utils v0.1.14
+#9 98.54    Compiling btoi v0.4.3
+#9 98.58    Compiling ring v0.17.14
+#9 98.78    Compiling regex-automata v0.4.10
+#9 98.97    Compiling rayon v1.11.0
+#9 99.09    Compiling time v0.3.43
+#9 99.09    Compiling memmap2 v0.9.8
+#9 99.09    Compiling mio v1.0.4
+#9 99.09    Compiling socket2 v0.6.0
+#9 99.09    Compiling getrandom v0.2.16
+#9 99.09    Compiling gix-sec v0.10.12
+#9 99.09    Compiling socket2 v0.5.10
+#9 99.10    Compiling filetime v0.2.26
+#9 99.10    Compiling terminal_size v0.1.17
+#9 99.11    Compiling console v0.15.11
+#9 99.11    Compiling atty v0.2.14
+#9 99.16    Compiling textwrap v0.15.2
+#9 99.24    Compiling parking_lot v0.12.4
+#9 99.31    Compiling tempfile v3.21.0
+#9 99.34    Compiling toml_edit v0.19.15
+#9 99.39    Compiling tokio v1.47.1
+#9 99.41    Compiling oclif v0.4.0
+#9 99.48    Compiling dialoguer v0.9.0
+#9 100.1    Compiling ctrlc v3.4.7
+#9 100.2    Compiling clap_derive v3.1.18
+#9 100.9    Compiling bstr v1.12.0
+#9 100.9    Compiling regex v1.11.2
+#9 101.0    Compiling synstructure v0.13.2
+#9 101.2    Compiling clap v3.1.18
+#9 101.3    Compiling globset v0.4.16
+#9 101.3    Compiling thiserror-impl v1.0.69
+#9 101.3    Compiling thiserror-impl v2.0.16
+#9 101.3    Compiling zerofrom-derive v0.1.6
+#9 101.3    Compiling yoke-derive v0.8.0
+#9 101.3    Compiling zerovec-derive v0.11.1
+#9 101.3    Compiling displaydoc v0.2.5
+#9 101.3    Compiling serde_derive v1.0.219
+#9 101.3    Compiling maybe-async v0.2.10
+#9 101.4    Compiling gix-macros v0.1.5
+#9 102.2    Compiling gix-hash v0.14.2
+#9 102.2    Compiling gix-date v0.8.7
+#9 102.2    Compiling gix-validate v0.8.5
+#9 102.2    Compiling gix-packetline v0.17.6
+#9 102.2    Compiling gix-packetline-blocking v0.17.5
+#9 102.2    Compiling zerofrom v0.1.6
+#9 102.3    Compiling gix-validate v0.10.0
+#9 102.3    Compiling gix-chunk v0.4.11
+#9 102.3    Compiling gix-quote v0.4.15
+#9 102.3    Compiling gix-bitmap v0.2.14
+#9 102.3    Compiling pest v2.8.1
+#9 102.3    Compiling yoke v0.8.0
+#9 102.3    Compiling gix-features v0.38.2
+#9 102.3    Compiling gix-hashtable v0.5.2
+#9 102.4    Compiling gix-actor v0.30.0
+#9 102.4    Compiling gix-path v0.10.20
+#9 102.5    Compiling zerovec v0.11.4
+#9 102.5    Compiling zerotrie v0.2.2
+#9 102.5    Compiling gix-object v0.41.0
+#9 102.5    Compiling gix-fs v0.10.2
+#9 102.5    Compiling gix-commitgraph v0.24.3
+#9 102.6    Compiling gix-config-value v0.14.12
+#9 102.6    Compiling gix-glob v0.16.5
+#9 102.6    Compiling gix-command v0.3.11
+#9 102.7    Compiling gix-tempfile v13.1.1
+#9 102.8    Compiling tokio-util v0.7.16
+#9 102.8    Compiling async-compression v0.4.30
+#9 102.8    Compiling gix-lock v13.1.1
+#9 102.8    Compiling gix-prompt v0.8.9
+#9 102.9    Compiling gix-attributes v0.22.5
+#9 102.9    Compiling gix-ignore v0.11.4
+#9 103.1    Compiling h2 v0.3.27
+#9 103.2    Compiling gix-pathspec v0.6.0
+#9 103.3    Compiling gix-revwalk v0.12.0
+#9 103.3    Compiling gix-ref v0.41.0
+#9 103.3    Compiling gix-pack v0.47.0
+#9 103.3    Compiling gix-diff v0.40.0
+#9 103.3    Compiling gix-filter v0.9.0
+#9 103.5    Compiling gix-traverse v0.37.0
+#9 103.5    Compiling gix-revision v0.26.0
+#9 103.5    Compiling gix-negotiate v0.12.0
+#9 103.5    Compiling tinystr v0.8.1
+#9 103.5    Compiling potential_utf v0.1.3
+#9 103.6    Compiling semver-parser v0.10.3
+#9 103.6    Compiling icu_collections v2.0.0
+#9 103.6    Compiling icu_locale_core v2.0.0
+#9 103.6    Compiling gix-index v0.29.0
+#9 103.7    Compiling gix-refspec v0.22.0
+#9 104.1    Compiling icu_provider v2.0.0
+#9 104.2    Compiling gix-config v0.34.0
+#9 104.2    Compiling gix-discover v0.29.0
+#9 104.3    Compiling icu_normalizer v2.0.0
+#9 104.3    Compiling icu_properties v2.0.1
+#9 104.3    Compiling gix-odb v0.57.0
+#9 104.3    Compiling gix-worktree v0.30.0
+#9 105.1    Compiling idna_adapter v1.2.1
+#9 105.2    Compiling idna v1.1.0
+#9 105.4    Compiling hyper v0.14.32
+#9 105.7    Compiling rustls-webpki v0.101.7
+#9 105.7    Compiling sct v0.7.1
+#9 105.9    Compiling url v2.5.7
+#9 105.9    Compiling serde_urlencoded v0.7.1
+#9 105.9    Compiling smol_str v0.2.2
+#9 105.9    Compiling cargo-platform v0.1.9
+#9 105.9    Compiling semver v0.11.0
+#9 106.3    Compiling gix-url v0.27.5
+#9 106.5    Compiling gix-credentials v0.24.5
+#9 106.5    Compiling gix-submodule v0.8.0
+#9 106.6    Compiling cargo_metadata v0.13.1
+#9 107.5    Compiling tokio-rustls v0.24.1
+#9 107.6    Compiling hyper-rustls v0.24.2
+#9 107.7    Compiling reqwest v0.11.27
+#9 108.3    Compiling gix-transport v0.41.2
+#9 108.7    Compiling gix-protocol v0.44.2
+#9 109.0    Compiling gix v0.58.0
+#9 111.2    Compiling tame-index v0.9.7
+#9 112.8    Compiling cargo-workspaces v0.4.0
+#9 123.6     Finished `release` profile [optimized] target(s) in 28.52s
+#9 123.6   Installing /root/.cargo/bin/cargo-workspaces
+#9 123.6   Installing /root/.cargo/bin/cargo-ws
+#9 123.6    Installed package `cargo-workspaces v0.4.0` (executables `cargo-workspaces`, `cargo-ws`)
+#9 123.8     Updating crates.io index
+#9 123.9  Downloading crates ...
+#9 124.0   Downloaded cargo-audit v0.21.2
+#9 124.0   Installing cargo-audit v0.21.2
+#9 124.0     Updating crates.io index
+#9 125.3      Locking 374 packages to latest compatible versions
+#9 125.3       Adding addr2line v0.24.2 (latest: v0.25.0)
+#9 125.3       Adding allocator-api2 v0.2.21 (latest: v0.3.0)
+#9 125.3       Adding auditable-info v0.9.0 (latest: v0.10.0)
+#9 125.3       Adding auditable-serde v0.8.0 (latest: v0.9.0)
+#9 125.3       Adding core-foundation v0.9.4 (latest: v0.10.1)
+#9 125.3       Adding fixedbitset v0.4.2 (latest: v0.5.7)
+#9 125.3       Adding fs-err v2.11.0 (latest: v3.1.1)
+#9 125.3       Adding generic-array v0.14.7 (latest: v1.2.0)
+#9 125.3       Adding getrandom v0.2.16 (latest: v0.3.3)
+#9 125.3       Adding gimli v0.31.1 (latest: v0.32.2)
+#9 125.3       Adding gix v0.72.1 (latest: v0.73.0)
+#9 125.3       Adding gix-attributes v0.26.1 (latest: v0.27.0)
+#9 125.3       Adding gix-commitgraph v0.28.0 (latest: v0.29.0)
+#9 125.3       Adding gix-config v0.45.1 (latest: v0.46.0)
+#9 125.3       Adding gix-credentials v0.29.0 (latest: v0.30.0)
+#9 125.3       Adding gix-diff v0.52.1 (latest: v0.53.0)
+#9 125.3       Adding gix-discover v0.40.1 (latest: v0.41.0)
+#9 125.3       Adding gix-features v0.42.1 (latest: v0.43.1)
+#9 125.3       Adding gix-filter v0.19.2 (latest: v0.20.0)
+#9 125.3       Adding gix-fs v0.15.0 (latest: v0.16.1)
+#9 125.3       Adding gix-glob v0.20.1 (latest: v0.21.0)
+#9 125.3       Adding gix-hash v0.18.0 (latest: v0.19.0)
+#9 125.3       Adding gix-hashtable v0.8.1 (latest: v0.9.0)
+#9 125.3       Adding gix-ignore v0.15.0 (latest: v0.16.0)
+#9 125.3       Adding gix-index v0.40.1 (latest: v0.41.0)
+#9 125.3       Adding gix-lock v17.1.0 (latest: v18.0.0)
+#9 125.3       Adding gix-negotiate v0.20.1 (latest: v0.21.0)
+#9 125.3       Adding gix-object v0.49.1 (latest: v0.50.2)
+#9 125.3       Adding gix-odb v0.69.1 (latest: v0.70.0)
+#9 125.3       Adding gix-pack v0.59.1 (latest: v0.60.0)
+#9 125.3       Adding gix-pathspec v0.11.0 (latest: v0.12.0)
+#9 125.3       Adding gix-protocol v0.50.1 (latest: v0.51.0)
+#9 125.3       Adding gix-ref v0.52.1 (latest: v0.53.1)
+#9 125.3       Adding gix-refspec v0.30.1 (latest: v0.31.0)
+#9 125.3       Adding gix-revision v0.34.1 (latest: v0.35.0)
+#9 125.3       Adding gix-revwalk v0.20.1 (latest: v0.21.0)
+#9 125.3       Adding gix-sec v0.11.0 (latest: v0.12.0)
+#9 125.3       Adding gix-shallow v0.4.0 (latest: v0.5.0)
+#9 125.3       Adding gix-submodule v0.19.1 (latest: v0.20.0)
+#9 125.3       Adding gix-tempfile v17.1.0 (latest: v18.0.0)
+#9 125.3       Adding gix-transport v0.47.0 (latest: v0.48.0)
+#9 125.3       Adding gix-traverse v0.46.2 (latest: v0.47.0)
+#9 125.3       Adding gix-url v0.31.0 (latest: v0.32.0)
+#9 125.3       Adding gix-worktree v0.41.0 (latest: v0.42.0)
+#9 125.3       Adding gix-worktree-state v0.19.0 (latest: v0.20.0)
+#9 125.3       Adding hash32 v0.3.1 (latest: v1.0.0)
+#9 125.4       Adding hashbrown v0.14.5 (latest: v0.16.0)
+#9 125.4       Adding hashbrown v0.15.5 (latest: v0.16.0)
+#9 125.4       Adding heapless v0.8.0 (latest: v0.9.1)
+#9 125.4       Adding linux-raw-sys v0.9.4 (latest: v0.10.0)
+#9 125.4       Adding num-conv v0.1.0 (latest: v0.2.0)
+#9 125.4       Adding object v0.36.7 (latest: v0.37.3)
+#9 125.4       Adding petgraph v0.6.5 (latest: v0.8.2)
+#9 125.4       Adding prodash v29.0.2 (latest: v30.0.1)
+#9 125.4       Adding serde_spanned v0.6.9 (latest: v1.0.0)
+#9 125.4       Adding syn v1.0.109 (latest: v2.0.106)
+#9 125.4       Adding synstructure v0.12.6 (latest: v0.13.2)
+#9 125.4       Adding tame-index v0.22.0 (latest: v0.23.0)
+#9 125.4       Adding thiserror v1.0.69 (latest: v2.0.16)
+#9 125.4       Adding thiserror-impl v1.0.69 (latest: v2.0.16)
+#9 125.4       Adding toml v0.8.23 (latest: v0.9.5)
+#9 125.4       Adding toml_datetime v0.6.11 (latest: v0.7.0)
+#9 125.4       Adding toml_edit v0.22.27 (latest: v0.23.4)
+#9 125.4       Adding wasi v0.11.1+wasi-snapshot-preview1 (latest: v0.14.3+wasi-0.2.4)
+#9 125.4       Adding wasmparser v0.207.0 (latest: v0.238.1)
+#9 125.5       Adding windows-sys v0.52.0 (latest: v0.60.2)
+#9 125.5       Adding windows-sys v0.59.0 (latest: v0.60.2)
+#9 125.5       Adding windows-targets v0.52.6 (latest: v0.53.3)
+#9 125.5       Adding windows_aarch64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 125.5       Adding windows_aarch64_msvc v0.52.6 (latest: v0.53.0)
+#9 125.5       Adding windows_i686_gnu v0.52.6 (latest: v0.53.0)
+#9 125.5       Adding windows_i686_gnullvm v0.52.6 (latest: v0.53.0)
+#9 125.5       Adding windows_i686_msvc v0.52.6 (latest: v0.53.0)
+#9 125.5       Adding windows_x86_64_gnu v0.52.6 (latest: v0.53.0)
+#9 125.5       Adding windows_x86_64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 125.5       Adding windows_x86_64_msvc v0.52.6 (latest: v0.53.0)
+#9 125.5  Downloading crates ...
+#9 125.6   Downloaded anstyle-query v1.1.4
+#9 125.6   Downloaded anstyle v1.0.11
+#9 125.6   Downloaded anstyle-parse v0.2.7
+#9 125.6   Downloaded auditable-serde v0.8.0
+#9 125.6   Downloaded ahash v0.8.12
+#9 125.6   Downloaded quitters v0.1.0
+#9 125.6   Downloaded allocator-api2 v0.2.21
+#9 125.6   Downloaded quinn v0.11.9
+#9 125.6   Downloaded libz-rs-sys v0.5.2
+#9 125.6   Downloaded gix-features v0.42.1
+#9 125.6   Downloaded uluru v3.1.0
+#9 125.6   Downloaded rand_chacha v0.9.0
+#9 125.6   Downloaded quinn-udp v0.5.14
+#9 125.6   Downloaded prodash v29.0.2
+#9 125.7   Downloaded strsim v0.11.1
+#9 125.7   Downloaded ppv-lite86 v0.2.21
+#9 125.7   Downloaded rand v0.9.2
+#9 125.7   Downloaded gix-discover v0.40.1
+#9 125.7   Downloaded tower-layer v0.3.3
+#9 125.7   Downloaded gix-index v0.40.1
+#9 125.7   Downloaded gix-attributes v0.26.1
+#9 125.7   Downloaded gix-actor v0.35.4
+#9 125.7   Downloaded gix-ignore v0.15.0
+#9 125.7   Downloaded gix-config v0.45.1
+#9 125.7   Downloaded petgraph v0.6.5
+#9 125.7   Downloaded wait-timeout v0.2.1
+#9 125.7   Downloaded rustc-hash v2.1.1
+#9 125.7   Downloaded fixedbitset v0.4.2
+#9 125.7   Downloaded gix-commitgraph v0.28.0
+#9 125.7   Downloaded twox-hash v2.1.1
+#9 125.7   Downloaded tracing-log v0.2.0
+#9 125.7   Downloaded generic-array v0.14.7
+#9 125.7   Downloaded sync_wrapper v1.0.2
+#9 125.7   Downloaded gix-date v0.10.5
+#9 125.7   Downloaded synstructure v0.12.6
+#9 125.7   Downloaded gix-fs v0.15.0
+#9 125.7   Downloaded gix-filter v0.19.2
+#9 125.7   Downloaded toml_write v0.1.2
+#9 125.7   Downloaded auditable-info v0.9.0
+#9 125.7   Downloaded auditable-extract v0.3.5
+#9 125.7   Downloaded secrecy v0.10.3
+#9 125.7   Downloaded sha1 v0.10.6
+#9 125.7   Downloaded subtle v2.6.1
+#9 125.7   Downloaded gix-diff v0.52.1
+#9 125.7   Downloaded gix-credentials v0.29.0
+#9 125.7   Downloaded http-body v1.0.1
+#9 125.7   Downloaded gix-config-value v0.15.1
+#9 125.7   Downloaded rustc-stable-hash v0.1.2
+#9 125.7   Downloaded canonical-path v2.0.2
+#9 125.7   Downloaded matchers v0.2.0
+#9 125.7   Downloaded block-buffer v0.10.4
+#9 125.7   Downloaded gix-hashtable v0.8.1
+#9 125.7   Downloaded gix-command v0.6.2
+#9 125.7   Downloaded gix-submodule v0.19.1
+#9 125.7   Downloaded gix-revwalk v0.20.1
+#9 125.7   Downloaded faster-hex v0.10.0
+#9 125.7   Downloaded is_terminal_polyfill v1.70.1
+#9 125.7   Downloaded smol_str v0.3.2
+#9 125.7   Downloaded gix-sec v0.11.0
+#9 125.7   Downloaded colorchoice v1.0.4
+#9 125.7   Downloaded gix-packetline-blocking v0.19.1
+#9 125.7   Downloaded utf8parse v0.2.2
+#9 125.7   Downloaded unicode-xid v0.2.6
+#9 125.7   Downloaded topological-sort v0.2.2
+#9 125.7   Downloaded rand_core v0.9.3
+#9 125.7   Downloaded heck v0.5.0
+#9 125.7   Downloaded gix-refspec v0.30.1
+#9 125.7   Downloaded gix-prompt v0.11.1
+#9 125.7   Downloaded clap_lex v0.7.5
+#9 125.7   Downloaded serde_spanned v0.6.9
+#9 125.7   Downloaded hash32 v0.3.1
+#9 125.7   Downloaded openssl-probe v0.1.6
+#9 125.7   Downloaded lru-slab v0.1.2
+#9 125.8   Downloaded gix-quote v0.6.0
+#9 125.8   Downloaded crypto-common v0.1.6
+#9 125.8   Downloaded io-close v0.3.7
+#9 125.8   Downloaded gix-utils v0.3.0
+#9 125.8   Downloaded gix-url v0.31.0
+#9 125.8   Downloaded gix-lock v17.1.0
+#9 125.8   Downloaded binfarce v0.2.1
+#9 125.8   Downloaded gix-hash v0.18.0
+#9 125.8   Downloaded gix-tempfile v17.1.0
+#9 125.8   Downloaded fs-err v3.1.1
+#9 125.8   Downloaded toml-span v0.5.2
+#9 125.8 error: failed to compile `cargo-audit v0.21.2`, intermediate artifacts can be found at `/tmp/cargo-installZHUGJ7`.
+#9 125.8 To reuse those artifacts with a future compilation, set the environment variable `CARGO_TARGET_DIR` to that path.
+#9 125.8 
+#9 125.8 Caused by:
+#9 125.8   failed to parse manifest at `/root/.cargo/registry/src/index.crates.io-6f17d22bba15001f/toml-span-0.5.2/Cargo.toml`
+#9 125.8 
+#9 125.8 Caused by:
+#9 125.8   feature `edition2024` is required
+#9 125.8 
+#9 125.8   The package requires the Cargo feature called `edition2024`, but that feature is not stabilized in this version of Cargo (1.82.0 (8f40fc59f 2024-08-21)).
+#9 125.8   Consider trying a newer version of Cargo (this may require the nightly release).
+#9 125.8   See https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#edition-2024 for more information about the status of this feature.
+#9 125.9     Updating crates.io index
+#9 126.0  Downloading crates ...
+#9 126.0   Downloaded cargo-tarpaulin v0.32.8
+#9 126.1   Installing cargo-tarpaulin v0.32.8
+#9 126.1     Updating crates.io index
+#9 126.7      Locking 263 packages to latest compatible versions
+#9 126.7       Adding addr2line v0.24.2 (latest: v0.25.0)
+#9 126.7       Adding cargo-platform v0.2.0 (latest: v0.3.0)
+#9 126.7       Adding cargo-util-schemas v0.2.0 (latest: v0.9.0)
+#9 126.7       Adding cargo_metadata v0.20.0 (latest: v0.22.0)
+#9 126.7       Adding core-foundation v0.9.4 (latest: v0.10.1)
+#9 126.7       Adding foreign-types v0.3.2 (latest: v0.5.0)
+#9 126.7       Adding foreign-types-shared v0.1.1 (latest: v0.3.1)
+#9 126.7       Adding gimli v0.31.1 (latest: v0.32.2)
+#9 126.7       Adding hashbrown v0.11.2 (latest: v0.16.0)
+#9 126.7       Adding hashbrown v0.15.5 (latest: v0.16.0)
+#9 126.8       Adding indexmap v1.8.2 (latest: v2.11.0)
+#9 126.8       Adding linux-raw-sys v0.4.15 (latest: v0.10.0)
+#9 126.8       Adding linux-raw-sys v0.9.4 (latest: v0.10.0)
+#9 126.8       Adding md5 v0.7.0 (latest: v0.8.0)
+#9 126.8       Adding nom v7.1.3 (latest: v8.0.0)
+#9 126.8       Adding object v0.26.2 (latest: v0.37.3)
+#9 126.8       Adding object v0.36.7 (latest: v0.37.3)
+#9 126.8       Adding ordered-float v2.10.1 (latest: v5.0.0)
+#9 126.8       Adding procfs v0.17.0 (latest: v0.18.0)
+#9 126.8       Adding procfs-core v0.17.0 (latest: v0.18.0)
+#9 126.8       Adding quick-xml v0.37.5 (latest: v0.38.3)
+#9 126.8       Adding rustc-hash v1.1.0 (latest: v2.1.1)
+#9 126.8       Adding rustix v0.38.44 (latest: v1.0.8)
+#9 126.8       Adding security-framework v2.11.1 (latest: v3.3.0)
+#9 126.8       Adding serde_spanned v0.6.9 (latest: v1.0.0)
+#9 126.8       Adding thiserror v1.0.69 (latest: v2.0.16)
+#9 126.8       Adding thiserror-impl v1.0.69 (latest: v2.0.16)
+#9 126.8       Adding toml v0.8.23 (latest: v0.9.5)
+#9 126.8       Adding toml_datetime v0.6.11 (latest: v0.7.0)
+#9 126.8       Adding toml_edit v0.22.27 (latest: v0.23.4)
+#9 126.8       Adding wasi v0.11.1+wasi-snapshot-preview1 (latest: v0.14.3+wasi-0.2.4)
+#9 126.8       Adding windows-sys v0.52.0 (latest: v0.60.2)
+#9 126.8       Adding windows-sys v0.59.0 (latest: v0.60.2)
+#9 126.8       Adding windows-targets v0.52.6 (latest: v0.53.3)
+#9 126.8       Adding windows_aarch64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 126.8       Adding windows_aarch64_msvc v0.52.6 (latest: v0.53.0)
+#9 126.8       Adding windows_i686_gnu v0.52.6 (latest: v0.53.0)
+#9 126.8       Adding windows_i686_gnullvm v0.52.6 (latest: v0.53.0)
+#9 126.8       Adding windows_i686_msvc v0.52.6 (latest: v0.53.0)
+#9 126.8       Adding windows_x86_64_gnu v0.52.6 (latest: v0.53.0)
+#9 126.8       Adding windows_x86_64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 126.8       Adding windows_x86_64_msvc v0.52.6 (latest: v0.53.0)
+#9 126.9  Downloading crates ...
+#9 126.9   Downloaded cargo-util-schemas v0.2.0
+#9 126.9   Downloaded anstream v0.6.20
+#9 126.9   Downloaded cargo-platform v0.2.0
+#9 126.9   Downloaded base64 v0.22.1
+#9 126.9   Downloaded clap v4.5.47
+#9 127.0   Downloaded cargo_metadata v0.20.0
+#9 127.0   Downloaded anyhow v1.0.99
+#9 127.0   Downloaded adler32 v1.2.0
+#9 127.0   Downloaded deflate v1.0.0
+#9 127.0   Downloaded minimal-lexical v0.2.1
+#9 127.0   Downloaded toml v0.8.23
+#9 127.0   Downloaded humantime-serde v1.1.1
+#9 127.0   Downloaded humantime v2.2.0
+#9 127.0   Downloaded serde-untagged v0.1.8
+#9 127.0   Downloaded indexmap v1.8.2
+#9 127.0   Downloaded unicase v2.8.1
+#9 127.0   Downloaded pkg-config v0.3.32
+#9 127.0   Downloaded tokio-native-tls v0.3.1
+#9 127.0   Downloaded sharded-slab v0.1.7
+#9 127.0   Downloaded rustc-hash v1.1.0
+#9 127.0   Downloaded rustls-pki-types v1.12.0
+#9 127.0   Downloaded tower v0.5.2
+#9 127.0   Downloaded iri-string v0.7.8
+#9 127.0   Downloaded tower-http v0.6.6
+#9 127.0   Downloaded tracing-subscriber v0.3.20
+#9 127.0   Downloaded vcpkg v0.2.15
+#9 127.1   Downloaded object v0.37.3
+#9 127.1   Downloaded openssl v0.10.73
+#9 127.1   Downloaded object v0.26.2
+#9 127.1   Downloaded gimli v0.32.2
+#9 127.1   Downloaded hyper v1.7.0
+#9 127.1   Downloaded git2 v0.20.2
+#9 127.1   Downloaded reqwest v0.12.23
+#9 127.1   Downloaded quick-xml v0.37.5
+#9 127.1   Downloaded libssh2-sys v0.3.1
+#9 127.2   Downloaded ruzstd v0.8.1
+#9 127.2   Downloaded http v1.3.1
+#9 127.2   Downloaded clap_builder v4.5.47
+#9 127.2   Downloaded openssl-sys v0.9.109
+#9 127.2   Downloaded hyper-util v0.1.16
+#9 127.2   Downloaded procfs-core v0.17.0
+#9 127.2   Downloaded nu-ansi-term v0.50.1
+#9 127.2   Downloaded jobserver v0.1.34
+#9 127.2   Downloaded hyper-tls v0.6.0
+#9 127.2   Downloaded native-tls v0.2.14
+#9 127.2   Downloaded mime_guess v2.0.5
+#9 127.2   Downloaded ordered-float v2.10.1
+#9 127.2   Downloaded num_cpus v1.17.0
+#9 127.2   Downloaded llvm_profparser v0.8.3
+#9 127.2   Downloaded http-body-util v0.1.3
+#9 127.2   Downloaded fallible-iterator v0.3.0
+#9 127.2   Downloaded clap_derive v4.5.47
+#9 127.2   Downloaded typeid v1.0.3
+#9 127.2   Downloaded procfs v0.17.0
+#9 127.2   Downloaded libgit2-sys v0.18.2+1.9.1
+#9 127.3   Downloaded hashbrown v0.11.2
+#9 127.3   Downloaded nom v7.1.3
+#9 127.3   Downloaded md5 v0.7.0
+#9 127.3   Downloaded gzip-header v1.0.0
+#9 127.3   Downloaded foreign-types-shared v0.1.1
+#9 127.3   Downloaded erased-serde v0.4.6
+#9 127.3   Downloaded openssl-macros v0.1.1
+#9 127.3   Downloaded leb128 v0.2.5
+#9 127.3   Downloaded serde-value v0.7.0
+#9 127.3   Downloaded libz-sys v1.1.22
+#9 127.3   Downloaded coveralls-api v0.7.0
+#9 127.3   Downloaded foreign-types v0.3.2
+#9 127.4    Compiling proc-macro2 v1.0.101
+#9 127.4    Compiling unicode-ident v1.0.18
+#9 127.4    Compiling libc v0.2.175
+#9 127.4    Compiling serde v1.0.219
+#9 127.4    Compiling shlex v1.3.0
+#9 127.4    Compiling find-msvc-tools v0.1.0
+#9 127.4    Compiling pkg-config v0.3.32
+#9 127.4    Compiling stable_deref_trait v1.2.0
+#9 127.4    Compiling memchr v2.7.5
+#9 127.4    Compiling vcpkg v0.2.15
+#9 127.4    Compiling cfg-if v1.0.3
+#9 127.4    Compiling autocfg v1.5.0
+#9 127.4    Compiling pin-project-lite v0.2.16
+#9 127.4    Compiling smallvec v1.15.1
+#9 127.4    Compiling bytes v1.10.1
+#9 127.4    Compiling once_cell v1.21.3
+#9 127.4    Compiling writeable v0.6.1
+#9 127.4    Compiling litemap v0.8.0
+#9 127.4    Compiling bitflags v2.9.4
+#9 127.4    Compiling itoa v1.0.15
+#9 127.4    Compiling icu_properties_data v2.0.1
+#9 127.4    Compiling futures-core v0.3.31
+#9 127.4    Compiling icu_normalizer_data v2.0.0
+#9 127.4    Compiling percent-encoding v2.3.2
+#9 127.4    Compiling crc32fast v1.5.0
+#9 127.4    Compiling futures-sink v0.3.31
+#9 127.4    Compiling semver v1.0.26
+#9 127.4    Compiling fnv v1.0.7
+#9 127.4    Compiling pin-utils v0.1.0
+#9 127.4    Compiling log v0.4.27
+#9 127.4    Compiling openssl v0.10.73
+#9 127.4    Compiling slab v0.4.11
+#9 127.4    Compiling futures-io v0.3.31
+#9 127.4    Compiling httparse v1.10.1
+#9 127.4    Compiling utf8_iter v1.0.4
+#9 127.4    Compiling foreign-types-shared v0.1.1
+#9 127.4    Compiling futures-task v0.3.31
+#9 127.4    Compiling adler2 v2.0.1
+#9 127.4    Compiling typeid v1.0.3
+#9 127.4    Compiling openssl-probe v0.1.6
+#9 127.4    Compiling hashbrown v0.15.5
+#9 127.4    Compiling tower-service v0.3.3
+#9 127.4    Compiling try-lock v0.2.5
+#9 127.4    Compiling equivalent v1.0.2
+#9 127.4    Compiling native-tls v0.2.14
+#9 127.4    Compiling atomic-waker v1.1.2
+#9 127.4    Compiling thiserror v1.0.69
+#9 127.4    Compiling ryu v1.0.20
+#9 127.4    Compiling serde_json v1.0.143
+#9 127.4    Compiling unicase v2.8.1
+#9 127.4    Compiling utf8parse v0.2.2
+#9 127.4    Compiling ipnet v2.11.0
+#9 127.4    Compiling iana-time-zone v0.1.63
+#9 127.4    Compiling regex-syntax v0.8.6
+#9 127.4    Compiling toml_write v0.1.2
+#9 127.4    Compiling base64 v0.22.1
+#9 127.4    Compiling tower-layer v0.3.3
+#9 127.4    Compiling thiserror v2.0.16
+#9 127.4    Compiling winnow v0.7.13
+#9 127.4    Compiling anstyle-query v1.1.4
+#9 127.4    Compiling anstyle v1.0.11
+#9 127.4    Compiling camino v1.1.12
+#9 127.4    Compiling mime v0.3.17
+#9 127.4    Compiling cfg_aliases v0.2.1
+#9 127.4    Compiling zeroize v1.8.1
+#9 127.4    Compiling rustix v0.38.44
+#9 127.4    Compiling is_terminal_polyfill v1.70.1
+#9 127.4    Compiling colorchoice v1.0.4
+#9 127.4    Compiling anyhow v1.0.99
+#9 127.4    Compiling iri-string v0.7.8
+#9 127.4    Compiling llvm_profparser v0.8.3
+#9 127.4    Compiling strsim v0.11.1
+#9 127.4    Compiling heck v0.5.0
+#9 127.4    Compiling linux-raw-sys v0.4.15
+#9 127.4    Compiling clap_lex v0.7.5
+#9 127.4    Compiling md5 v0.7.0
+#9 127.4    Compiling object v0.37.3
+#9 127.4    Compiling lazy_static v1.5.0
+#9 127.4    Compiling adler32 v1.2.0
+#9 127.4    Compiling minimal-lexical v0.2.1
+#9 127.4    Compiling hashbrown v0.11.2
+#9 127.4    Compiling unicode-xid v0.2.6
+#9 127.4    Compiling procfs v0.17.0
+#9 127.4    Compiling twox-hash v2.1.1
+#9 127.4    Compiling hex v0.4.3
+#9 127.4    Compiling humantime v2.2.0
+#9 127.4    Compiling same-file v1.0.6
+#9 127.4    Compiling nu-ansi-term v0.50.1
+#9 127.4    Compiling fallible-iterator v0.3.0
+#9 127.4    Compiling rustc-hash v1.1.0
+#9 127.4    Compiling leb128 v0.2.5
+#9 127.4    Compiling rustc-demangle v0.1.26
+#9 127.4    Compiling glob v0.3.3
+#9 127.5    Compiling sync_wrapper v1.0.2
+#9 127.5    Compiling nix v0.30.1
+#9 127.6    Compiling miniz_oxide v0.8.9
+#9 127.6    Compiling rustls-pki-types v1.12.0
+#9 127.6    Compiling foreign-types v0.3.2
+#9 127.6    Compiling num-traits v0.2.19
+#9 127.6    Compiling indexmap v1.8.2
+#9 127.6    Compiling ruzstd v0.8.1
+#9 127.7    Compiling walkdir v2.5.0
+#9 127.7    Compiling form_urlencoded v1.2.2
+#9 127.7    Compiling thread_local v1.1.9
+#9 127.7    Compiling futures-channel v0.3.31
+#9 127.8    Compiling sharded-slab v0.1.7
+#9 127.8    Compiling mime_guess v2.0.5
+#9 127.8    Compiling tracing-core v0.1.34
+#9 127.9    Compiling anstyle-parse v0.2.7
+#9 127.9    Compiling want v0.3.1
+#9 127.9    Compiling aho-corasick v1.1.3
+#9 127.9    Compiling nom v7.1.3
+#9 127.9    Compiling quick-xml v0.37.5
+#9 128.0    Compiling futures-util v0.3.31
+#9 128.1    Compiling anstream v0.6.20
+#9 128.2    Compiling gzip-header v1.0.0
+#9 128.2    Compiling http v1.3.1
+#9 128.2    Compiling flate2 v1.1.2
+#9 128.2    Compiling tracing-log v0.2.0
+#9 128.3    Compiling clap_builder v4.5.47
+#9 128.3    Compiling deflate v1.0.0
+#9 128.4    Compiling indexmap v2.11.0
+#9 128.4    Compiling quote v1.0.40
+#9 128.5    Compiling object v0.26.2
+#9 128.5    Compiling syn v2.0.106
+#9 128.8    Compiling ordered-float v2.10.1
+#9 128.8    Compiling chrono v0.4.41
+#9 128.8    Compiling http-body v1.0.1
+#9 128.9    Compiling http-body-util v0.1.3
+#9 129.0    Compiling gimli v0.32.2
+#9 129.1    Compiling jobserver v0.1.34
+#9 129.2    Compiling regex-automata v0.4.10
+#9 129.3    Compiling cc v1.2.35
+#9 129.4    Compiling socket2 v0.6.0
+#9 129.4    Compiling mio v1.0.4
+#9 129.4    Compiling num_cpus v1.17.0
+#9 129.6    Compiling tokio v1.47.1
+#9 129.8    Compiling procfs-core v0.17.0
+#9 130.2    Compiling openssl-sys v0.9.109
+#9 130.2    Compiling libz-sys v1.1.22
+#9 130.2    Compiling libssh2-sys v0.3.1
+#9 130.2    Compiling libgit2-sys v0.18.2+1.9.1
+#9 131.6    Compiling synstructure v0.13.2
+#9 131.9    Compiling matchers v0.2.0
+#9 131.9    Compiling regex v1.11.2
+#9 132.1    Compiling serde_derive v1.0.219
+#9 132.1    Compiling zerofrom-derive v0.1.6
+#9 132.1    Compiling yoke-derive v0.8.0
+#9 132.1    Compiling zerovec-derive v0.11.1
+#9 132.1    Compiling displaydoc v0.2.5
+#9 132.1    Compiling tracing-attributes v0.1.30
+#9 132.1    Compiling openssl-macros v0.1.1
+#9 132.1    Compiling thiserror-impl v1.0.69
+#9 132.1    Compiling thiserror-impl v2.0.16
+#9 132.1    Compiling clap_derive v4.5.47
+#9 133.4    Compiling hyper v1.7.0
+#9 133.4    Compiling tower v0.5.2
+#9 133.5    Compiling zerofrom v0.1.6
+#9 133.5    Compiling tracing v0.1.41
+#9 133.6    Compiling yoke v0.8.0
+#9 133.6    Compiling tracing-subscriber v0.3.20
+#9 133.7    Compiling zerovec v0.11.4
+#9 133.7    Compiling zerotrie v0.2.2
+#9 133.7    Compiling tower-http v0.6.6
+#9 134.0    Compiling clap v4.5.47
+#9 134.0    Compiling hyper-util v0.1.16
+#9 134.5    Compiling tinystr v0.8.1
+#9 134.5    Compiling potential_utf v0.1.3
+#9 134.6    Compiling icu_collections v2.0.0
+#9 134.7    Compiling icu_locale_core v2.0.0
+#9 135.1    Compiling icu_provider v2.0.0
+#9 135.3    Compiling icu_properties v2.0.1
+#9 135.3    Compiling icu_normalizer v2.0.0
+#9 135.6    Compiling tokio-native-tls v0.3.1
+#9 135.7    Compiling hyper-tls v0.6.0
+#9 136.1    Compiling idna_adapter v1.2.1
+#9 136.1    Compiling idna v1.1.0
+#9 136.6    Compiling rustc_version v0.4.1
+#9 136.7    Compiling url v2.5.7
+#9 136.7    Compiling toml_datetime v0.6.11
+#9 136.7    Compiling serde_spanned v0.6.9
+#9 136.7    Compiling erased-serde v0.4.6
+#9 136.7    Compiling serde-value v0.7.0
+#9 136.7    Compiling serde_urlencoded v0.7.1
+#9 136.7    Compiling cargo-platform v0.2.0
+#9 136.7    Compiling humantime-serde v1.1.1
+#9 136.8    Compiling toml_edit v0.22.27
+#9 136.8    Compiling cargo-tarpaulin v0.32.8
+#9 137.1    Compiling serde-untagged v0.1.8
+#9 137.2    Compiling git2 v0.20.2
+#9 137.4    Compiling reqwest v0.12.23
+#9 138.2    Compiling toml v0.8.23
+#9 138.2    Compiling coveralls-api v0.7.0
+#9 138.5    Compiling cargo-util-schemas v0.2.0
+#9 139.4    Compiling cargo_metadata v0.20.0
+#9 217.7     Finished `release` profile [optimized] target(s) in 1m 31s
+#9 217.8   Installing /root/.cargo/bin/cargo-tarpaulin
+#9 217.8    Installed package `cargo-tarpaulin v0.32.8` (executable `cargo-tarpaulin`)
+#9 218.0     Updating crates.io index
+#9 218.1 error: cannot install package `cargo-nextest 0.9.103`, it requires rustc 1.86 or newer, while the currently active rustc version is 1.82.0
+#9 218.1 `cargo-nextest 0.9.97-b.2` supports rustc 1.81
+#9 218.1     Updating crates.io index
+#9 218.2  Downloading crates ...
+#9 218.3   Downloaded cargo-hack v0.6.37
+#9 218.3   Installing cargo-hack v0.6.37
+#9 218.3     Updating crates.io index
+#9 218.7      Locking 54 packages to latest compatible versions
+#9 218.7       Adding hashbrown v0.15.5 (latest: v0.16.0)
+#9 218.7       Adding windows-sys v0.59.0 (latest: v0.60.2)
+#9 218.7       Adding windows-targets v0.52.6 (latest: v0.53.3)
+#9 218.7       Adding windows_aarch64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 218.7       Adding windows_aarch64_msvc v0.52.6 (latest: v0.53.0)
+#9 218.7       Adding windows_i686_gnu v0.52.6 (latest: v0.53.0)
+#9 218.7       Adding windows_i686_gnullvm v0.52.6 (latest: v0.53.0)
+#9 218.7       Adding windows_i686_msvc v0.52.6 (latest: v0.53.0)
+#9 218.7       Adding windows_x86_64_gnu v0.52.6 (latest: v0.53.0)
+#9 218.7       Adding windows_x86_64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 218.7       Adding windows_x86_64_msvc v0.52.6 (latest: v0.53.0)
+#9 218.7  Downloading crates ...
+#9 218.8   Downloaded toml_writer v1.0.2
+#9 218.8   Downloaded toml v0.9.5
+#9 218.8   Downloaded toml_datetime v0.7.0
+#9 218.8   Downloaded toml_parser v1.0.2
+#9 218.8   Downloaded serde_spanned v1.0.0
+#9 218.8   Downloaded toml_edit v0.23.4
+#9 218.8   Downloaded lexopt v0.3.1
+#9 218.8   Downloaded cargo-config2 v0.1.35
+#9 218.8    Compiling serde v1.0.219
+#9 218.8    Compiling proc-macro2 v1.0.101
+#9 218.8    Compiling unicode-ident v1.0.18
+#9 218.8    Compiling libc v0.2.175
+#9 218.8    Compiling cfg_aliases v0.2.1
+#9 218.8    Compiling winnow v0.7.13
+#9 218.8    Compiling serde_json v1.0.143
+#9 218.8    Compiling hashbrown v0.15.5
+#9 218.8    Compiling bitflags v2.9.4
+#9 218.8    Compiling equivalent v1.0.2
+#9 218.8    Compiling cfg-if v1.0.3
+#9 218.8    Compiling anyhow v1.0.99
+#9 218.8    Compiling toml_writer v1.0.2
+#9 218.8    Compiling itoa v1.0.15
+#9 218.8    Compiling ryu v1.0.20
+#9 218.8    Compiling memchr v2.7.5
+#9 218.8    Compiling lexopt v0.3.1
+#9 218.8    Compiling same-file v1.0.6
+#9 218.8    Compiling termcolor v1.4.1
+#9 218.9    Compiling nix v0.30.1
+#9 219.3    Compiling indexmap v2.11.0
+#9 219.4    Compiling quote v1.0.40
+#9 219.5    Compiling syn v2.0.106
+#9 220.2    Compiling toml_parser v1.0.2
+#9 220.8    Compiling serde_derive v1.0.219
+#9 221.0    Compiling toml_datetime v0.7.0
+#9 221.0    Compiling serde_spanned v1.0.0
+#9 221.1    Compiling ctrlc v3.4.7
+#9 221.1    Compiling toml v0.9.5
+#9 221.1    Compiling toml_edit v0.23.4
+#9 222.5    Compiling cargo-config2 v0.1.35
+#9 231.5    Compiling cargo-hack v0.6.37
+#9 250.4     Finished `release` profile [optimized] target(s) in 32.28s
+#9 250.4   Installing /root/.cargo/bin/cargo-hack
+#9 250.4    Installed package `cargo-hack v0.6.37` (executable `cargo-hack`)
+#9 250.5     Updating crates.io index
+#9 250.7 error: cannot install package `cargo-semver-checks 0.43.0`, it requires rustc 1.87 or newer, while the currently active rustc version is 1.82.0
+#9 250.7 `cargo-semver-checks 0.39.0` supports rustc 1.81
+#9 250.8     Updating crates.io index
+#9 250.9  Downloading crates ...
+#9 250.9   Downloaded cargo-fuzz v0.13.1
+#9 251.0   Installing cargo-fuzz v0.13.1
+#9 251.0     Updating crates.io index
+#9 251.2      Locking 60 packages to latest compatible versions
+#9 251.2       Adding cargo-platform v0.1.9 (latest: v0.3.0)
+#9 251.2       Adding cargo_metadata v0.18.1 (latest: v0.22.0)
+#9 251.2       Adding linux-raw-sys v0.9.4 (latest: v0.10.0)
+#9 251.2       Adding thiserror v1.0.69 (latest: v2.0.16)
+#9 251.2       Adding thiserror-impl v1.0.69 (latest: v2.0.16)
+#9 251.2       Adding toml v0.5.11 (latest: v0.9.5)
+#9 251.2  Downloading crates ...
+#9 251.3   Downloaded current_platform v0.2.0
+#9 251.3    Compiling proc-macro2 v1.0.101
+#9 251.3    Compiling unicode-ident v1.0.18
+#9 251.3    Compiling serde v1.0.219
+#9 251.3    Compiling semver v1.0.26
+#9 251.3    Compiling utf8parse v0.2.2
+#9 251.3    Compiling libc v0.2.175
+#9 251.3    Compiling is_terminal_polyfill v1.70.1
+#9 251.3    Compiling colorchoice v1.0.4
+#9 251.3    Compiling getrandom v0.3.3
+#9 251.3    Compiling serde_json v1.0.143
+#9 251.3    Compiling anstyle-query v1.1.4
+#9 251.3    Compiling anstyle v1.0.11
+#9 251.3    Compiling camino v1.1.12
+#9 251.3    Compiling thiserror v1.0.69
+#9 251.3    Compiling rustix v1.0.8
+#9 251.3    Compiling clap_lex v0.7.5
+#9 251.3    Compiling bitflags v2.9.4
+#9 251.3    Compiling anyhow v1.0.99
+#9 251.3    Compiling ryu v1.0.20
+#9 251.3    Compiling strsim v0.11.1
+#9 251.3    Compiling heck v0.5.0
+#9 251.4    Compiling linux-raw-sys v0.9.4
+#9 251.4    Compiling current_platform v0.2.0
+#9 251.4    Compiling cfg-if v1.0.3
+#9 251.4    Compiling itoa v1.0.15
+#9 251.4    Compiling memchr v2.7.5
+#9 251.4    Compiling once_cell v1.21.3
+#9 251.4    Compiling fastrand v2.3.0
+#9 251.4    Compiling anstyle-parse v0.2.7
+#9 251.5    Compiling anstream v0.6.20
+#9 251.7    Compiling clap_builder v4.5.47
+#9 251.9    Compiling quote v1.0.40
+#9 252.0    Compiling syn v2.0.106
+#9 252.8    Compiling tempfile v3.21.0
+#9 253.8    Compiling serde_derive v1.0.219
+#9 253.8    Compiling thiserror-impl v1.0.69
+#9 253.8    Compiling clap_derive v4.5.47
+#9 254.9    Compiling clap v4.5.47
+#9 257.3    Compiling cargo-platform v0.1.9
+#9 257.3    Compiling toml v0.5.11
+#9 257.5    Compiling rustc_version v0.4.1
+#9 258.0    Compiling cargo_metadata v0.18.1
+#9 260.6    Compiling cargo-fuzz v0.13.1
+#9 262.3     Finished `release` profile [optimized] target(s) in 11.55s
+#9 262.4   Installing /root/.cargo/bin/cargo-fuzz
+#9 262.4    Installed package `cargo-fuzz v0.13.1` (executable `cargo-fuzz`)
+#9 262.5     Updating crates.io index
+#9 262.7  Downloading crates ...
+#9 262.8   Downloaded cargo-check-external-types v0.3.0
+#9 262.8   Installing cargo-check-external-types v0.3.0
+#9 262.8     Updating crates.io index
+#9 263.0      Locking 94 packages to latest compatible versions
+#9 263.0       Adding cargo-platform v0.1.9 (latest: v0.3.0)
+#9 263.0       Adding cargo_metadata v0.19.2 (latest: v0.22.0)
+#9 263.0       Adding hashbrown v0.15.5 (latest: v0.16.0)
+#9 263.0       Adding serde_spanned v0.6.9 (latest: v1.0.0)
+#9 263.0       Adding supports-color v2.1.0 (latest: v3.0.2)
+#9 263.0       Adding toml v0.8.23 (latest: v0.9.5)
+#9 263.0       Adding toml_datetime v0.6.11 (latest: v0.7.0)
+#9 263.0       Adding toml_edit v0.22.27 (latest: v0.23.4)
+#9 263.1       Adding windows-sys v0.52.0 (latest: v0.60.2)
+#9 263.1       Adding windows-sys v0.59.0 (latest: v0.60.2)
+#9 263.1       Adding windows-targets v0.52.6 (latest: v0.53.3)
+#9 263.1       Adding windows_aarch64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 263.1       Adding windows_aarch64_msvc v0.52.6 (latest: v0.53.0)
+#9 263.1       Adding windows_i686_gnu v0.52.6 (latest: v0.53.0)
+#9 263.1       Adding windows_i686_gnullvm v0.52.6 (latest: v0.53.0)
+#9 263.1       Adding windows_i686_msvc v0.52.6 (latest: v0.53.0)
+#9 263.1       Adding windows_x86_64_gnu v0.52.6 (latest: v0.53.0)
+#9 263.1       Adding windows_x86_64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 263.1       Adding windows_x86_64_msvc v0.52.6 (latest: v0.53.0)
+#9 263.1  Downloading crates ...
+#9 263.1   Downloaded supports-color v3.0.2
+#9 263.1   Downloaded supports-color v2.1.0
+#9 263.1   Downloaded wildmatch v2.4.0
+#9 263.1   Downloaded cargo_metadata v0.19.2
+#9 263.1   Downloaded rustdoc-types v0.55.0
+#9 263.2    Compiling proc-macro2 v1.0.101
+#9 263.2    Compiling unicode-ident v1.0.18
+#9 263.2    Compiling serde v1.0.219
+#9 263.2    Compiling libc v0.2.175
+#9 263.2    Compiling thiserror v2.0.16
+#9 263.2    Compiling once_cell v1.21.3
+#9 263.2    Compiling utf8parse v0.2.2
+#9 263.2    Compiling equivalent v1.0.2
+#9 263.2    Compiling regex-syntax v0.8.6
+#9 263.2    Compiling colorchoice v1.0.4
+#9 263.2    Compiling hashbrown v0.15.5
+#9 263.2    Compiling is_terminal_polyfill v1.70.1
+#9 263.2    Compiling is_ci v1.2.0
+#9 263.2    Compiling camino v1.1.12
+#9 263.2    Compiling semver v1.0.26
+#9 263.2    Compiling anstyle v1.0.11
+#9 263.2    Compiling anstyle-query v1.1.4
+#9 263.2    Compiling memchr v2.7.5
+#9 263.2    Compiling serde_json v1.0.143
+#9 263.2    Compiling itoa v1.0.15
+#9 263.2    Compiling heck v0.5.0
+#9 263.2    Compiling toml_write v0.1.2
+#9 263.2    Compiling cfg-if v1.0.3
+#9 263.2    Compiling ryu v1.0.20
+#9 263.2    Compiling anyhow v1.0.99
+#9 263.2    Compiling pin-project-lite v0.2.16
+#9 263.2    Compiling lazy_static v1.5.0
+#9 263.2    Compiling strsim v0.11.1
+#9 263.2    Compiling log v0.4.27
+#9 263.2    Compiling clap_lex v0.7.5
+#9 263.2    Compiling owo-colors v4.2.2
+#9 263.2    Compiling winnow v0.7.13
+#9 263.2    Compiling nu-ansi-term v0.50.1
+#9 263.2    Compiling smallvec v1.15.1
+#9 263.2    Compiling ucd-trie v0.1.7
+#9 263.2    Compiling wildmatch v2.4.0
+#9 263.2    Compiling anstyle-parse v0.2.7
+#9 263.2    Compiling supports-color v3.0.2
+#9 263.2    Compiling thread_local v1.1.9
+#9 263.3    Compiling sharded-slab v0.1.7
+#9 263.3    Compiling tracing-core v0.1.34
+#9 263.4    Compiling anstream v0.6.20
+#9 263.5    Compiling clap_builder v4.5.47
+#9 263.6    Compiling tracing-log v0.2.0
+#9 263.7    Compiling quote v1.0.40
+#9 263.8    Compiling indexmap v2.11.0
+#9 263.9    Compiling syn v2.0.106
+#9 263.9    Compiling is-terminal v0.4.16
+#9 263.9    Compiling supports-color v2.1.0
+#9 264.1    Compiling regex-automata v0.4.10
+#9 265.6    Compiling matchers v0.2.0
+#9 266.4    Compiling serde_derive v1.0.219
+#9 266.4    Compiling thiserror-impl v2.0.16
+#9 266.4    Compiling tracing-attributes v0.1.30
+#9 266.4    Compiling clap_derive v4.5.47
+#9 267.1    Compiling tracing v0.1.41
+#9 267.2    Compiling pest v2.8.1
+#9 267.2    Compiling tracing-subscriber v0.3.20
+#9 267.5    Compiling clap v4.5.47
+#9 270.2    Compiling serde_spanned v0.6.9
+#9 270.2    Compiling toml_datetime v0.6.11
+#9 270.2    Compiling cargo-platform v0.1.9
+#9 270.2    Compiling rustdoc-types v0.55.0
+#9 270.3    Compiling toml_edit v0.22.27
+#9 270.8    Compiling cargo_metadata v0.19.2
+#9 271.6    Compiling toml v0.8.23
+#9 271.9    Compiling cargo-check-external-types v0.3.0
+#9 279.2     Finished `release` profile [optimized] target(s) in 16.75s
+#9 279.2   Installing /root/.cargo/bin/cargo-check-external-types
+#9 279.2    Installed package `cargo-check-external-types v0.3.0` (executable `cargo-check-external-types`)
+#9 279.3     Updating crates.io index
+#9 279.6  Downloading crates ...
+#9 279.7   Downloaded cargo-docs-rs v0.1.17
+#9 279.7   Installing cargo-docs-rs v0.1.17
+#9 279.7     Updating crates.io index
+#9 279.9      Locking 49 packages to latest compatible versions
+#9 279.9       Adding clap-cargo v0.16.0 (latest: v0.17.0)
+#9 279.9  Downloading crates ...
+#9 280.0   Downloaded target-triple v0.1.4
+#9 280.0   Downloaded serde_path_to_error v0.1.17
+#9 280.0   Downloaded clap-cargo v0.16.0
+#9 280.0   Downloaded cargo-subcommand-metadata v0.1.0
+#9 280.0 error: failed to compile `cargo-docs-rs v0.1.17`, intermediate artifacts can be found at `/tmp/cargo-installYvCuO3`.
+#9 280.0 To reuse those artifacts with a future compilation, set the environment variable `CARGO_TARGET_DIR` to that path.
+#9 280.0 
+#9 280.0 Caused by:
+#9 280.0   rustc 1.82.0 is not supported by the following package:
+#9 280.0     clap-cargo@0.16.0 requires rustc 1.86
+#9 280.0   Try re-running `cargo install` with `--locked`
+#9 280.1     Updating crates.io index
+#9 280.2  Downloading crates ...
+#9 280.2   Downloaded wasm-pack v0.13.1
+#9 280.3   Installing wasm-pack v0.13.1
+#9 280.3     Updating crates.io index
+#9 280.7      Locking 250 packages to latest compatible versions
+#9 280.7       Adding addr2line v0.24.2 (latest: v0.25.0)
+#9 280.7       Adding bzip2 v0.5.2 (latest: v0.6.0)
+#9 280.7       Adding cargo-platform v0.1.9 (latest: v0.3.0)
+#9 280.7       Adding cargo_metadata v0.15.4 (latest: v0.22.0)
+#9 280.7       Adding console v0.15.11 (latest: v0.16.0)
+#9 280.7       Adding constant_time_eq v0.3.1 (latest: v0.4.2)
+#9 280.7       Adding dialoguer v0.10.4 (latest: v0.12.0)
+#9 280.7       Adding env_logger v0.10.2 (latest: v0.11.8)
+#9 280.7       Adding fs4 v0.6.6 (latest: v0.13.1)
+#9 280.7       Adding generic-array v0.14.7 (latest: v1.2.0)
+#9 280.7       Adding getrandom v0.2.16 (latest: v0.3.3)
+#9 280.7       Adding gimli v0.31.1 (latest: v0.32.2)
+#9 280.7       Adding hashbrown v0.15.5 (latest: v0.16.0)
+#9 280.7       Adding human-panic v1.2.3 (latest: v2.0.3)
+#9 280.7       Adding is_executable v0.1.2 (latest: v1.0.5)
+#9 280.7       Adding linux-raw-sys v0.4.15 (latest: v0.10.0)
+#9 280.7       Adding linux-raw-sys v0.9.4 (latest: v0.10.0)
+#9 280.7       Adding num-conv v0.1.0 (latest: v0.2.0)
+#9 280.7       Adding object v0.36.7 (latest: v0.37.3)
+#9 280.7       Adding redox_users v0.4.6 (latest: v0.5.2)
+#9 280.8       Adding rustix v0.38.44 (latest: v1.0.8)
+#9 280.8       Adding serde_spanned v0.6.9 (latest: v1.0.0)
+#9 280.8       Adding siphasher v0.3.11 (latest: v1.0.1)
+#9 280.8       Adding strsim v0.10.0 (latest: v0.11.1)
+#9 280.8       Adding thiserror v1.0.69 (latest: v2.0.16)
+#9 280.8       Adding thiserror-impl v1.0.69 (latest: v2.0.16)
+#9 280.8       Adding toml v0.7.8 (latest: v0.9.5)
+#9 280.8       Adding toml v0.8.23 (latest: v0.9.5)
+#9 280.8       Adding toml_datetime v0.6.11 (latest: v0.7.0)
+#9 280.8       Adding toml_edit v0.19.15 (latest: v0.23.4)
+#9 280.8       Adding toml_edit v0.22.27 (latest: v0.23.4)
+#9 280.8       Adding ureq v2.12.1 (latest: v3.1.0)
+#9 280.8       Adding wasi v0.11.1+wasi-snapshot-preview1 (latest: v0.14.3+wasi-0.2.4)
+#9 280.8       Adding webpki-roots v0.26.11 (latest: v1.0.2)
+#9 280.8       Adding which v4.4.2 (latest: v8.0.0)
+#9 280.8       Adding windows-sys v0.48.0 (latest: v0.60.2)
+#9 280.8       Adding windows-sys v0.52.0 (latest: v0.60.2)
+#9 280.8       Adding windows-sys v0.59.0 (latest: v0.60.2)
+#9 280.8       Adding windows-targets v0.48.5 (latest: v0.53.3)
+#9 280.8       Adding windows-targets v0.52.6 (latest: v0.53.3)
+#9 280.8       Adding windows_aarch64_gnullvm v0.48.5 (latest: v0.53.0)
+#9 280.8       Adding windows_aarch64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 280.8       Adding windows_aarch64_msvc v0.48.5 (latest: v0.53.0)
+#9 280.8       Adding windows_aarch64_msvc v0.52.6 (latest: v0.53.0)
+#9 280.8       Adding windows_i686_gnu v0.48.5 (latest: v0.53.0)
+#9 280.8       Adding windows_i686_gnu v0.52.6 (latest: v0.53.0)
+#9 280.8       Adding windows_i686_gnullvm v0.52.6 (latest: v0.53.0)
+#9 280.8       Adding windows_i686_msvc v0.48.5 (latest: v0.53.0)
+#9 280.8       Adding windows_i686_msvc v0.52.6 (latest: v0.53.0)
+#9 280.8       Adding windows_x86_64_gnu v0.48.5 (latest: v0.53.0)
+#9 280.8       Adding windows_x86_64_gnu v0.52.6 (latest: v0.53.0)
+#9 280.8       Adding windows_x86_64_gnullvm v0.48.5 (latest: v0.53.0)
+#9 280.8       Adding windows_x86_64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 280.8       Adding windows_x86_64_msvc v0.48.5 (latest: v0.53.0)
+#9 280.8       Adding windows_x86_64_msvc v0.52.6 (latest: v0.53.0)
+#9 280.8       Adding winnow v0.5.40 (latest: v0.7.13)
+#9 280.8       Adding zip v2.4.2 (latest: v4.6.1)
+#9 280.8  Downloading crates ...
+#9 280.9   Downloaded bzip2 v0.5.2
+#9 280.9   Downloaded byteorder v1.5.0
+#9 280.9   Downloaded cargo_metadata v0.15.4
+#9 280.9   Downloaded constant_time_eq v0.3.1
+#9 280.9   Downloaded lzma-rs v0.3.0
+#9 280.9   Downloaded cipher v0.4.4
+#9 280.9   Downloaded env_logger v0.10.2
+#9 280.9   Downloaded aes v0.8.4
+#9 280.9   Downloaded fs4 v0.6.6
+#9 280.9   Downloaded bumpalo v3.19.0
+#9 280.9   Downloaded binary-install v0.4.1
+#9 280.9   Downloaded path-clean v1.0.1
+#9 281.0   Downloaded deflate64 v0.1.9
+#9 281.0   Downloaded xattr v1.5.1
+#9 281.0   Downloaded simd-adler32 v0.3.7
+#9 281.0   Downloaded siphasher v0.3.11
+#9 281.0   Downloaded xz2 v0.1.7
+#9 281.0   Downloaded pbkdf2 v0.12.2
+#9 281.0   Downloaded webpki-roots v0.26.11
+#9 281.0   Downloaded crc v3.3.0
+#9 281.0   Downloaded os_info v3.12.0
+#9 281.0   Downloaded socks v0.3.4
+#9 281.0   Downloaded is_executable v0.1.2
+#9 281.0   Downloaded inout v0.1.4
+#9 281.0   Downloaded cpufeatures v0.2.17
+#9 281.0   Downloaded zstd v0.13.3
+#9 281.0   Downloaded digest v0.10.7
+#9 281.0   Downloaded hmac v0.12.1
+#9 281.0   Downloaded dirs-sys-next v0.1.2
+#9 281.0   Downloaded dirs-next v2.0.0
+#9 281.0   Downloaded zopfli v0.8.2
+#9 281.0   Downloaded dialoguer v0.10.4
+#9 281.0   Downloaded zstd-safe v7.2.4
+#9 281.0   Downloaded zeroize_derive v1.4.2
+#9 281.0   Downloaded toml v0.7.8
+#9 281.0   Downloaded uuid v1.18.1
+#9 281.0   Downloaded human-panic v1.2.3
+#9 281.0   Downloaded tar v0.4.44
+#9 281.0   Downloaded crc-catalog v2.4.0
+#9 281.0   Downloaded typenum v1.18.0
+#9 281.0   Downloaded rustls-webpki v0.103.4
+#9 281.0   Downloaded zip v2.4.2
+#9 281.0   Downloaded ureq v2.12.1
+#9 281.1   Downloaded bzip2-sys v0.1.13+1.0.8
+#9 281.1   Downloaded webpki-roots v1.0.2
+#9 281.1   Downloaded rustls v0.23.31
+#9 281.2   Downloaded zstd-sys v2.0.15+zstd.1.5.7
+#9 281.2   Downloaded lzma-sys v0.1.20
+#9 281.3    Compiling proc-macro2 v1.0.101
+#9 281.3    Compiling unicode-ident v1.0.18
+#9 281.3    Compiling libc v0.2.175
+#9 281.3    Compiling shlex v1.3.0
+#9 281.3    Compiling find-msvc-tools v0.1.0
+#9 281.3    Compiling cfg-if v1.0.3
+#9 281.3    Compiling serde v1.0.219
+#9 281.3    Compiling pkg-config v0.3.32
+#9 281.3    Compiling stable_deref_trait v1.2.0
+#9 281.3    Compiling version_check v0.9.5
+#9 281.3    Compiling typenum v1.18.0
+#9 281.3    Compiling litemap v0.8.0
+#9 281.3    Compiling writeable v0.6.1
+#9 281.3    Compiling bitflags v2.9.4
+#9 281.3    Compiling icu_normalizer_data v2.0.0
+#9 281.3    Compiling hashbrown v0.15.5
+#9 281.3    Compiling getrandom v0.3.3
+#9 281.3    Compiling smallvec v1.15.1
+#9 281.3    Compiling log v0.4.27
+#9 281.3    Compiling subtle v2.6.1
+#9 281.3    Compiling equivalent v1.0.2
+#9 281.3    Compiling memchr v2.7.5
+#9 281.3    Compiling icu_properties_data v2.0.1
+#9 281.3    Compiling autocfg v1.5.0
+#9 281.3    Compiling adler2 v2.0.1
+#9 281.3    Compiling crc32fast v1.5.0
+#9 281.3    Compiling rustix v1.0.8
+#9 281.3    Compiling linux-raw-sys v0.9.4
+#9 281.3    Compiling once_cell v1.21.3
+#9 281.3    Compiling zstd-safe v7.2.4
+#9 281.3    Compiling byteorder v1.5.0
+#9 281.3    Compiling untrusted v0.9.0
+#9 281.3    Compiling rustix v0.38.44
+#9 281.3    Compiling utf8parse v0.2.2
+#9 281.3    Compiling serde_json v1.0.143
+#9 281.3    Compiling percent-encoding v2.3.2
+#9 281.3    Compiling itoa v1.0.15
+#9 281.3    Compiling rustls v0.23.31
+#9 281.3    Compiling anstyle-query v1.1.4
+#9 281.3    Compiling linux-raw-sys v0.4.15
+#9 281.3    Compiling anstyle v1.0.11
+#9 281.3    Compiling utf8_iter v1.0.4
+#9 281.3    Compiling cpufeatures v0.2.17
+#9 281.3    Compiling ryu v1.0.20
+#9 281.3    Compiling object v0.36.7
+#9 281.3    Compiling is_terminal_polyfill v1.70.1
+#9 281.3    Compiling colorchoice v1.0.4
+#9 281.3    Compiling thiserror v2.0.16
+#9 281.3    Compiling crc-catalog v2.4.0
+#9 281.3    Compiling powerfmt v0.2.0
+#9 281.3    Compiling parking_lot_core v0.9.11
+#9 281.3    Compiling num-conv v0.1.0
+#9 281.3    Compiling bumpalo v3.19.0
+#9 281.3    Compiling gimli v0.31.1
+#9 281.3    Compiling anyhow v1.0.99
+#9 281.3    Compiling time-core v0.1.6
+#9 281.3    Compiling thiserror v1.0.69
+#9 281.3    Compiling semver v1.0.26
+#9 281.3    Compiling zip v2.4.2
+#9 281.3    Compiling simd-adler32 v0.3.7
+#9 281.3    Compiling camino v1.1.12
+#9 281.3    Compiling toml_write v0.1.2
+#9 281.3    Compiling winnow v0.5.40
+#9 281.3    Compiling deflate64 v0.1.9
+#9 281.3    Compiling clap_lex v0.7.5
+#9 281.3    Compiling unicode-width v0.2.1
+#9 281.3    Compiling rustc-demangle v0.1.26
+#9 281.3    Compiling scopeguard v1.2.0
+#9 281.3    Compiling heck v0.5.0
+#9 281.3    Compiling fastrand v2.3.0
+#9 281.3    Compiling constant_time_eq v0.3.1
+#9 281.3    Compiling base64 v0.22.1
+#9 281.3    Compiling strsim v0.11.1
+#9 281.3    Compiling home v0.5.11
+#9 281.3    Compiling same-file v1.0.6
+#9 281.3    Compiling shell-words v1.1.0
+#9 281.3    Compiling siphasher v0.3.11
+#9 281.3    Compiling is_executable v0.1.2
+#9 281.3    Compiling hex v0.4.3
+#9 281.3    Compiling iana-time-zone v0.1.63
+#9 281.3    Compiling either v1.15.0
+#9 281.3    Compiling glob v0.3.3
+#9 281.3    Compiling path-clean v1.0.1
+#9 281.3    Compiling strsim v0.10.0
+#9 281.5    Compiling crc v3.3.0
+#9 281.5    Compiling generic-array v0.14.7
+#9 281.5    Compiling deranged v0.5.3
+#9 281.5    Compiling walkdir v2.5.0
+#9 281.5    Compiling form_urlencoded v1.2.2
+#9 281.6    Compiling anstyle-parse v0.2.7
+#9 281.6    Compiling miniz_oxide v0.8.9
+#9 281.7    Compiling lock_api v0.4.13
+#9 281.7    Compiling num-traits v0.2.19
+#9 281.7    Compiling env_logger v0.10.2
+#9 281.7    Compiling anstream v0.6.20
+#9 281.8    Compiling zopfli v0.8.2
+#9 281.8    Compiling lzma-rs v0.3.0
+#9 281.9    Compiling clap_builder v4.5.47
+#9 282.0    Compiling quote v1.0.40
+#9 282.0    Compiling indexmap v2.11.0
+#9 282.0    Compiling flate2 v1.1.2
+#9 282.1    Compiling syn v2.0.106
+#9 282.2    Compiling jobserver v0.1.34
+#9 282.2    Compiling getrandom v0.2.16
+#9 282.2    Compiling dirs-sys-next v0.1.2
+#9 282.2    Compiling filetime v0.2.26
+#9 282.2    Compiling socks v0.3.4
+#9 282.2    Compiling console v0.15.11
+#9 282.3    Compiling uuid v1.18.1
+#9 282.3    Compiling dirs-next v2.0.0
+#9 282.3    Compiling parking_lot v0.12.4
+#9 282.4    Compiling cc v1.2.35
+#9 282.5    Compiling chrono v0.4.41
+#9 282.6    Compiling crypto-common v0.1.6
+#9 282.6    Compiling block-buffer v0.10.4
+#9 282.6    Compiling inout v0.1.4
+#9 282.6    Compiling cipher v0.4.4
+#9 282.7    Compiling digest v0.10.7
+#9 282.8    Compiling hmac v0.12.1
+#9 282.8    Compiling sha1 v0.10.6
+#9 282.8    Compiling aes v0.8.4
+#9 282.9    Compiling pbkdf2 v0.12.2
+#9 282.9    Compiling time v0.3.43
+#9 283.2    Compiling zstd-sys v2.0.15+zstd.1.5.7
+#9 283.2    Compiling ring v0.17.14
+#9 283.2    Compiling lzma-sys v0.1.20
+#9 283.2    Compiling bzip2-sys v0.1.13+1.0.8
+#9 283.2    Compiling xattr v1.5.1
+#9 283.2    Compiling tempfile v3.21.0
+#9 283.3    Compiling tar v0.4.44
+#9 283.3    Compiling fs4 v0.6.6
+#9 283.3    Compiling which v4.4.2
+#9 283.4    Compiling addr2line v0.24.2
+#9 284.6    Compiling xz2 v0.1.7
+#9 284.9    Compiling synstructure v0.13.2
+#9 285.2    Compiling serde_derive v1.0.219
+#9 285.2    Compiling zerofrom-derive v0.1.6
+#9 285.2    Compiling yoke-derive v0.8.0
+#9 285.2    Compiling zerovec-derive v0.11.1
+#9 285.2    Compiling displaydoc v0.2.5
+#9 285.2    Compiling zeroize_derive v1.4.2
+#9 285.2    Compiling thiserror-impl v2.0.16
+#9 285.2    Compiling thiserror-impl v1.0.69
+#9 285.2    Compiling clap_derive v4.5.47
+#9 285.3    Compiling backtrace v0.3.75
+#9 285.4    Compiling bzip2 v0.5.2
+#9 285.8    Compiling zeroize v1.8.1
+#9 285.9    Compiling rustls-pki-types v1.12.0
+#9 285.9    Compiling dialoguer v0.10.4
+#9 286.1    Compiling webpki-roots v1.0.2
+#9 286.1    Compiling zerofrom v0.1.6
+#9 286.2    Compiling webpki-roots v0.26.11
+#9 286.2    Compiling yoke v0.8.0
+#9 286.3    Compiling zerovec v0.11.4
+#9 286.3    Compiling zerotrie v0.2.2
+#9 286.6    Compiling clap v4.5.47
+#9 287.1    Compiling tinystr v0.8.1
+#9 287.1    Compiling potential_utf v0.1.3
+#9 287.1    Compiling icu_collections v2.0.0
+#9 287.2    Compiling icu_locale_core v2.0.0
+#9 287.6    Compiling icu_provider v2.0.0
+#9 287.8    Compiling icu_normalizer v2.0.0
+#9 287.8    Compiling icu_properties v2.0.1
+#9 288.5    Compiling rustls-webpki v0.103.4
+#9 288.5    Compiling idna_adapter v1.2.1
+#9 288.6    Compiling idna v1.1.0
+#9 289.2    Compiling serde_spanned v0.6.9
+#9 289.2    Compiling toml_datetime v0.6.11
+#9 289.2    Compiling url v2.5.7
+#9 289.2    Compiling os_info v3.12.0
+#9 289.2    Compiling cargo-platform v0.1.9
+#9 289.3    Compiling serde_ignored v0.1.12
+#9 289.4    Compiling toml_edit v0.22.27
+#9 289.4    Compiling toml_edit v0.19.15
+#9 290.0    Compiling cargo_metadata v0.15.4
+#9 290.1    Compiling toml v0.8.23
+#9 290.3    Compiling human-panic v1.2.3
+#9 290.6    Compiling zstd v0.13.3
+#9 290.7    Compiling toml v0.7.8
+#9 291.8    Compiling ureq v2.12.1
+#9 292.3    Compiling binary-install v0.4.1
+#9 292.4    Compiling wasm-pack v0.13.1
+#9 295.9     Finished `release` profile [optimized] target(s) in 15.84s
+#9 296.0   Installing /root/.cargo/bin/wasm-pack
+#9 296.0    Installed package `wasm-pack v0.13.1` (executable `wasm-pack`)
+#9 296.1     Updating crates.io index
+#9 296.2 error: cannot install package `wasmtime-cli 36.0.2`, it requires rustc 1.86.0 or newer, while the currently active rustc version is 1.82.0
+#9 296.2 `wasmtime-cli 30.0.2` supports rustc 1.82.0
+#9 296.3     Updating crates.io index
+#9 296.4  Downloading crates ...
+#9 296.5   Downloaded wasm-bindgen-cli v0.2.100
+#9 296.5   Installing wasm-bindgen-cli v0.2.100
+#9 296.5     Updating crates.io index
+#9 296.8      Locking 208 packages to latest compatible versions
+#9 296.8       Adding base64 v0.13.1 (latest: v0.22.1)
+#9 296.8       Adding brotli-decompressor v4.0.3 (latest: v5.0.0)
+#9 296.9       Adding fallible-iterator v0.2.0 (latest: v0.3.0)
+#9 296.9       Adding getrandom v0.2.16 (latest: v0.3.3)
+#9 296.9       Adding gimli v0.26.2 (latest: v0.32.2)
+#9 296.9       Adding hashbrown v0.12.3 (latest: v0.16.0)
+#9 296.9       Adding hashbrown v0.14.5 (latest: v0.16.0)
+#9 296.9       Adding hashbrown v0.15.5 (latest: v0.16.0)
+#9 296.9       Adding indexmap v1.9.3 (latest: v2.11.0)
+#9 296.9       Adding linux-raw-sys v0.9.4 (latest: v0.10.0)
+#9 296.9       Adding num-conv v0.1.0 (latest: v0.2.0)
+#9 296.9       Adding quick-error v1.2.3 (latest: v2.0.1)
+#9 296.9       Adding rand v0.8.5 (latest: v0.9.2)
+#9 296.9       Adding rand_chacha v0.3.1 (latest: v0.9.0)
+#9 296.9       Adding rand_core v0.6.4 (latest: v0.9.3)
+#9 296.9       Adding twoway v0.1.8 (latest: v0.2.2)
+#9 296.9       Adding ureq v2.12.1 (latest: v3.1.0)
+#9 296.9       Adding wasi v0.11.1+wasi-snapshot-preview1 (latest: v0.14.3+wasi-0.2.4)
+#9 296.9       Adding wasm-encoder v0.214.0 (latest: v0.238.1)
+#9 296.9       Adding wasmparser v0.214.0 (latest: v0.238.1)
+#9 296.9       Adding webpki-roots v0.26.11 (latest: v1.0.2)
+#9 296.9       Adding windows-sys v0.52.0 (latest: v0.60.2)
+#9 296.9       Adding windows-targets v0.52.6 (latest: v0.53.3)
+#9 296.9       Adding windows_aarch64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 296.9       Adding windows_aarch64_msvc v0.52.6 (latest: v0.53.0)
+#9 296.9       Adding windows_i686_gnu v0.52.6 (latest: v0.53.0)
+#9 296.9       Adding windows_i686_gnullvm v0.52.6 (latest: v0.53.0)
+#9 296.9       Adding windows_i686_msvc v0.52.6 (latest: v0.53.0)
+#9 296.9       Adding windows_x86_64_gnu v0.52.6 (latest: v0.53.0)
+#9 296.9       Adding windows_x86_64_gnullvm v0.52.6 (latest: v0.53.0)
+#9 296.9       Adding windows_x86_64_msvc v0.52.6 (latest: v0.53.0)
+#9 296.9  Downloading crates ...
+#9 297.0   Downloaded alloc-no-stdlib v2.0.4
+#9 297.0   Downloaded alloc-stdlib v0.2.2
+#9 297.0   Downloaded chunked_transfer v1.5.0
+#9 297.0   Downloaded env_filter v0.1.3
+#9 297.0   Downloaded buf_redux v0.8.4
+#9 297.0   Downloaded fallible-iterator v0.2.0
+#9 297.0   Downloaded base64 v0.13.1
+#9 297.1   Downloaded wasm-bindgen-externref-xform v0.2.100
+#9 297.1   Downloaded safemem v0.3.3
+#9 297.1   Downloaded rand_chacha v0.3.1
+#9 297.1   Downloaded wasm-bindgen-wasm-interpreter v0.2.100
+#9 297.1   Downloaded wasm-bindgen-shared v0.2.100
+#9 297.1   Downloaded walrus-macro v0.22.0
+#9 297.1   Downloaded wasm-bindgen-multi-value-xform v0.2.100
+#9 297.1   Downloaded quick-error v1.2.3
+#9 297.1   Downloaded ascii v1.1.0
+#9 297.1   Downloaded twoway v0.1.8
+#9 297.1   Downloaded wasm-bindgen-wasm-conventions v0.2.100
+#9 297.1   Downloaded wasm-bindgen-threads-xform v0.2.100
+#9 297.1   Downloaded id-arena v2.2.1
+#9 297.1   Downloaded env_logger v0.11.8
+#9 297.1   Downloaded rouille v3.6.2
+#9 297.1   Downloaded threadpool v1.8.1
+#9 297.1   Downloaded tiny_http v0.12.0
+#9 297.1   Downloaded multipart v0.18.0
+#9 297.1   Downloaded wasm-encoder v0.214.0
+#9 297.1   Downloaded brotli-decompressor v4.0.3
+#9 297.1   Downloaded wasm-bindgen-cli-support v0.2.100
+#9 297.2   Downloaded walrus v0.23.3
+#9 297.2   Downloaded wasmparser v0.214.0
+#9 297.2   Downloaded zerocopy v0.8.26
+#9 297.3   Downloaded gimli v0.26.2
+#9 297.3   Downloaded jiff v0.2.15
+#9 297.4    Compiling proc-macro2 v1.0.101
+#9 297.4    Compiling unicode-ident v1.0.18
+#9 297.4    Compiling cfg-if v1.0.3
+#9 297.4    Compiling stable_deref_trait v1.2.0
+#9 297.4    Compiling libc v0.2.175
+#9 297.4    Compiling zerocopy v0.8.26
+#9 297.4    Compiling serde v1.0.219
+#9 297.4    Compiling autocfg v1.5.0
+#9 297.4    Compiling once_cell v1.21.3
+#9 297.4    Compiling log v0.4.27
+#9 297.4    Compiling crossbeam-utils v0.8.21
+#9 297.4    Compiling bitflags v2.9.4
+#9 297.4    Compiling version_check v0.9.5
+#9 297.4    Compiling memchr v2.7.5
+#9 297.4    Compiling rayon-core v1.13.0
+#9 297.4    Compiling heck v0.5.0
+#9 297.4    Compiling semver v1.0.26
+#9 297.4    Compiling hashbrown v0.12.3
+#9 297.4    Compiling either v1.15.0
+#9 297.4    Compiling equivalent v1.0.2
+#9 297.4    Compiling anyhow v1.0.99
+#9 297.4    Compiling writeable v0.6.1
+#9 297.4    Compiling hashbrown v0.15.5
+#9 297.4    Compiling litemap v0.8.0
+#9 297.4    Compiling icu_properties_data v2.0.1
+#9 297.4    Compiling fallible-iterator v0.2.0
+#9 297.4    Compiling icu_normalizer_data v2.0.0
+#9 297.4    Compiling leb128 v0.2.5
+#9 297.4    Compiling shlex v1.3.0
+#9 297.4    Compiling find-msvc-tools v0.1.0
+#9 297.4    Compiling zeroize v1.8.1
+#9 297.4    Compiling rustix v1.0.8
+#9 297.4    Compiling smallvec v1.15.1
+#9 297.4    Compiling getrandom v0.3.3
+#9 297.4    Compiling linux-raw-sys v0.9.4
+#9 297.4    Compiling utf8parse v0.2.2
+#9 297.4    Compiling unicase v2.8.1
+#9 297.4    Compiling serde_json v1.0.143
+#9 297.4    Compiling regex-syntax v0.8.6
+#9 297.4    Compiling anstyle-query v1.1.4
+#9 297.4    Compiling httparse v1.10.1
+#9 297.4    Compiling fastrand v2.3.0
+#9 297.4    Compiling crc32fast v1.5.0
+#9 297.4    Compiling colorchoice v1.0.4
+#9 297.4    Compiling is_terminal_polyfill v1.70.1
+#9 297.4    Compiling utf8_iter v1.0.4
+#9 297.4    Compiling percent-encoding v2.3.2
+#9 297.4    Compiling untrusted v0.9.0
+#9 297.4    Compiling anstyle v1.0.11
+#9 297.4    Compiling powerfmt v0.2.0
+#9 297.4    Compiling adler2 v2.0.1
+#9 297.4    Compiling mime v0.3.17
+#9 297.4    Compiling itoa v1.0.15
+#9 297.4    Compiling alloc-no-stdlib v2.0.4
+#9 297.4    Compiling safemem v0.3.3
+#9 297.4    Compiling wasm-bindgen-shared v0.2.100
+#9 297.4    Compiling rustls v0.23.31
+#9 297.4    Compiling ryu v1.0.20
+#9 297.4    Compiling iana-time-zone v0.1.63
+#9 297.4    Compiling strsim v0.11.1
+#9 297.4    Compiling quick-error v1.2.3
+#9 297.4    Compiling subtle v2.6.1
+#9 297.4    Compiling time-core v0.1.6
+#9 297.4    Compiling ascii v1.1.0
+#9 297.4    Compiling httpdate v1.0.3
+#9 297.4    Compiling chunked_transfer v1.5.0
+#9 297.4    Compiling clap_lex v0.7.5
+#9 297.4    Compiling num-conv v0.1.0
+#9 297.4    Compiling num_threads v0.1.7
+#9 297.4    Compiling base64 v0.22.1
+#9 297.4    Compiling rustc-demangle v0.1.26
+#9 297.4    Compiling jiff v0.2.15
+#9 297.4    Compiling base64 v0.13.1
+#9 297.4    Compiling sha1_smol v1.0.1
+#9 297.6    Compiling ahash v0.8.12
+#9 297.6    Compiling indexmap v1.9.3
+#9 297.6    Compiling wasm-encoder v0.214.0
+#9 297.6    Compiling num-traits v0.2.19
+#9 297.6    Compiling form_urlencoded v1.2.2
+#9 297.7    Compiling anstyle-parse v0.2.7
+#9 297.7    Compiling alloc-stdlib v0.2.2
+#9 297.7    Compiling cc v1.2.35
+#9 297.7    Compiling miniz_oxide v0.8.9
+#9 297.8    Compiling rustls-pki-types v1.12.0
+#9 297.8    Compiling brotli-decompressor v4.0.3
+#9 297.8    Compiling mime_guess v2.0.5
+#9 297.8    Compiling deranged v0.5.3
+#9 297.8    Compiling tiny_http v0.12.0
+#9 297.9    Compiling anstream v0.6.20
+#9 297.9    Compiling aho-corasick v1.1.3
+#9 297.9    Compiling twoway v0.1.8
+#9 297.9    Compiling buf_redux v0.8.4
+#9 298.0    Compiling clap_builder v4.5.47
+#9 298.1    Compiling quote v1.0.40
+#9 298.1    Compiling crossbeam-epoch v0.9.18
+#9 298.1    Compiling webpki-roots v1.0.2
+#9 298.2    Compiling flate2 v1.1.2
+#9 298.2    Compiling webpki-roots v0.26.11
+#9 298.2    Compiling syn v2.0.106
+#9 298.3    Compiling crossbeam-deque v0.8.6
+#9 298.5    Compiling getrandom v0.2.16
+#9 298.5    Compiling num_cpus v1.17.0
+#9 298.5    Compiling filetime v0.2.26
+#9 298.5    Compiling ring v0.17.14
+#9 298.5    Compiling gimli v0.26.2
+#9 298.5    Compiling chrono v0.4.41
+#9 298.6    Compiling rand_core v0.6.4
+#9 298.6    Compiling threadpool v1.8.1
+#9 298.8    Compiling rayon v1.11.0
+#9 298.9    Compiling regex-automata v0.4.10
+#9 299.1    Compiling time v0.3.43
+#9 299.3    Compiling tempfile v3.21.0
+#9 299.3    Compiling ppv-lite86 v0.2.21
+#9 299.6    Compiling rand_chacha v0.3.1
+#9 299.7    Compiling rand v0.8.5
+#9 300.2    Compiling multipart v0.18.0
+#9 300.5    Compiling id-arena v2.2.1
+#9 300.6    Compiling regex v1.11.2
+#9 300.8    Compiling synstructure v0.13.2
+#9 300.9    Compiling env_filter v0.1.3
+#9 301.0    Compiling env_logger v0.11.8
+#9 301.2    Compiling zerofrom-derive v0.1.6
+#9 301.2    Compiling yoke-derive v0.8.0
+#9 301.2    Compiling serde_derive v1.0.219
+#9 301.2    Compiling zerovec-derive v0.11.1
+#9 301.2    Compiling displaydoc v0.2.5
+#9 301.2    Compiling walrus-macro v0.22.0
+#9 301.2    Compiling clap_derive v4.5.47
+#9 302.1    Compiling zerofrom v0.1.6
+#9 302.2    Compiling yoke v0.8.0
+#9 302.3    Compiling zerovec v0.11.4
+#9 302.3    Compiling zerotrie v0.2.2
+#9 302.5    Compiling clap v4.5.47
+#9 303.0    Compiling tinystr v0.8.1
+#9 303.0    Compiling potential_utf v0.1.3
+#9 303.1    Compiling icu_collections v2.0.0
+#9 303.1    Compiling icu_locale_core v2.0.0
+#9 303.6    Compiling icu_provider v2.0.0
+#9 303.7    Compiling icu_normalizer v2.0.0
+#9 303.7    Compiling icu_properties v2.0.1
+#9 304.5    Compiling idna_adapter v1.2.1
+#9 304.5    Compiling idna v1.1.0
+#9 305.1    Compiling hashbrown v0.14.5
+#9 305.1    Compiling indexmap v2.11.0
+#9 305.1    Compiling url v2.5.7
+#9 305.7    Compiling wasmparser v0.214.0
+#9 305.8    Compiling rouille v3.6.2
+#9 305.9    Compiling rustls-webpki v0.103.4
+#9 308.8    Compiling ureq v2.12.1
+#9 309.9    Compiling walrus v0.23.3
+#9 311.4    Compiling wasm-bindgen-wasm-conventions v0.2.100
+#9 311.5    Compiling wasm-bindgen-externref-xform v0.2.100
+#9 311.5    Compiling wasm-bindgen-wasm-interpreter v0.2.100
+#9 311.5    Compiling wasm-bindgen-threads-xform v0.2.100
+#9 311.5    Compiling wasm-bindgen-multi-value-xform v0.2.100
+#9 311.6    Compiling wasm-bindgen-cli-support v0.2.100
+#9 315.4    Compiling wasm-bindgen-cli v0.2.100
+#9 317.6     Finished `release` profile [optimized] target(s) in 21.35s
+#9 317.6 warning: the following packages contain code that will be rejected by a future version of Rust: buf_redux v0.8.4, multipart v0.18.0
+#9 317.6 note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+#9 317.7   Installing /root/.cargo/bin/wasm-bindgen
+#9 317.7   Installing /root/.cargo/bin/wasm-bindgen-test-runner
+#9 317.7   Installing /root/.cargo/bin/wasm2es6js
+#9 317.7    Installed package `wasm-bindgen-cli v0.2.100` (executables `wasm-bindgen`, `wasm-bindgen-test-runner`, `wasm2es6js`)
+#9 317.8     Updating crates.io index
+#9 318.1  Downloading crates ...
+#9 318.2   Downloaded act v0.1.1
+#9 318.2   Installing act v0.1.1
+#9 318.2     Updating crates.io index
+#9 318.3      Locking 3 packages to latest compatible versions
+#9 318.3       Adding ansi-escapes v0.1.1 (latest: v0.2.0)
+#9 318.3  Downloading crates ...
+#9 318.4   Downloaded ansi-escapes v0.1.1
+#9 318.4   Downloaded rustc-serialize v0.3.25
+#9 318.4    Compiling rustc-serialize v0.3.25
+#9 318.4    Compiling ansi-escapes v0.1.1
+#9 319.4    Compiling act v0.1.1
+#9 320.4     Finished `release` profile [optimized] target(s) in 2.55s
+#9 320.4 warning: the following packages contain code that will be rejected by a future version of Rust: act v0.1.1
+#9 320.4 note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+#9 320.4   Installing /root/.cargo/bin/act
+#9 320.4    Installed package `act v0.1.1` (executable `act`)
+#9 DONE 320.5s
+
+#10 [6/8] RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg &&     chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg &&     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null &&     apt-get update &&     apt-get install -y gh &&     rm -rf /var/lib/apt/lists/*
+#10 0.411 4+1 records in
+#10 0.411 4+1 records out
+#10 0.411 2270 bytes (2.3 kB, 2.2 KiB) copied, 0.0806742 s, 28.1 kB/s
+#10 0.515 Get:1 https://cli.github.com/packages stable InRelease [3917 B]
+#10 0.533 Get:2 http://security.ubuntu.com/ubuntu jammy-security InRelease [129 kB]
+#10 0.613 Get:3 https://cli.github.com/packages stable/main amd64 Packages [346 B]
+#10 0.645 Get:4 http://archive.ubuntu.com/ubuntu jammy InRelease [270 kB]
+#10 0.767 Get:5 http://security.ubuntu.com/ubuntu jammy-security/universe amd64 Packages [1272 kB]
+#10 0.866 Get:6 http://security.ubuntu.com/ubuntu jammy-security/main amd64 Packages [3310 kB]
+#10 0.907 Get:7 http://security.ubuntu.com/ubuntu jammy-security/restricted amd64 Packages [5374 kB]
+#10 0.941 Get:8 http://security.ubuntu.com/ubuntu jammy-security/multiverse amd64 Packages [48.5 kB]
+#10 1.118 Get:9 http://archive.ubuntu.com/ubuntu jammy-updates InRelease [128 kB]
+#10 1.233 Get:10 http://archive.ubuntu.com/ubuntu jammy-backports InRelease [127 kB]
+#10 1.349 Get:11 http://archive.ubuntu.com/ubuntu jammy/restricted amd64 Packages [164 kB]
+#10 1.387 Get:12 http://archive.ubuntu.com/ubuntu jammy/main amd64 Packages [1792 kB]
+#10 1.621 Get:13 http://archive.ubuntu.com/ubuntu jammy/multiverse amd64 Packages [266 kB]
+#10 1.634 Get:14 http://archive.ubuntu.com/ubuntu jammy/universe amd64 Packages [17.5 MB]
+#10 2.155 Get:15 http://archive.ubuntu.com/ubuntu jammy-updates/universe amd64 Packages [1579 kB]
+#10 2.172 Get:16 http://archive.ubuntu.com/ubuntu jammy-updates/main amd64 Packages [3623 kB]
+#10 2.296 Get:17 http://archive.ubuntu.com/ubuntu jammy-updates/multiverse amd64 Packages [75.9 kB]
+#10 2.297 Get:18 http://archive.ubuntu.com/ubuntu jammy-updates/restricted amd64 Packages [5560 kB]
+#10 2.449 Get:19 http://archive.ubuntu.com/ubuntu jammy-backports/main amd64 Packages [83.2 kB]
+#10 2.450 Get:20 http://archive.ubuntu.com/ubuntu jammy-backports/universe amd64 Packages [35.2 kB]
+#10 3.241 Fetched 41.3 MB in 3s (14.9 MB/s)
+#10 3.241 Reading package lists...
+#10 4.090 Reading package lists...
+#10 4.905 Building dependency tree...
+#10 5.055 Reading state information...
+#10 5.220 The following NEW packages will be installed:
+#10 5.221   gh
+#10 5.321 0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.
+#10 5.321 Need to get 18.7 MB of archives.
+#10 5.321 After this operation, 54.9 MB of additional disk space will be used.
+#10 5.321 Get:1 https://cli.github.com/packages stable/main amd64 gh amd64 2.78.0 [18.7 MB]
+#10 7.342 debconf: delaying package configuration, since apt-utils is not installed
+#10 7.375 Fetched 18.7 MB in 2s (9486 kB/s)
+#10 7.400 Selecting previously unselected package gh.
+#10 7.400 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 41569 files and directories currently installed.)
+#10 7.421 Preparing to unpack .../archives/gh_2.78.0_amd64.deb ...
+#10 7.421 Unpacking gh (2.78.0) ...
+#10 7.719 Setting up gh (2.78.0) ...
+#10 DONE 7.9s
+
+#11 [7/8] WORKDIR /workspace
+#11 DONE 0.0s
+
+#12 [8/8] COPY . .
+#12 DONE 0.1s
+
+#13 exporting to image
+#13 exporting layers
+#13 exporting layers 25.1s done
+#13 writing image sha256:ab1a182c01ab2c8b856c7bb81a7245a590ee8d1e5800deac9c8704787dbf5dd7 done
+#13 naming to docker.io/library/envgym_test_1756910102 done
+#13 DONE 25.1s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

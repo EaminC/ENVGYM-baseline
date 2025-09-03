@@ -1,0 +1,130 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - SDKMAN! (latest version) - for managing Java/GraalVM installations
+   - GraalVM 17.0.7 (specifically this version for gu support, x86_64 Linux version)
+   - GraalVM 23.0.1 SDK (for commons-cli-graal and commons-csv-graal module compatibility, x86_64 Linux version)
+   - GraalPython component (via gu command)
+   - Maven (latest stable version, 3.8+ recommended)
+   - Python 3.10+ (CPython implementation, 3.11.4 recommended)
+   - pytest (via pip)
+   - Git (for cloning the repository if needed)
+   - Subversion (SVN) - for site deployment and checkout operations
+   - Apache Rat plugin dependencies (auto-downloaded by Maven)
+   - Checkstyle 9.0.1 (auto-downloaded by Maven)
+   - Checkstyle 2.17 (for commons-csv and commons-csv-graal, auto-downloaded by Maven)
+   - SpotBugs 4.4.2 (auto-downloaded by Maven)
+   - JaCoCo 0.8.7 (auto-downloaded by Maven)
+   - JUnit 4.13.2 (auto-downloaded by Maven)
+   - JUnit 4.12 (for commons-csv and commons-csv-graal, auto-downloaded by Maven)
+   - JUnit 3.8.1 (for graal-glue-generator, auto-downloaded by Maven)
+   - Hamcrest 2.2 (for commons-csv and commons-csv-graal, auto-downloaded by Maven)
+   - Mockito Core 4.11.0 (for commons-csv and commons-csv-graal, auto-downloaded by Maven)
+   - Commons IO 2.6 (for commons-csv and commons-csv-graal tests, auto-downloaded by Maven)
+   - Commons Lang3 3.7 (for commons-csv and commons-csv-graal tests, auto-downloaded by Maven)
+   - Commons Lang3 3.6 (for benchmarks, auto-downloaded by Maven)
+   - H2 Database 1.4.196 (for commons-csv and commons-csv-graal tests, auto-downloaded by Maven)
+   - GraalVM SDK 23.0.1 (auto-downloaded by Maven for graal-sdk dependency)
+   - Apache Commons Parent 52 (auto-downloaded by Maven)
+   - Apache Commons Parent 62 (for commons-csv and commons-csv-graal, auto-downloaded by Maven)
+   - Maven Surefire Plugin 3.0.0-M5 (auto-downloaded by Maven)
+   - Maven Javadoc Plugin 3.3.1 (auto-downloaded by Maven)
+   - JApiCmp Maven Plugin 0.15.3 (auto-downloaded by Maven)
+   - Clirr Maven Plugin (for commons-csv and commons-csv-graal, auto-downloaded by Maven)
+   - Apache Felix Bundle Plugin 5.1.2 (auto-downloaded by Maven)
+   - bnd Library 6.0.0 (auto-downloaded by Maven)
+   - Maven PMD Plugin 3.15.0 (auto-downloaded by Maven)
+   - Maven PMD Plugin 3.8 (for commons-csv and commons-csv-graal, auto-downloaded by Maven)
+   - Maven Antrun Plugin 3.0.0 (auto-downloaded by Maven)
+   - Maven Antrun Plugin 1.8 (for commons-csv and commons-csv-graal, auto-downloaded by Maven)
+   - Maven Assembly Plugin (auto-downloaded by Maven)
+   - Maven SCM Publish Plugin 1.1 (for commons-csv and commons-csv-graal, auto-downloaded by Maven)
+   - SpotBugs Maven Plugin 4.4.2.2 (auto-downloaded by Maven)
+   - FindBugs Maven Plugin (for commons-csv and commons-csv-graal, auto-downloaded by Maven)
+   - Maven Animal Sniffer Plugin 1.20 (auto-downloaded by Maven)
+   - Taglist Maven Plugin 2.4 (for commons-csv and commons-csv-graal, auto-downloaded by Maven)
+   - Javancss Maven Plugin 2.1 (for commons-csv and commons-csv-graal, auto-downloaded by Maven)
+   - JMH Core 1.5.2 (for commons-csv and commons-csv-graal benchmarks, optional, auto-downloaded by Maven)
+   - JMH Generator Annprocess 1.5.2 (for commons-csv and commons-csv-graal benchmarks, optional, auto-downloaded by Maven)
+   - GenJava GJ-CSV 1.0 (for benchmarks, optional, auto-downloaded by Maven)
+   - JavaCSV 2.0 (for benchmarks, optional, auto-downloaded by Maven)
+   - OpenCSV 3.1 (for benchmarks, optional, auto-downloaded by Maven)
+   - Super CSV 2.2.1 (for benchmarks, optional, auto-downloaded by Maven)
+   - Skife CSV 1.0 (for benchmarks, optional, manual download required)
+   - Maven Exec Plugin 3.0.0 (for graal-glue-generator and benchmarks, auto-downloaded by Maven)
+   - Maven Compiler Plugin 3.8.0 (for graal-glue-generator, auto-downloaded by Maven)
+   - JavaParser Symbol Solver Core 3.25.5 (for graal-glue-generator, auto-downloaded by Maven)
+
+2. FILES TO CREATE:
+   - `/home/cc/.sdkman/etc/config` - SDKMAN configuration (auto-created during installation)
+   - `/home/cc/.bashrc` or `/home/cc/.zshrc` - Update with SDKMAN initialization script
+   - `/home/cc/EnvGym/data/gluetest/generated/commons-cli/` - Directory for generated glue code (created by automation script)
+   - `/home/cc/EnvGym/data/gluetest/generated/commons-csv/` - Directory for generated glue code (created by automation script)
+   - Python virtual environment files (optional but recommended):
+     - `/home/cc/EnvGym/data/gluetest/venv/` - Virtual environment directory
+     - `/home/cc/EnvGym/data/gluetest/requirements.txt` - Python dependencies (pytest, selenium, coverage)
+   - `/home/cc/EnvGym/data/gluetest/commons-cli-graal/src/conf/checkstyle.xml` - Checkstyle configuration (copy from commons-cli)
+   - `/home/cc/EnvGym/data/gluetest/commons-cli-graal/src/conf/checkstyle-suppressions.xml` - Checkstyle suppressions (copy from commons-cli)
+   - `/home/cc/EnvGym/data/gluetest/commons-cli-graal/src/conf/spotbugs-exclude-filter.xml` - SpotBugs exclusion filter (copy from commons-cli)
+   - `/home/cc/EnvGym/data/gluetest/commons-cli-graal/src/assembly/bin.xml` - Binary assembly descriptor (copy from commons-cli)
+   - `/home/cc/EnvGym/data/gluetest/commons-cli-graal/src/assembly/src.xml` - Source assembly descriptor (copy from commons-cli)
+   - `/home/cc/EnvGym/data/gluetest/commons-cli-python/src/conf/checkstyle.xml` - Checkstyle configuration (copy from commons-cli)
+   - `/home/cc/EnvGym/data/gluetest/commons-cli-python/src/conf/checkstyle-suppressions.xml` - Checkstyle suppressions (copy from commons-cli)
+   - `/home/cc/EnvGym/data/gluetest/commons-cli-python/src/conf/spotbugs-exclude-filter.xml` - SpotBugs exclusion filter (copy from commons-cli)
+   - `/home/cc/EnvGym/data/gluetest/commons-cli-python/src/assembly/bin.xml` - Binary assembly descriptor (copy from commons-cli)
+   - `/home/cc/EnvGym/data/gluetest/commons-cli-python/src/assembly/src.xml` - Source assembly descriptor (copy from commons-cli)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-graal/src/conf/checkstyle.xml` - Checkstyle configuration (copy from commons-csv)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-graal/src/conf/checkstyle-suppressions.xml` - Checkstyle suppressions (copy from commons-csv)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-graal/src/conf/spotbugs-exclude-filter.xml` - SpotBugs exclusion filter (copy from commons-csv)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-graal/src/assembly/bin.xml` - Binary assembly descriptor (copy from commons-csv)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-graal/src/assembly/src.xml` - Source assembly descriptor (copy from commons-csv)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-python/src/conf/checkstyle.xml` - Checkstyle configuration (copy from commons-csv)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-python/src/conf/checkstyle-suppressions.xml` - Checkstyle suppressions (copy from commons-csv)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-python/src/conf/spotbugs-exclude-filter.xml` - SpotBugs exclusion filter (copy from commons-csv)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-python/src/assembly/bin.xml` - Binary assembly descriptor (copy from commons-csv)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-python/src/assembly/src.xml` - Source assembly descriptor (copy from commons-csv)
+   - `/home/cc/EnvGym/data/gluetest/src/conf/checkstyle.xml` - Checkstyle configuration (should exist in repository)
+   - `/home/cc/EnvGym/data/gluetest/src/conf/checkstyle-suppressions.xml` - Checkstyle suppressions (should exist in repository)
+   - `/home/cc/EnvGym/data/gluetest/src/conf/spotbugs-exclude-filter.xml` - SpotBugs exclusion filter (should exist in repository)
+   - `/home/cc/EnvGym/data/gluetest/src/assembly/bin.xml` - Binary assembly descriptor (should exist in repository)
+   - `/home/cc/EnvGym/data/gluetest/src/assembly/src.xml` - Source assembly descriptor (should exist in repository)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv/checkstyle.xml` - Checkstyle configuration for CSV (referenced in pom.xml)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv/LICENSE-header.txt` - License header for checkstyle (referenced in pom.xml)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-graal/checkstyle.xml` - Checkstyle configuration for CSV Graal (referenced in pom.xml)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-graal/LICENSE-header.txt` - License header for checkstyle (referenced in pom.xml)
+   - `/home/cc/EnvGym/data/gluetest/site-content/` - SVN checkout directory for site deployment (auto-created)
+   - `/home/cc/EnvGym/data/gluetest/commons-cli-graal/site-content/` - SVN checkout directory for graal module site deployment (auto-created)
+   - `/home/cc/EnvGym/data/gluetest/commons-cli-python/site-content/` - SVN checkout directory for python module site deployment (auto-created)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv/site-content/` - SVN checkout directory for CSV site deployment (auto-created)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-graal/site-content/` - SVN checkout directory for CSV graal module site deployment (auto-created)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv-python/site-content/` - SVN checkout directory for CSV python module site deployment (auto-created)
+   - `/home/cc/EnvGym/data/gluetest/graal-glue-generator/src/main/java/com/research/graalglue/App.java` - Main class for glue generator (to be created)
+   - `/home/cc/EnvGym/data/gluetest/graal-glue-generator/src/test/java/` - Test directory for glue generator (to be created)
+   - `/home/cc/EnvGym/data/gluetest/graal-glue-generator/target/` - Build output directory (auto-created by Maven)
+   - `/home/cc/EnvGym/data/gluetest/run.sh` - Test execution script (already exists, make executable)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv/src/test/resources/CSVFileParser/README.txt` - Documentation for CSV test files (already exists)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv/src/test/resources/CSVFileParser/test*.txt` - CSV test control files (should exist)
+   - `/home/cc/EnvGym/data/gluetest/commons-csv/src/test/resources/CSVFileParser/test*.csv` - CSV test data files (should exist)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Java tests in `/home/cc/EnvGym/data/gluetest/commons-cli/src/test/java/` - Original Commons CLI tests
+   - Java tests in `/home/cc/EnvGym/data/gluetest/commons-csv/src/test/java/` - Original Commons CSV tests
+   - Python tests in `/home/cc/EnvGym/data/gluetest/commons-cli-python/test_*.py` - Translated Python tests for CLI
+   - Python tests in `/home/cc/EnvGym/data/gluetest/commons-csv-python/test_*.py` - Translated Python tests for CSV
+   - Glue code tests in `/home/cc/EnvGym/data/gluetest/commons-cli-graal/src/test/java/` - GraalVM integration tests
+   - Glue code tests in `/home/cc/EnvGym/data/gluetest/commons-csv-graal/src/test/java/` - GraalVM integration tests
+   - Coverage verification tests - Ensure coverage metrics are collected properly
+   - Glue code generation tests - Verify automated glue generation works correctly
+   - Checkstyle compliance tests - Verify code style standards
+   - SpotBugs static analysis tests - Verify code quality
+   - FindBugs static analysis tests (for commons-csv and commons-csv-graal) - Verify code quality
+   - JaCoCo coverage reports - Verify test coverage metrics
+   - JApiCmp compatibility tests - Verify API compatibility with version 1.4
+   - Clirr compatibility tests (for commons-csv and commons-csv-graal) - Verify API compatibility
+   - GraalVM SDK integration tests - Verify GraalVM SDK 23.0.1 compatibility
+   - Maven multi-module build tests - Verify commons-cli-graal module builds correctly
+   - Maven multi-module build tests - Verify commons-cli-python module builds correctly
+   - Maven multi-module build tests - Verify commons-csv-graal module builds correctly
+   - Maven multi-module build tests - Verify commons-csv-python module builds correctly
+   - Assembly plugin tests - Verify binary and source distributions are created correctly
+   - PMD

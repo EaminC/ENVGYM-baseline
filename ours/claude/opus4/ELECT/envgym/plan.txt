@@ -1,0 +1,176 @@
+Based on the hardware information provided, here's the adjusted plan:
+
+## Environment Setup Plan for ELECT
+
+### System Requirements
+- **Architecture**: x86_64 (linux/amd64)
+- **Working Directory**: `/home/cc/EnvGym/data/ELECT`
+- **Base Image Options**: ubuntu:20.04, debian:bullseye, python:3.x, node:lts, alpine:latest
+- **GPU Support**: Not required (CPU-only setup)
+- **Docker Version**: 28.1.1 with BuildKit support
+
+### Docker Configuration
+
+#### Dockerfile
+```dockerfile
+FROM ubuntu:20.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV WORK_DIR=/home/cc/EnvGym/data/ELECT
+
+# Update and install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    python3 \
+    python3-pip \
+    python3-dev \
+    git \
+    wget \
+    curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create working directory
+WORKDIR ${WORK_DIR}
+
+# Copy project files
+COPY . .
+
+# Install Python dependencies (if requirements.txt exists)
+RUN if [ -f requirements.txt ]; then pip3 install --no-cache-dir -r requirements.txt; fi
+
+# Set default command
+CMD ["/bin/bash"]
+```
+
+#### Docker Compose (docker-compose.yml)
+```yaml
+version: '3.8'
+
+services:
+  elect:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    container_name: elect-env
+    volumes:
+      - .:/home/cc/EnvGym/data/ELECT
+    working_dir: /home/cc/EnvGym/data/ELECT
+    environment:
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
+    tty: true
+```
+
+### Build and Run Commands
+
+#### Build the Docker image
+```bash
+cd /home/cc/EnvGym/data/ELECT
+docker build --platform=linux/amd64 -t elect-env .
+```
+
+#### Run the container
+```bash
+# Interactive mode
+docker run --platform=linux/amd64 -it \
+  -v /home/cc/EnvGym/data/ELECT:/home/cc/EnvGym/data/ELECT \
+  -w /home/cc/EnvGym/data/ELECT \
+  elect-env
+
+# Or using docker-compose
+docker-compose up -d
+docker-compose exec elect /bin/bash
+```
+
+### Python Virtual Environment (Alternative to Docker)
+
+If you prefer a local Python environment:
+
+```bash
+cd /home/cc/EnvGym/data/ELECT
+python3 -m venv venv
+source venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt  # if exists
+```
+
+### Project Structure
+```
+/home/cc/EnvGym/data/ELECT/
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt (if applicable)
+├── src/
+├── data/
+├── scripts/
+└── README.md
+```
+
+### Additional Setup Scripts
+
+#### setup.sh
+```bash
+#!/bin/bash
+set -e
+
+WORK_DIR="/home/cc/EnvGym/data/ELECT"
+
+echo "Setting up ELECT environment..."
+
+# Navigate to working directory
+cd "$WORK_DIR"
+
+# Check if Docker is available
+if command -v docker &> /dev/null; then
+    echo "Building Docker environment..."
+    docker build --platform=linux/amd64 -t elect-env .
+    echo "Docker environment ready. Run 'docker run -it elect-env' to start."
+else
+    echo "Docker not found. Setting up Python virtual environment..."
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install --upgrade pip
+    if [ -f requirements.txt ]; then
+        pip install -r requirements.txt
+    fi
+    echo "Virtual environment ready. Run 'source venv/bin/activate' to activate."
+fi
+
+echo "Setup complete!"
+```
+
+### Makefile
+```makefile
+.PHONY: build run clean setup
+
+WORK_DIR := /home/cc/EnvGym/data/ELECT
+IMAGE_NAME := elect-env
+
+build:
+	docker build --platform=linux/amd64 -t $(IMAGE_NAME) .
+
+run:
+	docker run --platform=linux/amd64 -it \
+		-v $(WORK_DIR):$(WORK_DIR) \
+		-w $(WORK_DIR) \
+		$(IMAGE_NAME)
+
+clean:
+	docker rmi $(IMAGE_NAME) || true
+	rm -rf venv || true
+
+setup:
+	chmod +x setup.sh
+	./setup.sh
+```
+
+### Notes
+- No GPU/CUDA configuration needed as no NVIDIA GPU is detected
+- Using standard CPU-only instructions
+- The working directory path is preserved as specified
+- Docker BuildKit is available for optimized builds
+- Platform is explicitly set to linux/amd64 for consistency

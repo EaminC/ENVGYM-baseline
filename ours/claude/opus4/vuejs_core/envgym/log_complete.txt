@@ -1,0 +1,305 @@
+=== Docker Execution Log - 20250903_173535 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756920895
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 4.32kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:22.14.0-bookworm
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/21] FROM docker.io/library/node:22.14.0-bookworm@sha256:e5ddf893cc6aeab0e5126e4edae35aa43893e2836d1d246140167ccc2616f5d7
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 466.44kB 0.0s done
+#5 DONE 0.0s
+
+#6 [ 3/21] RUN corepack enable && corepack prepare pnpm@10.15.0 --activate
+#6 CACHED
+
+#7 [ 6/21] COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+#7 CACHED
+
+#8 [ 4/21] RUN npm install -g serve
+#8 CACHED
+
+#9 [ 2/21] RUN apt-get update && apt-get install -y     git     wget     curl     ca-certificates     fonts-liberation     libasound2     libatk-bridge2.0-0     libatk1.0-0     libc6     libcairo2     libcups2     libdbus-1-3     libexpat1     libfontconfig1     libgcc1     libgconf-2-4     libgdk-pixbuf2.0-0     libglib2.0-0     libgtk-3-0     libnspr4     libnss3     libpango-1.0-0     libpangocairo-1.0-0     libstdc++6     libx11-6     libx11-xcb1     libxcb1     libxcomposite1     libxcursor1     libxdamage1     libxext6     libxfixes3     libxi6     libxrandr2     libxrender1     libxss1     libxtst6     lsb-release     xdg-utils     libappindicator1     libnss3     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [ 5/21] WORKDIR /workspace
+#10 CACHED
+
+#11 [ 7/21] COPY packages/*/package.json packages/*/
+#11 CACHED
+
+#12 [ 8/21] COPY packages-private/*/package.json packages-private/*/
+#12 CACHED
+
+#13 [ 9/21] RUN pnpm config set auto-install-peers true &&     pnpm config set strict-peer-dependencies false &&     pnpm config set fetch-retries 5 &&     pnpm config set fetch-retry-factor 2 &&     pnpm config set fetch-retry-mintimeout 10000 &&     pnpm config set fetch-retry-maxtimeout 60000 &&     pnpm config set prefer-offline true
+#13 DONE 2.3s
+
+#14 [10/21] RUN pnpm store prune &&     pnpm fetch --prod --prefer-offline || true &&     pnpm fetch --dev --prefer-offline || true
+#14 0.699 Removed all cached metadata files
+#14 0.699 Removed 0 files
+#14 0.699 Removed 0 packages
+#14 1.086 Importing packages to virtual store
+#14 1.102 Already up to date
+#14 1.107 Progress: resolved 1, reused 0, downloaded 0, added 0
+#14 2.109 Progress: resolved 30, reused 0, downloaded 29, added 29
+#14 2.289 Progress: resolved 30, reused 0, downloaded 30, added 30, done
+#14 2.331 
+#14 2.331 devDependencies: skipped
+#14 2.331 
+#14 2.790 Importing packages to virtual store
+#14 2.806 Already up to date
+#14 2.822 Progress: resolved 1, reused 0, downloaded 0, added 0
+#14 3.823 Progress: resolved 574, reused 0, downloaded 348, added 125
+#14 4.240 Progress: resolved 574, reused 0, downloaded 574, added 574, done
+#14 4.458 .../node_modules/@swc/core postinstall$ node postinstall.js
+#14 4.491 .../node_modules/puppeteer postinstall$ node install.mjs
+#14 4.492 .../node_modules/unrs-resolver postinstall$ napi-postinstall unrs-resolver 1.7.2 check
+#14 4.539 .../esbuild@0.25.9/node_modules/esbuild postinstall$ node install.js
+#14 4.541 .../esbuild@0.21.5/node_modules/esbuild postinstall$ node install.js
+#14 4.545 .../node_modules/@swc/core postinstall: Error: Failed to load native binding
+#14 4.546 .../node_modules/@swc/core postinstall:     at Object.<anonymous> (/workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/binding.js:333:11)
+#14 4.547 .../node_modules/@swc/core postinstall:     at Module._compile (node:internal/modules/cjs/loader:1554:14)
+#14 4.547 .../node_modules/@swc/core postinstall:     at Object..js (node:internal/modules/cjs/loader:1706:10)
+#14 4.547 .../node_modules/@swc/core postinstall:     at Module.load (node:internal/modules/cjs/loader:1289:32)
+#14 4.548 .../node_modules/@swc/core postinstall:     at Function._load (node:internal/modules/cjs/loader:1108:12)
+#14 4.548 .../node_modules/@swc/core postinstall:     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+#14 4.548 .../node_modules/@swc/core postinstall:     at wrapModuleLoad (node:internal/modules/cjs/loader:220:24)
+#14 4.548 .../node_modules/@swc/core postinstall:     at Module.require (node:internal/modules/cjs/loader:1311:12)
+#14 4.549 .../node_modules/@swc/core postinstall:     at require (node:internal/modules/helpers:136:16)
+#14 4.549 .../node_modules/@swc/core postinstall:     at /workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/postinstall.js:81:19 {
+#14 4.549 .../node_modules/@swc/core postinstall:   [cause]: [
+#14 4.549 .../node_modules/@swc/core postinstall:     Error: Cannot find module './swc.linux-x64-gnu.node'
+#14 4.549 .../node_modules/@swc/core postinstall:     Require stack:
+#14 4.549 .../node_modules/@swc/core postinstall:     - /workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/binding.js
+#14 4.549 .../node_modules/@swc/core postinstall:     - /workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/postinstall.js
+#14 4.549 .../node_modules/@swc/core postinstall:         at Function._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+#14 4.549 .../node_modules/@swc/core postinstall:         at Function._load (node:internal/modules/cjs/loader:1055:27)
+#14 4.550 .../node_modules/@swc/core postinstall:         at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+#14 4.550 .../node_modules/@swc/core postinstall:         at wrapModuleLoad (node:internal/modules/cjs/loader:220:24)
+#14 4.550 .../node_modules/@swc/core postinstall:         at Module.require (node:internal/modules/cjs/loader:1311:12)
+#14 4.550 .../node_modules/@swc/core postinstall:         at require (node:internal/modules/helpers:136:16)
+#14 4.550 .../node_modules/@swc/core postinstall:         at requireNative (/workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/binding.js:211:16)
+#14 4.550 .../node_modules/@swc/core postinstall:         at Object.<anonymous> (/workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/binding.js:306:17)
+#14 4.550 .../node_modules/@swc/core postinstall:         at Module._compile (node:internal/modules/cjs/loader:1554:14)
+#14 4.550 .../node_modules/@swc/core postinstall:         at Object..js (node:internal/modules/cjs/loader:1706:10) {
+#14 4.550 .../node_modules/@swc/core postinstall:       code: 'MODULE_NOT_FOUND',
+#14 4.550 .../node_modules/@swc/core postinstall:       requireStack: [Array]
+#14 4.550 .../node_modules/@swc/core postinstall:     },
+#14 4.551 .../node_modules/@swc/core postinstall:     Error: Cannot find module '@swc/core-linux-x64-gnu'
+#14 4.551 .../node_modules/@swc/core postinstall:     Require stack:
+#14 4.551 .../node_modules/@swc/core postinstall:     - /workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/binding.js
+#14 4.551 .../node_modules/@swc/core postinstall:     - /workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/postinstall.js
+#14 4.551 .../node_modules/@swc/core postinstall:         at Function._resolveFilename (node:internal/modules/cjs/loader:1225:15)
+#14 4.551 .../node_modules/@swc/core postinstall:         at Function._load (node:internal/modules/cjs/loader:1055:27)
+#14 4.551 .../node_modules/@swc/core postinstall:         at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+#14 4.551 .../node_modules/@swc/core postinstall:         at wrapModuleLoad (node:internal/modules/cjs/loader:220:24)
+#14 4.551 .../node_modules/@swc/core postinstall:         at Module.require (node:internal/modules/cjs/loader:1311:12)
+#14 4.552 .../node_modules/@swc/core postinstall:         at require (node:internal/modules/helpers:136:16)
+#14 4.552 .../node_modules/@swc/core postinstall:         at requireNative (/workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/binding.js:216:16)
+#14 4.552 .../node_modules/@swc/core postinstall:         at Object.<anonymous> (/workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/binding.js:306:17)
+#14 4.552 .../node_modules/@swc/core postinstall:         at Module._compile (node:internal/modules/cjs/loader:1554:14)
+#14 4.552 .../node_modules/@swc/core postinstall:         at Object..js (node:internal/modules/cjs/loader:1706:10) {
+#14 4.552 .../node_modules/@swc/core postinstall:       code: 'MODULE_NOT_FOUND',
+#14 4.552 .../node_modules/@swc/core postinstall:       requireStack: [Array]
+#14 4.552 .../node_modules/@swc/core postinstall:     }
+#14 4.552 .../node_modules/@swc/core postinstall:   ]
+#14 4.552 .../node_modules/@swc/core postinstall: }
+#14 4.553 .../node_modules/@swc/core postinstall: @swc/core was not able to resolve native bindings installation. It'll try to use @swc/wasm as fallback instead.
+#14 4.617 .../esbuild@0.25.9/node_modules/esbuild postinstall: [esbuild] Failed to find package "@esbuild/linux-x64" on the file system
+#14 4.617 .../esbuild@0.25.9/node_modules/esbuild postinstall: This can happen if you use the "--no-optional" flag. The "optionalDependencies"
+#14 4.617 .../esbuild@0.25.9/node_modules/esbuild postinstall: package.json feature is used by esbuild to install the correct binary executable
+#14 4.617 .../esbuild@0.25.9/node_modules/esbuild postinstall: for your current platform. This install script will now attempt to work around
+#14 4.617 .../esbuild@0.25.9/node_modules/esbuild postinstall: this. If that fails, you need to remove the "--no-optional" flag to use esbuild.
+#14 4.617 .../esbuild@0.25.9/node_modules/esbuild postinstall: [esbuild] Trying to install package "@esbuild/linux-x64" using npm
+#14 4.630 .../node_modules/puppeteer postinstall: **INFO** Skipping Firefox download as instructed.
+#14 4.640 .../esbuild@0.21.5/node_modules/esbuild postinstall: [esbuild] Failed to find package "@esbuild/linux-x64" on the file system
+#14 4.640 .../esbuild@0.21.5/node_modules/esbuild postinstall: This can happen if you use the "--no-optional" flag. The "optionalDependencies"
+#14 4.640 .../esbuild@0.21.5/node_modules/esbuild postinstall: package.json feature is used by esbuild to install the correct binary executable
+#14 4.640 .../esbuild@0.21.5/node_modules/esbuild postinstall: for your current platform. This install script will now attempt to work around
+#14 4.640 .../esbuild@0.21.5/node_modules/esbuild postinstall: this. If that fails, you need to remove the "--no-optional" flag to use esbuild.
+#14 4.640 .../esbuild@0.21.5/node_modules/esbuild postinstall: [esbuild] Trying to install package "@esbuild/linux-x64" using npm
+#14 4.697 .../node_modules/unrs-resolver postinstall: npm warn config dev Please use --include=dev instead.
+#14 4.810 .../node_modules/unrs-resolver postinstall: [napi-postinstall@0.2.3] Failed to find package "@unrs/resolver-binding-linux-x64-gnu" on the file system
+#14 4.810 .../node_modules/unrs-resolver postinstall: This can happen if you use the "--no-optional" flag. The "optionalDependencies"
+#14 4.810 .../node_modules/unrs-resolver postinstall: package.json feature is used by unrs-resolver to install the correct napi binary
+#14 4.810 .../node_modules/unrs-resolver postinstall: for your current platform. This install script will now attempt to work around
+#14 4.810 .../node_modules/unrs-resolver postinstall: this. If that fails, you need to remove the "--no-optional" flag to use unrs-resolver.
+#14 4.814 .../node_modules/unrs-resolver postinstall: [napi-postinstall@0.2.3] Trying to install package "@unrs/resolver-binding-linux-x64-gnu" using npm
+#14 4.814 .../node_modules/unrs-resolver postinstall: [napi-postinstall@0.2.3] Failed to install package "@unrs/resolver-binding-linux-x64-gnu" using npm Cannot find module 'unrs-resolver/package.json'
+#14 4.814 .../node_modules/unrs-resolver postinstall: Require stack:
+#14 4.814 .../node_modules/unrs-resolver postinstall: - /workspace/node_modules/.pnpm/napi-postinstall@0.2.3/node_modules/napi-postinstall/lib/index.js
+#14 4.814 .../node_modules/unrs-resolver postinstall: - /workspace/node_modules/.pnpm/napi-postinstall@0.2.3/node_modules/napi-postinstall/lib/cli.js
+#14 4.921 .../node_modules/unrs-resolver postinstall: npm warn config dev Please use --include=dev instead.
+#14 4.921 .../node_modules/unrs-resolver postinstall: [napi-postinstall@0.2.3] Trying to download "https://registry.npmjs.org/@unrs/resolver-binding-linux-x64-gnu/-/resolver-binding-linux-x64-gnu-1.7.2.tgz"
+#14 5.014 .../node_modules/unrs-resolver postinstall: Done
+#14 5.085 .../node_modules/simple-git-hooks postinstall$ node ./postinstall.js
+#14 5.158 .../node_modules/simple-git-hooks postinstall: [INFO] No `.git` root folder found, skipping
+#14 5.165 .../node_modules/simple-git-hooks postinstall: [INFO] No `.git` root folder found, skipping
+#14 5.243 .../node_modules/@swc/core postinstall: Error: ENOENT: no such file or directory, rename '/workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/npm-install/node_modules/@swc/wasm' -> '/workspace/node_modules/@swc/wasm'
+#14 5.243 .../node_modules/@swc/core postinstall:     at Object.renameSync (node:fs:1021:11)
+#14 5.243 .../node_modules/@swc/core postinstall:     at /workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/postinstall.js:128:12
+#14 5.243 .../node_modules/@swc/core postinstall:     at Generator.next (<anonymous>)
+#14 5.243 .../node_modules/@swc/core postinstall:     at /workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/postinstall.js:31:71
+#14 5.243 .../node_modules/@swc/core postinstall:     at new Promise (<anonymous>)
+#14 5.243 .../node_modules/@swc/core postinstall:     at __awaiter (/workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/postinstall.js:27:12)
+#14 5.243 .../node_modules/@swc/core postinstall:     at validateBinary (/workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/postinstall.js:66:30)
+#14 5.243 .../node_modules/@swc/core postinstall:     at Object.<anonymous> (/workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/postinstall.js:145:1)
+#14 5.244 .../node_modules/@swc/core postinstall:     at Module._compile (node:internal/modules/cjs/loader:1554:14)
+#14 5.244 .../node_modules/@swc/core postinstall:     at Object..js (node:internal/modules/cjs/loader:1706:10) {
+#14 5.244 .../node_modules/@swc/core postinstall:   errno: -2,
+#14 5.244 .../node_modules/@swc/core postinstall:   code: 'ENOENT',
+#14 5.244 .../node_modules/@swc/core postinstall:   syscall: 'rename',
+#14 5.244 .../node_modules/@swc/core postinstall:   path: '/workspace/node_modules/.pnpm/@swc+core@1.13.3/node_modules/@swc/core/npm-install/node_modules/@swc/wasm',
+#14 5.244 .../node_modules/@swc/core postinstall:   dest: '/workspace/node_modules/@swc/wasm'
+#14 5.244 .../node_modules/@swc/core postinstall: }
+#14 5.245 .../node_modules/@swc/core postinstall: Failed to install fallback @swc/wasm@1.13.3. @swc/core will not properly.
+#14 5.245 .../node_modules/@swc/core postinstall: Please install @swc/wasm manually, or retry whole installation.
+#14 5.245 .../node_modules/@swc/core postinstall: If there are unexpected errors, please report at https://github.com/swc-project/swc/issues
+#14 5.254 .../node_modules/@swc/core postinstall: Done
+#14 5.257 .../node_modules/simple-git-hooks postinstall: Done
+#14 5.383 .../esbuild@0.21.5/node_modules/esbuild postinstall: Done
+#14 5.429 .../esbuild@0.25.9/node_modules/esbuild postinstall: Done
+#14 8.268 .../node_modules/puppeteer postinstall: chrome-headless-shell (139.0.7258.68) downloaded to /root/.cache/puppeteer/chrome-headless-shell/linux-139.0.7258.68
+#14 9.421 .../node_modules/puppeteer postinstall: chrome (139.0.7258.68) downloaded to /root/.cache/puppeteer/chrome/linux-139.0.7258.68
+#14 9.430 .../node_modules/puppeteer postinstall: Done
+#14 9.549 
+#14 9.549 dependencies: skipped
+#14 9.549 
+#14 9.549 optionalDependencies: skipped
+#14 9.549 
+#14 DONE 11.5s
+
+#15 [11/21] RUN echo "=== Installing shared package ===" &&     cd packages/shared &&     pnpm install --prefer-offline --network-timeout=100000 --ignore-scripts --no-optional || true &&     cd /workspace
+#15 0.226 /bin/sh: 1: cd: can't cd to packages/shared
+#15 0.226 === Installing shared package ===
+#15 DONE 0.3s
+
+#16 [12/21] RUN echo "=== Installing reactivity package ===" &&     cd packages/reactivity &&     pnpm install --prefer-offline --network-timeout=100000 --ignore-scripts --no-optional || true &&     cd /workspace
+#16 0.355 === Installing reactivity package ===
+#16 0.355 /bin/sh: 1: cd: can't cd to packages/reactivity
+#16 DONE 0.4s
+
+#17 [13/21] RUN echo "=== Installing compiler packages ===" &&     for pkg in compiler-core compiler-dom compiler-sfc compiler-ssr; do         echo "Installing $pkg..." &&         cd packages/$pkg &&         pnpm install --prefer-offline --network-timeout=100000 --ignore-scripts --no-optional || true &&         cd /workspace;     done
+#17 0.367 /bin/sh: 1: cd: can't cd to packages/compiler-core
+#17 0.367 /bin/sh: 1: cd: can't cd to packages/compiler-dom
+#17 0.367 /bin/sh: 1: cd: can't cd to packages/compiler-sfc
+#17 0.367 /bin/sh: 1: cd: can't cd to packages/compiler-ssr
+#17 0.367 === Installing compiler packages ===
+#17 0.367 Installing compiler-core...
+#17 0.367 Installing compiler-dom...
+#17 0.367 Installing compiler-sfc...
+#17 0.367 Installing compiler-ssr...
+#17 DONE 0.4s
+
+#18 [14/21] RUN echo "=== Installing runtime packages ===" &&     for pkg in runtime-core runtime-dom runtime-test; do         echo "Installing $pkg..." &&         cd packages/$pkg &&         pnpm install --prefer-offline --network-timeout=100000 --ignore-scripts --no-optional || true &&         cd /workspace;     done
+#18 0.355 === Installing runtime packages ===
+#18 0.355 Installing runtime-core...
+#18 0.355 Installing runtime-dom...
+#18 0.355 Installing runtime-test...
+#18 0.355 /bin/sh: 1: cd: can't cd to packages/runtime-core
+#18 0.355 /bin/sh: 1: cd: can't cd to packages/runtime-dom
+#18 0.355 /bin/sh: 1: cd: can't cd to packages/runtime-test
+#18 DONE 0.4s
+
+#19 [15/21] RUN echo "=== Installing remaining packages ===" &&     for pkg in server-renderer vue vue-compat; do         echo "Installing $pkg..." &&         cd packages/$pkg &&         pnpm install --prefer-offline --network-timeout=100000 --ignore-scripts --no-optional || true &&         cd /workspace;     done
+#19 0.357 === Installing remaining packages ===
+#19 0.357 Installing server-renderer...
+#19 0.357 Installing vue...
+#19 0.357 Installing vue-compat...
+#19 0.357 /bin/sh: 1: cd: can't cd to packages/server-renderer
+#19 0.357 /bin/sh: 1: cd: can't cd to packages/vue
+#19 0.357 /bin/sh: 1: cd: can't cd to packages/vue-compat
+#19 DONE 0.4s
+
+#20 [16/21] RUN echo "=== Installing root dependencies ===" &&     pnpm install --prefer-offline --network-timeout=100000 --ignore-scripts --no-optional ||     pnpm install --prefer-offline --network-timeout=100000 --ignore-scripts --no-optional --force ||     echo "=== Root install completed with warnings ==="
+#20 0.411 === Installing root dependencies ===
+#20 0.688  ERROR  Unknown option: 'network-timeout'
+#20 0.688 Did you mean 'fetch-timeout'? Use "--config.unknown=value" to force an unknown option.
+#20 0.689 For help, run: pnpm help install
+#20 0.940  ERROR  Unknown option: 'network-timeout'
+#20 0.940 Did you mean 'fetch-timeout'? Use "--config.unknown=value" to force an unknown option.
+#20 0.940 For help, run: pnpm help install
+#20 0.945 === Root install completed with warnings ===
+#20 DONE 1.0s
+
+#21 [17/21] COPY . .
+#21 DONE 0.2s
+
+#22 [18/21] RUN pnpm rebuild --prefer-offline || echo "=== Some packages failed to rebuild ==="
+#22 0.478  ERROR  Unknown option: 'prefer-offline'
+#22 0.478 For help, run: pnpm help rebuild
+#22 0.484 === Some packages failed to rebuild ===
+#22 DONE 0.5s
+
+#23 [19/21] RUN pnpm run build || echo "=== Build completed with warnings ==="
+#23 0.596 
+#23 0.596 > @3.5.20 build /workspace
+#23 0.596 > node scripts/build.js
+#23 0.596 
+#23 0.634 node:internal/modules/package_json_reader:268
+#23 0.634   throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+#23 0.634         ^
+#23 0.634 
+#23 0.634 Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'picocolors' imported from /workspace/scripts/build.js
+#23 0.634     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:268:9)
+#23 0.634     at packageResolve (node:internal/modules/esm/resolve:768:81)
+#23 0.634     at moduleResolve (node:internal/modules/esm/resolve:854:18)
+#23 0.634     at defaultResolve (node:internal/modules/esm/resolve:984:11)
+#23 0.634     at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:685:12)
+#23 0.634     at #cachedDefaultResolve (node:internal/modules/esm/loader:634:25)
+#23 0.634     at ModuleLoader.resolve (node:internal/modules/esm/loader:617:38)
+#23 0.634     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:273:38)
+#23 0.634     at ModuleJob._link (node:internal/modules/esm/module_job:135:49) {
+#23 0.634   code: 'ERR_MODULE_NOT_FOUND'
+#23 0.634 }
+#23 0.634 
+#23 0.634 Node.js v22.14.0
+#23 0.658  ELIFECYCLE  Command failed with exit code 1.
+#23 0.672 === Build completed with warnings ===
+#23 DONE 0.7s
+
+#24 [20/21] RUN pnpm exec simple-git-hooks || echo "=== Git hooks setup skipped ==="
+#24 0.655 undefined
+#24 0.655  ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command "simple-git-hooks" not found
+#24 0.670 === Git hooks setup skipped ===
+#24 DONE 0.7s
+
+#25 [21/21] RUN useradd -m -s /bin/bash developer &&     chown -R developer:developer /workspace
+#25 DONE 10.2s
+
+#26 exporting to image
+#26 exporting layers
+#26 exporting layers 9.8s done
+#26 writing image sha256:2cd49eb269f55d7c1be461aa2ec048b6131f893f4ffe9ab9d7076fa8e1956b28 done
+#26 naming to docker.io/library/envgym_test_1756920895 done
+#26 DONE 9.8s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

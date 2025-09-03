@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250902_103252",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756809170",
+  "build": {
+    "success": true,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 1.69kB done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/ubuntu:20.04\n#2 DONE 0.1s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/15] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214\n#4 DONE 0.0s\n\n#5 [ 2/15] RUN apt-get update && apt-get install -y     git     wget     build-essential     unzip     curl     && rm -rf /var/lib/apt/lists/*\n#5 CACHED\n\n#6 [ 9/15] RUN conda install pytorch==1.6.0 torchvision==0.7.0 cpuonly -c pytorch -y &&     conda install matplotlib -y &&     conda install scipy=1.5.2 -y &&     pip install -U 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'\n#6 CACHED\n\n#7 [ 7/15] RUN /root/miniconda3/bin/conda init bash &&     echo \"conda activate reltr\" >> ~/.bashrc\n#7 CACHED\n\n#8 [13/15] WORKDIR /workspace/RelTR\n#8 CACHED\n\n#9 [10/15] RUN mkdir -p ckpt data/vg/images data/oi/images\n#9 CACHED\n\n#10 [ 5/15] WORKDIR /workspace/RelTR\n#10 CACHED\n\n#11 [ 8/15] RUN /root/miniconda3/bin/conda create -n reltr python=3.6 -y\n#11 CACHED\n\n#12 [11/15] WORKDIR /workspace/RelTR/lib/fpn\n#12 CACHED\n\n#13 [ 3/15] WORKDIR /workspace\n#13 CACHED\n\n#14 [ 6/15] RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py37_4.10.3-Linux-x86_64.sh &&     bash Miniconda3-py37_4.10.3-Linux-x86_64.sh -b -p /root/miniconda3 &&     rm Miniconda3-py37_4.10.3-Linux-x86_64.sh\n#14 CACHED\n\n#15 [ 4/15] RUN git clone https://github.com/yrcong/RelTR.git\n#15 CACHED\n\n#16 [12/15] RUN chmod +x make.sh &&     ./make.sh || true\n#16 CACHED\n\n#17 [14/15] RUN find . -type d -name __pycache__ -exec rm -rf {} + || true\n#17 CACHED\n\n#18 [15/15] RUN echo '#!/bin/bash' > /workspace/entrypoint.sh &&     echo 'source /root/miniconda3/etc/profile.d/conda.sh' >> /workspace/entrypoint.sh &&     echo 'conda activate reltr' >> /workspace/entrypoint.sh &&     echo 'exec \"$@\"' >> /workspace/entrypoint.sh &&     chmod +x /workspace/entrypoint.sh\n#18 0.532 \n#18 0.532 \n#18 DONE 0.6s\n\n#19 exporting to image\n#19 exporting layers done\n#19 writing image sha256:5735a326b97be16daac5cd35dcfb67f63c1dbc6b6417da9331dd1420ac862fca done\n#19 naming to docker.io/library/envgym_test_1756809170 done\n#19 DONE 0.0s\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": "docker: Error response from daemon: failed to create task for container: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: exec: \"/workspace/entrypoint.sh\": stat /workspace/entrypoint.sh: no such file or directory: unknown\n\nRun 'docker run --help' for more information\n"
+  }
+}

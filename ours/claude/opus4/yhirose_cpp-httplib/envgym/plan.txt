@@ -1,0 +1,245 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - C++ Compiler (C++11 minimum, C++23 preferred for Docker build):
+     * GCC 9+ (Ubuntu 20.04 default) - for C++11/14/17 support
+     * GCC 12+ (via PPA or manual install) - for C++23 support
+     * GCC 13+ (via PPA or manual install) - for libstdc++-13-dev requirement
+     * Clang 10+ (Ubuntu 20.04 default) - for C++11/14/17 support
+     * Clang 16+ (via LLVM apt repository) - for C++23 support
+     * g++ (Alpine Linux) - for Alpine Docker builds
+     * g++ (Debian bullseye) - for ABI compatibility testing
+   - Make (for example builds and test builds):
+     * GNU Make 4.3 (Ubuntu 20.04 default)
+     * Required for example/Makefile and test/Makefile
+     * Required for proxy test target
+   - Clang-Format 18.1.8+ (for code formatting and pre-commit hooks):
+     * clang-format-18 (via LLVM apt repository)
+     * Required for style_check target
+   - Pre-commit 3.0+ (for Git hooks management):
+     * pre-commit (via pip3: `pip3 install pre-commit`)
+     * Python 3.8.10 (Ubuntu 20.04 default)
+   - OpenSSL 1.1.1+ (for HTTPS support):
+     * libssl-dev and libcrypto-dev (Ubuntu 20.04 repos)
+     * openssl-dev (Alpine Linux)
+   - zlib 1.2.11+ (for gzip compression):
+     * zlib1g-dev (Ubuntu 20.04 repos)
+     * zlib-dev (Alpine Linux)
+   - Brotli libraries (for Brotli compression):
+     * libbrotlidec, libbrotlienc, libbrotlicommon (Ubuntu 20.04)
+     * libbrotli-dev (Ubuntu 20.04 apt)
+     * libbrotlidec-static, libbrotlienc-static, libbrotlicommon-static (for static builds)
+     * brotli-dev (Alpine Linux)
+     * brotli runtime libraries (Alpine Linux)
+   - Zstd libraries (for Zstd compression):
+     * libzstd-dev (Ubuntu 20.04 repos)
+   - libcurl (for test dependencies):
+     * libcurl4-openssl-dev (Ubuntu 20.04 repos)
+   - Google Test (for unit testing):
+     * libgtest-dev (Ubuntu 20.04 repos)
+     * Built from source if custom injection points needed
+     * Headers: gtest.h, gtest-port.h, gtest-printers.h
+   - CMake 3.16.3+ (Ubuntu 20.04 default meets 3.14+ requirement)
+   - Meson 0.63.0+ (via pip3: `pip3 install meson>=0.63.0`)
+   - Ninja 1.10.0 (Ubuntu 20.04 default)
+   - Git 2.25.1+ (Ubuntu 20.04 default)
+   - Python 3.8.10 (Ubuntu 20.04 default, meets 3.8+ requirement)
+   - Docker 28.1.1 (already installed, supports BuildKit)
+   - Docker Buildx (included with Docker 28.1.1)
+   - Docker Compose 2.0+ (install via Docker plugin system)
+   - Squid Proxy 4.10+ (for proxy testing):
+     * squid (Ubuntu 20.04 repos)
+     * squid (Alpine Linux: apk)
+     * Required for Basic and Digest authentication testing
+     * Configuration tools: htpasswd (for Basic auth), htdigest (for Digest auth)
+   - Apache Utils (for proxy authentication setup):
+     * apache2-utils (Ubuntu 20.04)
+     * apache2-utils (Alpine Linux)
+     * Required for htpasswd and htdigest commands
+   - netcat-openbsd (for proxy connectivity testing):
+     * netcat-openbsd (Ubuntu 20.04 apt)
+     * Required for proxy test workflow
+   - pkg-config 0.29.1+ (Ubuntu 20.04 default)
+   - CPack (included with CMake 3.16.3)
+   - anl library (included in glibc on Ubuntu 20.04)
+   - libstdc++ (Alpine Linux runtime dependency)
+   - GitHub Actions CLI (optional, for local workflow testing)
+   - Docker Hub Account (for pushing release images)
+   - Docker Hub Access Token (for automated authentication)
+   - Fuzzing Tools (for CIFuzz integration):
+     * libFuzzer (included with Clang 10+)
+     * Address Sanitizer (ASAN) support in GCC/Clang
+     * Undefined Behavior Sanitizer (UBSAN) support
+     * Memory Sanitizer (MSAN) support (Clang only)
+     * AFL++ (optional, install from source)
+   - OSS-Fuzz Integration Requirements:
+     * Google OSS-Fuzz project registration (cpp-httplib)
+     * CIFuzz GitHub Action support
+     * Fuzzer build scripts compatibility
+   - ABI Compliance Tools (for ABI compatibility checking):
+     * abigail-tools (Ubuntu 20.04: apt install abigail-tools)
+     * abidiff command-line tool (included with abigail-tools)
+     * Required for tracking ABI changes between versions
+     * Debian bullseye container image (for consistent ABI testing environment)
+   - CA Certificates (for secure connections in containers):
+     * ca-certificates package (Ubuntu 20.04)
+     * Required for HTTPS connections in minimal containers
+   - C++ ABI library (for custom Google Test features):
+     * libc++abi-dev (if using Clang with libc++)
+     * Provides cxxabi.h for GTEST_HAS_CXXABI_H_ support
+
+2. FILES TO CREATE:
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/httplib.h (project root):
+     * Copy from cpp-httplib repository
+     * Required for both CMake and Meson configuration
+     * Required for example builds
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/split.py (project root):
+     * Copy from cpp-httplib repository
+     * Required if HTTPLIB_COMPILE=ON (CMake) or compile=true (Meson)
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/cmake/FindBrotli.cmake (already exists):
+     * Custom CMake module for finding Brotli libraries
+     * Supports static library preference via BROTLI_USE_STATIC_LIBS
+     * Handles decoder, encoder, and common components
+     * Uses PkgConfig when available (except for static libs due to upstream issues)
+     * Falls back to find_library with multiple search paths
+     * Creates IMPORTED targets Brotli::decoder, Brotli::encoder, Brotli::common
+     * Sets Brotli_INCLUDE_DIR variable
+     * Supports BROTLI_ROOT_DIR hint for custom installations
+     * No version support currently implemented
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/cmake/httplibConfig.cmake.in (already exists):
+     * CMake package configuration template
+     * Configures find_dependency calls for OpenSSL, ZLIB, Brotli, and Zstd
+     * Sets HTTPLIB_IS_USING_* variables for feature detection
+     * Handles CMake version compatibility for OpenSSL components
+     * Includes httplibTargets.cmake when all components are found
+     * Provides HTTPLIB_INCLUDE_DIR and HTTPLIB_HEADER_PATH variables
+     * Supports both header-only and compiled library modes
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/meson.build (already exists):
+     * Meson build configuration
+     * Place in project root
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/meson_options.txt (already exists):
+     * Contains feature options with 'auto' default
+     * Includes deprecated option names for backward compatibility
+     * SPDX license headers included
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/.clang-format (already exists):
+     * Code formatting configuration
+     * Based on LLVM style with custom modifications
+     * Enables single-line blocks, cases, and if statements
+     * Uses C++11 braced list style
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/.pre-commit-config.yaml (already exists):
+     * Pre-commit hooks configuration
+     * Uses clang-format v18.1.8 for automatic code formatting
+     * Targets .cpp, .cc, and .h files
+     * Applies in-place formatting with -i flag
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/.github/workflows/test.yaml (already exists):
+     * GitHub Actions CI/CD workflow configuration
+     * Triggers on push, pull_request, and workflow_dispatch
+     * Configurable test platforms via workflow inputs
+     * Concurrent job management with cancellation
+     * Google Test filter support via GTEST_FILTER
+     * Jobs: style-check, build-error-check-on-32bit, ubuntu, macos, windows
+     * Windows matrix builds: without SSL, with SSL, compiled library
+     * Uses vcpkg for Windows dependencies
+     * Uses Chocolatey for OpenSSL installation on Windows
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/.github/workflows/test_proxy.yaml (already exists):
+     * Dedicated proxy test workflow
+     * Triggers on push and pull_request
+     * Conditional execution to avoid duplicate runs on PRs
+     * Installs proxy test dependencies including netcat-openbsd
+     * Runs proxy test target via make
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/.github/workflows/release-docker.yml (already exists):
+     * Docker release workflow configuration
+     * Triggers on release publication and workflow_dispatch
+     * Fetches all history and tags for version extraction
+     * Extracts version tag without 'v' prefix
+     * Uses Docker Buildx for multi-platform builds
+     * Authenticates to Docker Hub using secrets
+     * Builds for linux/amd64 and linux/arm64 platforms
+     * Pushes to yhirose4dockerhub/cpp-httplib-server repository
+     * Tags with both 'latest' and version-specific tags
+     * Handles both manual and release event triggers
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/.github/workflows/cifuzz.yaml (already exists):
+     * CIFuzz workflow configuration
+     * Triggers on pull_request events
+     * Concurrency control with group cancellation
+     * Uses Google OSS-Fuzz CIFuzz actions
+     * Project name: 'cpp-httplib'
+     * Language: c++
+     * Fuzz duration: 600 seconds
+     * Artifact upload on crash detection
+     * Build and run fuzzer steps
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/.github/workflows/abidiff.yaml (already exists):
+     * ABI compatibility check workflow
+     * Triggers on push and pull_request events
+     * Concurrency control with group cancellation
+     * Uses Debian bullseye container for consistent environment
+     * Conditional execution to avoid duplicate runs on fork PRs
+     * Installs abigail-tools and build dependencies
+     * Checks out current and previous tagged version
+     * Builds both versions with debug symbols and compiled library
+     * Runs abidiff to compare ABI changes
+     * SPDX license headers included
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/Makefile:
+     * Test suite build configuration
+     * Targets: test, style_check, fuzz_test, proxy
+     * Platform-specific build configurations for x86_64
+     * Proxy test target for automated proxy testing
+     * Fuzzer build targets with sanitizer flags
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/meson.build:
+     * Meson test suite configuration
+     * Required if test=true option is set
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/CMakeLists.txt:
+     * CMake test suite configuration
+     * Link against testing framework
+     * Fuzzer target configuration with sanitizer flags
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/httplib.cc and /home/cc/EnvGym/data/yhirose_cpp-httplib/test/httplib.h:
+     * Generated from split.py when HTTPLIB_COMPILE=ON
+     * Compiled library implementation files
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/test:
+     * Main test executable
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/server_fuzzer:
+     * Fuzzing test executable
+     * Server-side fuzzing harness
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/client_fuzzer:
+     * Client-side fuzzing harness (if applicable)
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/parser_fuzzer:
+     * HTTP parser fuzzing harness (if applicable)
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/test_proxy:
+     * Proxy functionality test executable
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/test_split:
+     * Split functionality test executable
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/proxy/docker-compose.yml (already exists):
+     * Proxy test environment configuration
+     * Defines squid_basic service on port 3128
+     * Defines squid_digest service on port 3129
+     * Build args for authentication type configuration
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/proxy/Dockerfile (already exists):
+     * Alpine-based Squid proxy container configuration
+     * Supports both Basic and Digest authentication modes
+     * ARG auth for build-time configuration (default: "basic")
+     * ARG port for port configuration (default: "3128")
+     * Uses Alpine package manager for Squid installation
+     * Dynamic configuration file selection based on auth type
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/proxy/basic_squid.conf:
+     * Squid proxy configuration for Basic authentication
+     * HTTP port 3128 configuration
+     * Basic authentication settings
+     * Access control lists
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/proxy/digest_squid.conf:
+     * Squid proxy configuration for Digest authentication
+     * HTTP port 3129 configuration
+     * Digest authentication settings
+     * Access control lists
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/proxy/basic_passwd:
+     * Basic authentication password file
+     * Created with htpasswd
+     * Used when auth="basic"
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/proxy/digest_passwd:
+     * Digest authentication password file
+     * Created with htdigest
+     * Used when auth="digest"
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/gtest/include/gtest/internal/custom/README.md (already exists):
+     * Documentation for Google Test customization points
+     * Describes available macro definitions for custom implementations
+     * Covers logging, threading, library support, and API export customizations
+   - /home/cc/EnvGym/data/yhirose_cpp-httplib/test/gtest/include/gtest/internal/custom/gtest.h (optional):

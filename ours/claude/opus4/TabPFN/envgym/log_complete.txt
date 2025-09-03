@@ -1,0 +1,101 @@
+=== Docker Execution Log - 20250902_130716 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756818428
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 9.55kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.9-slim
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/20] FROM docker.io/library/python:3.9-slim@sha256:914169c7c8398b1b90c0b0ff921c8027445e39d7c25dc440337e56ce0f2566e6
+#4 DONE 0.0s
+
+#5 [ 9/20] RUN /home/cc/EnvGym/data/TabPFN/venv/bin/pip install --upgrade pip setuptools wheel
+#5 CACHED
+
+#6 [10/20] RUN /home/cc/EnvGym/data/TabPFN/venv/bin/pip install uv
+#6 CACHED
+
+#7 [ 7/20] RUN git submodule update --init --recursive
+#7 CACHED
+
+#8 [13/20] RUN /home/cc/EnvGym/data/TabPFN/venv/bin/pip install     "scikit-learn>=1.2.0,<1.7"     "pandas>=1.4.0,<3"     "scipy>=1.11.1,<2"     "einops>=0.2.0,<0.9"     "huggingface-hub"     "pydantic>=2.8.0"     "pydantic-settings>=2.0.0"     "python-dotenv"     "typing-extensions"
+#8 CACHED
+
+#9 [12/20] RUN /home/cc/EnvGym/data/TabPFN/venv/bin/pip install --no-deps .
+#9 CACHED
+
+#10 [ 5/20] RUN git clone https://github.com/priorlabs/tabpfn.git --depth 1 TabPFN
+#10 CACHED
+
+#11 [11/20] RUN /home/cc/EnvGym/data/TabPFN/venv/bin/pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+#11 CACHED
+
+#12 [ 4/20] WORKDIR /home/cc/EnvGym/data
+#12 CACHED
+
+#13 [ 2/20] RUN apt-get update && apt-get install -y     git     curl     build-essential     && rm -rf /var/lib/apt/lists/*
+#13 CACHED
+
+#14 [ 6/20] WORKDIR /home/cc/EnvGym/data/TabPFN
+#14 CACHED
+
+#15 [16/20] RUN echo '# TabPFN Settings\nTABPFN_MODEL_CACHE_DIR=/home/cc/EnvGym/data/TabPFN/models\nTABPFN_ALLOW_CPU_LARGE_DATASET=true\nTABPFN_EXCLUDE_DEVICES=cuda,mps\n\nPYTORCH_CUDA_ALLOC_CONF=\nCUDA_VISIBLE_DEVICES=\n\nFORCE_CONSISTENCY_TESTS=0\nCI=false' > .env
+#15 CACHED
+
+#16 [ 3/20] RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg     && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null     && apt-get update     && apt-get install gh -y     && rm -rf /var/lib/apt/lists/*
+#16 CACHED
+
+#17 [18/20] RUN mkdir -p scripts &&     echo '#!/usr/bin/env python3' > scripts/generate_dependencies.py &&     echo 'import sys' >> scripts/generate_dependencies.py &&     echo 'import re' >> scripts/generate_dependencies.py &&     echo 'from pathlib import Path' >> scripts/generate_dependencies.py &&     echo '' >> scripts/generate_dependencies.py &&     echo 'def parse_pyproject_toml():' >> scripts/generate_dependencies.py &&     echo '    """Parse pyproject.toml and extract dependencies."""' >> scripts/generate_dependencies.py &&     echo '    pyproject_path = Path("pyproject.toml")' >> scripts/generate_dependencies.py &&     echo '    if not pyproject_path.exists():' >> scripts/generate_dependencies.py &&     echo '        print("pyproject.toml not found")' >> scripts/generate_dependencies.py &&     echo '        sys.exit(1)' >> scripts/generate_dependencies.py &&     echo '    ' >> scripts/generate_dependencies.py &&     echo '    content = pyproject_path.read_text()' >> scripts/generate_dependencies.py &&     echo '    ' >> scripts/generate_dependencies.py &&     echo '    # Extract dependencies section' >> scripts/generate_dependencies.py &&     echo '    deps_match = re.search(r"dependencies = \[(.*?)\]", content, re.DOTALL)' >> scripts/generate_dependencies.py &&     echo '    if not deps_match:' >> scripts/generate_dependencies.py &&     echo '        print("No dependencies found")' >> scripts/generate_dependencies.py &&     echo '        return []' >> scripts/generate_dependencies.py &&     echo '    ' >> scripts/generate_dependencies.py &&     echo '    deps_text = deps_match.group(1)' >> scripts/generate_dependencies.py &&     echo '    deps = re.findall(r'"'"'"([^"]+)"'"'"', deps_text)' >> scripts/generate_dependencies.py &&     echo '    return deps' >> scripts/generate_dependencies.py &&     echo '' >> scripts/generate_dependencies.py &&     echo 'def generate_minimum_requirements(deps):' >> scripts/generate_dependencies.py &&     echo '    """Generate requirements with minimum versions."""' >> scripts/generate_dependencies.py &&     echo '    min_reqs = []' >> scripts/generate_dependencies.py &&     echo '    for dep in deps:' >> scripts/generate_dependencies.py &&     echo '        if ">=" in dep:' >> scripts/generate_dependencies.py &&     echo '            # Keep minimum version' >> scripts/generate_dependencies.py &&     echo '            min_reqs.append(dep.split(",")[0])' >> scripts/generate_dependencies.py &&     echo '        else:' >> scripts/generate_dependencies.py &&     echo '            min_reqs.append(dep)' >> scripts/generate_dependencies.py &&     echo '    return min_reqs' >> scripts/generate_dependencies.py &&     echo '' >> scripts/generate_dependencies.py &&     echo 'def generate_maximum_requirements(deps):' >> scripts/generate_dependencies.py &&     echo '    """Generate requirements with maximum versions."""' >> scripts/generate_dependencies.py &&     echo '    max_reqs = []' >> scripts/generate_dependencies.py &&     echo '    for dep in deps:' >> scripts/generate_dependencies.py &&     echo '        if "<" in dep:' >> scripts/generate_dependencies.py &&     echo '            # Extract package name and max version' >> scripts/generate_dependencies.py &&     echo '            parts = dep.split(">")' >> scripts/generate_dependencies.py &&     echo '            if len(parts) > 1:' >> scripts/generate_dependencies.py &&     echo '                pkg_name = parts[0]' >> scripts/generate_dependencies.py &&     echo '                max_part = dep.split("<")[-1]' >> scripts/generate_dependencies.py &&     echo '                max_version = max_part.strip()' >> scripts/generate_dependencies.py &&     echo '                # Convert < to ==' >> scripts/generate_dependencies.py &&     echo '                if max_version:' >> scripts/generate_dependencies.py &&     echo '                    max_reqs.append(f"{pkg_name}=={max_version}")' >> scripts/generate_dependencies.py &&     echo '                else:' >> scripts/generate_dependencies.py &&     echo '                    max_reqs.append(dep)' >> scripts/generate_dependencies.py &&     echo '            else:' >> scripts/generate_dependencies.py &&     echo '                max_reqs.append(dep)' >> scripts/generate_dependencies.py &&     echo '        else:' >> scripts/generate_dependencies.py &&     echo '            max_reqs.append(dep)' >> scripts/generate_dependencies.py &&     echo '    return max_reqs' >> scripts/generate_dependencies.py &&     echo '' >> scripts/generate_dependencies.py &&     echo 'def main():' >> scripts/generate_dependencies.py &&     echo '    if len(sys.argv) != 2 or sys.argv[1] not in ["minimum", "maximum"]:' >> scripts/generate_dependencies.py &&     echo '        print("Usage: python generate_dependencies.py [minimum|maximum]")' >> scripts/generate_dependencies.py &&     echo '        sys.exit(1)' >> scripts/generate_dependencies.py &&     echo '    ' >> scripts/generate_dependencies.py &&     echo '    mode = sys.argv[1]' >> scripts/generate_dependencies.py &&     echo '    deps = parse_pyproject_toml()' >> scripts/generate_dependencies.py &&     echo '    ' >> scripts/generate_dependencies.py &&     echo '    if mode == "minimum":' >> scripts/generate_dependencies.py &&     echo '        reqs = generate_minimum_requirements(deps)' >> scripts/generate_dependencies.py &&     echo '        output_file = "requirements-minimum.txt"' >> scripts/generate_dependencies.py &&     echo '    else:' >> scripts/generate_dependencies.py &&     echo '        reqs = generate_maximum_requirements(deps)' >> scripts/generate_dependencies.py &&     echo '        output_file = "requirements-maximum.txt"' >> scripts/generate_dependencies.py &&     echo '    ' >> scripts/generate_dependencies.py &&     echo '    with open(output_file, "w") as f:' >> scripts/generate_dependencies.py &&     echo '        for req in reqs:' >> scripts/generate_dependencies.py &&     echo '            f.write(req + "\\n")' >> scripts/generate_dependencies.py &&     echo '    ' >> scripts/generate_dependencies.py &&     echo '    print(f"Generated {output_file}")' >> scripts/generate_dependencies.py &&     echo '' >> scripts/generate_dependencies.py &&     echo 'if __name__ == "__main__":' >> scripts/generate_dependencies.py &&     echo '    main()' >> scripts/generate_dependencies.py
+#17 CACHED
+
+#18 [ 8/20] RUN python -m venv /home/cc/EnvGym/data/TabPFN/venv
+#18 CACHED
+
+#19 [14/20] RUN /home/cc/EnvGym/data/TabPFN/venv/bin/pip install pytest pytest-xdist psutil
+#19 CACHED
+
+#20 [15/20] RUN /home/cc/EnvGym/data/TabPFN/venv/bin/pip install     "ruff==0.8.6"     "mypy==1.17.0"     "pre-commit"     "commitizen"     "types-pyyaml"     "types-psutil"     "pyright"     "onnx"
+#20 CACHED
+
+#21 [17/20] RUN mkdir -p .gemini &&     echo 'code_review:\n  pull_request_opened:\n    summary: false' > .gemini/config.yaml
+#21 CACHED
+
+#22 [19/20] RUN chmod +x scripts/generate_dependencies.py
+#22 CACHED
+
+#23 [20/20] RUN echo 'export PATH=/home/cc/EnvGym/data/TabPFN/venv/bin:$PATH' >> ~/.bashrc
+#23 DONE 0.3s
+
+#24 exporting to image
+#24 exporting layers
+#24 exporting layers 6.5s done
+#24 writing image sha256:2bfbc18bb8dbd9a00d57a05206e6e83b5dc87a225a8fbc0561ed7836a7a64384 done
+#24 naming to docker.io/library/envgym_test_1756818428 done
+#24 DONE 6.5s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

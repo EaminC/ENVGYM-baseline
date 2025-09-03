@@ -1,0 +1,222 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Node.js (v22.14.0 - specified in .node-version, newer than package.json requirement)
+   - pnpm (v10.15.0 - specified as packageManager in package.json)
+   - Git (v2.30.0 or higher - required for commit hash retrieval in vite.config.ts)
+   - Visual Studio Code or preferred code editor (Linux x86_64 version)
+   - Vue DevTools browser extension (latest version)
+   - Puppeteer dependencies (for E2E testing - Linux x86_64 specific dependencies)
+   - Chromium browser (auto-installed by Puppeteer - Linux x86_64 version)
+   - Serve (for local development server)
+   - Simple Git Hooks (for commit hooks)
+   - Lint Staged (for pre-commit linting)
+   - @swc/core (build dependency, minification - Linux x86_64 binary)
+   - esbuild (build dependency - Linux x86_64 binary)
+   - Vite (v5.4.15 - for development server, used by sfc-playground and vite-debug)
+   - @vitejs/plugin-vue (v6.0.1 - for Vite Vue integration, used by sfc-playground and vite-debug)
+   - TypeScript (v5.2.0+ for isolatedDeclarations support, optional peer dependency, manually managed per renovate.json5)
+   - @types/node (for Node.js type definitions - required by tsconfig.build.json)
+   - @types/puppeteer (for Puppeteer type definitions)
+   - @types/trusted-types (v2.0.7 - for Trusted Types API support)
+   - vitest/globals types (for global test types)
+   - vitest/config (for Vitest configuration merging - required by vitest.unit.config.ts and vitest.workspace.ts)
+   - @vitest/coverage-v8 (for code coverage)
+   - jsdom (for DOM testing environment)
+   - Rollup plugins:
+     - @rollup/plugin-replace (pinned version per renovate.json5)
+     - @rollup/plugin-json
+     - @rollup/plugin-commonjs
+     - @rollup/plugin-node-resolve
+     - @rollup/plugin-alias
+     - rollup-plugin-polyfill-node
+     - rollup-plugin-esbuild
+     - rollup-plugin-dts (for TypeScript declaration bundling)
+   - picocolors (for colored console output)
+   - @vue/consolidate (v1.0.0 - for template engine support)
+   - magic-string (for source transformations and AST manipulation)
+   - source-map-js (v1.2.1 - for source map support, required by vue-compat and template-explorer)
+   - @babel/parser (for parsing TypeScript/JavaScript AST)
+   - @babel/types (for AST type definitions and node types)
+   - estree-walker (for AST traversal, required by vue-compat, ESM only per renovate.json5)
+   - entities (v4.5.0 - for HTML entity decoding, pinned version per renovate.json5)
+   - Node Version Manager (nvm, fnm, or volta) for Node.js version management - Linux x86_64 version
+   - ESLint v9.0.0+ (for code quality)
+   - eslint-plugin-import-x (for import/export linting)
+   - typescript-eslint (for TypeScript ESLint support)
+   - @vitest/eslint-plugin (for Vitest-specific linting rules)
+   - Netlify CLI (optional, for local Netlify deployment testing)
+   - Vercel CLI (optional, for local Vercel deployment testing)
+   - Prettier (latest version - for code formatting)
+   - eslint-config-prettier (for ESLint and Prettier integration)
+   - eslint-plugin-prettier (for running Prettier as ESLint rule)
+   - PostCSS (v8.5.6+ - for CSS processing in SFC)
+   - postcss-modules (v6.0.1+ - for CSS modules support)
+   - postcss-selector-parser (v7.1.0+ - for CSS selector parsing)
+   - Sass (v1.90.0+ - for SCSS/Sass compilation)
+   - Pug (v3.0.3+ - for Pug template compilation)
+   - hash-sum (v2.0.0+ - for generating hash sums)
+   - lru-cache (v10.1.0 - for caching compiled templates, pinned version per renovate.json5)
+   - merge-source-map (v1.1.0+ - for source map merging)
+   - minimatch (v10.0.3 - for file pattern matching)
+   - csstype (v3.1.3 - for CSS type definitions)
+   - @vue/repl (v4.6.3 - for SFC playground REPL functionality, excluded from optimizeDeps)
+   - file-saver (v2.0.5 - for downloading files in SFC playground)
+   - jszip (v3.10.1 - for creating zip files in SFC playground)
+   - monaco-editor (v0.52.2 - for template-explorer code editing)
+   - marked (pinned version - used in e2e test examples per renovate.json5)
+   - node:assert/strict (Node.js built-in module for assertions)
+   - node:fs (Node.js built-in module for file system operations)
+   - pkg-pr-new (for continuous release publishing)
+   - npm (latest version - for publishing packages, updated during release workflow)
+   - yyx990803/release-tag@master (GitHub Action for creating release tags)
+   - Renovate Bot (dependency update automation tool)
+   - GitHub Actions dependencies (auto-installed):
+     - actions/checkout@v5
+     - pnpm/action-setup@v4.1.0
+     - actions/setup-node@v4
+     - actions/cache@v4 (for caching Chromium binary)
+   - Vue workspace dependencies:
+     - @vue/shared (workspace dependency)
+     - @vue/compiler-core (workspace dependency)
+     - @vue/compiler-dom (workspace dependency)
+     - @vue/runtime-core (workspace dependency)
+     - @vue/runtime-dom (workspace dependency)
+     - @vue/runtime-test (workspace dependency)
+     - @vue/compiler-sfc (workspace dependency)
+     - @vue/compiler-ssr (workspace dependency)
+     - @vue/server-renderer (workspace dependency)
+     - @vue/reactivity (workspace dependency)
+     - @vue/compat (workspace dependency - Vue 2 compatibility layer)
+     - dts-built-test (workspace dependency - for TypeScript declaration testing)
+   - VS Code Extensions:
+     - Prettier - Code formatter (esbenp.prettier-vscode)
+     - ESLint (dbaeumer.vscode-eslint)
+     - Vue - Official (Vue.volar)
+     - TypeScript Vue Plugin (Vue.vscode-typescript-vue-plugin)
+     - Code Spell Checker (streetsidesoftware.code-spell-checker)
+     - Vitest Explorer (vitest.explorer) - for running and debugging Vitest tests in VS Code
+     - JavaScript Debugger (built-in VS Code extension for debugging)
+   - Linux-specific dependencies for Puppeteer/Chromium:
+     - libasound2
+     - libatk-bridge2.0-0
+     - libatk1.0-0
+     - libc6
+     - libcairo2
+     - libcups2
+     - libdbus-1-3
+     - libexpat1
+     - libfontconfig1
+     - libgcc1
+     - libgconf-2-4
+     - libgdk-pixbuf2.0-0
+     - libglib2.0-0
+     - libgtk-3-0
+     - libnspr4
+     - libnss3
+     - libpango-1.0-0
+     - libpangocairo-1.0-0
+     - libstdc++6
+     - libx11-6
+     - libx11-xcb1
+     - libxcb1
+     - libxcomposite1
+     - libxcursor1
+     - libxdamage1
+     - libxext6
+     - libxfixes3
+     - libxi6
+     - libxrandr2
+     - libxrender1
+     - libxss1
+     - libxtst6
+     - ca-certificates
+     - fonts-liberation
+     - libappindicator1
+     - libnss3
+     - lsb-release
+     - xdg-utils
+     - wget
+
+2. FILES TO CREATE:
+   - `.gitignore` - Standard Node.js/Vue.js ignore patterns (already exists, verified with dist, .DS_Store, node_modules, coverage, temp, explorations, TODOs.md, *.log, .idea, .eslintcache, dts-build/packages, *.tsbuildinfo, *.tgz)
+   - `.node-version` - Node.js version specification file (already exists, v22.14.0)
+   - `tsconfig.json` - TypeScript configuration for Vue 3 projects (already exists, verified)
+   - `tsconfig.build.json` - TypeScript build configuration (already exists, verified with declaration emission settings)
+   - `tsconfig.build-browser.json` - TypeScript build configuration for browser targets (required by rollup.dts.config.js)
+   - `tsconfig.build-node.json` - TypeScript build configuration for Node.js targets (required by rollup.dts.config.js)
+   - `rollup.config.js` - Rollup bundler configuration (already exists, verified)
+   - `rollup.dts.config.js` - Rollup configuration for TypeScript declarations (already exists, verified with dts plugin, patchTypes, and copyMts)
+   - `eslint.config.js` - ESLint v9+ flat config (already exists, verified)
+   - `.prettierrc` - Code formatting configuration (already exists, verified with semi: false, singleQuote: true, arrowParens: avoid)
+   - `.prettierignore` - Files to ignore for Prettier formatting (already exists, ignores dist, pnpm-lock.yaml, CHANGELOG*.md)
+   - `.vscode/settings.json` - VS Code workspace settings (already exists, verified with TypeScript SDK, spell check, and formatter settings)
+   - `.vscode/extensions.json` - Recommended VS Code extensions configuration (already exists, includes vitest.explorer)
+   - `.vscode/launch.json` - VS Code debugging configuration (already exists, configured for Vitest debugging with autoAttachChildProcesses, skipFiles, and integrated terminal)
+   - `vitest.config.ts` - Vitest testing framework configuration (already exists, verified)
+   - `vitest.e2e.config.ts` - Vitest E2E testing configuration (already exists, verified with thread pool options and CI detection)
+   - `vitest.unit.config.ts` - Vitest unit testing configuration (already exists, verified with mergeConfig and e2e exclusion)
+   - `vitest.workspace.ts` - Vitest workspace configuration (already exists, defines unit and e2e test projects)
+   - `pnpm-workspace.yaml` - PNPM workspace configuration (already exists)
+   - `netlify.toml` - Netlify deployment configuration (already exists, verified)
+   - `.github/renovate.json5` - Renovate Bot configuration (already exists, verified with weekly schedule, dependency grouping, and version pinning rules)
+   - `.github/workflows/ci.yml` - GitHub Actions CI workflow (already exists, verified with test job and continuous-release job)
+   - `.github/workflows/test.yml` - GitHub Actions test workflow (already exists, verified with unit-test, unit-test-windows, e2e-test, and lint-and-test-dts jobs)
+   - `.github/workflows/release.yml` - GitHub Actions release workflow (already exists, verified with tag-based trigger, test job dependency, and release environment)
+   - `CHANGELOG.md` - Changelog for stable releases (referenced in release workflow, ignored by Prettier)
+   - `cspell.json` - Code Spell Checker configuration
+   - `scripts/` directory with build scripts (leveraging 96 CPU cores for parallel builds):
+     - `dev.js` - Development build script (configure with --parallel flag for multi-core usage)
+     - `build.js` - Production build script (supports --withTypes flag for CI, configure with parallel builds using 96 cores)
+     - `release.js` - Release automation script (supports --publishOnly flag for release workflow)
+     - `verify-commit.js` - Commit message verification
+     - `usage-size.js` - Bundle size analysis
+     - `pre-dev-sfc.js` - SFC playground preparation
+     - `aliases.js` - Path alias configuration (already exists, used in rollup.config.js)
+     - `setup-vitest.ts` - Vitest setup file
+     - `inline-enums.js` - Enum inlining plugin for Rollup
+     - `verify-treeshaking.js` - Tree-shaking verification script (referenced in test.yml)
+   - `packages/` directory structure for monorepo
+   - `packages/[pkg]/types/` - Additional type definition directories for packages (optional, used by rollup.dts.config.js)
+   - `packages-private/` directory for internal packages
+   - `packages-private/tsconfig.json` - TypeScript configuration for private packages (already exists, extends root tsconfig.json with isolatedDeclarations: false)
+   - `packages-private/sfc-playground/` directory structure:
+     - `package.json` - SFC playground package configuration (already exists, private package v0.0.0)
+     - `index.html` - Main HTML entry point for SFC playground
+     - `vite.config.ts` - Vite configuration for SFC playground (already exists, verified with Vue plugin, copy-vue plugin, Git commit hash, and production devtools)
+     - `vercel.json` - Vercel deployment configuration (already exists, with silent GitHub integration and asset caching headers)
+     - `src/` - Source code directory
+       - `main.ts` - Main entry point
+       - `App.vue` - Root Vue component
+       - `components/` - Component directory
+       - `store/` - State management
+       - `utils/` - Utility functions
+     - `public/` - Static assets directory
+   - `packages-private/template-explorer/` directory structure:
+     - `package.json` - Template explorer package configuration (already exists, private package v0.0.0)
+     - `index.html` - Main HTML entry point for template explorer
+     - `src/` - Source code directory
+       - `index.ts` - Main entry point
+       - `options.ts` - Compiler options configuration
+       - `theme.ts` - Monaco editor theme configuration
+     - `style.css` - Template explorer styles
+   - `packages-private/dts-test/` directory structure:
+     - `package.json` - DTS test package configuration (already exists, private package v0.0.0)
+     - `tsconfig.json` - TypeScript configuration for declaration testing
+     - `tsconfig.test.json` - TypeScript configuration for test files (already exists, verified with noEmit: true, jsx: preserve, module: esnext, strict: true, moduleResolution: node, lib: [esnext, dom], include: ["./*"])
+     - `index.d.ts` - Main TypeScript declaration test file
+     - `tests/` - TypeScript declaration test files
+       - `compiler.test-d.ts` - Compiler API type tests
+       - `reactivity.test-d.ts` - Reactivity API type tests
+       - `runtime.test-d.ts` - Runtime API type tests
+       - `ref.test-d.ts` - Ref API type tests
+       - `computed.test-d.ts` - Computed API type tests
+       - `watch.test-d.ts` - Watch API type tests
+       - `component.test-d.ts` - Component type tests
+       - `directives.test-d.ts` - Directive type tests
+       - `props.test-d.ts` - Props type tests
+       - `emit.test-d.ts` - Emit type tests
+       - `slots.test-d.ts` - Slots type tests
+       - `jsx.test-d.tsx` - JSX type tests
+       - `h.test-d.ts` - h() function type tests
+       - `vnode.test-d.ts`

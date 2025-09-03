@@ -1,0 +1,120 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.8 or higher
+   - **PyTorch 2.0.0 CPU version** (no CUDA needed)
+   - PyTorch Geometric 2.3.1
+   - PyTorch Geometric dependencies (CPU versions):
+     - torch-scatter 2.1.1
+     - torch-cluster 1.6.1
+     - torch-spline-conv 1.2.2
+     - torch-sparse 0.6.17
+   - torchvision 0.15.1
+   - torchaudio 2.0.1
+   - numpy 1.24.4
+   - pandas 2.0.3
+   - ogb 1.3.6
+   - Git (for cloning repository)
+
+2. FILES TO CREATE:
+   - `config/pipeline_config/seed_gnn/gcn/cora.json`
+   - `config/pipeline_config/seed_gnn/gcn/amazoncomputers.json`
+   - `config/pipeline_config/seed_gnn/gcn/amazonphoto.json`
+   - `config/pipeline_config/seed_gnn/gcn/arxiv.json`
+   - `config/pipeline_config/seed_gnn/gcn/coauthorcs.json`
+   - `config/pipeline_config/seed_gnn/gcn/products.json`
+   - `config/pipeline_config/egnn/gcn/[dataset].json` (for all datasets)
+   - Similar config files for gat, gin, sage models
+   - `config/eval_config/edit_gnn/cora.json`
+   - `config/eval_config/edit_gnn/amazoncomputers.json`
+   - `config/eval_config/edit_gnn/amazonphoto.json`
+   - `config/eval_config/edit_gnn/arxiv.json`
+   - `config/eval_config/edit_gnn/coauthorcs.json`
+   - `config/eval_config/edit_gnn/products.json`
+   - `.gitignore` (already exists, no need to create)
+   - `data/` directory structure for datasets
+   - `output/` directory structure for results
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - `test_model_loading.py`: Test loading pretrained GCN, GAT, GIN, SAGE models
+   - `test_seed_gnn_forward.py`: Test SEED-GNN forward pass with frozen GNN + active MLP
+   - `test_editing_batch.py`: Test editing batch formation with 4 component types
+   - `test_backward_update.py`: Test MLP-only weight updates during editing
+   - `test_termination_conditions.py`: Test editing termination on success or step budget
+   - `test_metrics_calculation.py`: Test Success Rate and Test Drawdown calculations
+   - `test_config_loading.py`: Test pipeline and eval config loading
+   - `test_dataset_loading.py`: Test loading all 6 supported datasets
+   - `test_neighbor_sampling.py`: Test neighbor sampling functionality
+   - `test_output_generation.py`: Test output file generation and format
+   - `test_ogb_integration.py`: Test OGB dataset loading and processing
+   - `test_torch_geometric_integration.py`: Test PyG functionality with project models
+
+4. COMPLETE TODO LIST:
+   - Verify Python version: `python --version` (ensure 3.8+)
+   - **Skip CUDA checks** (no GPU available)
+   - Create virtual environment: `python -m venv seed_gnn_env`
+   - Activate virtual environment:
+     - Linux: `source seed_gnn_env/bin/activate`
+   - **Install PyTorch 2.0.0 CPU version**: `pip install torch==2.0.0+cpu -f https://download.pytorch.org/whl/torch_stable.html`
+   - Verify PyTorch installation: `python -c "import torch; print(torch.__version__, 'CPU:', not torch.cuda.is_available())"`
+   - **Install PyTorch Geometric dependencies for CPU**:
+     ```
+     pip install torch-scatter==2.1.1+pt20cpu torch-cluster==1.6.1+pt20cpu torch-spline-conv==1.2.2+pt20cpu torch-sparse==0.6.17+pt20cpu -f https://data.pyg.org/whl/torch-2.0.0+cpu.html
+     ```
+   - Install PyTorch Geometric: `pip install torch-geometric==2.3.1`
+   - **Install torchvision and torchaudio CPU versions**: 
+     ```
+     pip install torchvision==0.15.1+cpu torchaudio==2.0.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+     ```
+   - Verify PyG installation: `python -c "import torch_geometric; print(torch_geometric.__version__)"`
+   - Clone repository: `git clone <repository_url>`
+   - Navigate to project directory: `cd /home/cc/EnvGym/data/SEED-GNN`
+   - Install remaining dependencies from requirements.txt:
+     ```
+     pip install numpy==1.24.4 pandas==2.0.3 ogb==1.3.6
+     ```
+   - Verify all dependencies: `pip list | grep -E "torch|numpy|pandas|ogb"`
+   - Verify .gitignore exists and contains proper entries:
+     ```
+     cat .gitignore | grep -E "__pycache__|.vscode|*.egg-info|.DS_Store|ckpts|results/"
+     ```
+   - Create necessary directories:
+     ```
+     mkdir -p data
+     mkdir -p output/results
+     mkdir -p output/edit_ckpts
+     mkdir -p config/pipeline_config/seed_gnn/{gcn,gat,gin,sage}
+     mkdir -p config/pipeline_config/egnn/{gcn,gat,gin,sage}
+     mkdir -p config/eval_config/edit_gnn
+     mkdir -p scripts/pretrain/seed_gnn
+     mkdir -p scripts/edit/seed_gnn/{gcn,gat,gin,sage}
+     mkdir -p scripts/edit/egnn/{gcn,gat,gin,sage}
+     ```
+   - Create ckpts and results directories (referenced in .gitignore):
+     ```
+     mkdir -p ckpts
+     mkdir -p results
+     ```
+   - Download datasets to data directory (Cora, Amazon Computers, Amazon Photo, ArXiv, Coauthor CS, Products)
+   - Verify OGB dataset availability: `python -c "from ogb.nodeproppred import NodePropPredDataset; print('OGB ready')"`
+   - Verify main.py exists and is executable: `python main.py --help`
+   - **Set CPU-only environment variable**: `export CUDA_VISIBLE_DEVICES=""`
+   - Run baseline model training for Cora: `bash scripts/pretrain/seed_gnn/cora.sh output data`
+   - Verify checkpoint creation in output/edit_ckpts
+   - Test SEED-GNN editing on Cora GCN: `bash scripts/edit/seed_gnn/gcn/cora.sh output data`
+   - Verify output structure:
+     - Check for input_config folder
+     - Check for output_config.json with eval_results
+     - Check for raw_results.json
+     - Check for exp.log
+   - Run unit tests: `python -m pytest tests/`
+   - Test numpy compatibility: `python -c "import numpy; print(numpy.__version__)"`
+   - Test pandas functionality: `python -c "import pandas; print(pandas.__version__)"`
+   - Verify .gitignore is working properly:
+     ```
+     touch test.pyc && git status | grep -v test.pyc && rm test.pyc
+     ```
+   - **Monitor memory usage during training**: `free -h` (ensure sufficient RAM for CPU training)
+   - Document any missing dependencies or configuration issues
+   - Create backup of successful configuration: `pip freeze > environment_snapshot.txt`
+   - **Consider adding OMP_NUM_THREADS environment variable** for CPU performance: `export OMP_NUM_THREADS=4`

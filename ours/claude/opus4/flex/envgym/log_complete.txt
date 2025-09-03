@@ -1,0 +1,119 @@
+=== Docker Execution Log - 20250902_211924 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756847963
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 3.37kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/28] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [ 2/28] RUN apt-get update && apt-get install -y     wget     git     curl     build-essential     && rm -rf /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [ 3/28] RUN apt-get update && apt-get install -y     libsdl-image1.2-dev     libsdl-mixer1.2-dev     libsdl-ttf2.0-dev     libsdl1.2-dev     libsmpeg-dev     subversion     libportmidi-dev     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [10/28] RUN useradd -m -s /bin/bash cc
+#7 CACHED
+
+#8 [12/28] RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh &&     bash Miniconda3-latest-Linux-x86_64.sh -b -p /home/cc/miniconda3 &&     rm Miniconda3-latest-Linux-x86_64.sh
+#8 CACHED
+
+#9 [ 7/28] RUN apt-get update && apt-get install -y     libdirectfb-dev     libst-dev     mesa-utils     xvfb     x11vnc     libsdl-sge-dev     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [ 8/28] RUN apt-get update && apt-get install -y     libmysqlclient-dev     libpq-dev     gdal-bin     libgdal-dev     clang     swig     && rm -rf /var/lib/apt/lists/*
+#10 CACHED
+
+#11 [ 4/28] RUN apt-get update && apt-get install -y     ffmpeg     libswscale-dev     libavformat-dev     libavcodec-dev     libfreetype6-dev     libasound2-dev     libjack-dev     && rm -rf /var/lib/apt/lists/*
+#11 CACHED
+
+#12 [13/28] RUN /home/cc/miniconda3/bin/conda init bash
+#12 CACHED
+
+#13 [ 5/28] RUN apt-get update && apt-get install -y     portaudio19-dev     libsndfile1-dev     pkg-config     libgmp3-dev     libopenmpi-dev     libeigen3-dev     cmake     && rm -rf /var/lib/apt/lists/*
+#13 CACHED
+
+#14 [11/28] WORKDIR /home/cc
+#14 CACHED
+
+#15 [ 9/28] RUN ln -sf /usr/include/locale.h /usr/include/xlocale.h &&     ln -sf /usr/include/eigen3/Eigen /usr/include/Eigen
+#15 CACHED
+
+#16 [ 6/28] RUN apt-get update && apt-get install -y     libgl1-mesa-dev     libsdl2-dev     libsdl2-image-dev     libsdl2-ttf-dev     libsdl2-gfx-dev     libboost-all-dev     && rm -rf /var/lib/apt/lists/*
+#16 CACHED
+
+#17 [14/28] RUN /home/cc/miniconda3/bin/conda config --add channels conda-forge
+#17 CACHED
+
+#18 [internal] load build context
+#18 transferring context: 1.13MB 0.1s done
+#18 DONE 0.1s
+
+#19 [15/28] RUN /home/cc/miniconda3/bin/conda create -n flex-env python=3.8 -y
+#19 1.360 
+#19 1.360 CondaToSNonInteractiveError: Terms of Service have not been accepted for the following channels. Please accept or remove them before proceeding:
+#19 1.360     - https://repo.anaconda.com/pkgs/main
+#19 1.360     - https://repo.anaconda.com/pkgs/r
+#19 1.360 
+#19 1.360 To accept these channels' Terms of Service, run the following commands:
+#19 1.360     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+#19 1.360     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+#19 1.360 
+#19 1.360 For information on safely removing channels from your conda configuration,
+#19 1.360 please see the official documentation:
+#19 1.360 
+#19 1.360     https://www.anaconda.com/docs/tools/working-with-conda/channels
+#19 1.360 
+#19 ERROR: process "/bin/bash -c /home/cc/miniconda3/bin/conda create -n flex-env python=3.8 -y" did not complete successfully: exit code: 1
+------
+ > [15/28] RUN /home/cc/miniconda3/bin/conda create -n flex-env python=3.8 -y:
+1.360 
+1.360 To accept these channels' Terms of Service, run the following commands:
+1.360     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+1.360     conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+1.360 
+1.360 For information on safely removing channels from your conda configuration,
+1.360 please see the official documentation:
+1.360 
+1.360     https://www.anaconda.com/docs/tools/working-with-conda/channels
+1.360 
+------
+envgym.dockerfile:89
+--------------------
+  87 |     RUN /home/cc/miniconda3/bin/conda config --add channels conda-forge
+  88 |     
+  89 | >>> RUN /home/cc/miniconda3/bin/conda create -n flex-env python=3.8 -y
+  90 |     
+  91 |     RUN /home/cc/miniconda3/bin/conda run -n flex-env conda install -c conda-forge r-base r-eva -y
+--------------------
+ERROR: failed to solve: process "/bin/bash -c /home/cc/miniconda3/bin/conda create -n flex-env python=3.8 -y" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

@@ -1,0 +1,410 @@
+=== Iteration 1 - [2025-09-02 14:15:20] ===
+PLAN:
+  === ENVIRONMENT SETUP PLAN ===
+  1. DOWNLOADS NEEDED:
+     - Node.js (v22.x or higher - updated from package.json requirement)
+     - npm (v10.x or higher, comes with Node.js)
+     - Git (latest version)
+     - Vercel CLI (`npm i -g vercel`)
+     - A code editor (VS Code recommended)
+     - Express.js (v4.x) - for non-Vercel deployments
+     - Testing dependencies (from package.json):
+       - Jest (v29.7.0)
+       - @testing-library/dom (v10.4.1)
+       - @testing-library/jest-dom (v6.6.4)
+       - jest-environment-jsdom (v30.0.5)
+       - axios-mock-adapter (v2.1.0)
+       - jest-bench (v29.7.1)
+     - Development tools:
+       - ESLint (v9.33.0)
+       - Prettier (v3.6.2)
+       - Husky (v9.1.7)
+  2. FILES TO CREATE:
+     - `.env` - Environment variables file containing:
+       - `PAT_1` (GitHub Personal Access Token)
+       - `CACHE_SECONDS` (optional, for cache configuration)
+     - `.env.example` - Template for environment variables
+     - `vercel.json` - Vercel configuration (if modifying default)
+     - `express.js` - Express server file for non-Vercel deployments
+     - `jest.config.js` - Jest testing configuration (likely already exists)
+     - `jest.e2e.config.js` - E2E testing configuration (referenced in scripts)
+     - `jest.bench.config.js` - Benchmark testing configuration (referenced in scripts)
+     - `.gitignore` - Ensure .env files are excluded
+     - `docker-compose.yml` - Optional, for Docker deployment
+     - `Dockerfile` - Optional, for containerization (using linux/amd64 base images)
+     - `.prettierrc` - Prettier configuration
+     - `.eslintrc.js` - ESLint configuration
+     - `.husky/` - Husky git hooks directory
+  3. NECESSARY TEST CASES IN THE CODEBASE:
+     - API endpoint tests:
+       - Test `/api` stats card generation
+       - Test `/api/pin` repo card generation
+       - Test `/api/gist` gist card generation
+       - Test `/api/top-langs` language card generation
+       - Test `/api/wakatime` WakaTime card generation
+     - Parameter validation tests:
+       - Test all query parameters (username, theme, hide, show, etc.)
+       - Test invalid parameter handling
+       - Test edge cases (empty username, special characters)
+     - Rate limiting tests:
+       - Test cache functionality
+       - Test rate limit handling
+     - Theme tests:
+       - Test all available themes
+       - Test custom color parameters
+       - Test theme generation scripts
+     - Error handling tests:
+       - Test 404 for non-existent users
+       - Test API timeout scenarios
+       - Test invalid GitHub tokens
+     - Unit tests:
+       - Test individual functions and modules
+       - Test data parsing and formatting
+       - Test SVG generation
+     - E2E tests:
+       - Test complete user flows
+       - Test card rendering in browsers
+     - Performance benchmarks:
+       - Test response times
+       - Test memory usage
+  4. COMPLETE TODO LIST:
+     - Install Node.js v22 or higher and verify installation: `node --version && npm --version`
+     - Navigate to existing project directory: `cd /home/cc/EnvGym/data/anuraghazra_github-readme-stats`
+     - Install project dependencies: `npm install`
+     - Create GitHub Personal Access Token:
+       - Go to https://github.com/settings/tokens/new
+       - Enable `repo` and `user` permissions
+       - Copy the generated token
+     - Create `.env` file in project root with: `PAT_1=your_github_token_here`
+     - Set up development environment:
+       - Run `npm run prepare` to set up Husky git hooks
+       - Verify linting setup: `npm run lint`
+       - Verify formatting setup: `npm run format:check`
+     - For Docker deployment (optimized for x86_64):
+       - Create `Dockerfile` using Node.js linux/amd64 base image:
+         ```dockerfile
+         FROM --platform=linux/amd64 node:22-alpine
+         WORKDIR /app
+         COPY package*.json ./
+         RUN npm ci --only=production
+         COPY . .
+         EXPOSE 3000
+         CMD ["node", "api/index.js"]
+         ```
+       - Build with BuildKit: `DOCKER_BUILDKIT=1 docker build -t github-readme-stats .`
+       - Run container: `docker run -p 3000:3000 --env-file .env github-readme-stats`
+     - For Vercel deployment:
+       - Install Vercel CLI: `npm i -g vercel`
+       - Run `vercel login` and authenticate
+       - Run `vercel` and follow prompts
+       - Add PAT_1 as environment variable in Vercel dashboard
+     - For non-Vercel deployment:
+       - Create `express.js` file with server configuration
+       - Modify package.json to add start script: `"start": "node express.js"`
+       - Install Express if not using Vercel: `npm install express`
+     - Run all test suites to verify setup:
+       - Unit tests: `npm test`
+       - Watch mode for development: `npm run test:watch`
+       - E2E tests: `npm run test:e2e`
+       - Benchmarks: `npm run bench`
+     - Test locally:
+       - For Vercel: `vercel dev`
+       - For Express: `node express.js`
+       - For Docker: `docker run -p 3000:3000 --env-file .env github-readme-stats`
+     - Verify API endpoints:
+       - Test stats card: `http://localhost:3000/api?username=anuraghazra`
+       - Test repo card: `http://localhost:3000/api/pin?username=anuraghazra&repo=github-readme-stats`
+       - Test language card: `http://localhost:3000/api/top-langs?username=anuraghazra`
+     - Configure additional environment variables if needed:
+       - `CACHE_SECONDS` for custom cache duration
+     - Generate and verify theme documentation: `npm run theme-readme-gen`
+     - Test theme preview functionality: `npm run preview-theme`
+     - Generate language JSON data: `npm run generate-langs-json`
+     - Set up monitoring:
+       - Configure error logging
+       - Set up uptime monitoring
+     - Documentation:
+       - Update README with your instance URL
+       - Document any custom configurations
+       - Document deployment process
+     - Security checks:
+       - Ensure `.env` is in `.gitignore`
+       - Verify PAT has minimal required permissions
+       - Enable HTTPS for production deployment
+       - Review ESLint security warnings
+     - Pre-commit setup:
+       - Verify Husky hooks are working
+       - Test lint-staged configuration
+       - Ensure code formatting on commit
+     - Docker optimization for x86_64:
+       - Use multi-stage builds to reduce image size
+       - Leverage BuildKit cache mounts for npm packages
+       - Set appropriate resource limits in docker-compose.yml
+       - Use alpine-based images for smaller footprint
+NEXT:
+  current progress
+  Successfully built a Docker image with Node.js 22 Alpine base, installed all dependencies including git, python3, and build tools. Created all required configuration files (.env, .env.example, jest configs, express.js, .prettierrc, .eslintrc.js, .gitignore, docker-compose.yml). Installed npm packages, Express.js, and Vercel CLI. Set up basic environment with placeholder GitHub token and exposed port 3000.
+  next step
+  Replace placeholder GitHub token in .env file with actual PAT_1 token, add health check to verify API endpoints are accessible, run test suites (npm test, npm run test:e2e, npm run bench) to validate setup, and change CMD to start the Express server (CMD ["node", "express.js"]) instead of bash shell for production readiness.
+STATUS:
+  SUCCESS
+LOG:
+  === Docker Execution Log - 20250902_141508 ===
+  Dockerfile: envgym/envgym.dockerfile
+  Image Name: envgym_test_1756822467
+  === Build Log ===
+  Build Status: Success
+  Build Output:
+  Build Error:
+  #0 building with "default" instance using docker driver
+  #1 [internal] load build definition from envgym.dockerfile
+  #1 transferring dockerfile: 2.97kB done
+  #1 WARN: FromPlatformFlagConstDisallowed: FROM --platform flag should not use constant value "linux/amd64" (line 1)
+  #1 DONE 0.0s
+  #2 [internal] load metadata for docker.io/library/node:22-alpine
+  #2 DONE 0.6s
+  #3 [internal] load .dockerignore
+  #3 transferring context: 2B done
+  #3 DONE 0.0s
+  #4 [ 1/19] FROM docker.io/library/node:22-alpine@sha256:d2166de198f26e17e5a442f537754dd616ab069c47cc57b889310a717e0abbf9
+  #4 resolve docker.io/library/node:22-alpine@sha256:d2166de198f26e17e5a442f537754dd616ab069c47cc57b889310a717e0abbf9 done
+  #4 ...
+  #5 [internal] load build context
+  #5 transferring context: 7.41MB 0.1s done
+  #5 DONE 0.1s
+  #4 [ 1/19] FROM docker.io/library/node:22-alpine@sha256:d2166de198f26e17e5a442f537754dd616ab069c47cc57b889310a717e0abbf9
+  #4 sha256:70e3575514953b11adf257269030673dcb065f31ea11d9d86eb5c65b5a3c475f 6.42kB / 6.42kB done
+  #4 sha256:9824c27679d3b27c5e1cb00a73adb6f4f8d556994111c12db3c5d61a0c843df8 0B / 3.80MB 0.2s
+  #4 sha256:6a088b2daae062d11086b47ecffca042d75b83c6228cb05d89c60c854c3265cd 6.29MB / 51.04MB 0.2s
+  #4 sha256:52719e552fdfa1fbd5bd1e6ab184f77b28ec2b59509c98da3ef00ccb84385a51 622.59kB / 1.26MB 0.2s
+  #4 sha256:d2166de198f26e17e5a442f537754dd616ab069c47cc57b889310a717e0abbf9 6.41kB / 6.41kB done
+  #4 sha256:704b199e36b5c1bc505da773f742299dc1ee5a4c70b86d1eb406c334f63253c6 1.72kB / 1.72kB done
+  #4 sha256:9824c27679d3b27c5e1cb00a73adb6f4f8d556994111c12db3c5d61a0c843df8 3.15MB / 3.80MB 0.3s
+  #4 sha256:6a088b2daae062d11086b47ecffca042d75b83c6228cb05d89c60c854c3265cd 10.49MB / 51.04MB 0.3s
+  #4 sha256:52719e552fdfa1fbd5bd1e6ab184f77b28ec2b59509c98da3ef00ccb84385a51 1.26MB / 1.26MB 0.2s done
+  #4 sha256:016c0e95211121b6a80955630caaca8899d6572d51c48561f95a9ad97788a63a 0B / 444B 0.3s
+  #4 sha256:9824c27679d3b27c5e1cb00a73adb6f4f8d556994111c12db3c5d61a0c843df8 3.80MB / 3.80MB 0.3s done
+  #4 sha256:6a088b2daae062d11086b47ecffca042d75b83c6228cb05d89c60c854c3265cd 16.78MB / 51.04MB 0.4s
+  #4 sha256:016c0e95211121b6a80955630caaca8899d6572d51c48561f95a9ad97788a63a 444B / 444B 0.3s done
+  #4 extracting sha256:9824c27679d3b27c5e1cb00a73adb6f4f8d556994111c12db3c5d61a0c843df8 0.1s
+  #4 sha256:6a088b2daae062d11086b47ecffca042d75b83c6228cb05d89c60c854c3265cd 20.97MB / 51.04MB 0.5s
+  #4 extracting sha256:9824c27679d3b27c5e1cb00a73adb6f4f8d556994111c12db3c5d61a0c843df8 0.2s done
+  #4 sha256:6a088b2daae062d11086b47ecffca042d75b83c6228cb05d89c60c854c3265cd 27.26MB / 51.04MB 0.9s
+  #4 sha256:6a088b2daae062d11086b47ecffca042d75b83c6228cb05d89c60c854c3265cd 34.60MB / 51.04MB 1.2s
+  #4 sha256:6a088b2daae062d11086b47ecffca042d75b83c6228cb05d89c60c854c3265cd 45.09MB / 51.04MB 1.4s
+  #4 sha256:6a088b2daae062d11086b47ecffca042d75b83c6228cb05d89c60c854c3265cd 48.23MB / 51.04MB 1.5s
+  #4 sha256:6a088b2daae062d11086b47ecffca042d75b83c6228cb05d89c60c854c3265cd 51.04MB / 51.04MB 1.5s done
+  #4 extracting sha256:6a088b2daae062d11086b47ecffca042d75b83c6228cb05d89c60c854c3265cd 0.1s
+  #4 extracting sha256:6a088b2daae062d11086b47ecffca042d75b83c6228cb05d89c60c854c3265cd 3.4s done
+  #4 extracting sha256:52719e552fdfa1fbd5bd1e6ab184f77b28ec2b59509c98da3ef00ccb84385a51 0.1s done
+  #4 extracting sha256:016c0e95211121b6a80955630caaca8899d6572d51c48561f95a9ad97788a63a done
+  #4 DONE 5.1s
+  #6 [ 2/19] RUN apk add --no-cache     git     bash     python3     make     g++     curl
+  #6 0.257 fetch https://dl-cdn.alpinelinux.org/alpine/v3.22/main/x86_64/APKINDEX.tar.gz
+  #6 0.351 fetch https://dl-cdn.alpinelinux.org/alpine/v3.22/community/x86_64/APKINDEX.tar.gz
+  #6 0.616 (1/41) Installing ncurses-terminfo-base (6.5_p20250503-r0)
+  #6 0.622 (2/41) Installing libncursesw (6.5_p20250503-r0)
+  #6 0.634 (3/41) Installing readline (8.2.13-r1)
+  #6 0.643 (4/41) Installing bash (5.2.37-r0)
+  #6 0.671 Executing bash-5.2.37-r0.post-install
+  #6 0.675 (5/41) Installing brotli-libs (1.1.0-r2)
+  #6 0.702 (6/41) Installing c-ares (1.34.5-r0)
+  #6 0.713 (7/41) Installing libunistring (1.3-r0)
+  #6 0.769 (8/41) Installing libidn2 (2.3.7-r0)
+  #6 0.783 (9/41) Installing nghttp2-libs (1.65.0-r0)
+  #6 0.792 (10/41) Installing libpsl (0.21.5-r3)
+  #6 0.800 (11/41) Installing zstd-libs (1.5.7-r0)
+  #6 0.836 (12/41) Installing libcurl (8.14.1-r1)
+  #6 0.864 (13/41) Installing curl (8.14.1-r1)
+  #6 0.878 (14/41) Installing libstdc++-dev (14.2.0-r6)
+  #6 1.291 (15/41) Installing jansson (2.14.1-r0)
+  #6 1.296 (16/41) Installing binutils (2.44-r3)
+  #6 1.581 (17/41) Installing libgomp (14.2.0-r6)
+  #6 1.596 (18/41) Installing libatomic (14.2.0-r6)
+  #6 1.600 (19/41) Installing gmp (6.3.0-r3)
+  #6 1.620 (20/41) Installing isl26 (0.26-r1)
+  #6 1.685 (21/41) Installing mpfr4 (4.2.1_p1-r0)
+  #6 1.713 (22/41) Installing mpc1 (1.3.1-r1)
+  #6 1.721 (23/41) Installing gcc (14.2.0-r6)
+  #6 6.680 (24/41) Installing musl-dev (1.2.5-r10)
+  #6 7.046 (25/41) Installing g++ (14.2.0-r6)
+  #6 8.546 (26/41) Installing libexpat (2.7.1-r0)
+  #6 8.554 (27/41) Installing pcre2 (10.43-r1)
+  #6 8.578 (28/41) Installing git (2.49.1-r0)
+  #6 8.801 (29/41) Installing git-init-template (2.49.1-r0)
+  #6 8.805 (30/41) Installing make (4.4.1-r3)
+  #6 8.817 (31/41) Installing libbz2 (1.0.8-r6)
+  #6 8.822 (32/41) Installing libffi (3.4.8-r0)
+  #6 8.826 (33/41) Installing gdbm (1.24-r0)
+  #6 8.833 (34/41) Installing xz-libs (5.8.1-r0)
+  #6 8.848 (35/41) Installing mpdecimal (4.0.1-r0)
+  #6 8.858 (36/41) Installing libpanelw (6.5_p20250503-r0)
+  #6 8.862 (37/41) Installing sqlite-libs (3.49.2-r1)
+  #6 8.938 (38/41) Installing python3 (3.12.11-r0)
+  #6 9.589 (39/41) Installing python3-pycache-pyc0 (3.12.11-r0)
+  #6 10.04 (40/41) Installing pyc (3.12.11-r0)
+  #6 10.04 (41/41) Installing python3-pyc (3.12.11-r0)
+  #6 10.04 Executing busybox-1.37.0-r18.trigger
+  #6 10.05 OK: 283 MiB in 59 packages
+  #6 DONE 11.1s
+  #7 [ 3/19] WORKDIR /app
+  #7 DONE 0.0s
+  #8 [ 4/19] COPY package*.json ./
+  #8 DONE 0.0s
+  #9 [ 5/19] RUN npm ci
+  #9 4.226 
+  #9 4.226 > github-readme-stats@1.0.0 prepare
+  #9 4.226 > husky
+  #9 4.226 
+  #9 4.269 .git can't be found
+  #9 4.290 added 592 packages, and audited 593 packages in 4s
+  #9 4.290 
+  #9 4.290 95 packages are looking for funding
+  #9 4.290   run `npm fund` for details
+  #9 4.294 
+  #9 4.294 3 vulnerabilities (1 low, 2 moderate)
+  #9 4.294 
+  #9 4.294 To address all issues, run:
+  #9 4.294   npm audit fix
+  #9 4.294 
+  #9 4.294 Run `npm audit` for details.
+  #9 4.295 npm notice
+  #9 4.295 npm notice New major version of npm available! 10.9.3 -> 11.5.2
+  #9 4.295 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.5.2
+  #9 4.295 npm notice To update run: npm install -g npm@11.5.2
+  #9 4.295 npm notice
+  #9 DONE 4.8s
+  #10 [ 6/19] COPY . .
+  #10 DONE 0.0s
+  #11 [ 7/19] RUN npm run prepare || true
+  #11 0.333 
+  #11 0.333 > github-readme-stats@1.0.0 prepare
+  #11 0.333 > husky
+  #11 0.333 
+  #11 DONE 0.4s
+  #12 [ 8/19] RUN npm i -g vercel
+  #12 6.755 npm warn deprecated path-match@1.2.4: This package is archived and no longer maintained. For support, visit https://github.com/expressjs/express/discussions
+  #12 7.709 
+  #12 7.709 added 238 packages in 7s
+  #12 7.709 
+  #12 7.709 26 packages are looking for funding
+  #12 7.709   run `npm fund` for details
+  #12 DONE 8.4s
+  #13 [ 9/19] RUN echo 'PAT_1=your_github_token_here' > .env &&     echo 'CACHE_SECONDS=1800' >> .env
+  #13 DONE 0.2s
+  #14 [10/19] RUN echo 'PAT_1=your_github_token_here' > .env.example &&     echo 'CACHE_SECONDS=1800' >> .env.example
+  #14 DONE 0.4s
+  #15 [11/19] RUN if [ ! -f jest.config.js ]; then     echo "module.exports = { testEnvironment: 'jsdom' };" > jest.config.js;     fi
+  #15 DONE 0.4s
+  #16 [12/19] RUN if [ ! -f jest.e2e.config.js ]; then     echo "module.exports = { ...require('./jest.config.js'), testMatch: ['**/*.e2e.test.js'] };" > jest.e2e.config.js;     fi
+  #16 DONE 0.4s
+  #17 [13/19] RUN if [ ! -f jest.bench.config.js ]; then     echo "module.exports = { ...require('./jest.config.js'), testMatch: ['**/*.bench.js'] };" > jest.bench.config.js;     fi
+  #17 DONE 0.4s
+  #18 [14/19] RUN if [ ! -f express.js ]; then     echo "const express = require('express');" > express.js &&     echo "const app = express();" >> express.js &&     echo "const port = process.env.PORT || 3000;" >> express.js &&     echo "" >> express.js &&     echo "app.use('/api', require('./api/index'));" >> express.js &&     echo "app.use('/api/pin', require('./api/pin'));" >> express.js &&     echo "app.use('/api/gist', require('./api/gist'));" >> express.js &&     echo "app.use('/api/top-langs', require('./api/top-langs'));" >> express.js &&     echo "app.use('/api/wakatime', require('./api/wakatime'));" >> express.js &&     echo "" >> express.js &&     echo "app.listen(port, () => {" >> express.js &&     echo "  console.log(\`Server running on port ${port}\`);" >> express.js &&     echo "});" >> express.js;     fi
+  #18 DONE 0.4s
+  #19 [15/19] RUN npm install express
+  #19 4.079 
+  #19 4.079 added 53 packages, and audited 646 packages in 4s
+  #19 4.079 
+  #19 4.079 104 packages are looking for funding
+  #19 4.079   run `npm fund` for details
+  #19 4.083 
+  #19 4.083 3 vulnerabilities (1 low, 2 moderate)
+  #19 4.083 
+  #19 4.083 To address all issues, run:
+  #19 4.083   npm audit fix
+  #19 4.083 
+  #19 4.083 Run `npm audit` for details.
+  #19 DONE 4.2s
+  #20 [16/19] RUN if [ ! -f .prettierrc ]; then     echo '{"semi": true, "singleQuote": false}' > .prettierrc;     fi
+  #20 DONE 0.3s
+  #21 [17/19] RUN if [ ! -f .eslintrc.js ]; then     echo "module.exports = { extends: ['eslint:recommended'] };" > .eslintrc.js;     fi
+  #21 DONE 0.4s
+  #22 [18/19] RUN if [ ! -f .gitignore ] || ! grep -q "^\.env$" .gitignore; then     echo ".env" >> .gitignore;     fi
+  #22 DONE 0.3s
+  #23 [19/19] RUN if [ ! -f docker-compose.yml ]; then     echo "version: '3.8'" > docker-compose.yml &&     echo "services:" >> docker-compose.yml &&     echo "  app:" >> docker-compose.yml &&     echo "    build: ." >> docker-compose.yml &&     echo "    ports:" >> docker-compose.yml &&     echo "      - '3000:3000'" >> docker-compose.yml &&     echo "    env_file:" >> docker-compose.yml &&     echo "      - .env" >> docker-compose.yml &&     echo "    deploy:" >> docker-compose.yml &&     echo "      resources:" >> docker-compose.yml &&     echo "        limits:" >> docker-compose.yml &&     echo "          memory: 512M" >> docker-compose.yml &&     echo "          cpus: '0.5'" >> docker-compose.yml;     fi
+  #23 DONE 0.4s
+  #24 exporting to image
+  #24 exporting layers
+  #24 exporting layers 2.3s done
+  #24 writing image sha256:53541537fb7a8948093fd5890b1bcfd83aa002177b5d0a680259170b74bc5b72 done
+  #24 naming to docker.io/library/envgym_test_1756822467 done
+  #24 DONE 2.3s
+  === Runtime Log ===  
+  Runtime Status: Success
+  Runtime Output:
+  Runtime Error:
+  === Execution End ===
+DOCKERFILE:
+  FROM --platform=linux/amd64 node:22-alpine
+  RUN apk add --no-cache \
+      git \
+      bash \
+      python3 \
+      make \
+      g++ \
+      curl
+  WORKDIR /app
+  COPY package*.json ./
+  RUN npm ci
+  COPY . .
+  RUN npm run prepare || true
+  RUN npm i -g vercel
+  RUN echo 'PAT_1=your_github_token_here' > .env && \
+      echo 'CACHE_SECONDS=1800' >> .env
+  RUN echo 'PAT_1=your_github_token_here' > .env.example && \
+      echo 'CACHE_SECONDS=1800' >> .env.example
+  RUN if [ ! -f jest.config.js ]; then \
+      echo "module.exports = { testEnvironment: 'jsdom' };" > jest.config.js; \
+      fi
+  RUN if [ ! -f jest.e2e.config.js ]; then \
+      echo "module.exports = { ...require('./jest.config.js'), testMatch: ['**/*.e2e.test.js'] };" > jest.e2e.config.js; \
+      fi
+  RUN if [ ! -f jest.bench.config.js ]; then \
+      echo "module.exports = { ...require('./jest.config.js'), testMatch: ['**/*.bench.js'] };" > jest.bench.config.js; \
+      fi
+  RUN if [ ! -f express.js ]; then \
+      echo "const express = require('express');" > express.js && \
+      echo "const app = express();" >> express.js && \
+      echo "const port = process.env.PORT || 3000;" >> express.js && \
+      echo "" >> express.js && \
+      echo "app.use('/api', require('./api/index'));" >> express.js && \
+      echo "app.use('/api/pin', require('./api/pin'));" >> express.js && \
+      echo "app.use('/api/gist', require('./api/gist'));" >> express.js && \
+      echo "app.use('/api/top-langs', require('./api/top-langs'));" >> express.js && \
+      echo "app.use('/api/wakatime', require('./api/wakatime'));" >> express.js && \
+      echo "" >> express.js && \
+      echo "app.listen(port, () => {" >> express.js && \
+      echo "  console.log(\`Server running on port \${port}\`);" >> express.js && \
+      echo "});" >> express.js; \
+      fi
+  RUN npm install express
+  RUN if [ ! -f .prettierrc ]; then \
+      echo '{"semi": true, "singleQuote": false}' > .prettierrc; \
+      fi
+  RUN if [ ! -f .eslintrc.js ]; then \
+      echo "module.exports = { extends: ['eslint:recommended'] };" > .eslintrc.js; \
+      fi
+  RUN if [ ! -f .gitignore ] || ! grep -q "^\.env$" .gitignore; then \
+      echo ".env" >> .gitignore; \
+      fi
+  RUN if [ ! -f docker-compose.yml ]; then \
+      echo "version: '3.8'" > docker-compose.yml && \
+      echo "services:" >> docker-compose.yml && \
+      echo "  app:" >> docker-compose.yml && \
+      echo "    build: ." >> docker-compose.yml && \
+      echo "    ports:" >> docker-compose.yml && \
+      echo "      - '3000:3000'" >> docker-compose.yml && \
+      echo "    env_file:" >> docker-compose.yml && \
+      echo "      - .env" >> docker-compose.yml && \
+      echo "    deploy:" >> docker-compose.yml && \
+      echo "      resources:" >> docker-compose.yml && \
+      echo "        limits:" >> docker-compose.yml && \
+      echo "          memory: 512M" >> docker-compose.yml && \
+      echo "          cpus: '0.5'" >> docker-compose.yml; \
+      fi
+  EXPOSE 3000
+  ENV NODE_ENV=development
+  CMD ["/bin/bash"]
+--- End of Iteration 1 ---
+

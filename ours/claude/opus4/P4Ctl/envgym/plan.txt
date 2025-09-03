@@ -1,0 +1,215 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.7 (exact version for compatibility)
+   - Tofino Switch SDE 9.7.0 (from Intel/Barefoot Networks)
+   - BCC (BPF Compiler Collection) for Linux 5.15.0
+   - Bison 3.8.2 (parser generator)
+   - Flex 2.6.4 (lexical analyzer)
+   - Make (GNU Make 4.2.1 or higher)
+   - GCC/G++ (GNU Compiler Collection with C++11 support)
+   - Scapy 2.4.5 (Python packet manipulation library)
+   - Docker images: ubuntu:20.04 (for containerized host environments)
+   - ncat (netcat) utility for testing
+   - Git for repository cloning
+   - libfl-dev (Flex library development files)
+
+2. FILES TO CREATE:
+   - ~/.bashrc additions:
+     ```
+     export SDE=/home/cc/EnvGym/data/P4Ctl/bf-sde-9.7.0/
+     export SDE_INSTALL=/home/cc/EnvGym/data/P4Ctl/bf-sde-9.7.0/install
+     export P4CTL_HOME=/home/cc/EnvGym/data/P4Ctl
+     ```
+   - Docker Compose file (docker-compose.yml) for three host containers:
+     - Host1 container configuration (10.0.0.1)
+     - Host2 container configuration (10.0.0.2)
+     - Host3 container configuration (10.0.0.3)
+   - Dockerfile for host environments based on ubuntu:20.04
+   - Switch port configuration file for Tofino
+   - Python virtual environment configuration file (requirements.txt)
+   - NetCL policy rules file (netcl_rules.ncl)
+   - Compiled NetCL rules output file (compiled_rules.out)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - test_p4_program_compilation.py - Verify P4 program compiles without errors
+   - test_switch_controller_connection.py - Test control plane connectivity to switch
+   - test_ebpf_agent_loading.py - Verify eBPF programs load correctly
+   - test_host_labeling.py - Test DIFC label assignment to hosts
+   - test_cross_host_blocking.py - Verify Host1 to Host3 traffic blocking
+   - test_allowed_traffic.py - Ensure Host1 to Host2 traffic passes
+   - test_netcl_compilation.py - Test NetCL rule compilation
+   - test_netcl_compiler_rebuild.py - Test NetCL compiler rebuild process
+   - test_custom_packet_tools.py - Verify custom Scapy tools functionality
+   - test_pid_labeling.py - Test manual PID labeling feature
+   - test_stepping_stone_detection.py - Verify attack chain detection
+   - test_netcl_compiler_binary.py - Test netcl-compile binary generation
+
+4. COMPLETE TODO LIST:
+   - Change to working directory: `cd /home/cc/EnvGym/data/P4Ctl`
+   - Create Dockerfile for host containers:
+     ```dockerfile
+     FROM ubuntu:20.04
+     RUN apt-get update && apt-get install -y \
+         python3.7 python3.7-dev python3.7-venv \
+         build-essential git cmake make gcc g++ \
+         libfl-dev bpfcc-tools linux-headers-generic \
+         libbpfcc-dev python3-bpfcc ncat iproute2 iputils-ping
+     ```
+   - Create docker-compose.yml for three-host network:
+     ```yaml
+     version: '3.8'
+     services:
+       host1:
+         build: .
+         container_name: p4ctl_host1
+         networks:
+           p4net:
+             ipv4_address: 10.0.0.1
+         privileged: true
+       host2:
+         build: .
+         container_name: p4ctl_host2
+         networks:
+           p4net:
+             ipv4_address: 10.0.0.2
+         privileged: true
+       host3:
+         build: .
+         container_name: p4ctl_host3
+         networks:
+           p4net:
+             ipv4_address: 10.0.0.3
+         privileged: true
+     networks:
+       p4net:
+         driver: bridge
+         ipam:
+           config:
+             - subnet: 10.0.0.0/24
+     ```
+   - Build and start Docker containers: `docker-compose up -d`
+   - Install Python 3.7 on host system:
+     ```
+     sudo apt install python3.7 python3.7-dev python3.7-venv
+     sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
+     ```
+   - Install build dependencies on host:
+     ```
+     sudo apt install build-essential git cmake make gcc g++
+     sudo apt install libfl-dev
+     ```
+   - Install Bison 3.8.2 in working directory:
+     ```
+     cd /home/cc/EnvGym/data/P4Ctl
+     wget https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.gz
+     tar -xzf bison-3.8.2.tar.gz
+     cd bison-3.8.2 && ./configure --prefix=/home/cc/EnvGym/data/P4Ctl/tools && make && make install
+     export PATH=/home/cc/EnvGym/data/P4Ctl/tools/bin:$PATH
+     ```
+   - Install Flex 2.6.4 in working directory:
+     ```
+     cd /home/cc/EnvGym/data/P4Ctl
+     wget https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz
+     tar -xzf flex-2.6.4.tar.gz
+     cd flex-2.6.4 && ./configure --prefix=/home/cc/EnvGym/data/P4Ctl/tools && make && make install
+     ```
+   - Install BCC for kernel 5.15.0:
+     ```
+     sudo apt install bpfcc-tools linux-headers-$(uname -r)
+     sudo apt install libbpfcc-dev python3-bpfcc
+     ```
+   - Create Python virtual environment in working directory:
+     ```
+     cd /home/cc/EnvGym/data/P4Ctl
+     python3.7 -m venv p4control-env
+     source p4control-env/bin/activate
+     ```
+   - Install Scapy 2.4.5:
+     ```
+     pip install scapy==2.4.5
+     ```
+   - Download and install Tofino SDE 9.7.0 to /home/cc/EnvGym/data/P4Ctl/bf-sde-9.7.0
+   - Set environment variables in ~/.bashrc and source it
+   - Clone P4Control repository to working directory:
+     ```
+     cd /home/cc/EnvGym/data/P4Ctl
+     git clone [repository_url] P4Control
+     cd P4Control
+     ```
+   - Verify compiler prerequisites:
+     ```
+     /home/cc/EnvGym/data/P4Ctl/tools/bin/bison --version  # Should show 3.8.2
+     /home/cc/EnvGym/data/P4Ctl/tools/bin/flex --version   # Should show 2.6.4
+     g++ --version    # Should support C++11
+     ```
+   - Build NetCL compiler with custom tool paths:
+     ```
+     cd compiler
+     export PATH=/home/cc/EnvGym/data/P4Ctl/tools/bin:$PATH
+     make clean
+     make netcl
+     cd ..
+     ```
+   - Verify NetCL compiler built successfully:
+     ```
+     ls -la compiler/netcl-compile  # Check binary exists
+     ./compiler/netcl-compile --help
+     ```
+   - Verify Docker network connectivity: `docker exec p4ctl_host1 ping 10.0.0.2`
+   - Install ncat in all containers: `docker exec -it p4ctl_host[1-3] apt install ncat`
+   - Build P4 program: `./p4_build.sh -p switch/p4control.p4`
+   - Verify build success by checking for output files
+   - Start Tofino switch daemon: `./run_switchd.sh -p p4control`
+   - Verify switch is running: check process and logs
+   - Update interface name in host_agent/host_agent.py for container environments
+   - Get current bash PID in container: `docker exec -it p4ctl_host1 bash -c 'echo $$'`
+   - Update TAGGED_TERMINAL in host_agent/host_agent_ebpf.c
+   - Start control plane: `python3 switch/controller.py`
+   - Verify NetCL policies loaded: check controller output
+   - Run host agent in all three containers:
+     ```
+     docker exec -it p4ctl_host1 python3 /home/cc/EnvGym/data/P4Ctl/P4Control/host_agent/host_agent.py
+     docker exec -it p4ctl_host2 python3 /home/cc/EnvGym/data/P4Ctl/P4Control/host_agent/host_agent.py
+     docker exec -it p4ctl_host3 python3 /home/cc/EnvGym/data/P4Ctl/P4Control/host_agent/host_agent.py
+     ```
+   - Verify eBPF programs attached: `docker exec -it p4ctl_host1 bpftool prog list`
+   - Test basic connectivity between containers
+   - Set up ncat listeners in containers:
+     ```
+     docker exec -it p4ctl_host2 ncat -nlvp 9999 -e /bin/bash
+     docker exec -it p4ctl_host3 ncat -nlvp 9999 -e /bin/bash
+     ```
+   - Test cross-host attack scenario from Host1 container
+   - Verify attack blocked between Host1 and Host3
+   - Create test NetCL rules file in /home/cc/EnvGym/data/P4Ctl/P4Control
+   - Compile NetCL rules: `./compiler/netcl-compile -i netcl_rules.ncl -o compiled_rules.out`
+   - Update switch/netcl.py with compiled rules
+   - Restart control plane to load new rules
+   - Test NetCL compiler rebuild after modifications:
+     ```
+     cd /home/cc/EnvGym/data/P4Ctl/P4Control/compiler
+     export PATH=/home/cc/EnvGym/data/P4Ctl/tools/bin:$PATH
+     # Make test modification to compiler source (netcl.y or netcl.l)
+     make clean
+     make netcl
+     # Verify rebuilt compiler works
+     ./netcl-compile --help
+     cd ..
+     ```
+   - Test custom packet tools in containers:
+     - Run receiver: `docker exec -it p4ctl_host2 python3 custom-receive.py`
+     - Send test packet: `docker exec -it p4ctl_host1 python3 custom-send.py 10.0.0.2 HOST1 tracker1 "test message"`
+   - Verify compiler intermediate files are cleaned:
+     ```
+     cd /home/cc/EnvGym/data/P4Ctl/P4Control/compiler
+     make clean
+     ls -la  # Should not see netcl.tab.c, netcl.tab.h, lex.yy.c
+     cd ..
+     ```
+   - Create backup of working configuration:
+     ```
+     cd /home/cc/EnvGym/data/P4Ctl
+     tar -czf p4control-backup-$(date +%Y%m%d).tar.gz P4Control/ bf-sde-9.7.0/ tools/
+     ```
+   - Document any issues or modifications needed

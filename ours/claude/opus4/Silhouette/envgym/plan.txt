@@ -1,0 +1,177 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Git (latest version)
+   - Python 3.10.x with pip3
+   - Python packages via pip3: pymemcache, memcache, psutil, pytz, qemu.qmp, intervaltree, aenum, netifaces, prettytable, tqdm, numpy, matplotlib
+   - QEMU with KVM support (qemu-system-x86_64 package - optimized for x86_64 architecture)
+   - Ubuntu 20.04 packages (adjusted for base image compatibility):
+     * build-essential
+     * libssl-dev
+     * zlib1g-dev
+     * libbz2-dev
+     * libreadline-dev
+     * libsqlite3-dev
+     * curl
+     * libncursesw5-dev
+     * xz-utils
+     * tk-dev
+     * libxml2-dev
+     * libxmlsec1-dev
+     * libffi-dev
+     * liblzma-dev
+     * linux-headers-generic (for kernel module building in container environment)
+   - LLVM 15 toolchain (llvm-15, llvm-15-dev, llvm-15-tools)
+   - Clang/Clang++ 15 (clang-15, libclang-15-dev, clang-tools-15)
+   - CMake (for building LLVM passes)
+   - Make (included in build-essential)
+   - Memcached server
+   - Silhouette repository from GitHub (https://github.com/iaoing/Silhouette.git)
+   - Guest VM image from Zenodo (~30GB): silhouette_guest_vm.qcow2
+   - SSH client with key authentication support
+   - nohup command utility
+   - tmux (for long-running tests)
+   - pkill command utility
+   - nc (netcat) for memcached testing
+   - opt-15 (LLVM optimizer tool for running passes)
+   - Witcher repository (reference: https://github.com/cosmoss-jigu/witcher)
+   - Giri repository (reference: https://github.com/liuml07/giri)
+   - Chipmunk repository (reference: https://github.com/utsaslab/chipmunk)
+   - Vinter repository (reference: https://github.com/KIT-OSGroup/vinter/tree/master)
+   - CrashMonkey repository (reference: https://github.com/utsaslab/crashmonkey)
+   - JieweiWei/md5 repository (reference: https://github.com/JieweiWei/md5)
+   - NOVA-fortis file system source code (for bug reproduction)
+   - NOVA file system repository (https://github.com/NVSL/linux-nova)
+   - NOVA-chipmunk repository with disabled bugs (thirdPart/nova-chipmunk-disable-chipmunk-bugs)
+   - PMFS-new repository (https://github.com/NVSL/PMFS-new)
+   - PMFS-chipmunk repository with disabled bugs (thirdPart/pmfs-chipmunk-disable-chipmunk-bugs)
+   - WineFS repository (https://github.com/utsaslab/WineFS)
+   - Linux kernel 4.15 source code (for PMFS compatibility)
+   - Kernel configuration tools for enabling CONFIG_BLK_DEV_PMEM
+
+2. FILES TO CREATE:
+   - /home/cc/EnvGym/data/Silhouette/silhouette_ae/ (main working directory - adjusted path)
+   - /home/cc/EnvGym/data/Silhouette/silhouette_ae/qemu_imgs/ (VM image storage directory - requires ~30GB free space)
+   - ~/.ssh/config (SSH configuration, may need modification)
+   - nohup.out files in various test directories
+   - result/ directories under each test subdirectory
+   - Configuration modifications in codebase/scripts/fs_conf/ if using non-standard paths
+   - Potential modifications to codebase/scripts/vm_mgr/vm_instance.py for container-based KVM systems
+   - codebase/tools/disk_content/.gitignore (with content: xx.* and DumpDiskContent)
+   - codebase/tools/disk_content/disk_content.so (compiled library for x86_64)
+   - codebase/tools/disk_content/DumpDiskContent (compiled binary for x86_64)
+   - codebase/tools/disk_content/xx.* (temporary files generated during disk content analysis)
+   - codebase/tools/md5/.gitignore (with content: *.slo, *.lo, *.o, *.obj, *.gch, *.pch, *.so, *.dylib, *.dll, *.mod, *.lai, *.la, *.a, *.lib, *.exe, *.out, *.app)
+   - codebase/tools/md5/md5.so (compiled library for x86_64)
+   - codebase/tools/md5/README.md (already present in repository)
+   - codebase/tools/md5/md5.h (header file from JieweiWei/md5)
+   - codebase/tools/md5/md5.cpp (implementation file from JieweiWei/md5)
+   - codebase/tools/src_info/.gitignore (with content: DumpSrcAnnot and xx.*)
+   - codebase/tools/src_info/*.so (LLVM pass libraries for x86_64)
+   - codebase/tools/src_info/DumpSrcInfo (compiled Clang tool binary for x86_64)
+   - codebase/tools/src_info/DumpSrcAnnot (compiled Clang tool binary for source annotation)
+   - codebase/tools/src_info/xx.* (temporary files generated during source analysis)
+   - codebase/tools/struct_layout_ast/.gitignore (with content: DumpStructInfo)
+   - codebase/tools/struct_layout_ast/*.so (AST tool libraries for x86_64)
+   - codebase/tools/struct_layout_ast/DumpStructLayout (compiled Clang tool binary for x86_64)
+   - codebase/tools/struct_layout_ast/DumpStructInfo (compiled Clang tool binary for structure information)
+   - codebase/tools/struct_layout_pass/*.so (LLVM pass libraries for x86_64)
+   - codebase/trace/build-llvm15/*.so (instrumentation pass libraries for PM operation tracing)
+   - codebase/trace/README.md (already present in repository)
+   - codebase/trace/test/tracing_annot/.gitignore (with content: test_traceing_annot)
+   - codebase/trace/test/tracing_annot/test_traceing_annot (compiled test binary for tracing annotation)
+   - codebase/workload/ace/tests/generated test cases
+   - codebase/workload/ace/README.md (already present in repository)
+   - codebase/workload/ace/*.j (j-lang files generated by ace.py)
+   - codebase/workload/ace/seq_*/seq*.j (j-lang sequence files)
+   - codebase/workload/ace/seq_*/seq*.cpp (C++ files generated from j-lang)
+   - codebase/workload/ace/seq_*/seq* (compiled executables for x86_64)
+   - codebase/workload/ace/ace binary (ACE main executable for x86_64)
+   - codebase/workload/ace/ace/.gitignore (with content: __pycache__* and *.log)
+   - codebase/workload/ace/ace/__pycache__/ (Python cache directory, automatically generated)
+   - codebase/workload/ace/ace/*.log (log files generated during ACE execution)
+   - Memcached lock files and data entries
+   - codebase/scripts/fs_conf/sshkey/fast25_ae_vm (SSH private key with 600 permissions)
+   - codebase/scripts/fs_conf/sshkey/fast25_ae_vm.pub (SSH public key with 644 permissions)
+   - .gitignore file (already present in repository)
+   - .gitmodules file (already present in repository, empty)
+   - xx.posix.func.info files (POSIX function dumps from src_info)
+   - xx.func.info files (all function dumps from src_info)
+   - xx.struct.info files (structure name dumps from src_info)
+   - xx.struct.layout files (structure layout dumps from struct_layout_ast)
+   - xx.ast files (AST dumps for debugging)
+   - Intermediate .bc (bitcode) files for struct_layout_pass
+   - PM operation trace files generated by instrumentation passes
+   - Instrumented bitcode files for PM operation tracing
+   - evaluation/bugs/readme.md (already present in repository)
+   - evaluation/bugs/bug*/readme.md (bug report files for each bug)
+   - evaluation/bugs/bug*/result/ (result directories for each bug reproduction)
+   - evaluation/bugs/reproduce_all.sh (script to reproduce all bugs)
+   - evaluation/bugs/disable_all_bugs.sh (script to disable all bugs)
+   - evaluation/bugs/cleanup_all.sh (script to clean up all results)
+   - evaluation/cleanup_for_testing.sh (cleanup script for running tests)
+   - evaluation/bugs/bug*/run.sh (individual bug reproduction scripts)
+   - evaluation/bugs/bug*/clean_up.sh (individual bug cleanup scripts)
+   - evaluation/bugs/bug*/seq1_11func_bin/j-lang* (test cases for bugs)
+   - mech_repl_reason configuration files (for handling false positives)
+   - evaluation/bugs/bug1/result/result_validation/cannot_write/nova_link-1.txt (crash plan result files)
+   - evaluation/bugs/bug2/result/result_validation/mismatch_both_oracle/nova_symlink-1.txt (crash plan result files)
+   - evaluation/bugs/bug3/result/result_validation/mismatch_old_value/nova_fallocate-6.txt (crash plan result files)
+   - evaluation/bugs/bug3/result/result_details/j-lang4_20_nova_fallocate.txt (store sequence details)
+   - evaluation/bugs/bug4/result/result_validation/mismatch_both_oracle/nova_notify_change-1.txt (crash plan result files)
+   - evaluation/bugs/bug5/result/result_validation/semantic_bug_diff_dot_ino/nova_mkdir-1.txt (crash plan result files)
+   - evaluation/bugs/bug6/result/result_validation/mismatch_both_oracle/nova_unlink-1.txt (crash plan result files)
+   - evaluation/bugs/bug6/readme.md (already present in repository)
+   - evaluation/bugs/bug6/run.sh (bug 6 reproduction script)
+   - evaluation/bugs/bug6/clean_up.sh (bug 6 cleanup script)
+   - evaluation/bugs/bug7/readme.md (already present in repository)
+   - evaluation/bugs/bug7/run.sh (bug 7 reproduction script)
+   - evaluation/bugs/bug7/clean_up.sh (bug 7 cleanup script)
+   - evaluation/bugs/bug7/result/result_validation/get_prev_oracle_remount_failed/nova_lookup-1.txt (crash plan result files)
+   - evaluation/bugs/bug8/readme.md (already present in repository)
+   - evaluation/bugs/bug8/run.sh (bug 8 reproduction script)
+   - evaluation/bugs/bug8/clean_up.sh (bug 8 cleanup script)
+   - evaluation/bugs/bug8/result/result_tracing/syslog_error/case_2.sh.txt (syslog error output files)
+   - evaluation/bugs/bug9/readme.md (already present in repository)
+   - evaluation/bugs/bug9/run.sh (bug 9 reproduction script)
+   - evaluation/bugs/bug9/clean_up.sh (bug 9 cleanup script)
+   - evaluation/bugs/bug9/result/result_validation/cannot_write/nova_put_super-1.txt (crash plan result files)
+   - evaluation/bugs/bug10/readme.md (already present in repository)
+   - evaluation/bugs/bug10/run.sh (bug 10 reproduction script)
+   - evaluation/bugs/bug10/clean_up.sh (bug 10 cleanup script)
+   - evaluation/bugs/bug10/result/result_tracing/unknown_stat_error/case_2.sh.txt (kernel crash dump files)
+   - evaluation/bugs/bug11/readme.md (already present in repository)
+   - evaluation/bugs/bug11/run.sh (bug 11 reproduction script)
+   - evaluation/bugs/bug11/clean_up.sh (bug 11 cleanup script)
+   - evaluation/bugs/bug11/result/result_validation/get_post_oracle_remount_failed/nova_put_super-1.txt (crash plan result files)
+   - evaluation/bugs/bug12/readme.md (already present in repository)
+   - evaluation/bugs/bug12/run.sh (bug 12 reproduction script)
+   - evaluation/bugs/bug12/clean_up.sh (bug 12 cleanup script)
+   - evaluation/bugs/bug12/result/result_validation/semantic_bug_file_size_after_append/pmfs_xip_file_write-1.txt (crash plan result files)
+   - evaluation/bugs/bug13/readme.md (already present in repository)
+   - evaluation/bugs/bug13/run.sh (bug 13 reproduction script)
+   - evaluation/bugs/bug13/clean_up.sh (bug 13 cleanup script)
+   - evaluation/bugs/bug13/result/result_validation/mismatch_both_oracle/pmfs_create-1.txt (crash plan result files)
+   - evaluation/bugs/bug14/readme.md (already present in repository)
+   - evaluation/bugs/bug14/run.sh (bug 14 reproduction script)
+   - evaluation/bugs/bug14/clean_up.sh (bug 14 cleanup script)
+   - evaluation/bugs/bug14/result/result_validation/mismatch_old_value/nova_create-1.txt (crash plan result files)
+   - thirdPart/nova-chipmunk-disable-chipmunk-bugs/ (NOVA source with disabled bugs)
+   - thirdPart/pmfs-chipmunk-disable-chipmunk-bugs/README.md (already present in repository)
+   - thirdPart/pmfs-chipmunk-disable-chipmunk-bugs/Makefile (PMFS kernel module makefile)
+   - thirdPart/pmfs-chipmunk-disable-chipmunk-bugs/pmfs.ko (compiled PMFS kernel module for x86_64)
+   - thirdPart/pmfs-chipmunk-disable-chipmunk-bugs/setup-pmfs.sh (PMFS setup script)
+   - thirdPart/pmfs-chipmunk-disable-chipmunk-bugs/remount-pmfs.sh (PMFS remount script)
+   - env_base.py (environment configuration file referenced by run.sh - adjusted for container paths)
+   - evaluation/scalability/readme.md (already present in repository)
+   - evaluation/scalability/seq1/cleanup_all.sh (cleanup script for seq1 workload)
+   - evaluation/scalability/seq1/run_all.sh (run script for seq1 workload)
+   - evaluation/scalability/seq1/plot.sh (plot script for seq1 workload)
+   - evaluation/scalability/seq1/figure_1.pdf (generated figure for seq1 results)
+   - evaluation/scalability/seq1/table_9.txt (generated table for seq1 results)
+   - evaluation/scalability/seq2/cleanup_all.sh (cleanup script for seq2 workload)
+   - evaluation/scalability/seq2/run_all.sh (run script for seq2 workload)
+   - evaluation/scalability/seq2/plot.sh (plot script for seq2 workload)
+   - evaluation/scalability/seq2/figure_1.pdf (generated figure for seq2 results)
+   - evaluation/scalability/seq2/table_9.txt (generated table for seq2 results)
+   - evaluation/scalability/seq3/cleanup

@@ -1,0 +1,213 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - CMake (version 3.8 or higher, preferably 3.28+ for module support, 3.10.0+ for Android builds, 3.15.0+ for modern CUDA handling - **CUDA support not needed**, 3.26.0 for Vagrant VM)
+   - Bazel (version 8.1.1 specifically, as per .bazelversion file)
+   - Bazelisk (recommended for managing Bazel versions - will automatically use 8.1.1)
+   - rules_cc (Bazel C++ rules, automatically managed by Bazel)
+   - C++ compiler with C++11 support minimum (C++14 required for fuzzing):
+     - GCC 4.9+ (test with 4.9, 11, 13) - **x86_64 architecture**
+     - Clang 8+ (minimum for fuzzing support, test with 8, 11, 14) - **x86_64 architecture**
+     - MSVC 2015+ (Visual Studio 2019 with v142 toolset, Visual Studio 2022 with v143 toolset) - **not needed for Linux environment**
+     - MinGW-w64 (via MSYS2 for Windows) - **not needed for Linux environment**
+     - Xcode 14.3+ (for macOS 13 and 14) - **not needed for Linux environment**
+   - Git (latest stable version)
+   - GitHub CLI (gh) or web browser for GitHub integration
+   - Python 3.6+ (for running benchmarks, tests, and mkdocs)
+   - libc++ and libc++abi (for Clang stdlib tests)
+   - libatomic1, libc6-dev, libgomp1, libitm1, libmpc3 (for GCC 4.9)
+   - libtinfo5 (for Clang 3.6)
+   - locales-all (for locale testing)
+   - ~~MSYS2 (for MinGW testing on Windows)~~ - **not needed for Linux environment**
+   - ~~Windows SDK (for Windows builds)~~ - **not needed for Linux environment**
+   - pkg-config (for generating and testing .pc files)
+   - Android NDK (version 21.3.6528147 specifically for Android builds) - **x86_64 compatible version**
+   - Android SDK (with compileSdkVersion 25) - **x86_64 compatible version**
+   - Gradle (version 6.1 or higher for Android Gradle Plugin 4.1.1)
+   - Java Development Kit (JDK 8+ for Gradle) - **x86_64 architecture**
+   - Android Gradle Plugin (version 4.1.1)
+   - MkDocs (required for documentation generation)
+   - mkdocs-material theme (for documentation styling)
+   - mkdocstrings[python-legacy] (for C++ API documentation extraction)
+   - pymdownx (Python-Markdown extensions for MkDocs)
+   - highlight.js (version 10.7.2, loaded via CDN)
+   - mike (for MkDocs versioning support)
+   - Vagrant (latest stable version for VM-based testing) - **x86_64 architecture**
+   - VMware Workstation/Fusion or VirtualBox (for Vagrant provider) - **VirtualBox recommended for Linux x86_64**
+   - vagrant-vmware-desktop plugin (if using VMware)
+   - wget (for downloading packages in Vagrant VM)
+   - make (GNU Make for building in Vagrant VM)
+   - Google Test (gtest) - included as subdirectory in test/gtest
+   - ~~CUDA Toolkit 9.0+ (required for CUDA tests if FMT_CUDA_TEST enabled, supports C++14)~~ - **not needed, no GPU available**
+   - ~~NVCC (NVIDIA CUDA Compiler, included with CUDA Toolkit)~~ - **not needed, no GPU available**
+   - Intel C++ Compiler (optional, for specific compiler testing) - **x86_64 architecture**
+   - libFuzzer (LLVM fuzzing library, included with Clang 8.0+)
+   - AddressSanitizer (ASan, included with Clang/GCC)
+   - UndefinedBehaviorSanitizer (UBSan, included with Clang/GCC)
+   - OSS-Fuzz integration tools (for cloud-based fuzzing)
+   - AFL++ (optional alternative fuzzer) - **x86_64 architecture**
+   - Valgrind (for memory error detection in fuzzing) - **x86_64 architecture**
+   - kcov (for code coverage analysis during fuzzing) - **x86_64 architecture**
+   - gdb (for debugging fuzzer crashes)
+   - pthreads library (pthread support for Google Test, auto-detected)
+   - clang-format (latest stable version, for Google C++ Style Guide compliance with custom configuration)
+   - cpplint (for Google C++ Style Guide validation)
+   - vale or similar documentation linter (for Google Developer Documentation Style Guide compliance)
+   - Optional: clang-tidy v18 (for code migration and style enforcement)
+   - Optional: Doxygen (for API documentation generation)
+   - Optional: Ninja build system (for C++20 module support with CMake 3.28+)
+   - Optional: LLD linker (for MinGW builds) - **not needed for Linux environment**
+   - CPack (included with CMake, for package generation)
+
+2. FILES TO CREATE:
+   - .gitignore - exclude build artifacts and temporary files (already exists with content)
+   - build/.gitkeep - placeholder for build directory
+   - .clang-format - code formatting rules (already exists with Google C++ Style Guide configuration, custom settings for indentation, case labels, templates, and short case statements)
+   - .clang-tidy - static analysis configuration (configured for Google C++ Style Guide compliance)
+   - CONTRIBUTING.md - contribution guidelines (already exists with content)
+   - .github/workflows/linux.yml - Linux CI configuration
+   - ~~.github/workflows/windows.yml - Windows CI configuration~~ - **optional, focus on Linux**
+   - ~~.github/workflows/macos.yml - macOS CI configuration~~ - **optional, focus on Linux**
+   - .github/dependabot.yml - Dependabot configuration for automated dependency updates (already exists with content)
+   - include/fmt/base.h - core header file with version information
+   - include/fmt/format.h - main format header
+   - include/fmt/format-inl.h - inline implementations
+   - include/fmt/args.h - argument handling
+   - include/fmt/chrono.h - date/time formatting support
+   - include/fmt/ranges.h - container formatting support
+   - include/fmt/color.h - color output support
+   - include/fmt/os.h - file operations support
+   - include/fmt/ostream.h - output stream support
+   - include/fmt/printf.h - printf-style formatting
+   - include/fmt/compile.h - compile-time format string checking
+   - include/fmt/xchar.h - extended character support
+   - include/fmt/std.h - standard library type formatting
+   - include/fmt/core.h - core functionality
+   - src/format.cc - main implementation file
+   - src/os.cc - OS-specific implementation
+   - src/fmt.cc - C++20 module source (commented out in Bazel build)
+   - test/CMakeLists.txt - test configuration (already exists with content)
+   - test/gtest/CMakeLists.txt - Google Test build configuration (already exists with content)
+   - test/gtest/gmock-gtest-all.cc - combined Google Test and Google Mock implementation
+   - test/gtest/gmock/gmock.h - Google Mock header
+   - test/gtest/gtest/gtest.h - Google Test main header
+   - test/gtest/gtest/gtest-spi.h - Google Test SPI (Subject to change Programming Interface) header
+   - test/test-main.cc - main test runner implementation
+   - test/gtest-extra.cc - additional gtest utilities
+   - test/gtest-extra.h - additional gtest utilities header
+   - test/util.cc - test utilities implementation
+   - test/mock-allocator.h - mock allocator for testing
+   - test/header-only-test.cc - header-only mode test implementation
+   - test/ranges-odr-test.cc - ODR violation test for ranges
+   - test/detect-stdfs.cc - filesystem library detection
+   - test/noexception-test.cc - exception-disabled compilation test
+   - test/perf-sanity.cc - performance sanity check
+   - test/args-test.cc - argument handling tests
+   - test/base-test.cc - base functionality tests
+   - test/assert-test.cc - assertion tests
+   - test/chrono-test.cc - date/time formatting tests
+   - test/color-test.cc - color output tests
+   - test/gtest-extra-test.cc - gtest utilities tests
+   - test/format-test.cc - core formatting tests
+   - test/format-impl-test.cc - implementation detail tests
+   - test/ostream-test.cc - output stream tests
+   - test/compile-test.cc - compile-time format string tests
+   - test/compile-fp-test.cc - compile-time floating point tests
+   - test/printf-test.cc - printf-style formatting tests
+   - test/ranges-test.cc - ranges formatting tests
+   - test/no-builtin-types-test.cc - builtin types disabled tests
+   - test/scan-test.cc - scanning functionality tests
+   - test/std-test.cc - standard library integration tests
+   - test/unicode-test.cc - Unicode support tests
+   - test/xchar-test.cc - extended character tests
+   - test/enforce-checks-test.cc - compile-time enforcement tests
+   - test/module-test.cc - C++20 module tests
+   - test/posix-mock-test.cc - POSIX API mocking tests
+   - test/os-test.cc - OS functionality tests
+   - test/compile-error-test/ - compile error test directory
+   - test/compile-error-test/CMakeLists.txt - compile error test configuration (already exists with content)
+   - test/find-package-test/ - CMake find_package test directory
+   - test/find-package-test/CMakeLists.txt - CMake find_package test configuration (already exists with content)
+   - test/find-package-test/main.cc - test main source file for find_package tests
+   - test/add-subdirectory-test/ - CMake add_subdirectory test directory
+   - test/add-subdirectory-test/CMakeLists.txt - CMake add_subdirectory test configuration (already exists with content)
+   - test/add-subdirectory-test/main.cc - test main source file for add_subdirectory tests
+   - test/static-export-test/ - static library export test directory
+   - test/static-export-test/CMakeLists.txt - static library export test configuration (already exists with content)
+   - test/static-export-test/library.cc - shared library source file for static export tests
+   - test/static-export-test/main.cc - executable source file for static export tests
+   - ~~test/cuda-test/ - CUDA integration test directory~~ - **not needed, no GPU available**
+   - ~~test/cuda-test/CMakeLists.txt - CUDA test configuration~~ - **not needed, no GPU available**
+   - ~~test/cuda-test/cuda-cpp14.cu - CUDA C++14 test source file~~ - **not needed, no GPU available**
+   - ~~test/cuda-test/cpp14.cc - Host C++14 test source file~~ - **not needed, no GPU available**
+   - test/fuzzing/CMakeLists.txt - fuzzing test configuration (already exists with content)
+   - test/fuzzing/fuzzer-common.h - common fuzzer utilities header
+   - test/fuzzing/main.cc - fuzzer main function for reproduction mode
+   - test/fuzzing/chrono-duration.cc - chrono duration fuzzing
+   - test/fuzzing/chrono-timepoint.cc - chrono timepoint fuzzing
+   - test/fuzzing/float.cc - floating point formatting fuzzing
+   - test/fuzzing/named-arg.cc - named argument fuzzing
+   - test/fuzzing/one-arg.cc - single argument fuzzing
+   - test/fuzzing/two-args.cc - two arguments fuzzing
+   - test/fuzzing/build.sh - fuzzer build helper script
+   - test/fuzzing/README.md - fuzzing documentation (already exists with content)
+   - test/fuzzing/out_chrono/.gitkeep - fuzzer output directory placeholder
+   - benchmark/CMakeLists.txt - benchmark configuration
+   - support/README - build support directory documentation (already exists with content)
+   - support/cmake/ - CMake modules directory
+   - support/cmake/fmt.pc.in - pkg-config template (already exists with content)
+   - support/cmake/fmt-config.cmake.in - CMake config template (already exists with content)
+   - support/mkdocs.yml - MkDocs configuration (already exists with content)
+   - support/bazel/MODULE.bazel - Bazel module configuration
+   - support/bazel/BUILD.bazel - Bazel build configuration (already exists)
+   - support/bazel/WORKSPACE.bazel - Bazel workspace marker file (already exists)
+   - support/bazel/.bazelrc - Bazel configuration file
+   - support/bazel/.bazelversion - Bazel version specification (content: 8.1.1)
+   - support/bazel/README.md - Bazel setup instructions (already exists with content)
+   - support/build.gradle - Android Gradle build configuration (already exists with content)
+   - support/AndroidManifest.xml - Android manifest file for Gradle build
+   - support/gradle.properties - Gradle properties configuration
+   - support/settings.gradle - Gradle settings file
+   - support/local.properties - Local Android SDK/NDK paths (gitignored)
+   - support/Vagrantfile - Vagrant VM configuration (already exists with content)
+   - doc/api.md - API reference documentation
+   - doc/index.md - Documentation home page
+   - doc/syntax.md - Format syntax documentation
+   - doc/get-started.md - Getting started guide
+   - doc/fmt.css - Documentation custom CSS styling
+   - doc/fmt.js - Documentation custom JavaScript (for highlight.js integration)
+   - doc/ChangeLog-old.md - Old changelog (excluded from docs)
+   - site/ - MkDocs build output directory (gitignored)
+   - .vagrant/ - Vagrant VM data directory (gitignored)
+   - BUILD.bazel - Root Bazel build configuration (copy from support/bazel/)
+   - MODULE.bazel - Root Bazel module configuration (copy from support/bazel/)
+   - WORKSPACE.bazel - Root Bazel workspace marker (copy from support/bazel/)
+   - .bazelversion - Root Bazel version specification (copy from support/bazel/)
+   - .cpplint.cfg - cpplint configuration for Google C++ Style Guide validation
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Basic formatting tests (format strings, positional arguments)
+   - Type safety tests (compile-time format string validation)
+   - Performance benchmarks (comparison with printf, iostream)
+   - Unicode support tests (UTF-8 handling on Linux with standard locale)
+   - Container formatting tests (ranges.h functionality)
+   - Date/time formatting tests (chrono.h functionality)
+   - Color output tests (color.h functionality)
+   - File I/O tests (os.h functionality)
+   - Thread safety tests
+   - Memory safety tests (buffer overflow prevention)
+   - Locale independence tests
+   - Header-only mode tests (with FMT_HEADER_ONLY macro)
+   - C++20 std::format compatibility tests
+   - C++23 std::print compatibility tests
+   - Printf-style formatting tests
+   - Output stream tests (ostream.h functionality)
+   - Compile-time format string tests (compile.h functionality)
+   - Extended character tests (xchar.h functionality)
+   - C++20 module tests (if FMT_MODULE enabled - note: not supported in Bazel yet)
+   - Fuzzing tests (if FMT_FUZZ enabled)
+   - Fuzzing with AddressSanitizer tests
+   - Fuzzing with UndefinedBehaviorSanitizer tests
+   - Fuzzing crash reproduction tests
+   - Fuzzing corpus management tests
+   -

@@ -1,0 +1,138 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust (version 1.88.0 - must match Verus requirement)
+   - Cargo (comes with Rust)
+   - Verus (commit 3b6b805ac86cd6640d59468341055c7fa14cff07 - updated from build.md)
+   - Git (for cloning repositories)
+   - Docker (version 28.1.1 already installed with BuildKit enabled)
+   - kubectl (Kubernetes CLI tool)
+   - kind (version 0.23.0 - for local Kubernetes cluster with StatefulSetAutoDeletePVC support)
+   - minikube (alternative to kind)
+   - Build essentials (gcc, make, cmake for Linux x86_64)
+   - Python 3.x (for build scripts and tabulate module)
+   - pip3 (Python package manager)
+   - tabulate (Python module for formatting output)
+   - Z3 theorem prover (x86_64 Linux binary for Verus)
+   - OpenSSL development libraries (libssl-dev for tungstenite dependency and kube openssl-tls feature)
+   - pkg-config (for building native dependencies)
+   - Ubuntu 20.04 base image (matching host OS for Docker controller builds and GitHub Actions)
+   - Ubuntu 22.04 (for Verus builds where required)
+   - ghcr.io/anvil-verifier/anvil/verus:latest (pre-built Verus Docker image for remote builds)
+   - ghcr.io/anvil-verifier/anvil/verus:3b6b805ac86cd6640d59468341055c7fa14cff07 (specific version Verus Docker image)
+   - wget (for downloading dependencies in Docker)
+   - unzip (for extracting archives in Docker)
+   - curl (for downloading Rust toolchain in Docker)
+   - GitHub CLI (gh) or web access (for managing GitHub Actions workflows)
+   - Docker Hub CLI or ghcr.io access (for container registry operations)
+   - Go (version ^1.20 - for installing kind on x86_64)
+   - actions/checkout@v3 (GitHub Action)
+   - actions/checkout@v4 (GitHub Action)
+   - actions/cache@v4 (GitHub Action)
+   - actions/setup-go@v5 (GitHub Action)
+   - ZooKeeper client library (version 0.8 - for e2e tests and deps_hack)
+   - ZooKeeper server (version 3.8.x - for running ZooKeeper cluster)
+   - ZooKeeper Docker image (zookeeper:3.8 - for ZooKeeper deployment)
+   - Tokio runtime (version 1.14.0 with full features - for async e2e tests and deps_hack)
+   - Tracing libraries (tracing 0.1.36, tracing-subscriber 0.3.17 - for e2e test logging and deps_hack)
+   - Warp web framework (version 0.3 with TLS features - for deps_hack)
+   - Chrono (version 0.4.19 - for date/time handling in deps_hack)
+   - Base64 (version 0.13.0 - for encoding/decoding in deps_hack)
+   - Proptest (version 1.4.0 - for property-based testing in deps_hack)
+   - Anyhow (version 1.0.71 - for error handling in deps_hack)
+   - Thiserror (version 1.0.29 - for error definitions in deps_hack)
+   - Schemars (version 0.8.6 - for JSON schema generation in deps_hack)
+   - VSCode or IntelliJ IDEA (for IDE support)
+   - Certificate generation tools (openssl or similar for certs directory)
+   - FluentBit binary (x86_64 Linux build for log aggregation)
+   - Fluent-bit Kubernetes plugin (for container log collection)
+   - RabbitMQ Docker image (for RabbitMQ deployment)
+   - RabbitMQ operator dependencies
+   - AMQP client libraries (for RabbitMQ testing)
+   - kube-rs (version 0.91.0 - for VDeployment, VReplicaSet, and ZooKeeper controllers)
+   - k8s-openapi (for VDeployment, VReplicaSet, and ZooKeeper CRD support)
+   - ZooKeeper metrics exporter (for monitoring ZooKeeper cluster)
+   - ZooKeeper CLI tools (zkCli.sh - for ZooKeeper testing and debugging)
+
+2. FILES TO CREATE:
+   - `/home/cc/EnvGym/data/anvil/.env` - Environment variables for project configuration
+   - `/home/cc/EnvGym/data/anvil/Cargo.toml` - Already exists, may need updates for k8s dependencies
+   - `/home/cc/EnvGym/data/anvil/.cargo/config.toml` - Cargo configuration for custom build settings and Verus paths
+   - `/home/cc/EnvGym/data/anvil/rust-toolchain.toml` - Specify exact Rust toolchain version (1.88.0)
+   - `/home/cc/EnvGym/data/anvil/.gitignore` - Already exists with comprehensive ignore patterns
+   - `/home/cc/EnvGym/data/anvil/Makefile` - Build automation commands
+   - `/home/cc/EnvGym/data/anvil/docker-compose.yml` - Local development environment setup
+   - `/home/cc/EnvGym/data/anvil/.vscode/settings.json` or `.idea/` - IDE configuration for Rust and Verus (note: .vscode/ is gitignored)
+   - `/home/cc/EnvGym/data/anvil/scripts/setup.sh` - Automated setup script
+   - `/home/cc/EnvGym/data/anvil/scripts/verify.sh` - Verification runner script
+   - `/home/cc/EnvGym/data/anvil/tests/integration/config.yaml` - Test configuration
+   - `/home/cc/EnvGym/data/anvil/src/deps_hack/Cargo.toml` - Already exists with kube 0.91.0 and comprehensive dependencies
+   - `/home/cc/EnvGym/data/anvil/src/deps_hack/lib.rs` - Implementation for deps_hack module
+   - `/home/cc/EnvGym/data/anvil/.verus.toml` - Verus project configuration
+   - `/home/cc/EnvGym/data/anvil/docker/ae/Dockerfile` - Already exists for artifact evaluation (ensure FROM ubuntu:20.04)
+   - `/home/cc/EnvGym/data/anvil/docker/controller/Dockerfile` - Main controller Dockerfile with APP build argument support (FROM ubuntu:20.04)
+   - `/home/cc/EnvGym/data/anvil/docker/controller/Dockerfile.local` - Already exists for local controller builds
+   - `/home/cc/EnvGym/data/anvil/docker/controller/Dockerfile.remote` - Already exists for remote controller builds using pre-built Verus image
+   - `/home/cc/EnvGym/data/anvil/docker/verus/Dockerfile` - Already exists for building custom Verus Docker image
+   - `/home/cc/EnvGym/data/anvil/.dockerignore` - Exclude unnecessary files from Docker build context
+   - `/home/cc/EnvGym/data/anvil/docker/ae/build.sh` - Docker build automation script with --platform=linux/amd64
+   - `/home/cc/EnvGym/data/anvil/docker/ae/run.sh` - Docker run automation script
+   - `/home/cc/EnvGym/data/anvil/docker/controller/build-local.sh` - Local controller Docker build script with --platform=linux/amd64
+   - `/home/cc/EnvGym/data/anvil/docker/controller/build-remote.sh` - Remote controller Docker build script using Verus image
+   - `/home/cc/EnvGym/data/anvil/docker/verus/build.sh` - Verus Docker image build script with --platform=linux/amd64
+   - `/home/cc/EnvGym/data/anvil/scripts/build-controller.sh` - Controller binary build script
+   - `/home/cc/EnvGym/data/anvil/scripts/deploy-controller.sh` - Controller deployment automation script
+   - `/home/cc/EnvGym/data/anvil/build.sh` - Main build script used by Docker builds and CI (already exists)
+   - `/home/cc/EnvGym/data/anvil/build.md` - Build documentation (already exists)
+   - `/home/cc/EnvGym/data/anvil/deploy.sh` - Deployment script for controllers (already exists)
+   - `/home/cc/EnvGym/data/anvil/tools/activate` - Verus environment activation script (for Docker builds)
+   - `/home/cc/EnvGym/data/anvil/source/tools/get-z3.sh` - Z3 download script for x86_64 Linux
+   - `/home/cc/EnvGym/data/anvil/deploy/kind.yaml` - Already exists for kind cluster configuration
+   - `/home/cc/EnvGym/data/anvil/scripts/create-kind-cluster.sh` - Kind cluster creation automation script
+   - `/home/cc/EnvGym/data/anvil/scripts/delete-kind-cluster.sh` - Kind cluster deletion automation script
+   - `/home/cc/EnvGym/data/anvil/deploy/kind-dev.yaml` - Development kind cluster configuration (single node)
+   - `/home/cc/EnvGym/data/anvil/deploy/kind-prod.yaml` - Production-like kind cluster configuration (multi-node)
+   - `/home/cc/EnvGym/data/anvil/.github/workflows/ae.yml` - Already exists for artifact evaluation image CI/CD
+   - `/home/cc/EnvGym/data/anvil/.github/workflows/ci.yml` - Already exists for continuous integration (reference for versions)
+   - `/home/cc/EnvGym/data/anvil/.github/workflows/controller-build.yml` - Already exists for building all controller Docker images
+   - `/home/cc/EnvGym/data/anvil/.github/workflows/verus-build.yml` - Already exists for building Verus Docker image
+   - `/home/cc/EnvGym/data/anvil/.github/workflows/test.yml` - CI workflow for running tests
+   - `/home/cc/EnvGym/data/anvil/.github/workflows/verify.yml` - CI workflow for Verus verification
+   - `/home/cc/EnvGym/data/anvil/.github/workflows/docker-build.yml` - CI workflow for building all Docker images
+   - `/home/cc/EnvGym/data/anvil/scripts/push-ae-image.sh` - Script to manually push artifact evaluation image
+   - `/home/cc/EnvGym/data/anvil/scripts/push-controller-images.sh` - Script to manually push all controller images
+   - `/home/cc/EnvGym/data/anvil/scripts/push-verus-image.sh` - Script to manually push Verus Docker image
+   - `/home/cc/EnvGym/data/anvil/scripts/tag-release.sh` - Script to tag releases with proper versioning
+   - `/home/cc/EnvGym/data/anvil/.github/dependabot.yml` - Automated dependency updates configuration
+   - `/home/cc/EnvGym/data/anvil/CONTRIBUTING.md` - Contribution guidelines including CI/CD processes
+   - `/home/cc/EnvGym/data/anvil/local-test.sh` - Local testing and deployment script for controllers (already exists)
+   - `/home/cc/EnvGym/data/anvil/e2e/Cargo.toml` - E2E test runner configuration (already exists with kube 0.91.0 dependencies)
+   - `/home/cc/EnvGym/data/anvil/e2e/src/main.rs` - E2E test runner implementation (already exists)
+   - `/home/cc/EnvGym/data/anvil/e2e/README.md` - E2E test documentation (already exists)
+   - `/home/cc/EnvGym/data/anvil/scripts/cache-verus.sh` - Script to cache Verus build locally
+   - `/home/cc/EnvGym/data/anvil/scripts/build-all-controllers.sh` - Script to build all controller images locally
+   - `/home/cc/EnvGym/data/anvil/src/<controller_name>_controller.rs` - Controller source files (pattern from build.md)
+   - `/home/cc/EnvGym/data/anvil/deploy/<controller_name>/` - Test workload specifications for each controller
+   - `/home/cc/EnvGym/data/anvil/e2e/.cargo/config.toml` - E2E specific cargo configuration for feature flags
+   - `/home/cc/EnvGym/data/anvil/e2e/tests/` - Directory for e2e test implementations
+   - `/home/cc/EnvGym/data/anvil/src/deps_hack/.cargo/config.toml` - Feature configuration for deps_hack module
+   - `/home/cc/EnvGym/data/anvil/src/deps_hack/src/lib.rs` - Main library file for deps_hack module
+   - `/home/cc/EnvGym/data/anvil/src/deps_hack/tests/` - Test directory for deps_hack module
+   - `/home/cc/EnvGym/data/anvil/src/deps_hack/examples/` - Example usage of deps_hack module
+   - `/home/cc/EnvGym/data/anvil/verifiable-controllers.code-workspace` - VSCode workspace configuration (gitignored)
+   - `/home/cc/EnvGym/data/anvil/certs/` - Directory for certificate files (gitignored)
+   - `/home/cc/EnvGym/data/anvil/scripts/clean-build-artifacts.sh` - Script to clean generated files matching gitignore patterns
+   - `/home/cc/EnvGym/data/anvil/deploy/fluent/crd.yaml` - Already exists with FluentBit and FluentBitConfig CRD definitions
+   - `/home/cc/EnvGym/data/anvil/src/fluent_controller.rs` - FluentBit controller implementation
+   - `/home/cc/EnvGym/data/anvil/deploy/fluent/test-fluentbit.yaml` - Test FluentBit CR instance
+   - `/home/cc/EnvGym/data/anvil/deploy/fluent/test-fluentbitconfig.yaml` - Test FluentBitConfig CR instance
+   - `/home/cc/EnvGym/data/anvil/deploy/fluent/fluent-bit.conf` - FluentBit configuration template
+   - `/home/cc/EnvGym/data/anvil/deploy/fluent/parsers.conf` - FluentBit parsers configuration
+   - `/home/cc/EnvGym/data/anvil/deploy/fluent/rbac.yaml` - RBAC configuration for FluentBit controller
+   - `/home/cc/EnvGym/data/anvil/deploy/fluent/daemonset.yaml` - DaemonSet template for FluentBit deployment
+   - `/home/cc/EnvGym/data/anvil/docker/controller/Dockerfile.fluent` - FluentBit controller specific Dockerfile
+   - `/home/cc/EnvGym/data/anvil/scripts/deploy-fluent-controller.sh` - FluentBit controller deployment script
+   - `/home/cc/EnvGym/data/anvil/e2e/tests/fluent_basic_test.rs` - Basic FluentBit controller E2E tests
+   - `/home/cc/EnvGym/data/anvil/e2e/tests/fluent_config_update_test.rs` - FluentBit configuration update E2E tests
+   - `/home/cc/EnvGym/data/anvil/e2e/tests/fluent_multi_instance_test.rs` - Multiple FluentBit instance E2E tests
+   - `/home/cc/EnvGym/data/anvil/deploy/rabbitmq/crd.yaml` - Already exists

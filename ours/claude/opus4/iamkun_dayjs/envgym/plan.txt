@@ -1,0 +1,101 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Node.js (v14.0.0 or higher, recommended v18 LTS for linux/amd64)
+   - npm (v6.0.0 or higher, comes with Node.js)
+   - Git (latest stable version for Linux)
+   - Visual Studio Code or preferred code editor (Linux x86_64 version)
+   - Browser DevTools (Chrome/Firefox/Safari latest versions)
+   - Java Runtime Environment (OpenJDK for Linux x86_64 for Karma/Sauce Labs testing)
+
+2. FILES TO CREATE:
+   - `.gitignore` - Include node_modules/, dist/, coverage/, .env, .DS_Store, esm/
+   - `.npmrc` - Configure npm registry and package settings
+   - `.editorconfig` - Define coding styles for consistent formatting
+   - `.eslintrc.js` - ESLint configuration for code quality (already exists based on package.json)
+   - `.prettierrc` - Prettier configuration for code formatting
+   - `.github/workflows/ci.yml` - GitHub Actions CI/CD pipeline
+   - `.babelrc` or `babel.config.js` - Babel transpiler configuration
+   - `rollup.config.js` - Build tool configuration for bundling
+   - `karma.conf.js` - Karma test runner base configuration
+   - `karma.sauce.conf.js` - Sauce Labs cross-browser testing configuration (already exists)
+   - `.size-limit.json` - Size limit configuration (if not using package.json config)
+   - `index.d.ts` - TypeScript type definitions (main types file)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Parse date strings in various formats
+   - Format dates with different patterns
+   - Date manipulation (add, subtract, set)
+   - Date comparison methods (isBefore, isAfter, isSame)
+   - Locale loading and switching functionality
+   - Plugin system integration tests
+   - Immutability verification tests
+   - Timezone handling tests (specific TZ test with Pacific/Auckland, Europe/London, America/Whitehorse)
+   - Edge cases (leap years, DST transitions)
+   - Performance benchmarks against Moment.js
+   - Browser compatibility tests via Sauce Labs
+   - Bundle size verification tests (must stay under 2.99 KB)
+   - ESM module build tests
+   - TypeScript type definition tests
+   - Cross-timezone behavior tests
+
+4. COMPLETE TODO LIST:
+   - Verify working directory exists: `cd /home/cc/EnvGym/data/iamkun_dayjs`
+   - Install Node.js for Linux x86_64 and verify installation: `node --version && npm --version`
+   - Update package manager for Linux: `sudo apt-get update` (for Debian/Ubuntu) or appropriate for base image
+   - Install build essentials for native modules: `sudo apt-get install build-essential`
+   - Install Git for Linux: `sudo apt-get install git`
+   - Clone the Day.js repository if not present: `git clone https://github.com/iamkun/dayjs.git .` (in working directory)
+   - Install OpenJDK for Karma/Sauce Labs: `sudo apt-get install default-jre`
+   - Install project dependencies: `npm install`
+   - Verify all devDependencies from package.json are installed correctly
+   - Create/verify `.eslintrc.js` configuration compatible with eslint-config-airbnb-base
+   - Configure ESLint plugins for import and jest
+   - Create `.prettierrc` configuration file
+   - Verify Jest configuration in package.json
+   - Create/verify Babel configuration for build environment
+   - Set up rollup.config.js with babel and terser plugins
+   - Configure pre-commit hooks (already set up with pre-commit package)
+   - Create karma.conf.js base configuration
+   - Verify karma.sauce.conf.js for cross-browser testing
+   - Set up Sauce Labs credentials in environment variables
+   - Create TypeScript declaration files structure
+   - Verify size-limit configuration (2.99 KB limit)
+   - Run initial lint check: `npm run lint`
+   - Format documentation: `npm run prettier`
+   - Build ESM modules: `npm run babel`
+   - Run full build process: `npm run build`
+   - Verify bundle size: `npm run size`
+   - Run timezone-specific tests: `npm run test-tz`
+   - Run full test suite: `npm test`
+   - Verify code coverage in ./coverage/ directory
+   - Run Sauce Labs tests (requires account): `npm run test:sauce`
+   - Test build output in dayjs.min.js
+   - Verify ESM build in esm/ directory
+   - Check TypeScript types with: `npx tsc --noEmit index.d.ts`
+   - Install mockdate for time mocking in tests
+   - Compare performance with moment.js (v2.29.2)
+   - Test moment-timezone compatibility (v0.5.31)
+   - Set up development environment variables
+   - Create example usage files demonstrating core features
+   - Test pre-commit hook functionality
+   - Verify cross-env works for Linux platform builds
+   - Configure IDE with ESLint and Prettier extensions (if using GUI)
+   - Create development branch: `git checkout -b development`
+   - Run build and verify no files exceed size limit
+   - Test npm package locally: `npm link`
+   - Create test project to verify local package works
+   - Document any API changes
+   - Set up CI/CD pipeline for automated testing (configure for Linux runners)
+   - Configure npm publishing workflow
+   - Verify all timezone tests pass in different TZ environments
+   - Check Jest coverage meets project standards
+   - Validate all Babel transformations work correctly
+   - Test rollup bundling with all plugins
+   - Ensure gzip-size reports accurate bundle size
+   - Clean npm cache if needed: `npm cache clean --force`
+   - Final verification: Clean install and full test run
+   - Prepare for npm publish with proper version
+   - Create Dockerfile for containerized development environment (optional)
+   - Set proper file permissions for Linux: `chmod +x` for any executable scripts
+   - Verify disk space for node_modules and build artifacts: `df -h /home/cc/EnvGym/data/iamkun_dayjs`

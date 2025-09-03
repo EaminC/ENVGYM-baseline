@@ -1,0 +1,126 @@
+Based on the hardware information provided, here's the adjusted plan for the alibaba_fastjson2 project:
+
+## Environment Setup Plan for alibaba_fastjson2
+
+### Base Configuration
+- **Base Image**: `ubuntu:20.04` (x86_64 compatible)
+- **Working Directory**: `/home/cc/EnvGym/data/alibaba_fastjson2`
+- **Architecture**: linux/amd64
+- **Project**: alibaba_fastjson2
+
+### Development Environment Setup
+
+#### 1. System Dependencies
+```dockerfile
+FROM ubuntu:20.04
+
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update package lists and install essential tools
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    wget \
+    git \
+    vim \
+    unzip \
+    software-properties-common \
+    && rm -rf /var/lib/apt/lists/*
+```
+
+#### 2. Java Development Environment
+Since this is a Fastjson2 project (Java-based JSON library):
+```dockerfile
+# Install OpenJDK 8 and 11 (Fastjson2 supports multiple Java versions)
+RUN apt-get update && apt-get install -y \
+    openjdk-8-jdk \
+    openjdk-11-jdk \
+    maven \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set JAVA_HOME (default to Java 11)
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+```
+
+#### 3. Project Setup
+```dockerfile
+# Set working directory
+WORKDIR /home/cc/EnvGym/data/alibaba_fastjson2
+
+# Copy project files (if building from Dockerfile)
+# COPY . .
+
+# If the project uses Maven, prepare for dependency caching
+# RUN mvn dependency:go-offline || true
+```
+
+#### 4. Development Tools
+```dockerfile
+# Install additional development tools
+RUN apt-get update && apt-get install -y \
+    gradle \
+    ant \
+    jq \
+    && rm -rf /var/lib/apt/lists/*
+```
+
+### Docker Compose Configuration (if needed)
+```yaml
+version: '3.8'
+
+services:
+  fastjson2-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    volumes:
+      - .:/home/cc/EnvGym/data/alibaba_fastjson2
+      - maven-cache:/root/.m2
+    working_dir: /home/cc/EnvGym/data/alibaba_fastjson2
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+
+volumes:
+  maven-cache:
+```
+
+### Build and Run Commands
+```bash
+# Build the Docker image
+docker build --platform=linux/amd64 -t fastjson2-env .
+
+# Run the container
+docker run -it --rm \
+  -v $(pwd):/home/cc/EnvGym/data/alibaba_fastjson2 \
+  -w /home/cc/EnvGym/data/alibaba_fastjson2 \
+  fastjson2-env
+
+# Or using Docker Compose
+docker-compose up -d
+docker-compose exec fastjson2-dev bash
+```
+
+### Memory and Storage Considerations
+- **Minimum RAM**: 2GB recommended for Java development
+- **Storage**: ~2GB for base image + Java + tools, plus project dependencies
+- **CPU**: x86_64 architecture fully supported
+
+### Testing the Environment
+```bash
+# Verify Java installation
+java -version
+javac -version
+mvn -version
+
+# Run project tests (typical for Fastjson2)
+mvn clean test
+
+# Build the project
+mvn clean package
+```
+
+This plan is fully compatible with the x86_64 architecture and doesn't require any GPU support, making it suitable for the provided hardware configuration.

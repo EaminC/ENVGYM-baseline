@@ -1,0 +1,60 @@
+Based on the hardware information provided, here's the adjusted plan:
+
+## Environment Setup Plan
+
+### Base Configuration
+- **Working Directory**: `/home/cc/EnvGym/data/exli`
+- **Architecture**: x86_64 (linux/amd64)
+- **Base Image Options**: 
+  - ubuntu:20.04 (recommended for stability)
+  - debian:bullseye (alternative)
+  - python:3.x (if Python-focused)
+  - node:lts (if Node.js-focused)
+- **GPU Support**: Not required (CPU-only configuration)
+
+### Docker Configuration
+```dockerfile
+FROM ubuntu:20.04
+PLATFORM linux/amd64
+
+# Set working directory
+WORKDIR /home/cc/EnvGym/data/exli
+
+# Update and install basic dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    wget \
+    git \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy project files
+COPY . /home/cc/EnvGym/data/exli/
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH="/usr/local/bin:${PATH}"
+```
+
+### Build Instructions
+```bash
+# Build with BuildKit (enabled by default in Docker 28.1.1)
+docker build -t exli-env .
+
+# Run container
+docker run -it --rm \
+  -v /home/cc/EnvGym/data/exli:/home/cc/EnvGym/data/exli \
+  exli-env
+```
+
+### System Requirements
+- **CPU**: x86_64 architecture compatible
+- **Memory**: Minimum 2GB RAM recommended
+- **Storage**: At least 5GB free space for base image and dependencies
+- **Docker**: Version 28.1.1 with BuildKit support
+
+### Development Tools
+- Standard CPU-only libraries and tools
+- No CUDA or GPU-specific dependencies
+- Compatible with Ubuntu 20.04 package repositories

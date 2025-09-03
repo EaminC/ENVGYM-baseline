@@ -1,0 +1,103 @@
+=== Docker Execution Log - 20250903_014817 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756864093
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 957B done
+#1 WARN: FromPlatformFlagConstDisallowed: FROM --platform flag should not use constant value "linux/amd64" (line 1)
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node:18-alpine
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/12] FROM docker.io/library/node:18-alpine@sha256:8d6421d663b4c28fd3ebc498332f249011d118945588d0a35cb9bc4b8ca09d9e
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 3.66MB 1.1s done
+#5 DONE 1.1s
+
+#6 [ 4/12] COPY package*.json ./
+#6 CACHED
+
+#7 [ 5/12] COPY yarn.lock* ./
+#7 CACHED
+
+#8 [ 6/12] COPY lerna.json* ./
+#8 CACHED
+
+#9 [ 7/12] COPY pnpm-lock.yaml* ./
+#9 CACHED
+
+#10 [ 8/12] COPY .npmrc* ./
+#10 CACHED
+
+#11 [ 2/12] RUN apk add --no-cache     git     python3     make     g++     bash     openssh-client     ca-certificates
+#11 CACHED
+
+#12 [ 3/12] WORKDIR /app
+#12 CACHED
+
+#13 [ 9/12] COPY .yarnrc* ./
+#13 CACHED
+
+#14 [10/12] RUN npm install -g yarn &&     yarn install --frozen-lockfile || npm install
+#14 0.762 npm error code EEXIST
+#14 0.762 npm error path /usr/local/bin/yarn
+#14 0.762 npm error EEXIST: file already exists
+#14 0.762 npm error File exists: /usr/local/bin/yarn
+#14 0.762 npm error Remove the existing file and try again, or run npm
+#14 0.762 npm error with --force to overwrite files recklessly.
+#14 0.764 npm error A complete log of this run can be found in: /root/.npm/_logs/2025-09-03T01_48_15_565Z-debug-0.log
+#14 1.888 npm error code EUNSUPPORTEDPROTOCOL
+#14 1.888 npm error Unsupported URL Type "workspace:": workspace:^
+#14 1.889 npm error A complete log of this run can be found in: /root/.npm/_logs/2025-09-03T01_48_16_130Z-debug-0.log
+#14 ERROR: process "/bin/sh -c npm install -g yarn &&     yarn install --frozen-lockfile || npm install" did not complete successfully: exit code: 1
+------
+ > [10/12] RUN npm install -g yarn &&     yarn install --frozen-lockfile || npm install:
+0.762 npm error code EEXIST
+0.762 npm error path /usr/local/bin/yarn
+0.762 npm error EEXIST: file already exists
+0.762 npm error File exists: /usr/local/bin/yarn
+0.762 npm error Remove the existing file and try again, or run npm
+0.762 npm error with --force to overwrite files recklessly.
+0.764 npm error A complete log of this run can be found in: /root/.npm/_logs/2025-09-03T01_48_15_565Z-debug-0.log
+1.888 npm error code EUNSUPPORTEDPROTOCOL
+1.888 npm error Unsupported URL Type "workspace:": workspace:^
+1.889 npm error A complete log of this run can be found in: /root/.npm/_logs/2025-09-03T01_48_16_130Z-debug-0.log
+------
+
+ [33m1 warning found (use docker --debug to expand):
+[0m - FromPlatformFlagConstDisallowed: FROM --platform flag should not use constant value "linux/amd64" (line 1)
+envgym.dockerfile:25
+--------------------
+  24 |     # Install yarn globally and install dependencies
+  25 | >>> RUN npm install -g yarn && \
+  26 | >>>     yarn install --frozen-lockfile || npm install
+  27 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c npm install -g yarn &&     yarn install --frozen-lockfile || npm install" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

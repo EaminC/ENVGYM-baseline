@@ -1,0 +1,15 @@
+{
+  "timestamp": "20250902_191049",
+  "dockerfile_path": "envgym/envgym.dockerfile",
+  "image_name": "envgym_test_1756840248",
+  "build": {
+    "success": false,
+    "stdout": "",
+    "stderr": "#0 building with \"default\" instance using docker driver\n\n#1 [internal] load build definition from envgym.dockerfile\n#1 transferring dockerfile: 755B done\n#1 DONE 0.0s\n\n#2 [internal] load metadata for docker.io/library/node:18-alpine\n#2 DONE 0.3s\n\n#3 [internal] load .dockerignore\n#3 transferring context: 2B done\n#3 DONE 0.0s\n\n#4 [ 1/10] FROM docker.io/library/node:18-alpine@sha256:8d6421d663b4c28fd3ebc498332f249011d118945588d0a35cb9bc4b8ca09d9e\n#4 DONE 0.0s\n\n#5 [internal] load build context\n#5 transferring context: 2.18MB 0.0s done\n#5 DONE 0.0s\n\n#6 [ 4/10] RUN npm install -g n\n#6 CACHED\n\n#7 [ 3/10] RUN wget https://github.com/wg/wrk/archive/refs/tags/4.2.0.tar.gz -O /tmp/wrk.tar.gz &&     cd /tmp && tar -xzf wrk.tar.gz &&     cd wrk-4.2.0 &&     make &&     cp wrk /usr/local/bin/ &&     cd / && rm -rf /tmp/wrk*\n#7 CACHED\n\n#8 [ 2/10] RUN apk add --no-cache     bash     git     make     build-base     redis     lcov     yamllint     gcc     musl-dev     openssl-dev     curl     wget     linux-headers\n#8 CACHED\n\n#9 [ 5/10] RUN n 16 && n 17 && n 18\n#9 CACHED\n\n#10 [ 6/10] WORKDIR /home/cc/EnvGym/data/expressjs_express\n#10 CACHED\n\n#11 [ 7/10] COPY . .\n#11 DONE 0.1s\n\n#12 [ 8/10] RUN if [ -f package.json ]; then npm install; fi\n#12 0.225 env: can't execute 'node': No such file or directory\n#12 ERROR: process \"/bin/sh -c if [ -f package.json ]; then npm install; fi\" did not complete successfully: exit code: 127\n------\n > [ 8/10] RUN if [ -f package.json ]; then npm install; fi:\n0.225 env: can't execute 'node': No such file or directory\n------\nenvgym.dockerfile:33\n--------------------\n  31 |     COPY . .\n  32 |     \n  33 | >>> RUN if [ -f package.json ]; then npm install; fi\n  34 |     \n  35 |     RUN chmod -R 755 /home/cc/EnvGym/data/expressjs_express\n--------------------\nERROR: failed to solve: process \"/bin/sh -c if [ -f package.json ]; then npm install; fi\" did not complete successfully: exit code: 127\n"
+  },
+  "run": {
+    "success": false,
+    "stdout": "",
+    "stderr": ""
+  }
+}

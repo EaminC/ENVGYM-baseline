@@ -1,0 +1,209 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Node.js (LTS version, v18+ required based on package-lock.json engine requirements)
+   - Git (latest stable version)
+   - npm (comes with Node.js, v8+ required)
+   - Text editor/IDE (VS Code recommended)
+   - Browser requirements:
+     - Chrome/Chromium browser (for testing Chrome MV2 and MV3 extensions)
+     - Firefox browser (for testing Firefox MV2 extension)
+     - Microsoft Edge (optional, for Edge extension testing)
+     - Safari (optional, for Safari extension testing on macOS)
+   - Deno runtime (optional, for experimental support)
+   - TypeScript 5.8.3 (will be installed via npm)
+   - Puppeteer dependencies (system libraries for headless browser testing)
+   - Build tools and dependencies (will be installed via npm)
+   - System dependencies for native modules:
+     - Python (for node-gyp compilation)
+     - C++ build tools (Windows: Visual Studio Build Tools, macOS: Xcode Command Line Tools, Linux: build-essential)
+
+2. FILES TO CREATE:
+   - `.env` (if needed for environment variables)
+   - `.gitignore` (if not present, to exclude node_modules, build folders, coverage)
+   - `tsconfig.json` (TypeScript configuration, if not present)
+   - `eslint.config.js` (ESLint configuration for code style)
+   - Test configuration files:
+     - `tests/unit/jest.config.mjs` (unit test configuration)
+     - `tests/browser/jest.config.mjs` (browser test configuration)
+     - `tests/browser/jest.config.chrome-mv3.mjs` (Chrome MV3 test configuration)
+     - `tests/browser/jest.config.firefox.mjs` (Firefox test configuration)
+     - `tests/inject/karma.conf.cjs` (injection test configuration)
+   - CI/CD configuration files (optional):
+     - `.github/workflows/build.yml` (GitHub Actions)
+     - `.github/workflows/test.yml` (test automation)
+   - `deno.json` (Deno configuration, if using Deno)
+   - `.npmrc` (npm configuration for optional dependencies)
+   - `.nvmrc` (Node version specification file)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Unit tests (`npm run test:unit`):
+     - Dark Reader API functionality
+     - `DarkReader.enable()` functionality
+     - `DarkReader.disable()` functionality
+     - `DarkReader.auto()` system color scheme detection
+     - `DarkReader.exportGeneratedCSS()` CSS generation
+     - `DarkReader.isEnabled()` state checking
+     - Malevic UI framework integration tests
+   - Browser integration tests (`npm run test:browser`):
+     - Chrome MV2 extension tests
+     - Chrome MV3 extension tests
+     - Firefox MV2 extension tests
+     - Extension loading and initialization
+     - CSS injection and removal
+     - Site fixes synchronization
+     - Restricted pages handling
+     - Puppeteer-based automated browser tests
+   - Injection tests (`npm run test:inject`):
+     - CSS injection into web pages
+     - Style modification accuracy
+     - Performance impact tests
+     - Karma-based cross-browser testing
+   - Coverage tests (`npm run test:coverage`):
+     - Code coverage analysis
+     - Missing test identification
+     - Istanbul coverage reports
+   - Build process tests:
+     - Verify Chrome MV2/MV3 extension package creation
+     - Verify Firefox extension package creation
+     - Verify API bundle creation (darkreader.js and darkreader.mjs)
+     - Verify Plus version build
+     - Rollup bundling tests
+   - ESLint and TypeScript validation:
+     - Code style compliance
+     - Type safety checks
+     - Import resolution tests
+
+4. COMPLETE TODO LIST:
+   - Install Node.js LTS from nodejs.org (v18+ required)
+   - Verify Node.js installation: `node --version` (should be v18+)
+   - Verify npm installation: `npm --version` (should be v8+)
+   - Install system dependencies for native modules:
+     - Windows: Install Visual Studio Build Tools
+     - macOS: Install Xcode Command Line Tools: `xcode-select --install`
+     - Linux: Install build-essential: `sudo apt-get install build-essential`
+   - Clone Dark Reader repository: `git clone https://github.com/darkreader/darkreader.git`
+   - Navigate to project directory: `cd darkreader`
+   - Create `.nvmrc` file with Node version: `echo "18" > .nvmrc`
+   - Install project dependencies: `npm install`
+   - Verify dependency installation: 
+     - Check node_modules folder exists
+     - Verify native modules compiled successfully
+     - Check for optional dependency warnings
+   - Run initial debug build: `npm run debug`
+   - Run release build: `npm run build`
+   - Verify build outputs:
+     - Check `build/release/darkreader-chrome.zip` exists
+     - Check `build/release/darkreader-firefox.xpi` exists
+     - Check `darkreader.js` and `darkreader.mjs` exist (API builds)
+   - Set up development environment:
+     - Install Chrome/Chromium browser
+     - Install Firefox browser
+     - Enable developer mode in Chrome (chrome://extensions/)
+     - Enable debugging in Firefox (about:debugging)
+   - Set up development watch mode:
+     - Run `npm run debug:watch` for Chrome and Firefox development
+     - Run `npm run debug:watch:mv3` for Chrome MV3 development
+   - Load unpacked extension for testing:
+     - In Chrome: Load unpacked from `build/debug/chrome` folder
+     - In Firefox: Load temporary add-on from `build/debug/firefox` folder
+   - Test basic functionality:
+     - Enable Dark Reader on a test website
+     - Verify dark mode is applied
+     - Test disable functionality
+   - Set up API development:
+     - Run `npm run api` to build API
+     - Create test HTML file to verify API functionality
+     - Test both CommonJS (darkreader.js) and ES module (darkreader.mjs)
+     - Test Malevic UI framework integration
+   - Configure Jest testing environment:
+     - Verify Jest 30.0.4 is installed
+     - Test ts-jest TypeScript integration
+     - Configure jest-extended matchers
+   - Run test suites:
+     - Unit tests: `npm run test:unit`
+     - Browser tests: `npm run test:browser`
+     - Injection tests: `npm run test:inject`
+     - Coverage report: `npm run test:coverage`
+     - All tests: `npm run test:all`
+   - Configure linting:
+     - Run `npm run lint` to check code style
+     - Run `npm run lint:bundle` to check built bundles
+     - Configure @stylistic/eslint-plugin rules
+     - Fix linting issues before committing
+   - Configure optional Deno support:
+     - Install Deno from deno.land
+     - Run `npm run deno:bootstrap`
+     - Test Deno compatibility
+   - Set up Plus version development (if needed):
+     - Run `npm run plus-link` to create symbolic link
+     - Use `npm run debug:watch:plus` for Plus version development
+     - Build Plus release: `npm run build:plus`
+   - Configure IDE/Editor:
+     - Install TypeScript 5.8.3 support
+     - Install ESLint extension
+     - Configure Prettier 3.6.2 for code formatting
+     - Set up debugging configurations for Jest tests
+     - Configure path aliases for module resolution
+   - Set up Puppeteer for browser automation:
+     - Install system dependencies for headless Chrome
+     - Configure puppeteer-core 24.13.0
+     - Test browser automation scripts
+   - Configure Karma for cross-browser testing:
+     - Set up Chrome launcher
+     - Set up Firefox launcher
+     - Configure Safari launcher (macOS only)
+     - Test injection scenarios
+   - Test different build variants:
+     - Firefox specific: `npm run build:firefox`
+     - All variants: `npm run build:all`
+     - Debug with watch: `npm run debug:watch`
+   - Set up Rollup bundling:
+     - Configure TypeScript plugin
+     - Set up node resolution
+     - Configure replacement plugin for build variants
+   - Set up translation workflow (if contributing translations):
+     - Run `npm run translate-en-message` for message translation
+     - Run `npm run translate-new-en-messages` for new messages
+   - Configure Less CSS preprocessor:
+     - Verify Less 4.3.0 is installed
+     - Test style compilation
+   - Set up WebSocket development server:
+     - Configure ws 8.18.3 for hot reload
+     - Test Socket.io integration for development
+   - Upgrade dependencies (when needed):
+     - Run `npm run dependencies:upgrade`
+     - Test after upgrading
+     - Check for breaking changes
+   - Set up contribution workflow:
+     - Read CONTRIBUTING.md
+     - Configure git user details
+     - Create feature branch for development
+     - Follow code style guidelines (enforced by ESLint)
+     - Configure commit hooks for linting
+   - Performance optimization:
+     - Note the `--max-old-space-size=3072` flag for memory-intensive builds
+     - Monitor build performance
+     - Configure chokidar for efficient file watching
+   - Set up native module compilation:
+     - Configure unrs-resolver for module resolution
+     - Test platform-specific bindings
+     - Verify optional dependencies load correctly
+   - Configure source maps:
+     - Enable source map generation for debugging
+     - Configure istanbul for coverage mapping
+     - Test debugging in browsers
+   - Document environment setup:
+     - Create local notes on configuration
+     - Note any platform-specific issues
+     - Document custom build flags usage
+     - Record troubleshooting steps
+   - Verify complete setup:
+     - Build with custom flags: `npm run build -- --help`
+     - Test in multiple browsers (Chrome MV2, Chrome MV3, Firefox)
+     - Verify all test suites pass
+     - Check API functionality with example implementation
+     - Ensure watch mode works for rapid development
+     - Test extension in production mode
+     - Verify TypeScript compilation without errors
+     - Check ESLint passes on all source files

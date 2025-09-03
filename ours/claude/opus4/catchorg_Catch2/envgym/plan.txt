@@ -1,0 +1,123 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - C++ Compiler (GCC 9+ / Clang 10+) with C++17 support (available in Ubuntu 20.04 repositories)
+   - CMake 3.22 or higher (may need to add Kitware APT repository for Ubuntu 20.04 which ships with 3.16)
+   - Meson 0.54.1 or higher (install via pip3)
+   - Conan 1.63 (for Conan 1.x testing, install via pip3)
+   - Conan 2.1 or higher (for Conan 2.x testing, install via pip3)
+   - Conan Package Tools (cpt) - Python package for ConanMultiPackager
+   - Bazel 7.0 or higher (download from GitHub releases for x86_64 Linux)
+   - Bazelisk (download Linux x86_64 binary from GitHub)
+   - Git (available in Ubuntu 20.04 repositories)
+   - Python 3.8 (default in Ubuntu 20.04)
+   - pip3 (python3-pip package)
+   - codecov Python package (for code coverage reporting)
+   - Catch2 v3.10.0 source code from GitHub repository
+   - Ninja build system (ninja-build package)
+   - clang-format (available in Ubuntu 20.04 repositories)
+   - clang-tidy-15 or higher (may need LLVM APT repository)
+   - Valgrind (available in Ubuntu 20.04 repositories)
+   - libFuzzer (included with Clang)
+   - AddressSanitizer (included with GCC/Clang)
+   - Optional: lcov/gcov for code coverage (available in repositories)
+   - Doxygen 1.9.1 or higher (may need to build from source or use newer APT repository)
+   - Graphviz with dot tool (available in Ubuntu 20.04 repositories)
+   - Optional: PlantUML for UML diagram support (requires Java)
+   - Optional: MathJax for LaTeX formula rendering (download separately)
+   - Optional: pkg-config (available in Ubuntu 20.04 repositories)
+   - rules_cc 0.1.1 (automatically downloaded by Bazel with bzlmod)
+   - bazel_skylib 1.7.1 (automatically downloaded by Bazel with bzlmod)
+   - rules_license 1.0.0 (automatically downloaded by Bazel with bzlmod)
+   - GitHub Actions cache action v3 (automatically available in GitHub Actions)
+   - GitHub Actions checkout action v4 (automatically available in GitHub Actions)
+   - vcpkg (optional, can be cloned from GitHub)
+   - CTest (included with CMake)
+   - MPI implementation (optional, openmpi-bin package)
+   - JSON parsing capability in CMake (built-in with CMake 3.19+)
+   - MarkdownSnippets .NET tool (requires .NET SDK installation)
+   - .NET SDK 6.0 or higher (download from Microsoft for Linux x86_64)
+
+2. FILES TO CREATE:
+   - /home/cc/EnvGym/data/catchorg_Catch2/.gitignore - Version control ignore patterns including build directories, IDE files, generated files, temporary outputs, and cmake-build directories
+   - /home/cc/EnvGym/data/catchorg_Catch2/.gitattributes - Git line ending configuration with text=auto default, LF for source files, CRLF for Windows-specific files, LF enforcement for Python scripts, single_include headers, and LICENCE.txt
+   - /home/cc/EnvGym/data/catchorg_Catch2/CMakeLists.txt - Main CMake configuration with Catch2 integration and version placeholder
+   - /home/cc/EnvGym/data/catchorg_Catch2/CMakePresets.json - CMake presets configuration with basic-tests and all-tests presets
+   - /home/cc/EnvGym/data/catchorg_Catch2/meson.build - Main Meson configuration with Catch2 integration
+   - /home/cc/EnvGym/data/catchorg_Catch2/meson_options.txt - Meson build options with 'tests' and 'install' boolean options
+   - /home/cc/EnvGym/data/catchorg_Catch2/conanfile.py - Conan package recipe for Catch2
+   - /home/cc/EnvGym/data/catchorg_Catch2/BUILD.bazel - Main Bazel configuration with Catch2 targets
+   - /home/cc/EnvGym/data/catchorg_Catch2/WORKSPACE.bazel - Bazel workspace configuration (can be empty with MODULE.bazel)
+   - /home/cc/EnvGym/data/catchorg_Catch2/MODULE.bazel - Bazel module configuration with dependencies
+   - /home/cc/EnvGym/data/catchorg_Catch2/.bazelrc - Bazel configuration options with platform-specific compiler settings
+   - /home/cc/EnvGym/data/catchorg_Catch2/.bazelversion - Bazel version specification
+   - /home/cc/EnvGym/data/catchorg_Catch2/.clang-format - Clang-format configuration with C++14 standard, include sorting rules, and Catch2-specific formatting
+   - /home/cc/EnvGym/data/catchorg_Catch2/.clang-tidy - Clang-tidy configuration with comprehensive checks including clang-diagnostic-*, clang-analyzer-*, bugprone-*, modernize-*, performance-*, portability-*, readability-* with specific exclusions and WarningsAsErrors for critical checks
+   - /home/cc/EnvGym/data/catchorg_Catch2/LICENSE.txt - BSL-1.0 license file
+   - /home/cc/EnvGym/data/catchorg_Catch2/LICENCE.txt - BSL-1.0 license file (alternative spelling for compatibility)
+   - /home/cc/EnvGym/data/catchorg_Catch2/LICENSE.MIT - MIT license file for Bazel compatibility
+   - /home/cc/EnvGym/data/catchorg_Catch2/appveyor.yml - AppVeyor CI configuration (for Windows CI reference)
+   - /home/cc/EnvGym/data/catchorg_Catch2/codecov.yml - Codecov configuration with coverage settings, ignore patterns, and comment layout
+   - /home/cc/EnvGym/data/catchorg_Catch2/Doxyfile - Doxygen configuration for generating API documentation
+   - /home/cc/EnvGym/data/catchorg_Catch2/mdsnippets.json - MarkdownSnippets configuration with ReadOnly=false, TocLevel=5, cmake-build exclusion, WriteHeader=false, InPlaceOverwrite convention
+   - /home/cc/EnvGym/data/catchorg_Catch2/.github/workflows/linux-bazel-builds.yml - GitHub Actions workflow for Linux Bazel builds
+   - /home/cc/EnvGym/data/catchorg_Catch2/.github/workflows/linux-meson-builds.yml - GitHub Actions workflow for Linux Meson builds
+   - /home/cc/EnvGym/data/catchorg_Catch2/.github/workflows/linux-other-builds.yml - GitHub Actions workflow for complex Linux builds
+   - /home/cc/EnvGym/data/catchorg_Catch2/.github/workflows/linux-simple-builds.yml - GitHub Actions workflow for basic Linux builds with compiler matrix
+   - /home/cc/EnvGym/data/catchorg_Catch2/.github/workflows/mac-builds.yml - GitHub Actions workflow for macOS builds
+   - /home/cc/EnvGym/data/catchorg_Catch2/.github/workflows/package-manager-builds.yaml - GitHub Actions workflow for Conan package manager builds
+   - /home/cc/EnvGym/data/catchorg_Catch2/.github/workflows/windows-simple-builds.yml - GitHub Actions workflow for Windows builds
+   - /home/cc/EnvGym/data/catchorg_Catch2/tests/CMakeLists.txt - Test-specific CMake configuration with surrogate targets, self-tests, and CTest integration
+   - /home/cc/EnvGym/data/catchorg_Catch2/tests/meson.build - Test-specific Meson configuration
+   - /home/cc/EnvGym/data/catchorg_Catch2/tests/BUILD.bazel - Test-specific Bazel configuration
+   - /home/cc/EnvGym/data/catchorg_Catch2/tests/test_main.cpp - Main test runner file
+   - /home/cc/EnvGym/data/catchorg_Catch2/tests/test_factorial.cpp - Unit test for factorial function
+   - /home/cc/EnvGym/data/catchorg_Catch2/tests/test_fibonacci.cpp - Benchmark test for fibonacci function
+   - /home/cc/EnvGym/data/catchorg_Catch2/src/factorial.hpp - Header for factorial implementation
+   - /home/cc/EnvGym/data/catchorg_Catch2/src/factorial.cpp - Implementation of factorial function
+   - /home/cc/EnvGym/data/catchorg_Catch2/src/fibonacci.hpp - Header for fibonacci implementation
+   - /home/cc/EnvGym/data/catchorg_Catch2/src/fibonacci.cpp - Implementation of fibonacci function
+   - /home/cc/EnvGym/data/catchorg_Catch2/src/BUILD.bazel - Source-specific Bazel configuration
+   - /home/cc/EnvGym/data/catchorg_Catch2/src/CMakeLists.txt - Source-specific CMake configuration with Catch2 library targets
+   - /home/cc/EnvGym/data/catchorg_Catch2/src/catch2/meson.build - Catch2 source Meson configuration
+   - /home/cc/EnvGym/data/catchorg_Catch2/src/catch2/catch_user_config.hpp.in - Catch2 user configuration template
+   - /home/cc/EnvGym/data/catchorg_Catch2/build/.gitkeep - Placeholder for build directory
+   - /home/cc/EnvGym/data/catchorg_Catch2/builddir/.gitkeep - Placeholder for Meson build directory
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/Readme.md - Main documentation index with links to all documentation sections (with markdown snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/tutorial.md - Getting started tutorial with factorial example (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/assertions.md - Assertion macros documentation (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/matchers.md - Matchers documentation for complex property assertions (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/comparing-floating-point-numbers.md - Floating point comparison guide (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/logging.md - Logging macros documentation (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/test-cases-and-sections.md - Test organization documentation (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/test-fixtures.md - Test fixtures documentation (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/skipping-passing-failing.md - Runtime test control documentation (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/reporters.md - Output customization documentation (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/event-listeners.md - Event listeners documentation (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/generators.md - Data generators and value parameterized tests documentation (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/other-macros.md - Additional macros documentation (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/benchmarks.md - Micro benchmarking documentation (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/own-main.md - Custom main() implementation guide (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/configuration.md - Compile-time configuration documentation (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/tostring.md - String conversions documentation (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/command-line.md - Command line interface documentation
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/faq.md - Frequently asked questions
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/usage-tips.md - Best practices and tips
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/cmake-integration.md - CMake integration guide with ParseAndAddCatchTests deprecation notice (with code snippet placeholders)
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/ci-and-misc.md - CI and tooling integration documentation
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/limitations.md - Known limitations documentation
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/thread-safety.md - Thread safety documentation
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/why-catch.md - Why use Catch2 documentation
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/migrate-v2-to-v3.md - Migration guide from v2 to v3
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/opensource-users.md - List of open source projects using Catch2
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/commercial-users.md - List of commercial projects using Catch2
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/contributing.md - Contribution guidelines
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/release-notes.md - Release notes documentation
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/deprecations.md - Deprecations and incoming changes documentation
+   - /home/cc/EnvGym/data/catchorg_Catch2/docs/doxygen/.gitkeep - Placeholder for Doxygen output directory
+   - /home/cc/EnvGym/data/catchorg_Catch2/.github/workflows/ci.yml - GitHub Actions CI configuration
+   - /home/cc/EnvGym/data/catchorg_Catch2/CMake/CatchConfigOptions.cmake - Catch2 configuration options with macros for overridable and regular options
+   - /home/cc/EnvGym/data/catchorg_Catch2/CMake/CatchMiscFunctions.cmake - CMake helper functions for build reproducibility
+   - /home/cc/EnvGym/data/catchorg_Catch2/CMake/Catch2Config.cmake.in - CMake package configuration template with PACKAGE_INIT and target inclusion
+   - /home/cc/EnvGym/data/catchorg_Catch2/extras/gdbinit - GDB debugger helper configuration
+   - /home/cc/EnvGym/data/catchorg_Catch2/extras/lldbinit -

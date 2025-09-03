@@ -1,0 +1,97 @@
+Based on the hardware information provided, here is the complete adjusted plan:
+
+## Environment Setup Plan for RFuse
+
+### System Requirements
+- **Architecture**: x86_64 (linux/amd64)
+- **Working Directory**: `/home/cc/EnvGym/data/rfuse`
+- **GPU Support**: Not required (CPU-only implementation)
+- **Docker**: Version 28.1.1 with BuildKit support
+
+### Base Image Selection
+```dockerfile
+FROM ubuntu:20.04
+```
+*Alternative options: debian:bullseye or python:3.x-slim*
+
+### Environment Configuration
+
+#### 1. Base System Setup
+```dockerfile
+# Set environment variables to prevent interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
+# Update and install essential packages
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    wget \
+    curl \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+```
+
+#### 2. Python Environment
+```dockerfile
+# Install Python and pip
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create symbolic links for python
+RUN ln -s /usr/bin/python3 /usr/bin/python
+```
+
+#### 3. Working Directory Setup
+```dockerfile
+# Create and set working directory
+WORKDIR /home/cc/EnvGym/data/rfuse
+
+# Create necessary subdirectories
+RUN mkdir -p /home/cc/EnvGym/data/rfuse/{src,data,models,logs}
+```
+
+#### 4. Python Dependencies
+```dockerfile
+# Copy requirements file (if exists)
+COPY requirements.txt* ./
+
+# Install Python packages
+RUN pip3 install --no-cache-dir --upgrade pip && \
+    if [ -f requirements.txt ]; then pip3 install --no-cache-dir -r requirements.txt; fi
+```
+
+#### 5. Development Tools
+```dockerfile
+# Install additional development tools
+RUN apt-get update && apt-get install -y \
+    cmake \
+    pkg-config \
+    libopenblas-dev \
+    liblapack-dev \
+    && rm -rf /var/lib/apt/lists/*
+```
+
+### Docker Build Command
+```bash
+docker build --platform=linux/amd64 -t rfuse:latest .
+```
+
+### Docker Run Command
+```bash
+docker run -it \
+    --platform=linux/amd64 \
+    -v $(pwd):/home/cc/EnvGym/data/rfuse \
+    --name rfuse-container \
+    rfuse:latest
+```
+
+### Notes
+- All GPU-related dependencies and CUDA installations have been excluded
+- The setup focuses on CPU-only operations
+- BuildKit can be enabled for faster builds: `DOCKER_BUILDKIT=1 docker build ...`
+- Volume mounting ensures local development files are accessible within the container
+- The working directory path matches the hardware specification exactly

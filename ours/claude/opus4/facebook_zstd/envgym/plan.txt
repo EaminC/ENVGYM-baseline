@@ -1,0 +1,195 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - GCC compiler (version 5 or higher, preferably GCC 7.3.0+) OR Clang compiler (version 3.8+, with scan-build for static analysis) - **Compatible with x86_64 Ubuntu 20.04**
+   - GNU Make (latest stable version) - **Use with -j48 flag to leverage all 48 cores**
+   - CMake (version 3.10 or higher, 3.14+ recommended) - **Available in Ubuntu 20.04 repos**
+   - Git (latest stable version, with line ending configuration support)
+   - Python 3.x (for running test scripts) - **Python 3.8 included in Ubuntu 20.04**
+   - Ninja build system (required for Meson builds) - **Use ninja -j48 for parallel builds**
+   - Meson build system (version 0.50.0 or higher, required)
+   - pkg-config (for library detection and pkgconfig module)
+   - zlib development headers (version 1.2.11 or higher)
+   - lz4 development headers (version 1.9.0 or higher)
+   - xz/lzma development headers (liblzma)
+   - **REMOVED: Visual Studio tools (all versions) - Windows-specific, not needed for Linux**
+   - **REMOVED: MSBuild - Windows-specific**
+   - **REMOVED: Windows SDK - Windows-specific**
+   - **REMOVED: Xcode Command Line Tools - macOS-specific**
+   - **REMOVED: Swift 5.0 - Not needed for Linux x86_64 builds**
+   - clang-analyzer/scan-build (for static analysis)
+   - Profiling tools: perf (Linux) - **Compatible with x86_64 Linux**
+   - cpuset (Linux, optional for benchmark isolation)
+   - GitHub CLI (optional, for easier PR management)
+   - Valgrind (for memory leak detection) - **x86_64 compatible**
+   - UBSan (Undefined Behavior Sanitizer, part of GCC/Clang)
+   - ASan (Address Sanitizer, part of GCC/Clang)
+   - MSan (Memory Sanitizer, Clang only)
+   - TSan (Thread Sanitizer, part of GCC/Clang)
+   - CircleCI CLI (optional, for local CI testing)
+   - Travis CI CLI (optional, for local CI testing)
+   - **ADJUSTED: ARM cross-compilation toolchain - Keep for cross-compilation from x86_64 host**
+   - **ADJUSTED: PowerPC cross-compilation toolchain - Keep for cross-compilation from x86_64 host**
+   - QEMU static binaries: qemu-arm-static, qemu-aarch64-static, qemu-ppc-static, qemu-ppc64-static
+   - libc6-dev-i386, gcc-multilib, g++-multilib (for 32-bit builds on x86_64)
+   - libc6-dev-armel-cross, libc6-dev-arm64-cross (for ARM cross-compilation)
+   - gold linker (for sanitizer builds)
+   - egrep with color support
+   - column command (for formatted output)
+   - **REMOVED: FreeBSD 14.2 - Use Docker container for FreeBSD testing instead**
+   - **REMOVED: gmake on FreeBSD - Not needed on Linux**
+   - **REMOVED: coreutils on FreeBSD - Already present on Linux**
+   - Cirrus CI CLI (optional, for local Cirrus CI testing)
+   - Buck build system (specific version: c8dec2e8da52d483f6dd7c6cd2ad694e8e6fed2b)
+   - Java JDK 8 or higher (required for Buck) - **OpenJDK available in Ubuntu repos**
+   - Watchman (optional, for Buck file watching)
+   - Google Test framework (for pzstd tests)
+   - CodeLite IDE (optional)
+   - clangd language server (optional)
+   - Linux kernel headers - **linux-headers-generic package for Ubuntu 20.04**
+   - gcov (for code coverage analysis)
+   - dos2unix/unix2dos (for line ending conversion testing)
+   - file command (for binary file detection)
+   - **REMOVED: iOS-CMake toolchain - iOS-specific**
+   - CCache (optional, for build acceleration) - **Highly recommended with 48 cores**
+   - C++ compiler with C++14 support (g++ or clang++)
+   - pthreads library - **Already included in glibc on Linux**
+   - libm (math library) - **Already included in glibc on Linux**
+   - libbacktrace or libunwind (optional)
+   - **REMOVED: MSVC static runtime libraries - Windows-specific**
+   - ASM compiler support (NASM/YASM for x86/x64 assembly) - **x86_64 compatible**
+   - Doxygen (optional, for API documentation generation)
+   - CPack (included with CMake)
+   - Emscripten toolchain (optional, for WebAssembly builds)
+   - Docker (version 17.05 or higher) - **Already installed (28.1.1)**
+   - Docker Compose (optional)
+   - Alpine Linux package manager (apk) knowledge - **For Docker Alpine builds**
+   - Docker BuildKit - **Already available with Docker 28.1.1**
+   - **REMOVED: Docker CE from PPA - Already installed**
+   - Snapcraft (latest stable version)
+   - Snapd (snap daemon)
+   - LXD or Multipass (for isolated snap build environments)
+   - snapcraft-cleanbuild
+   - review-tools (snap package review tools)
+   - g++ (C++ compiler)
+   - Linux kernel source tree - **Use apt-get source linux or git clone**
+   - sed command (GNU sed) - **Already present on Ubuntu**
+   - Linux kernel build environment (kernel-devel, kernel-headers packages)
+   - Cross-compilation toolchains for x86, i386, and ARM architectures
+   - Linux kernel testing tools (kselftests)
+   - LKML submission tools (git-send-email, get_maintainer.pl)
+   - Sparse (semantic parser for C)
+   - Coccinelle (for semantic patches)
+   - checkpatch.pl (Linux kernel style checker)
+   - scripts/kernel-doc (kernel documentation tool)
+   - Google Test framework libraries
+   - 32-bit development libraries - **lib32stdc++ and related packages**
+   - time command - **Already present on Ubuntu**
+   - pigz (Parallel gzip) - **Can utilize all 48 cores**
+   - Silesia compression corpus
+   - Large test corpus files
+   - Memory profiling tools - **perf mem, valgrind cachegrind**
+   - Cache analysis tools (cachegrind, perf cache events)
+   - Standard C compiler - **gcc or clang**
+   - zstd library headers and development files
+   - Test files for externalSequenceProducer
+   - **REMOVED: MinGW+MSYS - Windows-specific**
+   - md5sum or equivalent - **md5sum available on Ubuntu**
+   - ar (archiver) with LTO support - **gcc-ar available**
+   - BMI2-capable CPU - **Check with lscpu for BMI2 support on x86_64**
+   - musl libc - **Can be installed for testing**
+   - pthread development headers - **Already included in libc6-dev**
+   - Link-time optimization tools - **gcc/clang with -flto**
+   - Symbol stripping tools - **strip command available**
+   - **REMOVED: ginstall - Solaris-specific, use install on Linux**
+   - ln command - **Already present**
+   - cp command - **Already present**
+   - rm command - **Already present**
+   - mkdir command with -p support - **Already present**
+   - grep command - **Already present**
+   - tr command - **Already present**
+   - **ADJUSTED: md5sum for Linux (not md5 command)**
+   - Compiler with -Oz support (Clang)
+   - Compiler with -z noexecstack support - **gcc/clang on Linux**
+   - Compiler with -z cet-report=error support - **gcc/clang with CET support**
+   - Assembler with --noexecstack support - **GNU as**
+   - grep with --color=never support - **GNU grep**
+   - Compiler with -Wa,--noexecstack support
+   - echo command - **Already present**
+   - test command - **Already present**
+   - ls command - **Already present**
+   - cut command - **Already present**
+   - realpath command - **Already present**
+   - install command - **Already present**
+   - tar command with --zstd support - **GNU tar 1.31+ in Ubuntu 20.04**
+   - Lorem ipsum generator
+   - XXH64 checksum implementation
+   - Wildcards support in shell - **bash/sh support**
+   - **REMOVED: Windows.h library - Windows-specific**
+
+2. FILES TO CREATE:
+   - `.gitignore` - Already exists
+   - `.gitattributes` - Already exists
+   - `build/.gitkeep` - Placeholder for build directory
+   - `tests/test_data/.gitkeep` - Placeholder for test data directory
+   - `dictionaries/.gitkeep` - Directory for storing trained dictionaries
+   - `.env` - Environment variables for test paths
+   - `cmake-build/` - Directory for CMake out-of-source builds
+   - `build-meson/` - Directory for Meson builds
+   - `build/meson/builddir/` - Meson build output directory
+   - `build/meson/builddir/staging/` - Meson staging directory
+   - `.vscode/c_cpp_properties.json` - VSCode C++ configuration (optional)
+   - `.github/workflows/ci.yml` - GitHub Actions CI configuration
+   - `tests/test_data/training_set/` - Directory for dictionary training samples
+   - `contrib/test_results/` - Directory for storing benchmark results
+   - `.clang-format` - Code formatting configuration
+   - `benchmark_results.txt` - Baseline performance metrics
+   - `.circleci/config.yml` - CircleCI configuration
+   - `.travis.yml` - Travis CI configuration
+   - `.cirrus.yml` - Cirrus CI configuration
+   - `tests/sanitizer_configs/` - Directory for sanitizer suppression files
+   - `tests/valgrind_suppressions.txt` - Valgrind suppression file
+   - `tests/large_data/` - Directory for large test data files
+   - `tests/corpus/` - Directory for fuzzer test corpus
+   - `tests/legacy_versions/` - Directory for legacy version test files
+   - `install/` - Directory for installation testing
+   - `mesonbuild/` - Meson build directory
+   - `cmakebuild/` - CMake build directory
+   - `/tmp/regress_results_dir/` - Temporary directory for regression test results
+   - `.swiftpm/` - **REMOVED: Swift-specific**
+   - `.build/` - **REMOVED: Swift-specific**
+   - `buck-out/` - Buck build output directory
+   - `.buckd/` - Buck daemon directory
+   - `.buckconfig.local` - Local Buck configuration overrides
+   - `BUCK` - Buck build file
+   - `contrib/pzstd/BUCK` - Buck build file for pzstd
+   - `.buckversion` - Buck version specification file
+   - `compile_flags.txt` - Compilation flags for clangd
+   - `.clang_complete` - Clang completion configuration
+   - `compile_commands.json` - Compilation database
+   - `_codelite/` - CodeLite project directory
+   - `_zstdbench/` - Benchmark results directory
+   - `googletest/` - Google Test framework directory
+   - `contrib/linux-kernel/linux/` - Linux kernel module directory
+   - `contrib/linux-kernel/linux/include/linux/` - Linux kernel include directory
+   - `contrib/linux-kernel/linux/lib/zstd/` - Linux kernel zstd library directory
+   - `contrib/linux-kernel/test/` - Linux kernel module test directory
+   - `contrib/linux-kernel/Makefile` - Already exists
+   - `contrib/linux-kernel/linux_zstd.h` - Linux kernel zstd header wrapper
+   - `contrib/linux-kernel/zstd_common_module.c` - Common module implementation
+   - `contrib/linux-kernel/zstd_compress_module.c` - Compression module implementation
+   - `contrib/linux-kernel/zstd_decompress_module.c` - Decompression module implementation
+   - `contrib/linux-kernel/decompress_sources.h` - Decompression sources header
+   - `contrib/linux-kernel/linux.mk` - Linux kernel module Makefile template
+   - `contrib/freestanding_lib/freestanding.py` - Python script for generating freestanding library
+   - `projects/` - Additional project directories
+   - `bin/` - Binary output directory
+   - **REMOVED: bin/Release/Win32/ - Windows-specific**
+   - **REMOVED: bin/Release/x64/ - Windows-specific**
+   - **REMOVED: bin/Debug/Win32/ - Windows-specific**
+   - **REMOVED: bin/Debug/x64/ - Windows-specific**
+   - `tests/line_ending_test_files/` - Directory for line ending test files
+   - **REMOVED: tests/windows_specific/ - Windows-specific**
+   - `tests/docker_test_environments/` - **NEW: Directory for Docker-based test environments**
+   - `.dockerignore` - **NEW: Docker ignore file for efficient builds**
+   - `docker-compose.test.yml` - **NEW: Docker Compose file for multi-platform testing**

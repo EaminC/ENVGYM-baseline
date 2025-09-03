@@ -1,0 +1,155 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Git (latest stable version with submodule support and attributes support)
+   - GCC or Clang compiler (C compiler with C99 support)
+   - libtool (latest stable version)
+   - make (GNU Make 3.81 or higher)
+   - automake (1.11.2 or higher, as specified in configure.ac)
+   - autoconf (2.65 or higher, as specified in configure.ac)
+   - flex (required for lexer generation)
+   - bison (version 3.0 or higher, required for parser generation)
+   - yacc (for YACC processing)
+   - ar (archiver, part of binutils)
+   - pkg-config (for library detection and libjq.pc generation)
+   - Python 3.8 (Ubuntu 20.04 default Python version, compatible with 3.8+ requirement)
+   - pip/pip3 (Python package installer)
+   - pipenv (latest stable version, for Python dependency management)
+   - virtualenv (for Python virtual environment creation)
+   - Docker (28.1.1 already available, with BuildKit support)
+   - Docker Compose (for orchestrating multi-container setups)
+   - Docker Buildx (for multi-platform Docker builds, BuildKit enabled)
+   - oniguruma library (optional, can use bundled version from submodule)
+   - libonig-dev (system oniguruma development package for Ubuntu)
+   - libm (math library, usually part of libc)
+   - pthread library (for thread support)
+   - valgrind (latest stable version, for memory leak detection and profiling)
+   - gcc/clang sanitizer support (optional, for ASan/UBSan)
+   - gcov (optional, for code coverage)
+   - Debian 11 base image dependencies (for Docker builds, bullseye)
+   - Ubuntu 20.04 base image dependencies (native environment)
+   - od (octal dump utility, for builtin.inc generation)
+   - rpmbuild (for RPM packaging)
+   - rpm-build package (provides rpmbuild command)
+   - libdl (for error injection module)
+   - lzma/xz compression utilities (for RPM w7.lzdio compression)
+   - Python HTTP server module (built-in with Python 3)
+   - GitHub CLI (gh) or web browser (for security reporting and attestation verification)
+   - Oniguruma 6.9.4+ (for regex support, bundled in vendor/oniguruma)
+   - decNumber library (bundled in vendor/decNumber for decimal arithmetic)
+   - NetBSD strptime implementation (bundled for portability)
+   - LLVM 10+ with UBSAN (optional, for undefined behavior detection)
+   - GCC 9.3.0 (Ubuntu 20.04 default, sufficient for C99 support)
+   - Tcl (optional, for multiline comment support testing)
+   - jinja2 3.1.6 (exact version for documentation)
+   - PyYAML 6.0.2 (exact version for documentation)
+   - Markdown 3.8.2 (exact version for documentation)
+   - lxml 6.0.0 (exact version for documentation)
+   - jsonschema 4.25.0 (exact version for documentation)
+   - curl (for downloading dependencies)
+   - tar (for extracting archives)
+   - realpath (for resolving paths, part of coreutils)
+   - GitHub Actions runner (for CI/CD)
+   - sha256sum (for checksum generation)
+   - GPG (for signing releases)
+   - strip (for binary stripping)
+   - file (for binary type identification)
+   - nproc (for CPU count detection)
+   - diff (for output comparison testing)
+   - tail (for manpage comparison, part of coreutils)
+   - clang-tools (includes scan-build static analyzer)
+   - scan-build (Clang static analyzer, part of clang-tools)
+   - gdb (GNU Debugger for core dump analysis)
+   - ulimit (shell builtin for resource limits)
+   - sed (stream editor for text processing)
+   - GitHub Pages deployment action dependencies
+   - GitHub Actions upload-pages-artifact action dependencies
+   - GitHub Actions deploy-pages action dependencies
+   - Dependabot CLI (optional, for local dependency scanning)
+   - dirname (for path manipulation, part of coreutils)
+   - basename (for filename extraction, part of coreutils)
+   - find (for file searching, part of findutils)
+   - cp (for file copying, part of coreutils)
+   - rm (for file removal, part of coreutils)
+   - mkdir (for directory creation, part of coreutils)
+   - cscope (optional, for code navigation)
+   - ctags/etags (optional, for tag generation)
+   - dos2unix/unix2dos (for line ending conversion)
+   - linguist (GitHub's language detection library, optional for local testing)
+
+2. FILES TO CREATE:
+   - `/home/cc/EnvGym/data/jqlang_jq/.gitattributes` - Git attributes configuration for line endings and file classification
+   - `/home/cc/EnvGym/data/jqlang_jq/test/sample.json` - Sample JSON file for testing
+   - `/home/cc/EnvGym/data/jqlang_jq/test/package.json` - Sample package.json for version extraction tests
+   - `/home/cc/EnvGym/data/jqlang_jq/test/large-dataset.json` - Large JSON file for performance testing
+   - `/home/cc/EnvGym/data/jqlang_jq/test/math-operations.json` - Test data for math functions
+   - `/home/cc/EnvGym/data/jqlang_jq/.dockerignore` - Exclude unnecessary files from Docker context
+   - `/home/cc/EnvGym/data/jqlang_jq/docker-compose.yml` - Docker compose configuration for easy testing
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/install-deps.sh` - Automated dependency installation script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/build.sh` - Automated build script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/build-static.sh` - Static build configuration script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-installation.sh` - Installation verification script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/docker-build.sh` - Docker image build script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/docker-test.sh` - Docker-based testing script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/configure-features.sh` - Feature configuration helper
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/setup-python-docs.sh` - Python documentation environment setup script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/verify-python-deps.sh` - Python dependency verification script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/update-submodules.sh` - Submodule update and verification script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/build-rpm.sh` - RPM package build script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/prepare-rpm-sources.sh` - RPM source preparation script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/build-website.sh` - Website build automation script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/serve-docs-locally.sh` - Local documentation server script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/security-audit.sh` - Security vulnerability scanning script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/check-security-advisories.sh` - Check for published security advisories
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/verify-attestations.sh` - Verify release artifact attestations
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-color-output.sh` - Test JQ_COLORS and NO_COLOR functionality
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-decimal-precision.sh` - Test decimal number precision preservation
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-new-builtins.sh` - Test new builtin functions (pick, debug, scan, abs, etc.)
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-syntax-changes.sh` - Test new syntax features (if without else, $binding as key)
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-multiline-comments.sh` - Test Tcl-style multiline comment support
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/benchmark-performance.sh` - Performance benchmarking script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-nan-handling.sh` - Test NaN and NaN with payload handling
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-unicode-regex.sh` - Test Unicode and regex functionality
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-streaming-parser.sh` - Test streaming JSON parser functionality
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-rfc7464.sh` - Test RFC7464 JSON text sequence support
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/generate-checksums.sh` - Generate SHA256 checksums for releases
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/sign-releases.sh` - GPG signing script for releases
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/create-multi-arch-docker.sh` - Multi-architecture Docker image creation
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-github-actions-locally.sh` - Local GitHub Actions testing
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-decnum-disabled.sh` - Test build with decnum disabled
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-decnum-enabled.sh` - Test build with decnum enabled
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-manpage-generation.sh` - Test manpage generation workflow
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/validate-manual-schema.sh` - Wrapper for manual schema validation
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-manpage-consistency.sh` - Test manpage and test file consistency
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-oniguruma-installed.sh` - Test with system oniguruma
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-oniguruma-disabled.sh` - Test with oniguruma disabled
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-oniguruma-bundled.sh` - Test with bundled oniguruma
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/run-scan-build.sh` - Local scan-build static analysis script
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/analyze-scan-build-results.sh` - Parse and report scan-build findings
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-scan-build-locally.sh` - Test scan-build workflow locally
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-valgrind.sh` - Test valgrind memory analysis locally
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/run-valgrind-checks.sh` - Run comprehensive valgrind checks
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/analyze-valgrind-results.sh` - Parse and report valgrind findings
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-website-workflow.sh` - Test website workflow locally
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-website-build.sh` - Test website build process locally
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-dependabot-config.sh` - Test Dependabot configuration validity
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/check-dependency-updates.sh` - Check for available dependency updates
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/update-python-deps.sh` - Update Python dependencies in docs/
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/update-github-actions.sh` - Update GitHub Actions versions
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-version-script.sh` - Test version detection script functionality
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/clean-build-artifacts.sh` - Clean all build artifacts and generated files
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/generate-tags.sh` - Generate ctags/etags for code navigation
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-gitattributes.sh` - Test git attributes configuration
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/verify-line-endings.sh` - Verify consistent line endings across files
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/check-generated-files.sh` - Verify generated files are properly marked
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/test-export-ignore.sh` - Test export-ignore attributes for releases
+   - `/home/cc/EnvGym/data/jqlang_jq/scripts/verify-linguist-attributes.sh` - Verify linguist attributes are correctly applied
+   - `/home/cc/EnvGym/data/jqlang_jq/config/m4/` - Directory for M4 macros
+   - `/home/cc/EnvGym/data/jqlang_jq/m4/` - Additional M4 macro directory
+   - `/home/cc/EnvGym/data/jqlang_jq/vendor/` - Directory for bundled dependencies (oniguruma, decNumber)
+   - `/home/cc/EnvGym/data/jqlang_jq/build/` - Build directory for outputs
+   - `/home/cc/EnvGym/data/jqlang_jq/BUILD.md` - Comprehensive build documentation
+   - `/home/cc/EnvGym/data/jqlang_jq/DOCKER.md` - Docker-specific build and usage documentation
+   - `/home/cc/EnvGym/data/jqlang_jq/FEATURES.md` - Documentation of optional features
+   - `/home/cc/EnvGym/data/jqlang_jq/PYTHON_DOCS.md` - Python documentation build guide
+   - `/home/cc/EnvGym/data/jqlang_jq/SUBMODULES.md` - Submodule management documentation

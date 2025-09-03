@@ -1,0 +1,21 @@
+current progress
+
+The Dockerfile has been successfully created with Ubuntu 22.04 base image and includes:
+- Basic build tools and system libraries (build-essential, git, curl, etc.)
+- Rust toolchains (stable 1.82.0, nightly-2025-01-25, miri nightly-2025-06-02)
+- Rust components (rustfmt, clippy, rust-src, miri)
+- Rust targets (x86_64-unknown-linux-musl, i686-unknown-linux-gnu, wasm32-unknown-unknown, wasm32-wasi)
+- Most cargo tools (cargo-edit, cargo-watch, cargo-spellcheck, etc.)
+- GitHub CLI
+- System dependencies for kernel compilation, testing, and development
+
+next step
+
+Add missing tools and fix version specifications:
+1. Install rust-analyzer for IDE support
+2. Install criterion as a system dependency (needed for benchmarks)
+3. Add environment variables for specific tool versions (e.g., CLIPPY_VERSION=1.88)
+4. Install additional missing tools: cargo-generate, cargo-expand
+5. Add healthcheck or verification commands to ensure all tools are properly installed
+6. Consider adding a non-root user for better security practices
+7. Add labels for better container documentation

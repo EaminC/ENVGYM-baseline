@@ -1,0 +1,222 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Go Programming Language (Go 1.24.0 or compatible version as per go.mod)
+   - Git (latest stable version)
+   - Protocol Buffer Compiler (protoc) - version 3.x or higher
+   - Go plugins for protoc:
+     - protoc-gen-go (v1.36.6 as per go.sum)
+     - protoc-gen-go-grpc (latest version)
+     - protoc-gen-validate (v1.2.1 as per go.sum)
+   - gRPC-Go package: google.golang.org/grpc (v1.74.2 as per examples/go.mod)
+   - gRPC Server Reflection package: google.golang.org/grpc/reflection
+   - gRPCurl - Command-line tool for interacting with gRPC servers
+   - Go module dependencies (will be auto-downloaded from go.mod/go.sum)
+   - OpenTelemetry Go SDK v1.37.0 and contrib packages
+   - OpenTelemetry Prometheus exporter v0.59.1
+   - OpenTelemetry stdout trace exporter v1.37.0
+   - OpenTelemetry SDK metric v1.37.0
+   - OpenTelemetry gRPC instrumentation v0.62.0
+   - OpenTelemetry HTTP instrumentation v0.62.0
+   - OpenTelemetry GCP detector v1.36.0
+   - SPIFFE Go library v2.5.0 for security
+   - CEL (Common Expression Language) v0.24.0 for policy evaluation
+   - Envoy control plane libraries for xDS integration (v1.32.4)
+   - Google Cloud Platform metadata detector v0.7.0
+   - Google Cloud Platform auth libraries v0.16.3
+   - Google Cloud Platform logging v1.13.0
+   - Google Cloud Platform monitoring v1.24.2
+   - Google Cloud Platform trace v1.11.6
+   - Google Cloud Platform operations detector v1.29.0
+   - OAuth2 client library v0.30.0
+   - Gonum v0.16.0 for statistical analysis
+   - Go vet dependencies (installed via scripts/vet.sh)
+   - gRPC credentials package for TLS/OAuth2
+   - gRPC metadata package for token handling
+   - gRPC keepalive package (google.golang.org/grpc/keepalive)
+   - gRPC encoding package (google.golang.org/grpc/encoding)
+   - gRPC gzip compression (google.golang.org/grpc/encoding/gzip)
+   - Google OAuth2 package (golang.org/x/oauth2/google)
+   - gRPC benchmark utilities (google.golang.org/grpc/benchmark)
+   - gRPC GCP observability package v1.0.1
+   - gRPC Advanced TLS package v1.0.0
+   - gRPC OpenCensus stats package v1.0.0
+   - Prometheus client library v1.23.0
+   - Prometheus client model v0.6.2
+   - Prometheus common v0.65.0
+   - Prometheus OTLP translator
+   - CNCF xDS Go library (latest)
+   - Google S2A Go library v0.1.9
+   - Enterprise Certificate Proxy v0.3.6
+   - AWS SDK Go v2 v1.37.2 (for cloud deployments)
+   - OpenCensus v0.24.0 and OpenCensus proto v0.4.1
+   - OpenCensus Stackdriver exporter v0.13.15-0.20230702191903-2de6d2748484
+   - CSV parsing libraries for payload curve analysis
+   - Go race detector (built-in with Go)
+   - Go concurrency testing tools (built-in with Go)
+   - Go standard compression packages (compress/gzip, compress/zlib)
+   - gRPC internal logging package (google.golang.org/grpc/grpclog)
+   - Structured logging libraries (zap, logrus, or slog for Go 1.21+)
+   - HTTP proxy libraries (golang.org/x/net/proxy)
+   - SOCKS5 proxy support libraries
+   - gRPC status package (google.golang.org/grpc/status)
+   - gRPC codes package (google.golang.org/grpc/codes)
+   - Google API error details proto (google.golang.org/genproto/googleapis/rpc/errdetails)
+   - Semantic versioning library (github.com/Masterminds/semver/v3)
+   - GitHub CLI tool for release management
+   - Changelog generation tools (github.com/git-chglog/git-chglog)
+   - gRPC connectivity package (google.golang.org/grpc/connectivity)
+   - gRPC backoff package (google.golang.org/grpc/backoff)
+   - Go linting tools (golint, gofmt, goimports)
+   - Google Style Guide linter (google.golang.org/grpc/cmd/protoc-gen-go-grpc)
+   - GitHub Actions CLI for local testing
+   - Spell checker tools (aspell or similar)
+   - Git commit message linter
+   - Security scanning tools (gosec, nancy, trivy)
+   - CVE scanning tools (grype, snyk)
+   - SAST (Static Application Security Testing) tools
+   - Dependency vulnerability scanners
+   - Testify v1.10.0 for testing assertions
+   - Go-jose v4.1.2 for JWT handling
+   - Klauspost compress v1.18.0 for advanced compression
+   - Zeebo errs v1.4.0 for error handling
+   - Golang.org/x dependencies:
+     - x/crypto v0.40.0
+     - x/net v0.42.0
+     - x/sync v0.16.0
+     - x/sys v0.34.0
+     - x/text v0.27.0
+     - x/time v0.12.0
+   - Google genproto libraries (latest versions)
+   - PlanetScale vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10
+   - Grafana regexp v0.0.0-20240518133315-a468a5bfb3bc
+   - Google Cloud API v0.245.0
+   - Google Cloud IAM v1.5.2
+   - Google Cloud Longrunning v0.6.7
+   - Go-logr v1.4.3 for structured logging
+   - Optional: GoLand/VS Code with Go extension for IDE support
+
+2. FILES TO CREATE:
+   - go.mod (already exists - google.golang.org/grpc module)
+   - go.sum (already exists - contains dependency checksums)
+   - examples/go.mod (already exists - google.golang.org/grpc/examples module)
+   - examples/go.sum (already exists - contains dependency checksums for examples)
+   - Makefile (already exists - contains build and test targets)
+   - CONTRIBUTING.md (already exists - contribution guidelines)
+   - SECURITY.md (already exists - references gRPC CVE Process)
+   - GOVERNANCE.md (already exists - references gRPC organization governance)
+   - MAINTAINERS.md (already exists - lists active and emeritus maintainers)
+   - examples/README.md (already exists - examples overview documentation)
+   - .gitignore - Ignore build artifacts and vendor directory
+   - proto/ directory - For .proto service definitions
+   - proto/example.proto - Sample gRPC service definition with validation rules
+   - proto/health.proto - Health check service definition
+   - proto/ratelimit.proto - Rate limiting service definition
+   - proto/error_details.proto - Custom error detail message definitions
+   - proto/echo.proto - Echo service definition for reflection examples
+   - server/main.go - gRPC server implementation with TLS, OAuth2, keepalive, compression, and reflection
+   - client/main.go - gRPC client implementation with TLS, OAuth2, keepalive, and compression
+   - config/config.yaml - Configuration file for server/client settings including keepalive and compression
+   - config/keepalive.yaml - Dedicated keepalive configuration parameters
+   - config/compression.yaml - Compression configuration (algorithms, defaults)
+   - config/envoy.yaml - Envoy proxy configuration for xDS
+   - config/logging.yaml - Logging configuration with log levels and verbosity settings
+   - config/proxy.yaml - HTTP CONNECT proxy configuration
+   - config/security.yaml - Security configuration including CVE scanning settings
+   - config/observability.yaml - OpenTelemetry and observability configuration
+   - config/gcp.yaml - GCP-specific configuration for cloud deployments
+   - config/aws.yaml - AWS-specific configuration for cloud deployments
+   - scripts/generate.sh - Script to generate Go code from proto files
+   - scripts/validate.sh - Script to validate proto files
+   - scripts/vet.sh - Script for running go vet with dependencies
+   - scripts/test_reflection.sh - Script to test server reflection with gRPCurl
+   - scripts/release.sh - Script for creating releases following versioning policy
+   - scripts/version_check.sh - Script to validate version compatibility
+   - scripts/lint.sh - Script for running linters following Google style guide
+   - scripts/pre-commit.sh - Pre-commit hook for code style validation
+   - scripts/test-all-modules.sh - Script to run tests across all modules
+   - scripts/security-scan.sh - Script for running security scans and CVE checks
+   - scripts/vulnerability-check.sh - Script for checking dependency vulnerabilities
+   - scripts/maintainer-check.sh - Script to validate maintainer permissions
+   - docker-compose.yml - For containerized development environment
+   - .env - Environment variables for logging, telemetry, and proxy configuration
+   - .github/pull_request_template.md - PR template with RELEASE NOTES section
+   - .github/ISSUE_TEMPLATE/bug_report.md - Bug report template
+   - .github/ISSUE_TEMPLATE/feature_request.md - Feature request template
+   - .github/ISSUE_TEMPLATE/security_vulnerability.md - Security vulnerability report template
+   - .github/workflows/ci.yml - CI workflow for PR validation
+   - .github/workflows/lint.yml - Linting workflow
+   - .github/workflows/spell-check.yml - Spell checking workflow
+   - .github/workflows/security-scan.yml - Security scanning workflow
+   - .github/workflows/cve-scan.yml - CVE scanning workflow for dependencies
+   - .github/workflows/maintainer-validation.yml - Workflow to validate maintainer changes
+   - .github/CODEOWNERS - GitHub code owners file based on MAINTAINERS.md
+   - examples/helloworld/ directory - Basic client and server example
+   - examples/helloworld/helloworld/helloworld.proto - Hello world service definition
+   - examples/helloworld/greeter_client/main.go - Basic hello world client using grpc.NewClient
+   - examples/helloworld/greeter_server/main.go - Basic hello world server with reflection
+   - examples/routeguide/ directory - Streaming RPCs example
+   - examples/routeguide/routeguide/route_guide.proto - Route guide service definition
+   - examples/routeguide/client/main.go - Route guide streaming client
+   - examples/routeguide/server/main.go - Route guide streaming server
+   - examples/routeguide/testdata/route_guide_db.json - Sample route data
+   - examples/features/ directory - Feature-focused examples
+   - examples/features/authentication/ - OAuth2 authentication examples
+   - examples/features/metadata/client/main.go - Metadata client examples
+   - examples/features/metadata/server/main.go - Metadata server examples
+   - examples/features/metadata_interceptor/server/main.go - Metadata interceptor example
+   - examples/features/keepalive/client/main.go - Keepalive client example
+   - examples/features/keepalive/server/main.go - Keepalive server example
+   - examples/features/compression/client/main.go - Compression client example
+   - examples/features/compression/server/main.go - Compression server example
+   - examples/features/multiplex/client/main.go - Multiplex client example
+   - examples/features/multiplex/server/main.go - Multiplex server example
+   - examples/features/concurrency/client/main.go - Concurrent client example
+   - examples/features/concurrency/server/main.go - Concurrent server example
+   - examples/features/concurrency/stream/main.go - Concurrent stream example
+   - examples/features/encoding/client/main.go - Custom codec client example
+   - examples/features/encoding/server/main.go - Custom codec server example
+   - examples/features/logging/client/main.go - Logging configuration client example
+   - examples/features/logging/server/main.go - Logging configuration server example
+   - examples/features/proxy/client/main.go - HTTP CONNECT proxy client example
+   - examples/features/proxy/custom_dialer/main.go - Custom proxy dialer example
+   - examples/features/error_details/client/main.go - Error details client example
+   - examples/features/error_details/server/main.go - Error details server example with rate limiting
+   - examples/features/reflection/server/main.go - Server reflection example implementation
+   - examples/features/reflection/client/main.go - Client using reflection for service discovery
+   - examples/features/connection_management/client/main.go - Client using grpc.NewClient with proper connection management
+   - examples/features/connection_management/legacy_client/main.go - Client showing deprecated grpc.Dial usage
+   - examples/features/retry/client/main.go - Client with built-in retry mechanism
+   - examples/features/retry/manual_retry/main.go - Client with manual retry and backoff strategy
+   - examples/features/error_handling/client/main.go - Client with comprehensive error handling
+   - examples/features/error_handling/server/main.go - Server with proper error status translation
+   - examples/features/security/tls/client/main.go - TLS security client example
+   - examples/features/security/tls/server/main.go - TLS security server example
+   - examples/features/security/oauth2/client/main.go - OAuth2 security client example
+   - examples/features/security/oauth2/server/main.go - OAuth2 security server example
+   - examples/features/security/jwt/client/main.go - JWT authentication client example
+   - examples/features/security/jwt/server/main.go - JWT authentication server example
+   - examples/features/observability/opentelemetry/client/main.go - OpenTelemetry client example
+   - examples/features/observability/opentelemetry/server/main.go - OpenTelemetry server example
+   - examples/features/observability/prometheus/client/main.go - Prometheus metrics client example
+   - examples/features/observability/prometheus/server/main.go - Prometheus metrics server example
+   - examples/features/observability/opencensus/client/main.go - OpenCensus client example
+   - examples/features/observability/opencensus/server/main.go - OpenCensus server example
+   - examples/features/observability/gcp/client/main.go - GCP observability client example
+   - examples/features/observability/gcp/server/main.go - GCP observability server example
+   - examples/features/observability/aws/client/main.go - AWS observability client example
+   - examples/features/observability/aws/server/main.go - AWS observability server example
+   - examples/features/xds/client/main.go - xDS client example
+   - examples/features/xds/server/main.go - xDS server example
+   - examples/features/advancedtls/client/main.go - Advanced TLS client example
+   - examples/features/advancedtls/server/main.go - Advanced TLS server example
+   - examples/rpc_errors/client/main.go - RPC errors client example with status checking
+   - examples/rpc_errors/server/main.go - RPC errors server example with quota violations
+   - examples/data/ directory - Data files used by examples
+   - examples/data/server1.pem - TLS certificate for server 1
+   - examples/data/server1.key - TLS private key for server 1
+   - examples/data/ca-cert.pem - Certificate authority for examples
+   - examples/data/x509/ directory - X509 certificate data for advanced TLS examples
+   - internal/ directory - Internal packages
+   - internal/cel/ - CEL policy engine implementation
+   - internal/interceptors/

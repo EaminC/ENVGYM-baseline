@@ -1,0 +1,29 @@
+=== Docker Execution Log - 20250902_181907 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756837146
+
+=== Build Log ===
+Build Status: Failed
+Build Error:
+--------------------
+8 |
+9 | >>> RUN if [ -f go.mod ]; then \
+10 | >>>         echo "go.mod found, downloading dependencies..." && \
+11 | >>>         go mod download; \
+12 | >>>     elif [ -n "$(find . -name '*.go' -print -quit)" ]; then \
+13 | >>>         echo "Go files found but no go.mod, initializing module..." && \
+14 | >>>         go mod init github.com/cli/cli && \
+15 | >>>         go mod tidy; \
+16 | >>>     else \
+17 | >>>         echo "No Go files found, skipping module initialization"; \
+18 | >>>     fi
+19 |
+--------------------
+ERROR: failed to solve: process "/bin/sh -c if [ -f go.mod ]; then         echo \"go.mod found, downloading dependencies...\" &&         go mod download;     elif [ -n \"$(find . -name '*.go' -print -quit)\" ]; then         echo \"Go files found but no go.mod, initializing module...\" &&         go mod init github.com/cli/cli &&         go mod tidy;     else         echo \"No Go files found, skipping module initialization\";     fi" did not complete successfully: exit code: 1
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Error:
+
+
+=== Execution End ===

@@ -1,0 +1,155 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.7 (specific version for TensorFlow 2.5.0 compatibility and tested with Fairify)
+   - Git (latest stable version)
+   - pip (will be updated after Python installation)
+   - Virtual environment package (included with Python 3.7)
+   - z3-solver (via pip)
+   - TensorFlow 2.5.0 CPU version (via pip - no GPU support needed)
+   - AIF360 (AI Fairness 360 toolkit, via pip)
+   - NumPy (dependency for TensorFlow and AIF360)
+   - Pandas (dependency for AIF360)
+   - Scikit-learn (dependency for AIF360)
+   - Matplotlib (for potential visualization needs)
+   - Bash shell (already available on Ubuntu 20.04)
+   - h5py (for loading .h5 model files)
+   - Jupyter (optional, for notebook development and testing)
+   - wget or curl (already available on Ubuntu 20.04)
+
+2. FILES TO CREATE:
+   - `.env` (/home/cc/EnvGym/data/Fairify) - Environment variables for paths and configurations
+   - `config.py` (/home/cc/EnvGym/data/Fairify) - Central configuration file for model paths, dataset paths, verification parameters, and Z3 solver settings
+   - `.gitignore` (/home/cc/EnvGym/data/Fairify) - Update existing file to include: *.DS_Store, .ipynb_checkpoints/, __pycache__/, ~$*, fenv/, *.pyc, .env, *.log, models/*.h5, data/*/processed/, res/, *.csv
+   - `test_environment.py` (/home/cc/EnvGym/data/Fairify) - Script to verify environment setup including TensorFlow, Z3, and AIF360
+   - `logs/` directory - For storing verification results and logs
+   - `results/` directory - For storing output files from verification runs
+   - `data/processed/` subdirectories - For storing preprocessed datasets from AIF360
+   - `solver_config.py` (/home/cc/EnvGym/data/Fairify) - Z3 solver specific configurations and timeout settings
+   - Shell script execution permissions - Make all .sh files executable in src/, stress/, relaxed/, targeted/, targeted2/
+   - `ARTIFACT_EVALUATION.md` (/home/cc/EnvGym/data/Fairify) - Document artifact evaluation instructions and badge criteria
+   - `requirements_verified.txt` (/home/cc/EnvGym/data/Fairify) - Verified working package versions
+   - `LICENSE_NOTICE.md` (/home/cc/EnvGym/data/Fairify) - Additional license notices for dependencies and third-party components
+   - `data/adult/adult.data` - Adult census training data (32561 instances) if not present
+   - `data/adult/adult.test` - Adult census test data (16281 instances) if not present
+   - `data/adult/adult.names` - Adult census dataset feature information if not present
+   - `data/bank/bank-additional-full.csv` - Bank marketing full dataset (41188 instances) if not present
+   - `data/bank/bank-additional-names.txt` - Bank marketing dataset feature information if not present
+   - `data/german/german.data` - German credit data (1000 instances) if not present
+   - `data/german/german.doc` - German credit dataset feature documentation if not present
+   - `test_adult_dataset.py` - Test script specifically for Adult census dataset loading and preprocessing
+   - `test_bank_dataset.py` - Test script specifically for Bank marketing dataset loading and preprocessing
+   - `test_german_dataset.py` - Test script specifically for German credit dataset loading and preprocessing
+   - `relaxed/AC/res/` directory - For storing Adult Census relaxed verification CSV results
+   - `relaxed/GC/res/` directory - For storing German Credit relaxed verification CSV results
+   - `relaxed/BM/res/` directory - For storing Bank Marketing relaxed verification CSV results
+   - `src/AC/res/` directory - For storing Adult Census standard verification CSV results
+   - `src/AC/res-race/` directory - For storing Adult Census race-specific verification CSV results
+   - `src/AC/res-sex/` directory - For storing Adult Census sex-specific verification CSV results
+   - `src/GC/res/` directory - For storing German Credit standard verification CSV results
+   - `src/GC/res-sex/` directory - For storing German Credit sex-specific verification CSV results
+   - `src/BM/res/` directory - For storing Bank Marketing standard verification CSV results
+   - `stress/AC/res/` directory - For storing Adult Census stress test CSV results
+   - `stress/GC/res/` directory - For storing German Credit stress test CSV results
+   - `stress/BM/res/` directory - For storing Bank Marketing stress test CSV results
+   - `targeted/AC/res/` directory - For storing Adult Census targeted verification CSV results
+   - `targeted/GC/res/` directory - For storing German Credit targeted verification CSV results
+   - `targeted/BM/res/` directory - For storing Bank Marketing targeted verification CSV results
+   - `targeted2/AC/res/` directory - For storing Adult Census targeted2 verification CSV results
+   - `targeted2/GC/res/` directory - For storing German Credit targeted2 verification CSV results
+   - `targeted2/BM/res/` directory - For storing Bank Marketing targeted2 verification CSV results
+   - `readme.md` files for all res/ directories - Documentation explaining CSV result file generation
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - `test_data_loading.py` - Test loading of German Credit (GC), Adult Census (AC), and Bank Marketing (BM) datasets with AIF360 preprocessing
+   - `test_model_loading.py` - Test loading of pre-trained TensorFlow 2.5.0 neural network models from .h5 files
+   - `test_fairness_metrics.py` - Test fairness metric calculations using AIF360 metrics
+   - `test_z3_solver.py` - Test Z3 solver integration and basic constraint solving
+   - `test_verification_basic.py` - Test basic verification functionality with Z3
+   - `test_scaled_experiment.py` - Test scaled experiment execution
+   - `test_relaxed_queries.py` - Test relaxed query verification using Z3
+   - `test_targeted_queries.py` - Test targeted query verification (both types)
+   - `test_aif360_integration.py` - Test AIF360 bias detection and mitigation features
+   - `test_tensorflow_compatibility.py` - Test TensorFlow 2.5.0 CPU-only specific features
+   - `test_shell_scripts.py` - Test shell script execution and parameter passing
+   - `test_timeout_handling.py` - Test 30-minute and 1-hour timeout configurations
+   - `test_utils.py` - Test utility functions
+   - `test_h5_model_loading.py` - Test loading Kaggle and benchmark models from .h5 files
+   - `test_csv_output.py` - Test CSV result file generation in res/ directories
+   - `test_artifact_reproducibility.py` - Test artifact reproducibility on x86_64 architecture
+   - `test_license_compliance.py` - Test MIT license compliance for all components
+   - `test_gitignore.py` - Test that .gitignore properly excludes all specified patterns
+   - `integration_test.py` - End-to-end test of complete verification pipeline with all components
+   - `test_adult_dataset.py` - Test Adult census dataset loading (48842 total instances: 32561 training + 16281 test)
+   - `test_adult_income_prediction.py` - Test income threshold prediction ($50K/yr) functionality
+   - `test_bank_dataset.py` - Test Bank marketing dataset loading (41188 instances)
+   - `test_bank_subscription_prediction.py` - Test term deposit subscription prediction functionality
+   - `test_german_dataset.py` - Test German credit dataset loading (1000 instances)
+   - `test_german_credit_risk.py` - Test credit risk classification (good/bad) functionality
+   - `test_uci_ml_datasets.py` - Test all UCI ML Repository dataset integrations
+   - `test_date_ordered_data.py` - Test handling of date-ordered Bank marketing data (May 2008 to November 2010)
+   - `test_csv_result_generation.py` - Test CSV file generation in all experiment type res/ directories
+   - `test_res_directory_creation.py` - Test automatic creation of res/ directories for all dataset-experiment combinations
+   - `test_csv_format_validation.py` - Test CSV output format consistency across all verification types
+   - `test_res_readme_files.py` - Test presence and content of readme.md files in all res/ directories
+   - `test_race_specific_verification.py` - Test race-specific verification functionality for Adult Census dataset
+   - `test_res_race_directory.py` - Test CSV result generation in src/AC/res-race/ directory
+   - `test_sex_specific_verification.py` - Test sex-specific verification functionality for Adult Census dataset
+   - `test_res_sex_directory.py` - Test CSV result generation in src/AC/res-sex/ directory
+   - `test_bm_res_directory.py` - Test CSV result generation specifically in src/BM/res/ directory
+   - `test_gc_sex_specific_verification.py` - Test sex-specific verification functionality for German Credit dataset
+   - `test_gc_res_sex_directory.py` - Test CSV result generation in src/GC/res-sex/ directory
+   - `test_stress_ac_res_directory.py` - Test CSV result generation in stress/AC/res/ directory
+   - `test_stress_bm_res_directory.py` - Test CSV result generation in stress/BM/res/ directory
+   - `test_stress_gc_res_directory.py` - Test CSV result generation in stress/GC/res/ directory
+   - `test_targeted_ac_res_directory.py` - Test CSV result generation in targeted/AC/res/ directory
+   - `test_targeted_bm_res_directory.py` - Test CSV result generation in targeted/BM/res/ directory
+   - `test_targeted_gc_res_directory.py` - Test CSV result generation in targeted/GC/res/ directory
+   - `test_targeted2_ac_res_directory.py` - Test CSV result generation in targeted2/AC/res/ directory
+   - `test_targeted2_bm_res_directory.py` - Test CSV result generation in targeted2/BM/res/ directory
+   - `test_targeted2_gc_res_directory.py` - Test CSV result generation in targeted2/GC/res/ directory
+
+4. COMPLETE TODO LIST:
+   - Verify working directory: `pwd` (should be /home/cc/EnvGym/data/Fairify)
+   - Install Python 3.7 if not present (verify with `python3 --version` or `python3.7 --version`)
+   - Install Git if not present (verify with `git --version`)
+   - Verify Bash shell availability: `echo $SHELL` (should be /bin/bash on Ubuntu 20.04)
+   - Navigate to project directory: `cd /home/cc/EnvGym/data/Fairify`
+   - Verify LICENSE file exists and contains MIT License
+   - Verify .gitignore exists and contains basic patterns (*.DS_Store, .ipynb_checkpoints/, __pycache__/, ~$*)
+   - Update .gitignore to include additional patterns: fenv/, *.pyc, .env, *.log, models/*.h5, data/*/processed/, res/, *.csv
+   - Create virtual environment: `python3.7 -m venv fenv`
+   - Activate virtual environment: `source fenv/bin/activate`
+   - Update pip: `python -m pip install --upgrade pip`
+   - Install TensorFlow CPU version: `pip install tensorflow-cpu==2.5.0`
+   - Install core requirements: `pip install -r requirements.txt`
+   - Verify TensorFlow installation: `python -c "import tensorflow as tf; print(tf.__version__); print('CPU devices:', tf.config.list_physical_devices('CPU'))"`
+   - Verify Z3 installation: `python -c "import z3; print(z3.get_version_string())"`
+   - Verify AIF360 installation: `python -c "import aif360; print('AIF360 imported successfully')"`
+   - Verify h5py installation: `python -c "import h5py; print('h5py version:', h5py.__version__)"`
+   - Install additional dependencies if needed: `pip install numpy pandas scikit-learn matplotlib h5py`
+   - Verify all package installations: `pip list`
+   - Create necessary directories: `mkdir -p logs results data/processed`
+   - Create result directories for all experiments: `mkdir -p src/{AC,GC,BM}/res stress/{AC,GC,BM}/res relaxed/{AC,GC,BM}/res targeted/{AC,GC,BM}/res targeted2/{AC,GC,BM}/res`
+   - Create race-specific result directory for Adult Census: `mkdir -p src/AC/res-race`
+   - Create sex-specific result directory for Adult Census: `mkdir -p src/AC/res-sex`
+   - Create sex-specific result directory for German Credit: `mkdir -p src/GC/res-sex`
+   - Create readme.md files in all res/ directories: `for dir in src/{AC,GC,BM}/res stress/{AC,GC,BM}/res relaxed/{AC,GC,BM}/res targeted/{AC,GC,BM}/res targeted2/{AC,GC,BM}/res src/AC/res-race src/AC/res-sex src/GC/res-sex; do echo "Running the verification will produce result in \`csv\` files and save in this directory." > $dir/readme.md; done`
+   - Verify targeted/AC/res/readme.md exists with correct content: `cat targeted/AC/res/readme.md`
+   - Verify targeted/BM/res/readme.md exists with correct content: `cat targeted/BM/res/readme.md`
+   - Verify targeted/GC/res/readme.md exists with correct content: `cat targeted/GC/res/readme.md`
+   - Verify targeted2/AC/res/readme.md exists with correct content: `cat targeted2/AC/res/readme.md`
+   - Verify targeted2/BM/res/readme.md exists with correct content: `cat targeted2/BM/res/readme.md`
+   - Verify targeted2/GC/res/readme.md exists with correct content: `cat targeted2/GC/res/readme.md`
+   - Verify stress/AC/res/readme.md exists with correct content: `cat stress/AC/res/readme.md`
+   - Verify stress/BM/res/readme.md exists with correct content: `cat stress/BM/res/readme.md`
+   - Verify stress/GC/res/readme.md exists with correct content: `cat stress/GC/res/readme.md`
+   - Verify src/BM/res/readme.md exists with correct content: `cat src/BM/res/readme.md`
+   - Verify relaxed/GC/res/readme.md exists with correct content: `cat relaxed/GC/res/readme.md`
+   - Verify src/AC/res-race/readme.md exists with correct content: `cat src/AC/res-race/readme.md`
+   - Verify src/AC/res-sex/readme.md exists with correct content: `cat src/AC/res-sex/readme.md`
+   - Verify src/GC/res-sex/readme.md exists with correct content: `cat src/GC/res-sex/readme.md`
+   - Verify readme.md files exist in all res/ directories: `find /home/cc/EnvGym/data/Fairify -path "*/res/readme.md" -type f | sort`
+   - Verify readme.md file exists in AC res-race directory: `find /home/cc/EnvGym/data/Fairify -path "*/res-race/readme.md" -type f`
+   - Verify readme.md file exists in AC res-sex directory: `find /home/cc/EnvGym/data/Fairify -path "*/AC/res-sex/readme.md" -type f`
+   - Verify readme.md file exists in GC res-sex directory: `find /home

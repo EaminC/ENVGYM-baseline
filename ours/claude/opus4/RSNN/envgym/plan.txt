@@ -1,0 +1,300 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.10.12 (exact version specified in README)
+   - Git (for cloning repositories and installing specific commits)
+   - pip (Python package manager, usually comes with Python)
+   - ffmpeg or libsndfile (for soundfile package)
+   - HDF5 libraries (for h5py and tables)
+   - Visual Studio Code (optional, based on .code-workspace in gitignore)
+   - Requirements from requirements.txt:
+     - numpy (with float32 support for dtype configuration)
+     - torch (CPU-only version - no CUDA support available)
+     - scipy
+     - matplotlib
+     - seaborn
+     - h5py
+     - soundfile
+     - tables
+     - torchaudio
+     - torchvision
+     - tonic
+     - xlsxwriter
+     - hydra-core (for defaults configuration and directory management)
+     - neurobench (for benchmarking metrics)
+     - pandas
+     - snntorch (for snnTorch model evaluation option)
+     - omegaconf
+     - KDEpy
+     - stork (specific commit 40c68fe from GitHub)
+     - randman (from fzenke GitHub)
+   - Dataset: "Nonhuman Primate Reaching with Multichannel Sensorimotor Cortex Electrophysiology" from Zenodo (https://zenodo.org/records/583331)
+   - IEEE BioCAS 2024 Grand Challenge dataset (if available)
+   - Pre-trained model checkpoints for loco and indy monkeys (if available)
+   - Pre-trained models in both stork and snnTorch formats (for evaluation comparison)
+
+2. FILES TO CREATE:
+   - `/home/cc/EnvGym/data/RSNN/conf/data/data-default.yaml` (modify existing file with data_dir path)
+   - `/home/cc/EnvGym/data/RSNN/conf/config.yaml` (modify existing file with output directory)
+   - `/home/cc/EnvGym/data/RSNN/conf/hydra/default.yaml` (verified to exist with proper run/sweep/job configuration)
+   - `/home/cc/EnvGym/data/RSNN/conf/initializer/fluct-driven.yaml` (verify existence)
+   - `/home/cc/EnvGym/data/RSNN/conf/evaluation/eval-default.yaml` (verify existence)
+   - `/home/cc/EnvGym/data/RSNN/conf/plotting/plot_all.yaml` (verify existence)
+   - `/home/cc/EnvGym/data/RSNN/conf/model/bigRSNN.yaml` (verify existence)
+   - `/home/cc/EnvGym/data/RSNN/conf/model/tinyRSNN.yaml` (verify existence)
+   - `/home/cc/EnvGym/data/RSNN/conf/training/training-bigRSNN.yaml` (verify existence)
+   - `/home/cc/EnvGym/data/RSNN/conf/training/training-tinyRSNN.yaml` (verify existence)
+   - `/home/cc/EnvGym/data/RSNN/conf/train-bigRSNN.yaml` (verify existence)
+   - `/home/cc/EnvGym/data/RSNN/conf/train-tinyRSNN.yaml` (verify existence)
+   - `/home/cc/EnvGym/data/RSNN/conf/evaluate.yaml` (verify existence)
+   - `.env` file for environment variables (optional):
+     - DATA_DIR=/home/cc/EnvGym/data/RSNN/data
+     - OUTPUT_DIR=/home/cc/EnvGym/data/RSNN/output
+     - MODEL_DIR=/home/cc/EnvGym/data/RSNN/models
+     - PYTHONPATH=/home/cc/EnvGym/data/RSNN
+     - TORCH_DTYPE=float32
+     - NB_WORKERS=2
+     - PRETRAINED_MODELS_DIR=/home/cc/EnvGym/data/RSNN/pretrained_models
+   - `setup.py` or `pyproject.toml` for package management (optional)
+   - `.gitignore` file (already exists, verify content):
+     - data/*
+     - **/__pycache__/**
+     - **/matData/**
+     - *.svg
+     - *.ods
+     - **/*.code-workspace
+     - output/*
+     - notebooks/*
+     - .vscode/*
+     - models/*
+     - Additional entries to add:
+       - .env
+       - *.pyc
+       - *.h5
+       - *.mat
+       - *.xlsx
+       - /outputs/
+       - .hydra/
+       - multirun/
+       - pretrained_models/*
+       - checkpoints/*
+   - `requirements-dev.txt` for development dependencies:
+     - pytest
+     - jupyter
+     - ipykernel
+     - black
+     - flake8
+   - Directory structure for pre-trained models:
+     - `/home/cc/EnvGym/data/RSNN/pretrained_models/loco/`
+     - `/home/cc/EnvGym/data/RSNN/pretrained_models/indy/`
+     - `/home/cc/EnvGym/data/RSNN/pretrained_models/tinyRSNN/loco/`
+     - `/home/cc/EnvGym/data/RSNN/pretrained_models/tinyRSNN/indy/`
+     - `/home/cc/EnvGym/data/RSNN/pretrained_models/bigRSNN/loco/`
+     - `/home/cc/EnvGym/data/RSNN/pretrained_models/bigRSNN/indy/`
+     - `/home/cc/EnvGym/data/RSNN/models/`
+     - `/home/cc/EnvGym/data/RSNN/models/snnTorch/`
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - `test_data_loader.py`:
+     - Test data loading from specified directory
+     - Test session filtering (loco/indy sessions)
+     - Test train/validation/test split functionality
+     - Test data preprocessing and normalization
+     - Test HDF5 and MAT file reading
+     - Test audio data handling with torchaudio
+     - Test matData directory structure handling
+     - Test multi-worker data loading (nb_workers=2)
+     - Test float32 dtype consistency
+     - Test multi-session data aggregation for pretraining
+     - Test monkey-specific data loading
+   - `test_models.py`:
+     - Test bigRSNN model initialization and forward pass
+     - Test tinyRSNN model initialization and forward pass
+     - Test model loading from state dictionaries
+     - Test model conversion to snnTorch format
+     - Test stork layer integration
+     - Test randman initialization
+     - Test CPU device placement (no CUDA available)
+     - Test float32 precision operations
+     - Test pre-trained model loading for both monkeys
+     - Test model state transfer between sessions
+     - Test tinyRSNN specific configurations from training-tinyRSNN.yaml
+     - Test snnTorch model equivalence with stork models
+     - Test model loading from models directory
+   - `test_training.py`:
+     - Test training loop for small batch
+     - Test loss computation
+     - Test gradient updates
+     - Test pruning functionality for tinyRSNN
+     - Test omegaconf configuration handling
+     - Test output directory creation and management
+     - Test seed handling (seed=False functionality)
+     - Test multi-worker training efficiency
+     - Test pretraining mode on aggregated sessions for both models
+     - Test session-specific fine-tuning after pretraining
+     - Test load_state functionality for both monkeys and both models
+     - Test training from scratch when load_state is False
+     - Test monkey-specific training loops
+     - Test tinyRSNN pretraining workflow
+     - Test tinyRSNN load_state configuration
+     - Test model saving to models directory
+     - Test CPU-only training performance
+   - `test_evaluation.py`:
+     - Test R2 score calculation
+     - Test NeuroBench benchmark wrapper
+     - Test computational metrics (MACs, ACs, sparsity)
+     - Test results JSON generation
+     - Test KDEpy density estimation
+     - Test Excel report generation with xlsxwriter
+     - Test SVG figure export
+     - Test ODS file handling
+     - Test eval-default configuration loading
+     - Test evaluation on pre-trained vs fine-tuned models
+     - Test monkey-specific evaluation metrics
+     - Test tinyRSNN evaluation with pretraining
+     - Test static metrics: footprint, connection_sparsity
+     - Test workload metrics: r2, activation_sparsity, synaptic_operations
+     - Test modelname selection: 'tinyRSNN', 'bigRSNN', 'all'
+     - Test snnTorch model evaluation when use_snnTorch_model=True
+     - Test evaluation with models from model_dir
+     - Test evaluation configuration loading from evaluate.yaml
+   - `test_config.py`:
+     - Test hydra configuration loading
+     - Test configuration overrides
+     - Test multirun functionality
+     - Test omegaconf interpolation
+     - Test defaults.yaml loading and merging
+     - Test configuration composition with defaults list
+     - Test _self_ override behavior
+     - Test dtype and device configuration propagation (CPU only)
+     - Test train-bigRSNN.yaml configuration loading
+     - Test train-tinyRSNN.yaml configuration loading
+     - Test pretraining flag functionality for both models
+     - Test load_state dictionary parsing for both models
+     - Test train_monkeys list configuration
+     - Test evaluate.yaml configuration loading
+     - Test model_dir and output_dir configuration
+     - Test modelname parameter validation
+     - Test use_snnTorch_model flag functionality
+   - `test_hydra_outputs.py`:
+     - Test hydra run directory creation with timestamp format
+     - Test hydra sweep directory structure for multirun
+     - Test job.chdir functionality
+     - Test output_dir interpolation in run.dir
+     - Test multirun subdirectory creation with seed values
+     - Test hydra.job.name interpolation in sweep paths
+     - Test ${now:%Y-%m-%d} and ${now:%H-%M-%S} timestamp generation
+     - Test working directory changes with chdir=True
+     - Test multirun output organization
+     - Test .hydra configuration folder creation in run directories
+   - `test_visualization.py`:
+     - Test matplotlib figure generation
+     - Test seaborn plotting functions
+     - Test tonic visualization utilities
+     - Test SVG export functionality
+     - Test plot_all configuration loading
+     - Test pretraining vs fine-tuning comparison plots
+     - Test tinyRSNN specific visualization
+     - Test evaluation metrics visualization
+   - `test_notebooks.py`:
+     - Test notebook execution in notebooks directory
+     - Test data access from notebooks
+     - Test output generation from notebooks
+   - `test_initializer.py`:
+     - Test fluct-driven initializer configuration
+     - Test initializer parameter loading
+     - Test initializer application to models
+   - `test_pretraining.py`:
+     - Test pretraining data aggregation across sessions
+     - Test pretraining model saving and loading
+     - Test transition from pretraining to session-specific training
+     - Test monkey-specific pretraining isolation
+     - Test tinyRSNN pretraining workflow
+     - Test bigRSNN pretraining workflow
+     - Test load_state behavior when pretraining is False
+   - `test_benchmarking.py`:
+     - Test NeuroBench static metrics computation
+     - Test NeuroBench workload metrics computation
+     - Test metric aggregation for 'all' modelname option
+     - Test snnTorch model benchmarking
+     - Test benchmark result export and formatting
+
+4. COMPLETE TODO LIST:
+   1. Install system dependencies:
+      - Install ffmpeg: `sudo apt-get update && sudo apt-get install -y ffmpeg`
+      - Install HDF5: `sudo apt-get install -y libhdf5-dev`
+      - Install build essentials: `sudo apt-get install -y build-essential`
+      - Verify: `ffmpeg -version` and `h5cc -showconfig`
+   
+   2. Install Python 3.10.12:
+      - Add deadsnakes PPA: `sudo add-apt-repository ppa:deadsnakes/ppa`
+      - Update: `sudo apt-get update`
+      - Install: `sudo apt-get install -y python3.10 python3.10-venv python3.10-dev`
+      - Verify: `python3.10 --version`
+   
+   3. Create virtual environment:
+      - `cd /home/cc/EnvGym/data/RSNN`
+      - `python3.10 -m venv venv`
+      - Activate: `source venv/bin/activate`
+      - Verify: `which python` should point to venv
+   
+   4. Clone repository (if not already present):
+      - `cd /home/cc/EnvGym/data`
+      - `git clone [repository_url] RSNN` (if needed)
+      - `cd RSNN`
+      - Verify .gitignore exists and contains expected entries
+   
+   5. Create necessary directories:
+      - `mkdir -p data`
+      - `mkdir -p output`
+      - `mkdir -p notebooks`
+      - `mkdir -p matData`
+      - `mkdir -p .hydra`
+      - `mkdir -p models`
+      - `mkdir -p models/snnTorch`
+      - `mkdir -p pretrained_models/tinyRSNN/loco`
+      - `mkdir -p pretrained_models/tinyRSNN/indy`
+      - `mkdir -p pretrained_models/bigRSNN/loco`
+      - `mkdir -p pretrained_models/bigRSNN/indy`
+      - `mkdir -p checkpoints`
+      - `mkdir -p multirun`
+      - Verify directories are created and empty
+   
+   6. Update configuration files for CPU-only execution:
+      - Edit `/home/cc/EnvGym/data/RSNN/conf/defaults.yaml`:
+        - Change `device: "cuda"` to `device: "cpu"`
+      - Edit `/home/cc/EnvGym/data/RSNN/conf/evaluate.yaml`:
+        - Change `device: "cuda"` to `device: "cpu"`
+      - Update data paths in `/home/cc/EnvGym/data/RSNN/conf/data/data-default.yaml`:
+        - Set `data_dir: /home/cc/EnvGym/data/RSNN/data`
+      - Verify all referenced configs exist
+      - Test configuration loading: `python -c "from hydra import compose, initialize; initialize(config_path='conf'); cfg = compose(config_name='train-bigRSNN'); print(f'Device: {cfg.device}, Pretraining: {cfg.pretraining}')"`
+   
+   7. Install dependencies:
+      - `pip install --upgrade pip`
+      - `pip install wheel setuptools`
+      - Install CPU-only PyTorch: `pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu`
+      - `pip install -r requirements.txt`
+      - Verify installations and test imports
+      - Test PyTorch CPU: `python -c "import torch; print(f'PyTorch version: {torch.__version__}, CUDA available: {torch.cuda.is_available()}')"`
+   
+   8. Download datasets:
+      - Download from Zenodo: `wget https://zenodo.org/records/583331/files/[filename]`
+      - Extract to `/home/cc/EnvGym/data/RSNN/data/`
+      - Organize MAT files in appropriate structure
+      - Verify data integrity
+   
+   9. Download pre-trained models (if available):
+      - Download model checkpoints to `/home/cc/EnvGym/data/RSNN/pretrained_models/`
+      - Organize by model type and monkey
+      - Verify model files are compatible with CPU-only execution
+   
+   10. Create environment file:
+       - Create `.env` file with adjusted paths
+       - Set PYTHONPATH and other environment variables
+   
+   11. Run initial tests:
+       - Test data loading: `python -m pytest test_data_loader.py -v`
+       - Test model initialization: `python -m pytest test_models.py -v`
+       - Test configuration: `python -m pytest test_config.py -v`
+       - Verify

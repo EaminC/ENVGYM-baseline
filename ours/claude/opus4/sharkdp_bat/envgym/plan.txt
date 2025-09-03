@@ -1,0 +1,265 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust toolchain (1.74.0 or higher) - rustup recommended
+   - Git (latest stable version) - for cloning repository and submodules
+   - Git LFS (Large File Support) - for handling binary assets in submodules
+   - Less pager - version 530 or newer (standard in Ubuntu 20.04)
+   - fzf (optional) - for theme preview functionality
+   - fd (optional) - for enhanced file finding
+   - ripgrep (optional) - for batgrep functionality
+   - xclip (Linux) - for clipboard functionality
+   - Sublime Text syntax files (optional) - for additional language support
+   - Terminal with 24-bit truecolor support (recommended) - gnome-terminal, xterm-256color
+   - pkg-config (Linux) - for git2 dependency compilation
+   - libgit2-dev (Ubuntu/Debian) - for git2 feature
+   - libssl-dev (Ubuntu/Debian) - for git2 SSL support
+   - CMake (optional) - for building libgit2 from source if needed
+   - libonig-dev (Ubuntu/Debian, optional) - for regex-onig feature support
+   - zlib1g-dev (Ubuntu/Debian) - for compression support
+   - rustfmt (installed with Rust toolchain) - for code formatting
+   - clippy (installed with Rust toolchain) - for code linting
+   - cargo-audit - for security vulnerability scanning and advisory management
+   - GitHub CLI (optional) - for easier PR management and Dependabot interaction
+   - Text editor with Markdown support - vim, nano, or emacs
+   - Build-essential (Ubuntu/Debian) - for compilation tools
+   - Console 0.16+ dependencies - for updated console support
+   - Terminal-colorsaurus 1.0 - for dark/light detection
+   - Quote-based codegen tools - for build script improvements
+   - Lean 4 syntax support files - for updated Lean syntax
+   - Catppuccin theme files - for new theme support
+   - Dracula theme files - for theme support
+   - Nord theme files - for theme support
+   - Solarized theme files (updated) - for improved theme support
+   - Gruvbox theme files (updated to gruvbox-dark/gruvbox-light) - for theme support
+   - Base16 community themes - for base16 support
+   - Typst syntax files - for Typst support
+   - VHDL syntax files - for VHDL support
+   - GDScript syntax files - for Godot support
+   - Idris 2 syntax files - for Idris 2 support
+   - CSV/TSV improved syntax files - with delimiter autodetection
+   - Debsources syntax files - for apt sources.list
+   - Quadlet syntax files - for systemd quadlets
+   - Hosts syntax (updated) - for /etc/hosts files
+   - GitHub theme (updated) - for improved GitHub theme
+   - Docker (already available) - for containerized usage
+   - Ansible (optional) - for automated installation
+   - col command (coreutils) - for man page formatting
+   - prettybat dependencies (optional) - prettier, shfmt, rustfmt for code formatting
+   - batman dependencies (optional) - for colored man pages
+   - delta (optional) - for diff syntax highlighting
+   - fonts-noto-cjk (Ubuntu/Debian) - for CJK font support
+   - fonts-noto-color-emoji (Ubuntu/Debian) - for emoji support
+   - iconv (libc-bin) - for encoding conversion
+   - APT package manager - native to Ubuntu/Debian
+   - MANROFFOPT environment support - for man page formatting
+   - json_pp (perl) - for JSON pretty printing
+   - yaml2json (optional) - for YAML to JSON conversion
+   - curl - for downloading files
+   - awk (gawk) - for man page processing
+   - jq - for JSON processing in CI/CD workflows
+   - cargo-metadata - for extracting crate information
+   - cross - for cross-compilation support
+   - gcc-arm-linux-gnueabihf (Ubuntu/Debian) - for ARM cross-compilation
+   - gcc-aarch64-linux-gnu (Ubuntu/Debian) - for AArch64 cross-compilation
+   - tar - for creating tarball archives
+   - fakeroot (Ubuntu/Debian) - for building Debian packages
+   - dpkg-deb (Ubuntu/Debian) - for creating .deb packages
+   - gzip - for compressing man pages and changelogs
+   - GitHub Actions runner - for CI/CD execution
+   - man-db - for viewing manual pages
+   - Dependabot CLI (optional) - for local dependency management testing
+   - anyhow crate - for error handling in build scripts
+   - Build script dependencies - for cargo build script execution
+   - echo command (coreutils) - for testing pager configuration
+
+2. FILES TO CREATE:
+   - `/home/cc/.config/bat/config` (Linux user configuration)
+     - Basic content: theme settings, style preferences, syntax mappings
+     - Add `--theme="TwoDark"` or configure for auto theme detection
+     - Add `--style=default` as the new default
+     - Configure `--binary=as-text` if needed
+     - Add custom `--map-syntax` rules for glob patterns
+     - Japanese-specific theme settings if needed
+     - Korean-specific theme settings if needed
+     - Russian-specific theme settings if needed
+     - Chinese-specific theme settings if needed
+     - Add `--paging=always` for consistent pager behavior
+     - Add custom `--pager` configuration if needed
+   - `/etc/bat/config` (Linux system-wide configuration)
+     - For organization-wide default settings
+     - Add `--paging=always` for consistent pager behavior
+     - Add `--pager="echo dummy-pager-from-system-config"` for testing
+   - `/home/cc/.config/bat/syntaxes/` directory
+     - For custom .sublime-syntax files
+     - Place Typst, VHDL, GDScript, Idris 2 syntax files
+     - Japanese language syntax support files
+     - Korean language syntax support files
+     - Russian language syntax support files
+     - Chinese language syntax support files
+   - `/home/cc/.config/bat/themes/` directory
+     - For custom .tmTheme files
+     - Place Catppuccin, updated Gruvbox, updated GitHub themes
+     - Japanese-friendly themes (if available)
+     - Korean-friendly themes (if available)
+     - Russian-friendly themes (if available)
+     - Chinese-friendly themes (if available)
+   - `/home/cc/.bashrc` or `/home/cc/.zshrc` modifications
+     - Aliases for bat commands
+     - Environment variable exports (BAT_THEME, BAT_PAGER, etc.)
+     - LESSOPEN preprocessor configuration (optional)
+     - Add `export BAT_THEME_DARK="theme-name"` for dark mode
+     - Add `export BAT_THEME_LIGHT="theme-name"` for light mode
+     - Add MANPAGER configuration for colored man pages
+     - Add batgrep, batman, prettybat aliases
+     - Add batdiff function for git diff integration
+     - Add bathelp function for --help message coloring
+     - Add BAT_PAGER="less -RF" configuration
+     - Add BAT_TABS configuration for tab width
+   - `batdiff` shell function file (optional)
+     - Git diff integration script
+   - Test configuration files in project
+     - `tests/syntax-tests/` directory structure
+     - `tests/integration/` test scripts
+     - Regression test files for new features
+   - `/home/cc/.cargo/config.toml` (optional)
+     - Custom build flags for optimized compilation
+     - x86_64 architecture optimizations
+   - `/home/cc/.cargo/audit.toml` (already exists)
+     - Security advisory configuration
+     - Contains ignore list for RUSTSEC-2024-0320 and RUSTSEC-2024-0421
+   - `/home/cc/EnvGym/data/sharkdp_bat/build/` directory outputs
+     - Generated assets from build process
+     - Static syntax mappings generated by build script
+   - `/home/cc/EnvGym/data/sharkdp_bat/Cargo.lock` file (auto-generated)
+     - Dependency lock file for reproducible builds
+   - `/home/cc/EnvGym/data/sharkdp_bat/rustfmt.toml` (already exists)
+     - Rust code formatting configuration using defaults
+   - `/home/cc/EnvGym/data/sharkdp_bat/.gitignore` (already exists)
+     - Excludes target/, backup files, and generated assets
+   - Generated completion files (auto-generated during build)
+     - `/home/cc/EnvGym/data/sharkdp_bat/assets/completions/bat.bash` (Bash)
+     - `/home/cc/EnvGym/data/sharkdp_bat/assets/completions/bat.fish` (Fish)
+     - `/home/cc/EnvGym/data/sharkdp_bat/assets/completions/bat.zsh` (Zsh)
+   - Generated manual page (auto-generated during build)
+     - `/home/cc/EnvGym/data/sharkdp_bat/assets/manual/bat.1`
+   - Generated metadata file (auto-generated during build)
+     - `/home/cc/EnvGym/data/sharkdp_bat/assets/metadata.yaml`
+   - Submodule initialization tracking file
+     - `/home/cc/EnvGym/data/sharkdp_bat/.git/modules/` directory structure for all submodules
+   - Syntax and theme cache files (auto-generated)
+     - Binary cache files for all submodule syntaxes and themes
+   - CHANGELOG.md entries (for contributions)
+     - New entries in appropriate subsections (Features, Bugfixes, Other, Syntaxes, Themes)
+     - Follow existing format with issue/PR references
+   - Feature request issue templates (when proposing new features)
+     - Using GitHub's feature request template
+   - Regression test files (for contributions)
+     - New tests in `tests/integration_tests.rs`
+     - Syntax test files in appropriate directories
+   - Theme auto-detection configuration
+     - Terminal color scheme detection settings
+   - Syntax mapping configuration for new languages
+     - `.mill` → Scala
+     - `.flatpakref`, `.flatpakrepo` → INI
+     - `flake.lock` → JSON
+     - `*.jsonl`, `*.ndjson` → JSON
+     - `*.csproj`, `*.vbproj`, `*.props`, `*.targets` → XML
+     - CITATION.cff → YAML
+     - `uv.lock` → TOML
+     - `/etc/wireguard/*.conf` → TOML
+     - `/etc/pacman.conf` → INI
+     - `*.ino` → C++ (Arduino files)
+     - `.ignore` → Git Ignore
+     - `*.conf` → INI
+     - `/etc/apache2/**/*.conf` → Apache Conf
+   - `/home/cc/EnvGym/data/sharkdp_bat/doc/README-ja.md` (already exists)
+     - Japanese documentation file
+   - `/home/cc/EnvGym/data/sharkdp_bat/doc/README-ko.md` (already exists)
+     - Korean documentation file
+   - `/home/cc/EnvGym/data/sharkdp_bat/doc/README-ru.md` (already exists)
+     - Russian documentation file
+   - `/home/cc/EnvGym/data/sharkdp_bat/doc/README-zh.md` (already exists)
+     - Chinese documentation file
+   - Japanese example files for testing
+     - Test files with Japanese content for syntax highlighting
+   - Korean example files for testing
+     - Test files with Korean content for syntax highlighting
+   - Russian example files for testing
+     - Test files with Russian content for syntax highlighting
+   - Chinese example files for testing
+     - Test files with Chinese content for syntax highlighting
+   - Docker alias configuration file
+     - Docker run command aliases for bat
+   - Ansible playbook files (optional)
+     - For automated installation across multiple systems
+   - Man page wrapper script (optional)
+     - For Mandoc compatibility on systems using it
+   - `/home/cc/EnvGym/data/sharkdp_bat/.github/workflows/CICD.yml` (already exists)
+     - GitHub Actions CI/CD workflow configuration
+   - `/home/cc/EnvGym/data/sharkdp_bat/.github/dependabot.yml` (already exists)
+     - Dependabot configuration for automated dependency updates
+   - `/home/cc/EnvGym/data/sharkdp_bat/_cicd-intermediates/` directory (CI/CD generated)
+     - Temporary directory for CI/CD artifacts
+   - `/home/cc/EnvGym/data/sharkdp_bat/tests/scripts/license-checks.sh` (for CI/CD)
+     - Script for checking licenses in dependencies
+   - `/home/cc/EnvGym/data/sharkdp_bat/tests/syntax-tests/regression_test.sh` (for CI/CD)
+     - Script for syntax highlighting regression testing
+   - `/home/cc/EnvGym/data/sharkdp_bat/tests/syntax-tests/test_custom_assets.sh` (for CI/CD)
+     - Script for testing custom assets
+   - `/home/cc/EnvGym/data/sharkdp_bat/tests/examples/system_config/` directory
+     - System-wide configuration test files
+   - `/home/cc/EnvGym/data/sharkdp_bat/tests/examples/system_config/bat/config` (already exists)
+     - Test system configuration file with paging and pager settings
+     - Contains `--paging=always` and `--pager="echo dummy-pager-from-system-config"`
+   - Cross-compilation configuration files
+     - Settings for various target architectures
+   - Debian package control files (CI/CD generated)
+     - DEBIAN/control for package metadata
+     - usr/share/doc/ files for documentation
+   - Release artifacts staging directory
+     - For organizing release binaries and packages
+   - `/home/cc/EnvGym/data/sharkdp_bat/build/main.rs` (already exists)
+     - Main build script entry point
+   - `/home/cc/EnvGym/data/sharkdp_bat/build/application.rs` (referenced by main.rs)
+     - Application-specific build tasks (man page and completion generation)
+   - `/home/cc/EnvGym/data/sharkdp_bat/build/syntax_mapping.rs` (referenced by main.rs)
+     - Static syntax mapping generation module
+   - `/home/cc/EnvGym/data/sharkdp_bat/build/util.rs` (referenced by main.rs)
+     - Build script utility functions
+   - Generated static syntax mapping files
+     - Output from syntax_mapping::build_static_mappings()
+   - `/home/cc/EnvGym/data/sharkdp_bat/tests/examples/bat.conf` (already exists)
+     - Test configuration file with paging and pager settings
+     - Contains `--paging=always` and `--pager="echo dummy-pager-from-config"`
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Unit tests for syntax highlighting engine
+   - Integration tests for Git integration features
+   - Tests for different file encodings (UTF-8, UTF-16, Latin-1)
+   - Tests for pager integration (less, more, custom pagers)
+   - Tests for theme switching and detection
+   - Tests for non-printable character display
+   - Tests for file concatenation functionality
+   - Tests for stdin input handling
+   - Tests for line number display
+   - Tests for grid and header display options
+   - Tests for tab expansion functionality
+   - Tests for ANSI escape sequence handling
+   - Tests for Linux path handling
+   - Tests for configuration file parsing
+   - Tests for system-wide configuration file parsing
+   - Tests for configuration precedence (system vs user config)
+   - Performance tests for large files
+   - Tests for git2 integration features
+   - Tests for LESSOPEN preprocessor functionality
+   - Tests for terminal-colorsaurus integration
+   - Tests for Unicode segmentation
+   - Tests for content inspection (binary vs text detection)
+   - Tests for shell-words parsing in pager configuration
+   - Tests for glob pattern matching (globset)
+   - Tests for encoding detection and conversion
+   - Tests for bugreport generation
+   - Tests for build asset generation
+   - Tests for Oniguruma regex engine (regex-onig feature)
+   - Tests for x86_64 architecture-specific optim

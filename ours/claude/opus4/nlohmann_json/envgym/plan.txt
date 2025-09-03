@@ -1,0 +1,246 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - CMake 3.5 or higher (recommended: latest stable version, 3.13+ for FetchContent support, 3.20+ for ARM testing, 3.28+ for C++ modules)
+   - Meson build system 0.54.0 or higher (with Ninja backend)
+   - Bazel 7.0 or higher (for Bazel module support)
+   - Bazelisk (recommended for managing Bazel versions)
+   - Swift 5.9 or higher (for Swift Package Manager support)
+   - Xcode 11.7 or higher (for Apple platform development, tested versions: 11.7, 12.4, 12.5.1, 13.0, 13.1, 13.2.1, 13.3.1, 13.4.1, 14.0, 14.0.1, 14.1, 14.2, 14.3, 14.3.1, 15.0.1, 15.1, 15.2, 15.3, 15.4, 16.0, 16.1, 16.2, 16.3)
+   - C++ compiler with C++11 support:
+     - GCC 4.8 or higher (latest for ARM container testing, GCC 15 for C++26 support)
+     - Clang 3.4 or higher (Clang 20 for latest features)
+     - MSVC 2015 or higher (with natvis support)
+     - Apple Clang 9.1 or higher (included with Xcode)
+     - Intel oneAPI C++ Compiler (icpc)
+   - Git (for cloning repository and downloading test data)
+   - Python 3.x (for amalgamate.py script, Meson, MkDocs, natvis generation, and header serving)
+   - pip3 (Python package manager)
+   - wheel 0.45.1 (Python packaging)
+   - MkDocs 1.6.1 (documentation framework)
+   - mkdocs-git-revision-date-localized-plugin 1.4.7
+   - mkdocs-material 9.6.18 (MkDocs theme)
+   - mkdocs-material-extensions 1.3.1
+   - mkdocs-minify-plugin 0.8.0
+   - mkdocs-redirects 1.2.2
+   - mkdocs-htmlproofer-plugin 1.3.0
+   - PyYAML 6.0.2 (YAML linter and header server configuration)
+   - watchdog 6.0.0 (file system monitoring for header server)
+   - jinja2 3.1.6 (for natvis file generation)
+   - Ninja build system (recommended backend for Meson and CMake)
+   - doctest framework (included as submodule)
+   - lcov (for code coverage reports)
+   - Valgrind (for memory leak detection)
+   - cppcheck 1.5.0 (exact version for static analysis)
+   - cpplint 2.0.2 (exact version for C++ style checking)
+   - reuse 5.0.2 (exact version for SPDX license compliance)
+   - astyle 3.4.13 (exact version for code formatting)
+   - Doxygen (for documentation generation)
+   - Google Benchmark (for performance testing)
+   - pkg-config (for package configuration with Meson and CMake)
+   - CPack (for package generation, included with CMake)
+   - buildtools/buildifier (for Bazel file formatting)
+   - Docker (for ARM container testing)
+   - wget (for downloading dependencies in CI environments)
+   - make (for building CMake from source)
+   - build-essential (Ubuntu/Debian package for basic build tools)
+   - unzip (for extracting archives)
+   - libssl-dev (for SSL support)
+   - clang-tools (for clang-tidy and clang-analyze)
+   - iwyu (Include What You Use tool)
+   - locales (for locale-specific testing)
+   - gcc-multilib and g++-multilib (for 32-bit builds)
+   - libc++ and libc++-dev (for Clang libc++ testing)
+   - Emscripten SDK (for WebAssembly builds)
+   - CUDA toolkit (for CUDA examples)
+   - Intel oneAPI Base Toolkit (for Intel compiler testing)
+   - Coveralls CLI tool (for coverage reporting)
+   - macOS 13 or higher (for macOS-specific testing)
+   - ctest (included with CMake, for running tests)
+
+2. FILES TO CREATE:
+   - build/.gitignore (ignore build artifacts)
+   - builddir/.gitignore (ignore Meson build artifacts)
+   - bazel-*/.gitignore (ignore Bazel build artifacts)
+   - .swiftpm/.gitignore (ignore Swift Package Manager artifacts)
+   - .bazelrc (Bazel configuration)
+   - .bazelversion (specify Bazel version for Bazelisk)
+   - test/BUILD.bazel (Bazel test targets)
+   - examples/BUILD.bazel (Bazel example targets)
+   - .vscode/settings.json (VS Code configuration for C++11)
+   - .clang-format (code formatting rules)
+   - .astylerc (astyle formatting configuration)
+   - test_config.json (sample JSON test file)
+   - CMakePresets.json (CMake configuration presets)
+   - meson_options.txt (Meson build options if needed)
+   - .github/workflows/local-test.yml (local testing workflow)
+   - .github/workflows/macos.yml (already exists, verify content)
+   - test_meson_integration.cpp (Meson integration test program)
+   - test_cmake_integration.cpp (CMake integration test program)
+   - test_bazel_integration.cpp (Bazel integration test program)
+   - test_spm_integration.swift (Swift Package Manager integration test)
+   - test_fetchcontent/CMakeLists.txt (FetchContent integration test)
+   - test_modules/CMakeLists.txt (C++ modules test, requires CMake 3.28+)
+   - test_natvis/test_debug.cpp (MSVC natvis debugging test)
+   - test_bazel_module/MODULE.bazel (Bazel module integration test)
+   - test_bazel_module/BUILD.bazel (Bazel module test build file)
+   - test_bazel_module/WORKSPACE.bazel (empty for bzlmod)
+   - test_singleheader_bazel/BUILD.bazel (test single header Bazel target)
+   - test_singleheader_bazel/test.cpp (test program for single header)
+   - test_spm/Package.swift (Swift Package Manager test project)
+   - test_spm/Sources/test_spm/main.swift (Swift test program)
+   - test_spm_objc/Package.swift (Objective-C++ integration test)
+   - test_spm_objc/Sources/test_spm_objc/test.mm (Objective-C++ test file)
+   - test_arm/test_arm_build.sh (ARM architecture build test script)
+   - docker/Dockerfile.arm (ARM container configuration)
+   - docker/Dockerfile.gcc (GCC container configuration)
+   - docker/Dockerfile.clang (Clang container configuration)
+   - docs/mkdocs/requirements.txt (already exists, verify content)
+   - mkdocs.yml (MkDocs configuration if not exists)
+   - docs/mkdocs/.gitignore (ignore MkDocs build artifacts)
+   - cmake/requirements/requirements-cppcheck.txt (already exists, verify content matches cppcheck==1.5.0)
+   - cmake/requirements/requirements-cpplint.txt (already exists, verify content matches cpplint==2.0.2)
+   - cmake/requirements/requirements-reuse.txt (already exists, verify content matches reuse==5.0.2)
+   - tools/astyle/requirements.txt (already exists, verify content matches astyle==3.4.13)
+   - tools/generate_natvis/requirements.txt (already exists, verify content matches jinja2==3.1.6)
+   - tools/serve_header/requirements.txt (already exists, verify content matches PyYAML==6.0.2 and watchdog==6.0.0)
+   - .cppcheck-suppressions.txt (cppcheck suppression rules if needed)
+   - scripts/run_cppcheck.sh (cppcheck execution script)
+   - scripts/run_cpplint.sh (cpplint execution script)
+   - scripts/run_reuse.sh (reuse execution script)
+   - scripts/run_astyle.sh (astyle execution script)
+   - scripts/check_formatting.sh (code formatting check script)
+   - scripts/generate_natvis.sh (natvis generation script)
+   - scripts/serve_header.sh (header server startup script)
+   - CPPLINT.cfg (cpplint configuration file)
+   - .reuse/dep5 (REUSE copyright and license information if needed)
+   - LICENSES/ (directory for license files if not exists)
+   - tools/generate_natvis/generate_natvis.py (natvis generation script if not exists)
+   - tools/generate_natvis/natvis_template.jinja2 (natvis template file if not exists)
+   - test_natvis/test_natvis_generation.py (natvis generation test)
+   - tools/serve_header/serve_header.py (header server script if not exists)
+   - tools/serve_header/config.yaml (header server configuration if not exists)
+   - test_serve_header/test_header_server.py (header server functionality test)
+   - test_serve_header/test_file_watching.py (file system monitoring test)
+   - test_emscripten/CMakeLists.txt (Emscripten build test)
+   - test_emscripten/test_wasm.cpp (WebAssembly test program)
+   - test_cuda/CMakeLists.txt (CUDA integration test)
+   - test_cuda/test_cuda.cu (CUDA test program)
+   - test_intel/CMakeLists.txt (Intel compiler test)
+   - test_intel/test_icpc.cpp (Intel compiler test program)
+   - test_coverage/run_coverage.sh (coverage report generation script)
+   - test_clang_tidy/.clang-tidy (clang-tidy configuration)
+   - test_clang_analyze/run_analyze.sh (clang static analyzer script)
+   - test_gcc_old/test_gcc48.cpp (GCC 4.8 compatibility test)
+   - test_clang_old/test_clang34.cpp (Clang 3.4 compatibility test)
+   - test_standards/test_cxx11.cpp (C++11 standard compliance test)
+   - test_standards/test_cxx14.cpp (C++14 standard compliance test)
+   - test_standards/test_cxx17.cpp (C++17 standard compliance test)
+   - test_standards/test_cxx20.cpp (C++20 standard compliance test)
+   - test_standards/test_cxx23.cpp (C++23 standard compliance test)
+   - test_standards/test_cxx26.cpp (C++26 standard compliance test)
+   - test_libcxx/test_libcxx.cpp (libc++ compatibility test)
+   - test_libstdcxx/test_libstdcxx.cpp (libstdc++ compatibility test)
+   - .github/dependabot.yml (dependency update configuration)
+   - .github/workflows/codeql.yml (security analysis workflow)
+   - cmake/ci.cmake (CI target definitions if not exists)
+   - test_macos/test_xcode_versions.sh (Xcode version compatibility test script)
+   - test_macos/test_macos_standards.sh (macOS C++ standards test script)
+   - test_macos/test_parallel_builds.sh (macOS parallel build test script)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Basic JSON parsing and serialization tests
+   - Unicode handling tests (UTF-8, UTF-16, UTF-32)
+   - Error handling and exception tests
+   - Memory management tests (no leaks)
+   - Performance benchmarks
+   - Binary format tests (BSON, CBOR, MessagePack, UBJSON, BJData)
+   - JSON Pointer and JSON Patch tests
+   - Custom type serialization tests
+   - Iterator and STL container compatibility tests
+   - Edge cases: empty objects, null values, large numbers
+   - Compiler-specific tests for supported compilers
+   - Meson subproject integration tests
+   - pkg-config integration tests
+   - Single header vs multiple headers include tests
+   - CMake FetchContent integration tests
+   - CMake add_subdirectory integration tests
+   - Bazel module integration tests
+   - Bazel workspace integration tests
+   - Bazel cc_library target tests
+   - Bazel transitive dependency tests
+   - Swift Package Manager integration tests
+   - Swift/Objective-C++ interoperability tests
+   - Apple platform specific tests (iOS, macOS, tvOS, watchOS, visionOS)
+   - Swift Package Manager dependency resolution tests
+   - Swift Package Manager C++ language standard tests
+   - Diagnostic messages tests (JSON_Diagnostics)
+   - Diagnostic positions tests (JSON_Diagnostic_Positions)
+   - Implicit conversions tests (JSON_ImplicitConversions)
+   - Enum serialization tests (JSON_DisableEnumSerialization)
+   - Global UDL namespace tests (JSON_GlobalUDLs)
+   - Legacy discarded value comparison tests
+   - C++ modules tests (CMake 3.28+)
+   - MSVC natvis visualization tests
+   - Bazel single header target tests (singleheader-json)
+   - Bazel multi-header target tests (json)
+   - Bazel alwayslink attribute verification
+   - Bazel license compliance tests
+   - ARM architecture compatibility tests
+   - Fast tests configuration (JSON_FastTests)
+   - Cross-compilation tests for ARM platforms
+   - CMake build from source tests
+   - Parallel build tests with different job counts
+   - Documentation build tests with MkDocs
+   - Documentation link validation tests
+   - Documentation syntax and formatting tests
+   - MkDocs plugin functionality tests
+   - Static analysis tests with cppcheck 1.5.0
+   - Cppcheck configuration validation tests
+   - Cppcheck suppression rules tests
+   - Cppcheck CMake integration tests
+   - C++ style compliance tests with cpplint 2.0.2
+   - Cpplint configuration validation tests
+   - Cpllint filter rules tests
+   - Cpplint CMake integration tests
+   - Combined static analysis workflow tests
+   - SPDX license compliance tests with reuse 5.0.2
+   - Reuse lint validation tests
+   - License header verification tests
+   - Copyright information consistency tests
+   - Reuse CMake integration tests
+   - License file completeness tests
+   - Third-party license attribution tests
+   - Code formatting consistency tests with astyle 3.4.13
+   - Astyle configuration validation tests
+   - Astyle pre-commit hook tests
+   - Astyle CI integration tests
+   - Formatting check vs formatting apply tests
+   - Multi-file formatting batch tests
+   - Formatting preservation tests for special code blocks
+   - Natvis file generation tests
+   - Natvis template rendering tests with jinja2
+   - Natvis Visual Studio integration tests
+   - Natvis debugger visualization accuracy tests
+   - Natvis file syntax validation tests
+   - Natvis generation script error handling tests
+   - Natvis template variable substitution tests
+   - Natvis multi-version compatibility tests
+   - Header server startup and shutdown tests
+   - Header server file watching tests with watchdog
+   - Header server configuration loading tests (YAML parsing)
+   - Header server file change detection tests
+   - Header server concurrent access tests
+   - Header server error handling tests
+   - Header server performance tests under load
+   - Header server cross-platform compatibility tests
+   - Header server hot-reload functionality tests
+   - Header server integration with build systems tests
+   - GCC version compatibility tests (4.8 through latest)
+   - Clang version compatibility tests (3.4 through latest)
+   - C++ standard compliance tests (C++11, 14, 17, 20, 23, 26)
+   - libc++ vs libstdc++ compatibility tests
+   - Valgrind memory leak detection tests
+   - Code coverage report generation tests
+   - Coverage report upload to Coveralls tests
+   

@@ -1,0 +1,169 @@
+=== Docker Execution Log - 20250903_182749 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756924055
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 3.47kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/18] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 708.58kB 0.0s done
+#5 DONE 0.0s
+
+#6 [ 5/18] RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test &&     apt-get update &&     apt-get install -y gcc-12 g++-12 gcc-13 g++-13 libstdc++-13-dev ||     (add-apt-repository -y ppa:ubuntu-toolchain-r/ppa &&      apt-get update &&      apt-get install -y gcc-12 g++-12 || true) &&     rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [ 4/18] RUN wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - &&     echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-16 main" >> /etc/apt/sources.list &&     echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-18 main" >> /etc/apt/sources.list &&     apt-get update &&     apt-get install -y clang-16 clang-format-18 ||     (apt-get install -y clang-16 && apt-get install -y clang-format) &&     rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [ 7/18] RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 --slave /usr/bin/g++ g++ /usr/bin/g++-13 ||     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 120 --slave /usr/bin/g++ g++ /usr/bin/g++-12 ||     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9
+#8 CACHED
+
+#9 [ 2/18] RUN apt-get update && apt-get install -y     software-properties-common     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [ 6/18] RUN pip3 install --no-cache-dir     pre-commit>=3.0     meson>=0.63.0
+#10 CACHED
+
+#11 [ 8/18] RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-16 160 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-16 || true
+#11 CACHED
+
+#12 [ 3/18] RUN apt-get update && apt-get install -y     build-essential     gcc-9     g++-9     make     cmake     ninja-build     git     python3     python3-pip     pkg-config     wget     curl     gnupg     lsb-release     libssl-dev     zlib1g-dev     libbrotli-dev     libzstd-dev     libcurl4-openssl-dev     libgtest-dev     squid     apache2-utils     netcat-openbsd     abigail-tools     ca-certificates     && rm -rf /var/lib/apt/lists/*
+#12 CACHED
+
+#13 [ 9/18] RUN if command -v clang-format-18 >/dev/null 2>&1; then         update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-18 180;     elif command -v clang-format >/dev/null 2>&1; then         update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format 100;     fi
+#13 CACHED
+
+#14 [10/18] WORKDIR /workspace
+#14 CACHED
+
+#15 [11/18] COPY . /workspace/cpp-httplib/
+#15 DONE 0.1s
+
+#16 [12/18] WORKDIR /workspace/cpp-httplib
+#16 DONE 0.0s
+
+#17 [13/18] RUN if [ -f httplib.h ]; then         echo "httplib.h found";     else         echo "Error: httplib.h not found" && exit 1;     fi
+#17 0.214 httplib.h found
+#17 DONE 0.3s
+
+#18 [14/18] RUN mkdir -p build &&     cd build &&     cmake ..         -DCMAKE_BUILD_TYPE=Release         -DHTTPLIB_REQUIRE_OPENSSL=ON         -DHTTPLIB_REQUIRE_ZLIB=ON         -DHTTPLIB_REQUIRE_BROTLI=ON         -DHTTPLIB_TEST=ON         -DHTTPLIB_COMPILE=OFF         -GNinja &&     ninja || true
+#18 0.456 -- The CXX compiler identification is GNU 9.4.0
+#18 0.466 -- Check for working CXX compiler: /usr/bin/c++
+#18 0.542 -- Check for working CXX compiler: /usr/bin/c++ -- works
+#18 0.545 -- Detecting CXX compiler ABI info
+#18 0.630 -- Detecting CXX compiler ABI info - done
+#18 0.647 -- Detecting CXX compile features
+#18 0.647 -- Detecting CXX compile features - done
+#18 0.649 -- Looking for C++ include pthread.h
+#18 0.734 -- Looking for C++ include pthread.h - found
+#18 0.734 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+#18 0.822 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+#18 0.822 -- Check if compiler accepts -pthread
+#18 0.908 -- Check if compiler accepts -pthread - yes
+#18 0.910 -- Found Threads: TRUE  
+#18 0.997 CMake Error at /usr/share/cmake-3.16/Modules/FindPackageHandleStandardArgs.cmake:146 (message):
+#18 0.997   Could NOT find OpenSSL, try to set the path to OpenSSL root folder in the
+#18 0.997   system variable OPENSSL_ROOT_DIR: Found unsuitable version "1.1.1f", but
+#18 0.997   required is at least "3.0.0" (found /usr/lib/x86_64-linux-gnu/libcrypto.so)
+#18 0.997 Call Stack (most recent call first):
+#18 0.997   /usr/share/cmake-3.16/Modules/FindPackageHandleStandardArgs.cmake:391 (_FPHSA_FAILURE_MESSAGE)
+#18 0.997   /usr/share/cmake-3.16/Modules/FindOpenSSL.cmake:447 (find_package_handle_standard_args)
+#18 0.997   CMakeLists.txt:137 (find_package)
+#18 0.997 
+#18 0.997 
+#18 0.997 -- Configuring incomplete, errors occurred!
+#18 0.997 See also "/workspace/cpp-httplib/build/CMakeFiles/CMakeOutput.log".
+#18 0.997 See also "/workspace/cpp-httplib/build/CMakeFiles/CMakeError.log".
+#18 DONE 1.0s
+
+#19 [15/18] RUN cd /usr/src/gtest &&     cmake . &&     make &&     cp lib/*.a /usr/lib/
+#19 0.350 CMake Warning at CMakeLists.txt:54 (project):
+#19 0.350   VERSION keyword not followed by a value or was followed by a value that
+#19 0.350   expanded to nothing.
+#19 0.350 
+#19 0.350 
+#19 0.446 -- The CXX compiler identification is GNU 9.4.0
+#19 0.519 -- The C compiler identification is GNU 9.4.0
+#19 0.528 -- Check for working CXX compiler: /usr/bin/c++
+#19 0.653 -- Check for working CXX compiler: /usr/bin/c++ -- works
+#19 0.656 -- Detecting CXX compiler ABI info
+#19 0.778 -- Detecting CXX compiler ABI info - done
+#19 0.799 -- Detecting CXX compile features
+#19 0.799 -- Detecting CXX compile features - done
+#19 0.802 -- Check for working C compiler: /usr/bin/cc
+#19 0.923 -- Check for working C compiler: /usr/bin/cc -- works
+#19 0.925 -- Detecting C compiler ABI info
+#19 1.048 -- Detecting C compiler ABI info - done
+#19 1.069 -- Detecting C compile features
+#19 1.070 -- Detecting C compile features - done
+#19 1.091 -- Found PythonInterp: /usr/bin/python3.8 (found version "3.8.10") 
+#19 1.093 -- Looking for pthread.h
+#19 1.216 -- Looking for pthread.h - found
+#19 1.217 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+#19 1.336 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+#19 1.337 -- Looking for pthread_create in pthreads
+#19 1.436 -- Looking for pthread_create in pthreads - not found
+#19 1.436 -- Looking for pthread_create in pthread
+#19 1.557 -- Looking for pthread_create in pthread - found
+#19 1.560 -- Found Threads: TRUE  
+#19 1.564 -- Configuring done
+#19 1.570 -- Generating done
+#19 1.570 -- Build files have been written to: /usr/src/gtest
+#19 1.631 Scanning dependencies of target gtest
+#19 1.649 [ 25%] Building CXX object CMakeFiles/gtest.dir/src/gtest-all.cc.o
+#19 4.162 [ 50%] Linking CXX static library lib/libgtest.a
+#19 4.282 [ 50%] Built target gtest
+#19 4.304 Scanning dependencies of target gtest_main
+#19 4.326 [ 75%] Building CXX object CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
+#19 4.866 [100%] Linking CXX static library lib/libgtest_main.a
+#19 4.956 [100%] Built target gtest_main
+#19 DONE 5.0s
+
+#20 [16/18] RUN pre-commit install || true
+#20 0.388 pre-commit installed at .git/hooks/pre-commit
+#20 DONE 0.5s
+
+#21 [17/18] RUN if [ -f test/proxy/basic_passwd ] && [ -f test/proxy/digest_passwd ]; then         echo "Proxy password files exist";     else         mkdir -p test/proxy &&         htpasswd -bc test/proxy/basic_passwd test test &&         printf "test:cpp-httplib proxy:test\n" | htdigest -c test/proxy/digest_passwd;     fi
+#21 0.376 Proxy password files exist
+#21 DONE 0.4s
+
+#22 [18/18] WORKDIR /workspace/cpp-httplib
+#22 DONE 0.0s
+
+#23 exporting to image
+#23 exporting layers
+#23 exporting layers 5.0s done
+#23 writing image sha256:a744d90a4258f25844082a0036342182323b7cbd9378e55ec0e63a463d3ab678 done
+#23 naming to docker.io/library/envgym_test_1756924055 done
+#23 DONE 5.0s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

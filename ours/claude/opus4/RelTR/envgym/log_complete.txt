@@ -1,0 +1,87 @@
+=== Docker Execution Log - 20250902_103727 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756809444
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.45kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/15] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [13/15] WORKDIR /workspace/RelTR
+#5 CACHED
+
+#6 [ 8/15] RUN conda install pytorch==1.6.0 torchvision==0.7.0 cpuonly -c pytorch -y &&     conda install matplotlib -y &&     conda install scipy=1.5.2 -y &&     pip install -U 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
+#6 CACHED
+
+#7 [10/15] RUN mkdir -p ckpt data/vg/images data/oi/images
+#7 CACHED
+
+#8 [ 5/15] RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py37_4.10.3-Linux-x86_64.sh &&     bash Miniconda3-py37_4.10.3-Linux-x86_64.sh -b -p /root/miniconda3 &&     rm Miniconda3-py37_4.10.3-Linux-x86_64.sh
+#8 CACHED
+
+#9 [ 3/15] WORKDIR /workspace
+#9 CACHED
+
+#10 [ 2/15] RUN apt-get update && apt-get install -y     git     wget     build-essential     unzip     curl     && rm -rf /var/lib/apt/lists/*
+#10 CACHED
+
+#11 [ 9/15] WORKDIR /workspace/RelTR
+#11 CACHED
+
+#12 [ 6/15] RUN /root/miniconda3/bin/conda init bash &&     echo "conda activate reltr" >> ~/.bashrc
+#12 CACHED
+
+#13 [ 4/15] RUN git clone https://github.com/yrcong/RelTR.git
+#13 CACHED
+
+#14 [11/15] WORKDIR /workspace/RelTR/lib/fpn
+#14 CACHED
+
+#15 [12/15] RUN chmod +x make.sh &&     ./make.sh || true
+#15 CACHED
+
+#16 [ 7/15] RUN /root/miniconda3/bin/conda create -n reltr python=3.6 -y
+#16 CACHED
+
+#17 [14/15] RUN find . -type d -name __pycache__ -exec rm -rf {} + || true
+#17 CACHED
+
+#18 [15/15] RUN python -c "import torch; print(torch.__version__)"
+#18 0.965 1.6.0
+#18 0.965 
+#18 DONE 1.0s
+
+#19 exporting to image
+#19 exporting layers done
+#19 writing image sha256:2912411a12750780379a2a0ab3a5e77f2a73415e88e0551bcb426d7d76c108ee done
+#19 naming to docker.io/library/envgym_test_1756809444 done
+#19 DONE 0.0s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

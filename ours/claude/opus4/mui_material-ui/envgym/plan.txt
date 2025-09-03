@@ -1,0 +1,105 @@
+Based on the hardware information provided, here's the adjusted plan for the Material-UI project:
+
+## Environment Setup Plan for Material-UI Project
+
+### Base Configuration
+- **Working Directory**: `/home/cc/EnvGym/data/mui_material-ui`
+- **Architecture**: x86_64 (linux/amd64)
+- **Base Image**: `node:18-alpine` (lightweight, amd64 compatible)
+
+### Dockerfile Configuration
+
+```dockerfile
+FROM --platform=linux/amd64 node:18-alpine
+
+# Install basic dependencies
+RUN apk add --no-cache \
+    git \
+    python3 \
+    make \
+    g++ \
+    bash
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY yarn.lock* ./
+COPY lerna.json* ./
+
+# Install dependencies
+RUN npm install -g yarn && \
+    yarn install --frozen-lockfile
+
+# Copy project files
+COPY . .
+
+# Build the project
+RUN yarn build
+
+# Expose development server port
+EXPOSE 3000
+
+# Default command
+CMD ["yarn", "start"]
+```
+
+### Docker Compose Configuration
+
+```yaml
+version: '3.8'
+
+services:
+  mui-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILDKIT_INLINE_CACHE: 1
+    platform: linux/amd64
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    command: yarn dev
+```
+
+### Build Commands
+
+```bash
+# Enable BuildKit for better performance
+export DOCKER_BUILDKIT=1
+
+# Build the image
+docker build --platform=linux/amd64 -t mui-material-ui:latest .
+
+# Run with Docker Compose
+docker-compose up -d
+
+# Or run directly
+docker run -it --rm \
+  -v $(pwd):/app \
+  -v /app/node_modules \
+  -p 3000:3000 \
+  mui-material-ui:latest
+```
+
+### Development Environment Requirements
+
+- **Node.js**: v18.x (LTS version, fully compatible with x86_64)
+- **Package Manager**: Yarn or npm
+- **Build Tools**: Webpack, Babel (included in project dependencies)
+- **Memory**: Minimum 2GB RAM recommended for build processes
+- **Storage**: At least 2GB free space for dependencies and build artifacts
+
+### Notes
+
+- No GPU configurations needed (no CUDA support required)
+- Using Alpine Linux base for smaller image size
+- BuildKit enabled for faster builds with Docker 28.1.1
+- Platform explicitly set to linux/amd64 for consistency
+- Volume mounts configured to support hot-reloading during development

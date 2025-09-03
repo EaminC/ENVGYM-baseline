@@ -1,0 +1,133 @@
+=== ENVIRONMENT SETUP PLAN (ADJUSTED FOR LINUX x86_64) ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.7 (as specified in install.sh, compatible with Python 3.6+ requirement)
+   - Anaconda or Miniconda for conda environment management (Linux x86_64 version)
+   - Git for version control (install via apt-get if not present)
+   - Git LFS (Large File Storage) for handling large CSV files
+   - CSV files from Zenodo (https://zenodo.org/record/6388301):
+     - lrm_features.csv
+     - lrm_metrics.csv
+     - timeseries_features.csv
+     - timeseries_metrics.csv
+     - mixture_features.csv
+     - mixture_metrics.csv
+   - All Python packages from requirements.txt:
+     - scikit-learn (CPU-only version)
+     - numpy (CPU-optimized build)
+     - matplotlib
+     - pandas
+     - jsonpickle
+     - nearpy
+     - treeinterpreter
+     - cleanlab
+
+2. FILES TO CREATE:
+   - subcategories/lrm.json - model names for lrm class
+   - subcategories/timeseries.json - model names for timeseries class
+   - subcategories/mixture.json - model names for mixture class
+   - .gitignore - to exclude generated files and directories
+   - csvs/.gitattributes - Git LFS tracking configuration for CSV files
+   - environment.yml - conda environment specification file
+   - setup.sh - automated setup script for Linux (update existing install.sh)
+   - Dockerfile - containerized environment setup for consistent deployment
+   - docker-compose.yml - Docker compose configuration for easy container management
+   - config.py - configuration file for thresholds and paths
+   - csvs/ directory (if not exists)
+   - subcategories/ directory (if not exists)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - test_train.py:
+     - test_load_features_and_metrics() - verify CSV loading functionality
+     - test_random_forest_training() - test RF algorithm training (CPU-only)
+     - test_cross_validation() - verify CV functionality
+     - test_feature_importance() - test feature contribution extraction
+     - test_threshold_evaluation() - test different threshold evaluations
+     - test_runtime_sampling() - test runtime feature extraction
+     - test_warmup_sampling() - test warmup feature extraction
+     - test_jsonpickle_serialization() - test model serialization with jsonpickle
+     - test_nearpy_integration() - test nearest neighbor functionality
+     - test_treeinterpreter_analysis() - test tree interpretation features
+     - test_cleanlab_data_cleaning() - test data cleaning functionality
+   - test_data_validation.py:
+     - test_csv_format_validation() - verify CSV file formats
+     - test_missing_data_handling() - test handling of missing values
+     - test_feature_selection() - test feature filtering with -keep option
+     - test_numpy_array_operations() - test numpy array handling (CPU operations)
+     - test_pandas_dataframe_operations() - test pandas DataFrame operations
+     - test_large_file_handling() - test Git LFS tracked file operations
+   - test_visualization.py:
+     - test_plot_generation() - verify plot creation and saving
+     - test_results_saving() - verify results are saved correctly
+     - test_matplotlib_backend() - test matplotlib backend configuration (Agg for headless)
+   - test_environment.py:
+     - test_conda_environment_creation() - verify conda environment setup
+     - test_directory_structure() - verify all required directories exist
+     - test_git_repository_configuration() - verify git repository is properly configured
+     - test_git_lfs_configuration() - verify Git LFS is properly installed and configured
+     - test_docker_environment() - verify Docker container can be built and run
+
+4. COMPLETE TODO LIST:
+   - [ ] Update system packages: sudo apt-get update && sudo apt-get upgrade -y
+   - [ ] Install Git if not present: sudo apt-get install -y git
+   - [ ] Install Git LFS: sudo apt-get install -y git-lfs && git lfs install
+   - [ ] Install wget for downloading: sudo apt-get install -y wget
+   - [ ] Download Miniconda for Linux x86_64: wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+   - [ ] Install Miniconda: bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3
+   - [ ] Initialize conda: eval "$($HOME/miniconda3/bin/conda shell.bash hook)"
+   - [ ] Add conda to PATH in ~/.bashrc: echo 'export PATH="$HOME/miniconda3/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
+   - [ ] Navigate to working directory: cd /home/cc/EnvGym/data/sixthsense
+   - [ ] Clone the SixthSense repository if not exists: git clone https://github.com/uiuc-arc/sixthsense.git . || git pull origin main
+   - [ ] Verify git configuration: git remote -v (should show origin pointing to https://github.com/uiuc-arc/sixthsense)
+   - [ ] Check current branch: git branch (should show main branch)
+   - [ ] Pull latest changes: git pull origin main
+   - [ ] Verify Git LFS is tracking large files: git lfs track
+   - [ ] Make install.sh executable: chmod +x install.sh
+   - [ ] Run install.sh to create conda environment: ./install.sh
+   - [ ] Manually activate environment: conda activate ssense
+   - [ ] Create additional required directories: mkdir -p csvs subcategories plots results
+   - [ ] Create csvs/.gitattributes with content: echo "*.csv filter=lfs diff=lfs merge=lfs -text" > csvs/.gitattributes
+   - [ ] Download CSV files from Zenodo: wget -P csvs/ https://zenodo.org/record/6388301/files/{lrm,timeseries,mixture}_{features,metrics}.csv
+   - [ ] Track CSV files with Git LFS: git lfs track "csvs/*.csv" && git add csvs/.gitattributes
+   - [ ] Install dependencies: pip install -r requirements.txt
+   - [ ] Verify Python version: python --version (should be 3.7.x)
+   - [ ] Verify scikit-learn installation: python -c "import sklearn; print(sklearn.__version__)"
+   - [ ] Verify numpy installation: python -c "import numpy; print(numpy.__version__)"
+   - [ ] Verify pandas installation: python -c "import pandas; print(pandas.__version__)"
+   - [ ] Set matplotlib backend for headless environment: echo "backend: Agg" > ~/.config/matplotlib/matplotlibrc
+   - [ ] Verify matplotlib installation: python -c "import matplotlib; matplotlib.use('Agg'); print(matplotlib.__version__)"
+   - [ ] Verify jsonpickle installation: python -c "import jsonpickle; print(jsonpickle.__version__)"
+   - [ ] Verify nearpy installation: python -c "import nearpy; print('nearpy installed successfully')"
+   - [ ] Verify treeinterpreter installation: python -c "import treeinterpreter; print('treeinterpreter installed successfully')"
+   - [ ] Verify cleanlab installation: python -c "import cleanlab; print(cleanlab.__version__)"
+   - [ ] Create subcategories JSON files with model names
+   - [ ] Test basic functionality: python train.py --help
+   - [ ] Run a test training for lrm class: python train.py -f csvs/lrm_features.csv -l csvs/lrm_metrics.csv -a rf -m rhat_min -suf avg -bw -plt -saveas plots/test_lrm.png -keep _ast_ dt_ var_min var_max data_size -st -tname naive-bayes-unsup -cv -ignore_vi
+   - [ ] Verify plots directory contains generated plot
+   - [ ] Verify results directory contains output files
+   - [ ] Test runtime sampling mode (modify lines 730-738 in train.py if needed)
+   - [ ] Test warmup sampling mode
+   - [ ] Test feature importance extraction with a specific program index
+   - [ ] Test model serialization with jsonpickle
+   - [ ] Test nearest neighbor search functionality if implemented
+   - [ ] Test tree interpretation features if implemented
+   - [ ] Test data cleaning with cleanlab if implemented
+   - [ ] Verify Git LFS is properly handling CSV files: git lfs ls-files
+   - [ ] Document any missing dependencies or errors encountered
+   - [ ] Create a local backup of the configured environment: conda env export > environment.yml
+   - [ ] Update install.sh to include all necessary setup steps including Git LFS
+   - [ ] Test environment recreation: conda env create -f environment.yml -n ssense_test
+   - [ ] Clean up test environment: conda env remove -n ssense_test
+   - [ ] Create .gitignore file with content: echo -e "*.pyc\n__pycache__/\nplots/\nresults/\n.conda/\n*.egg-info/" > .gitignore
+   - [ ] Create Dockerfile for containerized deployment: echo "FROM python:3.7-slim\nWORKDIR /app\nCOPY . .\nRUN pip install -r requirements.txt" > Dockerfile
+   - [ ] Build Docker image: docker build -t sixthsense:latest .
+   - [ ] Test Docker container: docker run --rm -v $(pwd):/app sixthsense:latest python train.py --help
+   - [ ] Create docker-compose.yml for easier container management
+   - [ ] Stage and commit any local configuration changes: git add . && git commit -m "Add local configuration for Linux x86_64"
+   - [ ] Create documentation for team members on environment setup including Git LFS requirements
+   - [ ] Create a feature branch for any code modifications: git checkout -b feature/environment-setup
+   - [ ] Push changes to remote repository if needed: git push origin feature/environment-setup
+   - [ ] Verify disk space for CSV files (ensure sufficient space in /home/cc/EnvGym/data/sixthsense)
+   - [ ] Set up CPU-optimized numpy/scipy if needed: conda install -c conda-forge numpy scipy
+   - [ ] Configure memory limits for large dataset processing if needed
+   - [ ] Test complete pipeline in Docker container to ensure portability

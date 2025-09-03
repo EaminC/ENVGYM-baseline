@@ -1,0 +1,18 @@
+current progress
+
+The Dockerfile has been successfully created with:
+- Ubuntu 20.04 base image with Python 3.7 installed
+- Git repository cloned (Lottery-Ticket-Hypothesis-in-Pytorch)
+- All required Python packages installed (torch, torchvision, numpy, matplotlib, etc.)
+- Directory structure created (data, dumps, saves, plots, runs)
+- Basic configuration files created (.gitignore, test_main.py, config.py)
+- Environment variables set (DEBIAN_FRONTEND, TZ, PYTHONUNBUFFERED)
+
+next step
+
+Add verification and testing commands to the Dockerfile:
+1. Add RUN command to verify all dependencies: `RUN python3.7 -c "import torch, torchvision, numpy, matplotlib, tqdm, pandas, seaborn, scipy, tensorboardX; print('All dependencies verified')"`
+2. Add RUN command to test basic functionality: `RUN python3.7 test_main.py`
+3. Add RUN command to verify CPU-only setup: `RUN python3.7 -c "import torch; assert not torch.cuda.is_available(), 'CUDA should not be available'; print('CPU-only mode confirmed')"`
+4. Add EXPOSE command for TensorBoard: `EXPOSE 6006`
+5. Change CMD to run a basic test: `CMD ["python3.7", "main.py", "--prune_type=lt", "--arch_type=fc1", "--dataset=mnist", "--prune_percent=10", "--prune_iterations=1", "--end_iter=1", "--device=cpu"]`

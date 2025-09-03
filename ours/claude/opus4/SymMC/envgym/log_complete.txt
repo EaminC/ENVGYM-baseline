@@ -1,0 +1,652 @@
+=== Docker Execution Log - 20250902_124043 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756816811
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 9.32kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/22] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 1.08MB 0.1s done
+#5 DONE 0.1s
+
+#6 [ 2/22] RUN apt-get update && apt-get install -y     openjdk-8-jdk     ant     build-essential     cmake     zlib1g-dev     libgmp-dev     libgmpxx4ldbl     git     wget     curl     python3     python3-pip     && rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [ 3/22] WORKDIR /home/cc/EnvGym/data/SymMC
+#7 CACHED
+
+#8 [ 4/22] COPY . /home/cc/EnvGym/data/SymMC/
+#8 DONE 1.0s
+
+#9 [ 5/22] RUN ls -la /home/cc/EnvGym/data/SymMC/ &&     ls -la /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/ || echo "Enhanced_Kodkod directory listing failed"
+#9 0.240 total 48
+#9 0.240 drwxr-xr-x 1 root root 4096 Sep  2 12:22 .
+#9 0.240 drwxr-xr-x 1 root root 4096 Sep  2 12:25 ..
+#9 0.240 drwxrwxr-x 8 root root 4096 Aug 28 00:24 .git
+#9 0.240 -rw-rw-r-- 1 root root   72 Aug 28 00:24 .gitignore
+#9 0.240 drwxrwxr-x 6 root root 4096 Aug 28 00:24 Dataset
+#9 0.240 drwxrwxr-x 6 root root 4096 Aug 28 00:24 Enhanced_Kodkod
+#9 0.240 drwxrwxr-x 3 root root 4096 Aug 28 00:24 Enumerator_Estimator
+#9 0.240 -rw-rw-r-- 1 root root 5667 Aug 28 00:24 README.md
+#9 0.240 drwxrwxr-x 2 root root 4096 Sep  2 12:40 envgym
+#9 0.240 drwxrwxr-x 2 root root 4096 Aug 28 00:24 images
+#9 0.242 total 44
+#9 0.242 drwxrwxr-x 6 root root 4096 Aug 28 00:24 .
+#9 0.242 drwxr-xr-x 1 root root 4096 Sep  2 12:22 ..
+#9 0.242 -rw-rw-r-- 1 root root  716 Aug 28 00:24 .classpath
+#9 0.242 -rw-rw-r-- 1 root root  370 Aug 28 00:24 .project
+#9 0.242 drwxrwxr-x 2 root root 4096 Aug 28 00:24 .settings
+#9 0.242 -rwxrwxr-x 1 root root   25 Aug 28 00:24 build.sh
+#9 0.242 -rw-rw-r-- 1 root root  404 Aug 28 00:24 build.xml
+#9 0.242 drwxrwxr-x 2 root root 4096 Aug 28 00:24 lib
+#9 0.242 -rwxrwxr-x 1 root root  261 Aug 28 00:24 run.sh
+#9 0.242 drwxrwxr-x 6 root root 4096 Aug 28 00:24 src
+#9 0.242 drwxrwxr-x 2 root root 4096 Aug 28 00:24 util
+#9 DONE 0.3s
+
+#10 [ 6/22] RUN mkdir -p /home/cc/EnvGym/data/SymMC/lib     && mkdir -p /home/cc/EnvGym/data/SymMC/config
+#10 DONE 0.4s
+
+#11 [ 7/22] RUN if [ ! -f /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib/java-cup-11a.jar ]; then         for i in 1 2 3; do             wget --tries=3 --timeout=30 https://www2.cs.tum.edu/projects/cup/releases/java-cup-11a.jar -O /home/cc/EnvGym/data/SymMC/lib/java-cup-11a.jar && break ||             curl -L --retry 3 --connect-timeout 30 https://www2.cs.tum.edu/projects/cup/releases/java-cup-11a.jar -o /home/cc/EnvGym/data/SymMC/lib/java-cup-11a.jar && break ||             sleep 5;         done;     else         cp /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib/java-cup-11a.jar /home/cc/EnvGym/data/SymMC/lib/;     fi
+#11 DONE 0.5s
+
+#12 [ 8/22] RUN if [ ! -f /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib/org.alloytools.alloy.dist.jar ]; then         for i in 1 2 3; do             wget --tries=3 --timeout=30 https://repo1.maven.org/maven2/org/alloytools/org.alloytools.alloy.dist/5.1.0/org.alloytools.alloy.dist-5.1.0.jar -O /home/cc/EnvGym/data/SymMC/lib/org.alloytools.alloy.dist.jar && break ||             curl -L --retry 3 --connect-timeout 30 https://repo1.maven.org/maven2/org/alloytools/org.alloytools.alloy.dist/5.1.0/org.alloytools.alloy.dist-5.1.0.jar -o /home/cc/EnvGym/data/SymMC/lib/org.alloytools.alloy.dist.jar && break ||             sleep 5;         done;     else         cp /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib/org.alloytools.alloy.dist.jar /home/cc/EnvGym/data/SymMC/lib/;     fi
+#12 DONE 0.4s
+
+#13 [ 9/22] RUN if [ ! -f /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib/org.sat4j.core.jar ]; then         for i in 1 2 3; do             wget --tries=3 --timeout=30 https://repo1.maven.org/maven2/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar -O /home/cc/EnvGym/data/SymMC/lib/org.sat4j.core.jar && break ||             curl -L --retry 3 --connect-timeout 30 https://repo1.maven.org/maven2/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar -o /home/cc/EnvGym/data/SymMC/lib/org.sat4j.core.jar && break ||             sleep 5;         done;     else         cp /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib/org.sat4j.core.jar /home/cc/EnvGym/data/SymMC/lib/;     fi
+#13 DONE 0.4s
+
+#14 [10/22] RUN if [ ! -f /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib/org.sat4j.core-src.jar ]; then         for i in 1 2 3; do             wget --tries=3 --timeout=30 https://repo1.maven.org/maven2/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5-sources.jar -O /home/cc/EnvGym/data/SymMC/lib/org.sat4j.core-src.jar && break ||             curl -L --retry 3 --connect-timeout 30 https://repo1.maven.org/maven2/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5-sources.jar -o /home/cc/EnvGym/data/SymMC/lib/org.sat4j.core-src.jar && break ||             sleep 5;         done;     else         cp /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib/org.sat4j.core-src.jar /home/cc/EnvGym/data/SymMC/lib/;     fi
+#14 DONE 0.4s
+
+#15 [11/22] RUN echo "*.tmp\n*.o\n*.a\n*.so\nlib/*.jar\n.classpath\n.project\n.idea/\n*/.idea/\nEnhanced_Kodkod/bin/\nEnumerator_Estimator/cmake-build-release/" >> /home/cc/EnvGym/data/SymMC/.gitignore
+#15 DONE 0.4s
+
+#16 [12/22] RUN ls -la /home/cc/EnvGym/data/SymMC/lib/ && file /home/cc/EnvGym/data/SymMC/lib/*.jar || echo "JAR file verification failed"
+#16 0.280 total 10788
+#16 0.280 drwxr-xr-x 1 root root     4096 Sep  2 12:40 .
+#16 0.280 drwxr-xr-x 1 root root     4096 Sep  2 12:40 ..
+#16 0.280 -rwxr-xr-x 1 root root    96121 Sep  2 12:40 java-cup-11a.jar
+#16 0.280 -rwxr-xr-x 1 root root 10370077 Sep  2 12:40 org.alloytools.alloy.dist.jar
+#16 0.280 -rwxr-xr-x 1 root root   333710 Sep  2 12:40 org.sat4j.core-src.jar
+#16 0.280 -rwxr-xr-x 1 root root   225352 Sep  2 12:40 org.sat4j.core.jar
+#16 0.293 /home/cc/EnvGym/data/SymMC/lib/java-cup-11a.jar:              Zip archive data, at least v1.0 to extract
+#16 0.293 /home/cc/EnvGym/data/SymMC/lib/org.alloytools.alloy.dist.jar: Java archive data (JAR)
+#16 0.293 /home/cc/EnvGym/data/SymMC/lib/org.sat4j.core-src.jar:        Java archive data (JAR)
+#16 0.293 /home/cc/EnvGym/data/SymMC/lib/org.sat4j.core.jar:            Java archive data (JAR)
+#16 DONE 0.3s
+
+#17 [13/22] RUN if [ -d /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod ]; then         cd /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod &&         if [ -f /home/cc/EnvGym/data/SymMC/lib/org.alloytools.alloy.dist.jar ]; then             cp /home/cc/EnvGym/data/SymMC/lib/org.alloytools.alloy.dist.jar lib/ || echo "Failed to copy org.alloytools.alloy.dist.jar";         fi &&         if [ -f /home/cc/EnvGym/data/SymMC/lib/java-cup-11a.jar ]; then             cp /home/cc/EnvGym/data/SymMC/lib/java-cup-11a.jar lib/ || echo "Failed to copy java-cup-11a.jar";         fi &&         if [ -f /home/cc/EnvGym/data/SymMC/lib/org.sat4j.core.jar ]; then             cp /home/cc/EnvGym/data/SymMC/lib/org.sat4j.core.jar lib/ || echo "Failed to copy org.sat4j.core.jar";         fi &&         if [ -f /home/cc/EnvGym/data/SymMC/lib/org.sat4j.core-src.jar ]; then             cp /home/cc/EnvGym/data/SymMC/lib/org.sat4j.core-src.jar lib/ || echo "Failed to copy org.sat4j.core-src.jar";         fi;     else         echo "Warning: Enhanced_Kodkod directory not found, skipping JAR setup";     fi
+#17 DONE 0.4s
+
+#18 [14/22] WORKDIR /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod
+#18 DONE 0.0s
+
+#19 [15/22] RUN if [ -f build.sh ]; then         chmod +x build.sh &&         ./build.sh || echo "Build script failed, continuing...";     fi &&     if [ -f run.sh ]; then         chmod +x run.sh;     fi
+#19 0.475 Buildfile: /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/build.xml
+#19 0.614 
+#19 0.614 compile:
+#19 0.637     [mkdir] Created dir: /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/bin
+#19 0.707     [javac] Compiling 309 source files to /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/bin
+#19 0.907     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.907     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.907     [javac]                                          ^
+#19 0.907     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.908     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.908     [javac]                                           ^
+#19 0.908     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.908     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.908     [javac]                                            ^
+#19 0.908     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.908     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.908     [javac]                                             ^
+#19 0.908     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.909     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.909     [javac]                                              ^
+#19 0.909     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.909     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.909     [javac]                                               ^
+#19 0.909     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.909     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.909     [javac]                                                ^
+#19 0.910     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.910     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.910     [javac]                                                 ^
+#19 0.910     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.910     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.910     [javac]                                                  ^
+#19 0.910     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.910     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.911     [javac]                                                   ^
+#19 0.911     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.911     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.911     [javac]                                                    ^
+#19 0.911     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.911     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.911     [javac]                                                     ^
+#19 0.911     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.911     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.911     [javac]                                                      ^
+#19 0.912     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.912     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.912     [javac]                                                       ^
+#19 0.912     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.912     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.912     [javac]                                                        ^
+#19 0.912     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.912     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.912     [javac]                                                         ^
+#19 0.912     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.912     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.913     [javac]                                                          ^
+#19 0.913     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.913     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.913     [javac]                                                           ^
+#19 0.913     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.913     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.913     [javac]                                                            ^
+#19 0.913     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.913     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.913     [javac]                                                             ^
+#19 0.914     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.914     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.914     [javac]                                                              ^
+#19 0.914     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.914     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.914     [javac]                                                               ^
+#19 0.914     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.914     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.914     [javac]                                                                ^
+#19 0.915     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.915     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.915     [javac]                                                                 ^
+#19 0.915     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.915     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.915     [javac]                                                                  ^
+#19 0.915     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.915     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.915     [javac]                                                                   ^
+#19 0.915     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:29: error: unmappable character for encoding ASCII
+#19 0.915     [javac]     final static String  SUPERSCRIPTS = "???????????????????????????";
+#19 0.915     [javac]                                                                    ^
+#19 0.916     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.916     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.916     [javac]                                          ^
+#19 0.916     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.916     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.916     [javac]                                           ^
+#19 0.916     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.916     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.916     [javac]                                            ^
+#19 0.916     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.916     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.916     [javac]                                             ^
+#19 0.916     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.917     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.917     [javac]                                              ^
+#19 0.917     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.917     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.917     [javac]                                               ^
+#19 0.917     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.917     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.917     [javac]                                                ^
+#19 0.917     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.917     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.917     [javac]                                                 ^
+#19 0.917     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.917     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.917     [javac]                                                  ^
+#19 0.918     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.918     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.918     [javac]                                                   ^
+#19 0.918     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.918     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.918     [javac]                                                    ^
+#19 0.918     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.918     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.918     [javac]                                                     ^
+#19 0.918     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.918     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.918     [javac]                                                      ^
+#19 0.918     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.919     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.919     [javac]                                                       ^
+#19 0.919     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.919     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.919     [javac]                                                        ^
+#19 0.919     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.919     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.919     [javac]                                                         ^
+#19 0.919     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.919     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.919     [javac]                                                          ^
+#19 0.919     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.920     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.920     [javac]                                                           ^
+#19 0.920     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.920     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.920     [javac]                                                            ^
+#19 0.920     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.920     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.920     [javac]                                                             ^
+#19 0.920     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.920     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.920     [javac]                                                              ^
+#19 0.920     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.920     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.920     [javac]                                                               ^
+#19 0.920     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.920     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.920     [javac]                                                                ^
+#19 0.921     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.921     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.921     [javac]                                                                 ^
+#19 0.921     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.921     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.921     [javac]                                                                  ^
+#19 0.921     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.921     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.921     [javac]                                                                   ^
+#19 0.921     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.921     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.921     [javac]                                                                    ^
+#19 0.921     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.921     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.921     [javac]                                                                     ^
+#19 0.922     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.922     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.922     [javac]                                                                      ^
+#19 0.922     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:30: error: unmappable character for encoding ASCII
+#19 0.922     [javac]     final static String  SUBSCRIPTS   = "??????????????????????????????";
+#19 0.922     [javac]                                                                       ^
+#19 0.922     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.922     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.922     [javac]                                          ^
+#19 0.922     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.922     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.922     [javac]                                           ^
+#19 0.922     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.922     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.922     [javac]                                            ^
+#19 0.923     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.923     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.923     [javac]                                             ^
+#19 0.923     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.923     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.923     [javac]                                              ^
+#19 0.923     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.923     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.923     [javac]                                               ^
+#19 0.923     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.923     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.923     [javac]                                                ^
+#19 0.923     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.923     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.923     [javac]                                                 ^
+#19 0.924     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.924     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.924     [javac]                                                  ^
+#19 0.924     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.924     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.924     [javac]                                                   ^
+#19 0.924     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.924     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.924     [javac]                                                    ^
+#19 0.924     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.924     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.924     [javac]                                                     ^
+#19 0.924     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.924     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.924     [javac]                                                      ^
+#19 0.925     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.925     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.925     [javac]                                                       ^
+#19 0.925     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.925     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.925     [javac]                                                        ^
+#19 0.925     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.925     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.925     [javac]                                                         ^
+#19 0.925     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.925     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.925     [javac]                                                          ^
+#19 0.925     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.925     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.925     [javac]                                                           ^
+#19 0.925     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.925     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.926     [javac]                                                            ^
+#19 0.926     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.926     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.926     [javac]                                                             ^
+#19 0.926     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.926     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.926     [javac]                                                              ^
+#19 0.926     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.926     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.926     [javac]                                                               ^
+#19 0.926     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.926     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.926     [javac]                                                                ^
+#19 0.926     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.926     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.927     [javac]                                                                 ^
+#19 0.927     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.927     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.927     [javac]                                                                  ^
+#19 0.927     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.927     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.927     [javac]                                                                   ^
+#19 0.927     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.927     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.927     [javac]                                                                    ^
+#19 0.927     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.927     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.928     [javac]                                                                     ^
+#19 0.928     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.928     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.928     [javac]                                                                      ^
+#19 0.928     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.928     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.928     [javac]                                                                       ^
+#19 0.928     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.928     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.928     [javac]                                                                        ^
+#19 0.928     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.928     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.929     [javac]                                                                         ^
+#19 0.929     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:31: error: unmappable character for encoding ASCII
+#19 0.929     [javac]     final static String  BOX_SINGLE   = "?????????????????????????????????";
+#19 0.929     [javac]                                                                          ^
+#19 0.929     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:116: error: unmappable character for encoding ASCII
+#19 0.929     [javac]     static Pattern SUPERSCRIPTED_NAME_P = Pattern.compile("(\\p{javaJavaIdentifierPart}+)([???????????????????????????]+)");
+#19 0.929     [javac]                                                                                            ^
+#19 0.929     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:116: error: unmappable character for encoding ASCII
+#19 0.929     [javac]     static Pattern SUPERSCRIPTED_NAME_P = Pattern.compile("(\\p{javaJavaIdentifierPart}+)([???????????????????????????]+)");
+#19 0.929     [javac]                                                                                             ^
+#19 0.929     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:116: error: unmappable character for encoding ASCII
+#19 0.929     [javac]     static Pattern SUPERSCRIPTED_NAME_P = Pattern.compile("(\\p{javaJavaIdentifierPart}+)([???????????????????????????]+)");
+#19 0.929     [javac]                                                                                              ^
+#19 0.929     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:116: error: unmappable character for encoding ASCII
+#19 0.929     [javac]     static Pattern SUPERSCRIPTED_NAME_P = Pattern.compile("(\\p{javaJavaIdentifierPart}+)([???????????????????????????]+)");
+#19 0.929     [javac]                                                                                               ^
+#19 0.929     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:116: error: unmappable character for encoding ASCII
+#19 0.929     [javac]     static Pattern SUPERSCRIPTED_NAME_P = Pattern.compile("(\\p{javaJavaIdentifierPart}+)([???????????????????????????]+)");
+#19 0.929     [javac]                                                                                                ^
+#19 0.930     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:116: error: unmappable character for encoding ASCII
+#19 0.930     [javac]     static Pattern SUPERSCRIPTED_NAME_P = Pattern.compile("(\\p{javaJavaIdentifierPart}+)([???????????????????????????]+)");
+#19 0.930     [javac]                                                                                                 ^
+#19 0.930     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:116: error: unmappable character for encoding ASCII
+#19 0.930     [javac]     static Pattern SUPERSCRIPTED_NAME_P = Pattern.compile("(\\p{javaJavaIdentifierPart}+)([???????????????????????????]+)");
+#19 0.930     [javac]                                                                                                  ^
+#19 0.930     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:116: error: unmappable character for encoding ASCII
+#19 0.930     [javac]     static Pattern SUPERSCRIPTED_NAME_P = Pattern.compile("(\\p{javaJavaIdentifierPart}+)([???????????????????????????]+)");
+#19 0.930     [javac]                                                                                                   ^
+#19 0.930     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:116: error: unmappable character for encoding ASCII
+#19 0.930     [javac]     static Pattern SUPERSCRIPTED_NAME_P = Pattern.compile("(\\p{javaJavaIdentifierPart}+)([???????????????????????????]+)");
+#19 0.930     [javac]                                                                                                    ^
+#19 0.930     [javac] /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/src/edu/mit/csail/sdg/alloy4/TableView.java:116: error: unmappable character for encoding ASCII
+#19 0.930     [javac]     static Pattern SUPERSCRIPTED_NAME_P = Pattern.compile("(\\p{javaJavaIdentifierPart}+)([???????????????????????????]+)");
+#19 0.930     [javac]                                                                                                     ^
+#19 1.089     [javac] 100 errors
+#19 1.096 
+#19 1.096 BUILD FAILED
+#19 1.096 /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/build.xml:13: Compile failed; see the compiler error output for details.
+#19 1.096 
+#19 1.096 Total time: 0 seconds
+#19 1.134 Build script failed, continuing...
+#19 DONE 1.2s
+
+#20 [16/22] WORKDIR /home/cc/EnvGym/data/SymMC/Enumerator_Estimator
+#20 DONE 0.0s
+
+#21 [17/22] RUN if [ -f build.sh ]; then         chmod +x build.sh &&         ./build.sh || echo "Build script failed, continuing...";     fi
+#21 0.502 -- The C compiler identification is GNU 9.4.0
+#21 0.587 -- The CXX compiler identification is GNU 9.4.0
+#21 0.593 -- Check for working C compiler: /usr/bin/cc
+#21 0.710 -- Check for working C compiler: /usr/bin/cc -- works
+#21 0.712 -- Detecting C compiler ABI info
+#21 0.832 -- Detecting C compiler ABI info - done
+#21 0.851 -- Detecting C compile features
+#21 0.851 -- Detecting C compile features - done
+#21 0.854 -- Check for working CXX compiler: /usr/bin/c++
+#21 0.984 -- Check for working CXX compiler: /usr/bin/c++ -- works
+#21 0.987 -- Detecting CXX compiler ABI info
+#21 1.120 -- Detecting CXX compiler ABI info - done
+#21 1.139 -- Detecting CXX compile features
+#21 1.140 -- Detecting CXX compile features - done
+#21 1.147 -- Found ZLIB: /usr/lib/x86_64-linux-gnu/libz.so (found version "1.2.11") 
+#21 1.148 -- Configuring done
+#21 1.155 -- Generating done
+#21 1.155 -- Build files have been written to: /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/cmake-build-release
+#21 1.232 Scanning dependencies of target minisat-lib-static
+#21 1.253 [  5%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/utils/Options.cc.o
+#21 1.299 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.cc:21:
+#21 1.299 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 1.299   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#21 1.299       |                             ^
+#21 1.299 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 1.299   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#21 1.299       |                             ^
+#21 1.299 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 1.299   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#21 1.299       |                         ^
+#21 1.490 [ 10%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/utils/System.cc.o
+#21 1.586 [ 15%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/core/Solver.cc.o
+#21 1.633 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.h:28,
+#21 1.633                  from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:26:
+#21 1.633 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 1.633   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#21 1.633       |                             ^
+#21 1.633 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 1.633   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#21 1.633       |                             ^
+#21 1.633 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 1.633   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#21 1.633       |                         ^
+#21 1.636 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:995:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 1.636   995 |     printf("restarts              : %"PRIu64"\n", starts);
+#21 1.636       |            ^
+#21 1.636 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:996:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 1.636   996 |     printf("conflicts             : %-12"PRIu64"   (%.0f /sec)\n", conflicts   , conflicts   /cpu_time);
+#21 1.636       |            ^
+#21 1.636 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:997:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 1.636   997 |     printf("decisions             : %-12"PRIu64"   (%4.2f %% random) (%.0f /sec)\n", decisions, (float)rnd_decisions*100 / (float)decisions, decisions   /cpu_time);
+#21 1.636       |            ^
+#21 1.636 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:998:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 1.636   998 |     printf("propagations          : %-12"PRIu64"   (%.0f /sec)\n", propagations, propagations/cpu_time);
+#21 1.636       |            ^
+#21 1.636 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:999:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 1.636   999 |     printf("conflict literals     : %-12"PRIu64"   (%4.2f %% deleted)\n", tot_literals, (max_literals - tot_literals)*100 / (double)max_literals);
+#21 1.636       |            ^
+#21 2.730 [ 20%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/simp/SimpSolver.cc.o
+#21 2.777 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.h:28,
+#21 2.777                  from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/SimpSolver.h:25,
+#21 2.777                  from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/SimpSolver.cc:22:
+#21 2.777 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 2.777   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#21 2.777       |                             ^
+#21 2.777 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 2.777   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#21 2.777       |                             ^
+#21 2.777 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 2.777   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#21 2.777       |                         ^
+#21 3.698 [ 25%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/perm/BasicPermPair.cpp.o
+#21 4.603 [ 30%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/perm/MCSampler.cpp.o
+#21 6.459 [ 35%] Building CXX object CMakeFiles/minisat-lib-static.dir/minisat/perm/PermPair.cpp.o
+#21 7.366 [ 40%] Linking CXX static library libminisat.a
+#21 7.423 [ 40%] Built target minisat-lib-static
+#21 7.442 Scanning dependencies of target minisat_simp
+#21 7.453 [ 45%] Building CXX object CMakeFiles/minisat_simp.dir/minisat/simp/Main.cc.o
+#21 7.500 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/Main.cc:26:
+#21 7.500 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 7.500   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#21 7.500       |                             ^
+#21 7.500 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 7.500   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#21 7.500       |                             ^
+#21 7.500 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 7.500   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#21 7.500       |                         ^
+#21 7.579 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/Main.cc:65:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 7.579    65 |     printf("restarts              : %"PRIu64"\n", solver.starts);
+#21 7.579       |            ^
+#21 7.579 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/Main.cc:66:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 7.579    66 |     printf("conflicts             : %-12"PRIu64"   (%.0f /sec)\n", solver.conflicts   , solver.conflicts   /cpu_time);
+#21 7.579       |            ^
+#21 7.579 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/Main.cc:67:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 7.579    67 |     printf("decisions             : %-12"PRIu64"   (%4.2f %% random) (%.0f /sec)\n", solver.decisions, (float)solver.rnd_decisions*100 / (float)solver.decisions, solver.decisions   /cpu_time);
+#21 7.579       |            ^
+#21 7.579 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/Main.cc:68:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 7.579    68 |     printf("propagations          : %-12"PRIu64"   (%.0f /sec)\n", solver.propagations, solver.propagations/cpu_time);
+#21 7.579       |            ^
+#21 7.579 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/Main.cc:69:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 7.579    69 |     printf("conflict literals     : %-12"PRIu64"   (%4.2f %% deleted)\n", solver.tot_literals, (solver.max_literals - solver.tot_literals)*100 / (double)solver.max_literals);
+#21 7.579       |            ^
+#21 9.187 [ 50%] Linking CXX executable minisat
+#21 9.282 [ 50%] Built target minisat_simp
+#21 9.303 Scanning dependencies of target minisat_core
+#21 9.314 [ 55%] Building CXX object CMakeFiles/minisat_core.dir/minisat/core/Main.cc.o
+#21 9.363 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:27:
+#21 9.363 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 9.363   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#21 9.363       |                             ^
+#21 9.363 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 9.363   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#21 9.363       |                             ^
+#21 9.363 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 9.363   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#21 9.363       |                         ^
+#21 9.366 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:82:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 9.366    82 |     printf("restarts              : %"PRIu64"\n", solver.starts);
+#21 9.366       |            ^
+#21 9.366 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:83:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 9.366    83 |     printf("conflicts             : %-12"PRIu64"   (%.0f /sec)\n", solver.conflicts   , solver.conflicts   /cpu_time);
+#21 9.366       |            ^
+#21 9.366 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:84:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 9.366    84 |     printf("decisions             : %-12"PRIu64"   (%4.2f %% random) (%.0f /sec)\n", solver.decisions, (float)solver.rnd_decisions*100 / (float)solver.decisions, solver.decisions   /cpu_time);
+#21 9.366       |            ^
+#21 9.366 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:85:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 9.366    85 |     printf("propagations          : %-12"PRIu64"   (%.0f /sec)\n", solver.propagations, solver.propagations/cpu_time);
+#21 9.366       |            ^
+#21 9.366 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:86:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 9.366    86 |     printf("conflict literals     : %-12"PRIu64"   (%4.2f %% deleted)\n", solver.tot_literals, (solver.max_literals - solver.tot_literals)*100 / (double)solver.max_literals);
+#21 9.366       |            ^
+#21 9.366 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Main.cc:158:16: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 9.366   158 |         printf("%"PRIu64", %g\n", num, cpuTime()-initial_time);
+#21 9.366       |                ^
+#21 9.658 [ 60%] Linking CXX executable minisat_core
+#21 9.753 [ 60%] Built target minisat_core
+#21 9.776 Scanning dependencies of target minisat-lib-shared
+#21 9.797 [ 65%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/utils/Options.cc.o
+#21 9.843 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.cc:21:
+#21 9.843 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 9.843   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#21 9.843       |                             ^
+#21 9.843 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 9.843   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#21 9.843       |                             ^
+#21 9.843 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 9.843   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#21 9.843       |                         ^
+#21 10.04 [ 70%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/utils/System.cc.o
+#21 10.13 [ 75%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/core/Solver.cc.o
+#21 10.18 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.h:28,
+#21 10.18                  from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:26:
+#21 10.18 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 10.18   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#21 10.18       |                             ^
+#21 10.18 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 10.18   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#21 10.18       |                             ^
+#21 10.18 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 10.18   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#21 10.18       |                         ^
+#21 10.18 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:995:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 10.18   995 |     printf("restarts              : %"PRIu64"\n", starts);
+#21 10.18       |            ^
+#21 10.18 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:996:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 10.18   996 |     printf("conflicts             : %-12"PRIu64"   (%.0f /sec)\n", conflicts   , conflicts   /cpu_time);
+#21 10.18       |            ^
+#21 10.18 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:997:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 10.18   997 |     printf("decisions             : %-12"PRIu64"   (%4.2f %% random) (%.0f /sec)\n", decisions, (float)rnd_decisions*100 / (float)decisions, decisions   /cpu_time);
+#21 10.18       |            ^
+#21 10.18 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:998:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 10.18   998 |     printf("propagations          : %-12"PRIu64"   (%.0f /sec)\n", propagations, propagations/cpu_time);
+#21 10.18       |            ^
+#21 10.18 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.cc:999:12: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 10.18   999 |     printf("conflict literals     : %-12"PRIu64"   (%4.2f %% deleted)\n", tot_literals, (max_literals - tot_literals)*100 / (double)max_literals);
+#21 10.18       |            ^
+#21 11.25 [ 80%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/simp/SimpSolver.cc.o
+#21 11.29 In file included from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/core/Solver.h:28,
+#21 11.29                  from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/SimpSolver.h:25,
+#21 11.29                  from /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/simp/SimpSolver.cc:22:
+#21 11.29 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:285:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 11.29   285 |             fprintf(stderr, "%4"PRIi64, range.begin);
+#21 11.29       |                             ^
+#21 11.29 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:291:29: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 11.29   291 |             fprintf(stderr, "%4"PRIi64, range.end);
+#21 11.29       |                             ^
+#21 11.29 /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/minisat/utils/Options.h:293:25: warning: invalid suffix on literal; C++11 requires a space between literal and string macro [-Wliteral-suffix]
+#21 11.29   293 |         fprintf(stderr, "] (default: %"PRIi64")\n", value);
+#21 11.29       |                         ^
+#21 12.19 [ 85%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/perm/BasicPermPair.cpp.o
+#21 13.09 [ 90%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/perm/MCSampler.cpp.o
+#21 14.93 [ 95%] Building CXX object CMakeFiles/minisat-lib-shared.dir/minisat/perm/PermPair.cpp.o
+#21 15.83 [100%] Linking CXX shared library libminisat.so
+#21 15.96 [100%] Built target minisat-lib-shared
+#21 DONE 16.0s
+
+#22 [18/22] WORKDIR /home/cc/EnvGym/data/SymMC
+#22 DONE 0.0s
+
+#23 [19/22] RUN echo '#!/bin/bash' > /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'echo "=== Environment Check ==="' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'echo "Java version:"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'java -version 2>&1 | head -n1' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'echo "Ant version:"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'ant -version' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'echo "CMake version:"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'cmake --version | head -n1' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'echo "G++ version:"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'g++ --version | head -n1' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'echo "JAR files:"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'ls -la /home/cc/EnvGym/data/SymMC/lib/*.jar 2>/dev/null || echo "No JAR files in lib"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'ls -la /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib/*.jar 2>/dev/null || echo "No JAR files in Enhanced_Kodkod/lib"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'echo "Build scripts:"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'test -x /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/build.sh && echo "Enhanced_Kodkod build.sh is executable" || echo "Enhanced_Kodkod build.sh not found or not executable"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'test -x /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/build.sh && echo "Enumerator_Estimator build.sh is executable" || echo "Enumerator_Estimator build.sh not found or not executable"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'test -x /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/run.sh && echo "Enhanced_Kodkod run.sh is executable" || echo "Enhanced_Kodkod run.sh not found or not executable"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'echo "Compiled classes:"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'test -f /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/bin/edu/mit/csail/sdg/alloy4whole/ExampleUsingTheCompiler.class && echo "ExampleUsingTheCompiler compiled" || echo "ExampleUsingTheCompiler not compiled"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'echo "MiniSat executable:"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'test -x /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/cmake-build-release/minisat && echo "minisat executable exists" || echo "minisat executable not found"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'echo "GMP library:"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'ldconfig -p | grep -q gmp && echo "GMP library installed" || echo "GMP library not found"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'echo ".gitignore:"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh &&     echo 'test -f /home/cc/EnvGym/data/SymMC/.gitignore && echo ".gitignore exists" || echo ".gitignore not found"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh
+#23 DONE 0.3s
+
+#24 [20/22] RUN chmod +x /home/cc/EnvGym/data/SymMC/environment_check.sh
+#24 DONE 0.4s
+
+#25 [21/22] RUN echo '#!/bin/bash' > /home/cc/EnvGym/data/SymMC/test_runner.sh &&     echo 'echo "=== Running Test Suite ==="' >> /home/cc/EnvGym/data/SymMC/test_runner.sh &&     echo 'cd /home/cc/EnvGym/data/SymMC' >> /home/cc/EnvGym/data/SymMC/test_runner.sh &&     echo './environment_check.sh' >> /home/cc/EnvGym/data/SymMC/test_runner.sh
+#25 DONE 0.4s
+
+#26 [22/22] RUN chmod +x /home/cc/EnvGym/data/SymMC/test_runner.sh
+#26 DONE 0.4s
+
+#27 exporting to image
+#27 exporting layers
+#27 exporting layers 7.5s done
+#27 writing image sha256:29eaa5d2ba9e8fd39f6a7c2cf7832a9cb1ff7500134f8826bd9d6ab5cf200729 done
+#27 naming to docker.io/library/envgym_test_1756816811 done
+#27 DONE 7.5s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

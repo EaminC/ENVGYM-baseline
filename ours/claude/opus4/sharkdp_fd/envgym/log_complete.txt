@@ -1,0 +1,213 @@
+=== Docker Execution Log - 20250903_104935 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756896509
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.43kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/ubuntu:20.04
+#2 DONE 0.2s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/13] FROM docker.io/library/ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214
+#4 DONE 0.0s
+
+#5 [ 2/13] RUN apt-get update && apt-get install -y     git     curl     make     build-essential     gcc-arm-linux-gnueabihf     gcc-aarch64-linux-gnu     jq     pkg-config     libssl-dev     ca-certificates     cmake     libclang-dev     clang     && rm -rf /var/lib/apt/lists/*
+#5 CACHED
+
+#6 [ 3/13] RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o rustup-init.sh     && chmod +x rustup-init.sh     && ./rustup-init.sh -y --default-toolchain 1.77.2     && rm rustup-init.sh
+#6 CACHED
+
+#7 [ 4/13] RUN . /root/.cargo/env     && rustup component add rustfmt clippy
+#7 CACHED
+
+#8 [ 5/13] RUN . /root/.cargo/env     && cargo install cross --locked --verbose || true
+#8 CACHED
+
+#9 [internal] load build context
+#9 transferring context: 784.62kB 0.0s done
+#9 DONE 0.0s
+
+#10 [ 6/13] RUN . /root/.cargo/env     && cargo install cargo-audit || true
+#10 0.273     Updating crates.io index
+#10 0.318 error: cannot install package `cargo-audit 0.21.2`, it requires rustc 1.81.0 or newer, while the currently active rustc version is 1.77.2
+#10 0.318 `cargo-audit 0.21.1` supports rustc 1.74.0
+#10 DONE 0.4s
+
+#11 [ 7/13] WORKDIR /workspace
+#11 DONE 0.0s
+
+#12 [ 8/13] COPY . /workspace/
+#12 DONE 0.0s
+
+#13 [ 9/13] RUN . /root/.cargo/env     && cargo build --release --locked
+#13 0.328     Updating crates.io index
+#13 0.505  Downloading crates ...
+#13 0.552   Downloaded anyhow v1.0.98
+#13 0.560   Downloaded argmax v0.4.0
+#13 0.561   Downloaded anstyle-query v1.1.3
+#13 0.562   Downloaded bitflags v2.9.1
+#13 0.566   Downloaded anstyle v1.0.11
+#13 0.568   Downloaded aho-corasick v1.1.3
+#13 0.574   Downloaded proc-macro2 v1.0.95
+#13 0.577   Downloaded anstyle-parse v0.2.7
+#13 0.578   Downloaded anstream v0.6.19
+#13 0.587   Downloaded lscolors v0.20.0
+#13 0.616   Downloaded colorchoice v1.0.4
+#13 0.618   Downloaded cfg_aliases v0.2.1
+#13 0.620   Downloaded faccess v0.2.4
+#13 0.631   Downloaded tikv-jemallocator v0.6.0
+#13 0.634   Downloaded crossbeam-deque v0.8.6
+#13 0.636   Downloaded version_check v0.9.5
+#13 0.638   Downloaded shlex v1.3.0
+#13 0.641   Downloaded normpath v1.3.0
+#13 0.643   Downloaded walkdir v2.5.0
+#13 0.645   Downloaded cfg-if v1.0.1
+#13 0.646   Downloaded errno v0.3.13
+#13 0.647   Downloaded home v0.5.9
+#13 0.648   Downloaded ctrlc v3.4.7
+#13 0.650   Downloaded terminal_size v0.4.2
+#13 0.651   Downloaded serde v1.0.219
+#13 0.654   Downloaded globset v0.4.16
+#13 0.656   Downloaded is_terminal_polyfill v1.70.1
+#13 0.657   Downloaded clap_lex v0.7.5
+#13 0.659   Downloaded strsim v0.11.1
+#13 0.663   Downloaded heck v0.5.0
+#13 0.664   Downloaded utf8parse v0.2.2
+#13 0.665   Downloaded etcetera v0.10.0
+#13 0.676   Downloaded same-file v1.0.6
+#13 0.684   Downloaded once_cell v1.21.3
+#13 0.692   Downloaded clap_derive v4.5.41
+#13 0.701   Downloaded quote v1.0.40
+#13 0.739   Downloaded nu-ansi-term v0.50.1
+#13 0.745   Downloaded crossbeam-utils v0.8.21
+#13 0.760   Downloaded log v0.4.27
+#13 0.771   Downloaded crossbeam-epoch v0.9.18
+#13 0.775   Downloaded ignore v0.4.23
+#13 0.784   Downloaded clap v4.5.42
+#13 0.798   Downloaded unicode-ident v1.0.18
+#13 0.814   Downloaded clap_complete v4.5.55
+#13 0.824   Downloaded jiff-static v0.2.15
+#13 0.866   Downloaded memchr v2.7.5
+#13 0.881   Downloaded cc v1.2.29
+#13 0.885   Downloaded nix v0.30.1
+#13 0.907   Downloaded crossbeam-channel v0.5.15
+#13 1.009   Downloaded clap_builder v4.5.42
+#13 1.089   Downloaded regex v1.11.1
+#13 1.208   Downloaded syn v2.0.104
+#13 1.246   Downloaded bstr v1.12.0
+#13 1.289   Downloaded regex-syntax v0.8.5
+#13 1.317   Downloaded rustix v1.0.7
+#13 1.418   Downloaded regex-automata v0.4.9
+#13 1.447   Downloaded jiff v0.2.15
+#13 1.489   Downloaded libc v0.2.174
+#13 1.544   Downloaded tikv-jemalloc-sys v0.6.0+5.3.0-1-ge13ca993e8ccb9ba9847cc330696e02839f328f7
+#13 1.697   Downloaded linux-raw-sys v0.9.4
+#13 1.802    Compiling bitflags v2.9.1
+#13 1.802    Compiling libc v0.2.174
+#13 1.802    Compiling memchr v2.7.5
+#13 1.802    Compiling proc-macro2 v1.0.95
+#13 1.802    Compiling unicode-ident v1.0.18
+#13 1.802    Compiling crossbeam-utils v0.8.21
+#13 1.802    Compiling rustix v1.0.7
+#13 1.802    Compiling utf8parse v0.2.2
+#13 1.802    Compiling linux-raw-sys v0.9.4
+#13 1.802    Compiling shlex v1.3.0
+#13 1.803    Compiling cfg_aliases v0.2.1
+#13 1.803    Compiling colorchoice v1.0.4
+#13 1.803    Compiling is_terminal_polyfill v1.70.1
+#13 1.803    Compiling regex-syntax v0.8.5
+#13 1.804    Compiling cfg-if v1.0.1
+#13 1.806    Compiling anstyle v1.0.11
+#13 1.808    Compiling anstyle-query v1.1.3
+#13 1.810    Compiling clap_lex v0.7.5
+#13 1.810    Compiling strsim v0.11.1
+#13 1.810    Compiling heck v0.5.0
+#13 1.812    Compiling log v0.4.27
+#13 1.814    Compiling same-file v1.0.6
+#13 1.816    Compiling version_check v0.9.5
+#13 1.817    Compiling anyhow v1.0.98
+#13 1.819    Compiling nu-ansi-term v0.50.1
+#13 1.820    Compiling bitflags v1.3.2
+#13 1.820    Compiling once_cell v1.21.3
+#13 1.820    Compiling home v0.5.9
+#13 1.820    Compiling jiff v0.2.15
+#13 1.820    Compiling normpath v1.3.0
+#13 1.858    Compiling anstyle-parse v0.2.7
+#13 1.889    Compiling nix v0.30.1
+#13 1.903    Compiling etcetera v0.10.0
+#13 1.920    Compiling walkdir v2.5.0
+#13 1.955    Compiling cc v1.2.29
+#13 1.981    Compiling anstream v0.6.19
+#13 2.053    Compiling fd-find v10.3.0 (/workspace)
+#13 2.212    Compiling aho-corasick v1.1.3
+#13 2.212    Compiling bstr v1.12.0
+#13 2.324    Compiling crossbeam-epoch v0.9.18
+#13 2.324    Compiling crossbeam-channel v0.5.15
+#13 2.369    Compiling quote v1.0.40
+#13 2.495    Compiling syn v2.0.104
+#13 2.513    Compiling crossbeam-deque v0.8.6
+#13 2.698    Compiling terminal_size v0.4.2
+#13 2.745    Compiling clap_builder v4.5.42
+#13 2.749    Compiling tikv-jemalloc-sys v0.6.0+5.3.0-1-ge13ca993e8ccb9ba9847cc330696e02839f328f7
+#13 3.064    Compiling lscolors v0.20.0
+#13 3.177    Compiling faccess v0.2.4
+#13 3.318    Compiling regex-automata v0.4.9
+#13 4.350    Compiling ctrlc v3.4.7
+#13 4.350    Compiling argmax v0.4.0
+#13 4.585    Compiling clap_derive v4.5.41
+#13 5.163    Compiling globset v0.4.16
+#13 5.163    Compiling regex v1.11.1
+#13 5.388    Compiling ignore v0.4.23
+#13 5.822    Compiling clap v4.5.42
+#13 5.852    Compiling clap_complete v4.5.55
+#13 20.05    Compiling tikv-jemallocator v0.6.0
+#13 54.16     Finished release [optimized] target(s) in 53.87s
+#13 DONE 54.2s
+
+#14 [10/13] RUN . /root/.cargo/env     && make completions
+#14 0.253 target/release/fd --gen-completions bash > autocomplete/fd.bash
+#14 0.260 target/release/fd --gen-completions fish > autocomplete/fd.fish
+#14 0.267 target/release/fd --gen-completions powershell > autocomplete/fd.ps1
+#14 0.274 cp contrib/completion/_fd autocomplete/_fd
+#14 DONE 0.3s
+
+#15 [11/13] RUN mkdir -p /root/.config/fd     && echo ".git/" > /root/.config/fd/ignore     && echo "*.bak" >> /root/.config/fd/ignore     && echo "/mnt/external-drive" >> /root/.config/fd/ignore
+#15 DONE 0.4s
+
+#16 [12/13] RUN echo 'export FZF_DEFAULT_COMMAND="fd --type f"' >> /root/.bashrc     && echo 'export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"' >> /root/.bashrc
+#16 DONE 0.4s
+
+#17 [13/13] WORKDIR /workspace
+#17 DONE 0.0s
+
+#18 exporting to image
+#18 exporting layers
+#18 exporting layers 9.1s done
+#18 writing image sha256:c20b6b13815d158a963a04f8e5bc58b265db00308d6bef80b1e22e1993b59747 done
+#18 naming to docker.io/library/envgym_test_1756896509 done
+#18 DONE 9.1s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

@@ -1,0 +1,152 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.7 or higher
+   - pip (Python package manager)
+   - Git (for cloning the repository)
+   - Python packages from requirements.txt:
+     - torch==1.2.0 (CPU version)
+     - torchvision==0.4.0 (CPU version)
+     - numpy==1.17.2
+     - matplotlib==3.1.1
+     - tqdm==4.36.1
+     - pandas==0.25.1
+     - seaborn==0.9.0
+     - scipy==1.3.1
+     - tensorboardX==1.8
+     - Pillow==6.2.0
+     - cycler==0.10.0
+     - kiwisolver==1.1.0
+     - protobuf==3.9.2
+     - pyparsing==2.4.2
+     - python-dateutil==2.8.0
+     - pytz==2019.2
+     - six==1.12.0
+   - Dataset files (will be auto-downloaded by torchvision):
+     - MNIST dataset
+     - Fashion-MNIST dataset
+     - CIFAR-10 dataset
+     - CIFAR-100 dataset
+
+2. FILES TO CREATE:
+   - `.gitignore`:
+     ```
+     __pycache__/
+     *.pyc
+     data/
+     dumps/
+     saves/
+     plots/
+     runs/
+     .DS_Store
+     *.pth
+     *.log
+     ```
+   - `test_main.py` (for testing functionality)
+   - `config.py` (for configuration management)
+   - Directory structure:
+     - `/home/cc/EnvGym/data/Lottory/data/` (for datasets)
+     - `/home/cc/EnvGym/data/Lottory/dumps/` (for intermediate outputs)
+     - `/home/cc/EnvGym/data/Lottory/saves/` (for model checkpoints)
+     - `/home/cc/EnvGym/data/Lottory/plots/` (for visualization outputs)
+       - `/home/cc/EnvGym/data/Lottory/plots/lt/`
+       - `/home/cc/EnvGym/data/Lottory/plots/reinit/`
+       - `/home/cc/EnvGym/data/Lottory/plots/lt/combined_plots/`
+     - `/home/cc/EnvGym/data/Lottory/runs/` (for TensorBoard logs)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - `test_architectures.py`:
+     - Test each architecture loads correctly for each dataset
+     - Test input/output dimensions match dataset requirements
+     - Test forward pass with dummy data
+   - `test_pruning.py`:
+     - Test lottery ticket pruning functionality
+     - Test random reinitialization pruning
+     - Test pruning percentage calculations
+     - Test weight mask generation
+   - `test_data_loading.py`:
+     - Test dataset loading for all supported datasets
+     - Test data transformations
+     - Test batch size handling
+   - `test_training.py`:
+     - Test training loop execution
+     - Test validation loop execution
+     - Test loss calculation
+     - Test accuracy calculation
+   - `test_utils.py`:
+     - Test utility functions
+     - Test checkpoint saving/loading
+     - Test plotting functions
+   - `test_visualization.py`:
+     - Test matplotlib plotting functionality
+     - Test seaborn integration
+     - Test TensorBoard logging
+
+4. COMPLETE TODO LIST:
+   - [ ] Navigate to working directory
+     - `cd /home/cc/EnvGym/data/Lottory`
+   - [ ] Install Python 3.7 or higher (if not present)
+     - Ubuntu 20.04 comes with Python 3.8: `python3 --version`
+   - [ ] Install pip if not present
+     - `apt-get update && apt-get install -y python3-pip`
+     - Verify: `pip3 --version`
+   - [ ] Install Git
+     - `apt-get install -y git`
+     - Verify: `git --version`
+   - [ ] Clone the repository
+     - `git clone <repository-url>`
+     - `cd Lottery-Ticket-Hypothesis-in-Pytorch`
+   - [ ] Create virtual environment
+     - `python3 -m venv venv`
+     - Activate: `source venv/bin/activate`
+   - [ ] Install CPU-only PyTorch dependencies
+     - `pip3 install torch==1.2.0+cpu torchvision==0.4.0+cpu -f https://download.pytorch.org/whl/torch_stable.html`
+     - Or if the above fails: `pip3 install torch==1.2.0 torchvision==0.4.0`
+   - [ ] Install remaining Python dependencies
+     - `pip3 install numpy==1.17.2 matplotlib==3.1.1 tqdm==4.36.1 pandas==0.25.1 seaborn==0.9.0 scipy==1.3.1 tensorboardX==1.8 Pillow==6.2.0`
+     - Verify PyTorch: `python3 -c "import torch; print(torch.__version__)"`
+     - Verify torchvision: `python3 -c "import torchvision; print(torchvision.__version__)"`
+   - [ ] Verify CPU-only setup
+     - `python3 -c "import torch; print('CUDA available:', torch.cuda.is_available()); print('Using CPU-only mode')"`
+   - [ ] Create necessary directories
+     - `mkdir -p data dumps saves plots/lt/combined_plots plots/reinit runs`
+   - [ ] Create .gitignore file
+     - Add patterns listed above
+   - [ ] Verify all dependencies
+     - `python3 -c "import pandas, seaborn, scipy, tensorboardX; print('All dependencies loaded successfully')"`
+   - [ ] Test basic functionality (CPU mode)
+     - Run minimal test: `python3 main.py --prune_type=lt --arch_type=fc1 --dataset=mnist --prune_percent=10 --prune_iterations=1 --end_iter=1 --device=cpu`
+   - [ ] Create test files
+     - Create `test_main.py` with basic import tests
+     - Run: `python3 test_main.py`
+   - [ ] Download datasets (automatic on first run)
+     - Test MNIST: `python3 main.py --dataset=mnist --end_iter=1 --device=cpu`
+     - Verify data downloaded to `data/` directory
+   - [ ] Test lightweight architectures with MNIST (suitable for CPU)
+     - `python3 main.py --arch_type=fc1 --dataset=mnist --end_iter=1 --device=cpu`
+     - `python3 main.py --arch_type=lenet5 --dataset=mnist --end_iter=1 --device=cpu`
+     - Note: AlexNet, ResNet18, and VGG16 may be slow on CPU
+   - [ ] Verify output directories
+     - Check `saves/` for checkpoint files
+     - Check `dumps/` for intermediate outputs
+     - Check `plots/` for generated plots
+     - Check `runs/` for TensorBoard logs
+   - [ ] Test pruning functionality with reduced iterations (for CPU efficiency)
+     - Run: `python3 main.py --prune_type=lt --prune_iterations=1 --end_iter=2 --device=cpu`
+     - Run: `python3 main.py --prune_type=reinit --prune_iterations=1 --end_iter=2 --device=cpu`
+   - [ ] Test visualization capabilities
+     - Verify matplotlib plots are generated correctly
+     - Test seaborn-enhanced visualizations if available
+   - [ ] Test TensorBoard integration
+     - Run: `tensorboard --logdir=runs --bind_all`
+     - Access TensorBoard at http://localhost:6006
+   - [ ] Test combine_plots.py
+     - Run at least two experiments with same architecture/dataset
+     - Execute: `python3 combine_plots.py`
+     - Verify combined plots in `plots/lt/combined_plots/`
+   - [ ] Create documentation
+     - Document CPU-only configuration
+     - Note expected slower performance compared to GPU
+     - Record successful configuration details for x86_64 architecture
+     - Document TensorBoard usage instructions
+     - Note: For production runs, consider using smaller batch sizes and fewer epochs due to CPU limitations

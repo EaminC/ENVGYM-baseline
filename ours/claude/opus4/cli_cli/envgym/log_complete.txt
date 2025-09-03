@@ -1,0 +1,88 @@
+=== Docker Execution Log - 20250902_181907 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756837146
+
+=== Build Log ===
+Build Status: Failed
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 1.20kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/golang:1.22-alpine
+#2 ...
+
+#3 [internal] load metadata for docker.io/library/alpine:latest
+#3 DONE 0.2s
+
+#2 [internal] load metadata for docker.io/library/golang:1.22-alpine
+#2 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [builder 1/6] FROM docker.io/library/golang:1.22-alpine@sha256:1699c10032ca2582ec89a24a1312d986a3f094aed3d5c1147b19880afe40e052
+#5 DONE 0.0s
+
+#6 [stage-1 1/5] FROM docker.io/library/alpine:latest@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1
+#6 DONE 0.0s
+
+#7 [stage-1 2/5] RUN apk add --no-cache bash git ca-certificates
+#7 CACHED
+
+#8 [internal] load build context
+#8 transferring context: 314.15kB 0.1s done
+#8 DONE 0.1s
+
+#9 [builder 2/6] RUN apk add --no-cache git make bash
+#9 CACHED
+
+#10 [builder 3/6] WORKDIR /workspace
+#10 CACHED
+
+#11 [builder 4/6] COPY . .
+#11 DONE 0.4s
+
+#12 [builder 5/6] RUN if [ -f go.mod ]; then         echo "go.mod found, downloading dependencies..." &&         go mod download;     elif [ -n "$(find . -name '*.go' -print -quit)" ]; then         echo "Go files found but no go.mod, initializing module..." &&         go mod init github.com/cli/cli &&         go mod tidy;     else         echo "No Go files found, skipping module initialization";     fi
+#12 0.213 go.mod found, downloading dependencies...
+#12 0.218 go: go.mod requires go >= 1.24.0 (running go 1.22.12; GOTOOLCHAIN=local)
+#12 ERROR: process "/bin/sh -c if [ -f go.mod ]; then         echo \"go.mod found, downloading dependencies...\" &&         go mod download;     elif [ -n \"$(find . -name '*.go' -print -quit)\" ]; then         echo \"Go files found but no go.mod, initializing module...\" &&         go mod init github.com/cli/cli &&         go mod tidy;     else         echo \"No Go files found, skipping module initialization\";     fi" did not complete successfully: exit code: 1
+------
+ > [builder 5/6] RUN if [ -f go.mod ]; then         echo "go.mod found, downloading dependencies..." &&         go mod download;     elif [ -n "$(find . -name '*.go' -print -quit)" ]; then         echo "Go files found but no go.mod, initializing module..." &&         go mod init github.com/cli/cli &&         go mod tidy;     else         echo "No Go files found, skipping module initialization";     fi:
+0.213 go.mod found, downloading dependencies...
+0.218 go: go.mod requires go >= 1.24.0 (running go 1.22.12; GOTOOLCHAIN=local)
+------
+envgym.dockerfile:9
+--------------------
+   8 |     
+   9 | >>> RUN if [ -f go.mod ]; then \
+  10 | >>>         echo "go.mod found, downloading dependencies..." && \
+  11 | >>>         go mod download; \
+  12 | >>>     elif [ -n "$(find . -name '*.go' -print -quit)" ]; then \
+  13 | >>>         echo "Go files found but no go.mod, initializing module..." && \
+  14 | >>>         go mod init github.com/cli/cli && \
+  15 | >>>         go mod tidy; \
+  16 | >>>     else \
+  17 | >>>         echo "No Go files found, skipping module initialization"; \
+  18 | >>>     fi
+  19 |     
+--------------------
+ERROR: failed to solve: process "/bin/sh -c if [ -f go.mod ]; then         echo \"go.mod found, downloading dependencies...\" &&         go mod download;     elif [ -n \"$(find . -name '*.go' -print -quit)\" ]; then         echo \"Go files found but no go.mod, initializing module...\" &&         go mod init github.com/cli/cli &&         go mod tidy;     else         echo \"No Go files found, skipping module initialization\";     fi" did not complete successfully: exit code: 1
+
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

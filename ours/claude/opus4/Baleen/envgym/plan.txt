@@ -1,0 +1,203 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Git (latest version) with submodule support
+   - Python 3.11 or Python 3.8 (for PyPy variant)
+   - Conda/Mamba/Micromamba (recommended: Micromamba 1.4.1) OR pip
+   - JupyterLab (latest version, for viewing notebooks and running as a service)
+   - Trace data files from https://ftp.pdl.cmu.edu/pub/datasets/Baleen24/
+   - BCacheSim submodule from https://github.com/wonglkd/BCacheSim.git
+   - BCacheSim submodule dependencies
+   - Python packages from env_cachelib-py-3.11.yaml or requirements.txt
+   - Optional: PyPy 3.8 for faster non-ML runs
+   - Optional: Redis and Brooce (for cluster experiments)
+   - systemd (for running Jupyter as a service on Linux systems)
+
+2. FILES TO CREATE:
+   - data/ directory (for storing trace files)
+   - data/.gitignore file (to ignore all data files except scripts)
+   - data/tectonic/201910/Region1/ directory structure (for trace files)
+   - runs/ directory (for experiment results)
+   - runs/.gitignore file (to ignore all files except .gitignore, config.json files, and subdirectories)
+   - tmp/ directory (for ML models and generated episode files) - Note: gitignored
+   - tmp/example/201910_Region1_0_0.1/ directory (for ML model storage)
+   - notebooks/figs/ directory (for output figures)
+   - notebooks/paper-figs/figs/ directory (for paper figures) - Note: gitignored
+   - runs/example/rejectx/ directory structure
+   - runs/example/baleen/prefetch_ml-on-partial-hit/ directory structure
+   - runs/example/baleen/example/201910_Region1_0_0.1/ directory (for offline analysis)
+   - .gitignore file (already exists in repository)
+   - .gitmodules file (already exists in repository)
+   - runs/example/rejectx/config.json (already exists in repository)
+   - Configuration files will be auto-generated during experiments
+   - getting-started.sh script (already exists in repository)
+   - ML model files: ea_5892.86_wr_35.599_admit_threshold_binary.model
+   - ML model files: ea_5892.86_wr_35.599_prefetch_{k}.model
+   - Offline analysis file: offline_analysis_ea_5892.86.csv
+   - /etc/systemd/system/jupyter.service (for Jupyter service on Chameleon Cloud)
+   - /home/cc/EnvGym/data/Baleen/ directory (working directory for Jupyter service)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Verify Git submodule initialization and update
+   - Test BCacheSim submodule accessibility
+   - Verify BCacheSim directory exists before proceeding
+   - Test git pull with --recurse-submodules functionality
+   - Test BCacheSim.cachesim.simulate_ap module functionality
+   - Test BCacheSim.episodic_analysis.train module functionality
+   - Verify trace file loading and parsing
+   - Test ML model training with sample data
+   - Verify simulation output format and correctness
+   - Test notebook execution for example.ipynb
+   - Validate figure generation in paper-figs notebooks
+   - Test policy implementations (RejectX, Baleen)
+   - Verify configuration file parsing
+   - Test data preprocessing pipeline
+   - Verify gitignored directories are properly excluded from version control
+   - Test that temporary files in tmp/ are created and accessible
+   - Verify Jupyter checkpoints are not tracked
+   - Validate submodule version consistency
+   - Test getting-started.sh script execution
+   - Verify trace file path: data/tectonic/201910/Region1/full_0_0.1.trace
+   - Test ML model loading from tmp/example/201910_Region1_0_0.1/
+   - Verify AP threshold value (0.798545) functionality for Baleen
+   - Test prefetch_when="partial" behavior for Baleen
+   - Validate prefetch_range="acctime-episode-predict" functionality for Baleen
+   - Test ap_feat_subset="meta+block+chunk" feature extraction
+   - Verify cache size configuration (366.475 GB)
+   - Test stats_start offset (86400.0 seconds)
+   - Validate log_interval functionality (600.0 seconds)
+   - Test learned_ap_filter_count=6 configuration
+   - Verify offline analysis CSV file generation
+   - Test eviction_policy="LRU" implementation
+   - Verify rejectx_ap=true configuration
+   - Test ap_probability=0.508154 functionality
+   - Validate batch_size=512 processing
+   - Test ram_cache=false behavior
+   - Verify flip_threshold=true functionality
+   - Test prefetch_when="never" for RejectX
+   - Validate prefetch_range="episode" for RejectX
+   - Test ap_threshold=1.0 for RejectX
+   - Verify config.json file structure and parsing
+   - Test JupyterLab installation and accessibility
+   - Verify Jupyter service starts without authentication token
+   - Test Jupyter service auto-restart on failure
+   - Validate Jupyter service runs as user 'cc'
+   - Test Jupyter service accessibility on default port 8888
+   - Verify systemd service file syntax and permissions
+   - Test Jupyter service logs for errors
+   - Validate WorkingDirectory /home/cc/EnvGym/data/Baleen exists and is accessible
+   - Verify data/.gitignore properly ignores all files except itself and shell scripts
+   - Test that downloaded trace files in data/ are not tracked by git
+   - Verify shell scripts in data/ directory are tracked by git
+   - Test that data directory structure is maintained while ignoring content
+   - Verify runs/.gitignore exists and properly ignores all files except .gitignore, config.json files, and subdirectories
+   - Test that experiment results in runs/ are not tracked by git
+   - Verify config.json files in runs/ subdirectories are tracked
+   - Test that .ipynb_checkpoints in runs/ are ignored
+   - Verify subdirectories in runs/ can be created and accessed
+   - Test x86_64 architecture compatibility for all binaries
+   - Verify Python packages are x86_64 compatible
+   - Test CPU-only execution without GPU dependencies
+
+4. COMPLETE TODO LIST:
+   - Verify working directory: `cd /home/cc/EnvGym/data/Baleen`
+   - Install Git if not present: `sudo apt-get update && sudo apt-get install -y git`
+   - Clone repository with submodules: `git clone --recurse-submodules https://github.com/wonglkd/Baleen-FAST24.git .`
+   - Verify BCacheSim directory exists: `if [ ! -d "BCacheSim" ]; then echo "Error: BCacheSim not found"; exit 1; fi`
+   - Pull latest changes with submodules: `git pull --recurse-submodules`
+   - Verify .gitmodules file exists with BCacheSim submodule configuration
+   - Ensure BCacheSim submodule is properly initialized: `git submodule status`
+   - If submodule not initialized: `git submodule update --init --recursive`
+   - Verify .gitignore file exists and contains proper entries
+   - Create required directories: `mkdir -p data runs tmp notebooks/figs notebooks/paper-figs/figs`
+   - Verify data/.gitignore exists with correct content
+   - If data/.gitignore doesn't exist, create it with proper ignore rules
+   - Verify runs/.gitignore exists with correct content
+   - If runs/.gitignore doesn't exist, create it with content: `echo -e '*\n.ipynb_checkpoints\n!.gitignore\n!config.json\n!*/' > runs/.gitignore`
+   - Create trace data directory structure: `mkdir -p data/tectonic/201910/Region1`
+   - Create ML model directory: `mkdir -p tmp/example/201910_Region1_0_0.1`
+   - Create offline analysis directory: `mkdir -p runs/example/baleen/example/201910_Region1_0_0.1`
+   - Verify RejectX config exists: `cat runs/example/rejectx/config.json`
+   - Validate RejectX config parameters: rejectx_ap=true, ap_probability=0.508154, batch_size=512
+   - Confirm RejectX uses ap_threshold=1.0 and prefetch_when="never"
+   - Install Micromamba for x86_64: `curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj bin/micromamba`
+   - Add Micromamba to PATH: `export PATH=$PATH:$(pwd)/bin`
+   - Initialize Micromamba: `./bin/micromamba shell init -s bash -p ~/micromamba`
+   - Source bashrc: `source ~/.bashrc`
+   - Create Python environment: `micromamba env create -f BCacheSim/install/env_cachelib-py-3.11.yaml`
+   - Activate environment: `micromamba activate cachelib-py-3.11`
+   - Optional: Create PyPy environment: `micromamba env create -f BCacheSim/install/env_cachelib-pypy-3.8.yaml`
+   - Alternative: Install via pip: `python3 -m pip install --user -r BCacheSim/install/requirements.txt`
+   - Install JupyterLab: `micromamba install -c conda-forge jupyterlab` or `pip install jupyterlab`
+   - Verify JupyterLab installation: `jupyter lab --version`
+   - Ensure current user is 'cc': `whoami`
+   - Ensure working directory permissions: `chmod -R 755 /home/cc/EnvGym/data/Baleen`
+   - Create Jupyter service file: `sudo tee /etc/systemd/system/jupyter.service << EOF
+[Unit]
+Description=Jupyter Lab
+After=network.target
+
+[Service]
+Type=simple
+User=cc
+WorkingDirectory=/home/cc/EnvGym/data/Baleen
+ExecStart=/home/cc/micromamba/envs/cachelib-py-3.11/bin/jupyter lab --no-browser --ip=0.0.0.0 --NotebookApp.token='' --NotebookApp.password=''
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF`
+   - Set proper permissions for service file: `sudo chmod 644 /etc/systemd/system/jupyter.service`
+   - Reload systemd daemon: `sudo systemctl daemon-reload`
+   - Enable Jupyter service for auto-start: `sudo systemctl enable jupyter.service`
+   - Start Jupyter service: `sudo systemctl start jupyter.service`
+   - Check Jupyter service status: `sudo systemctl status jupyter.service`
+   - Verify Jupyter is accessible at http://localhost:8888 without authentication
+   - Check Jupyter service logs if needed: `sudo journalctl -u jupyter.service -f`
+   - Navigate to data directory: `cd data`
+   - Verify any shell scripts in data/ are tracked by git: `git ls-files *.sh`
+   - Download trace files: `bash get-tectonic.sh`
+   - Verify trace file exists: `ls -la tectonic/201910/Region1/full_0_0.1.trace`
+   - Confirm downloaded trace files are ignored by git: `git status`
+   - Return to project root: `cd ..`
+   - Test RejectX baseline (4 mins): `./BCacheSim/run_py.sh py -B -m BCacheSim.cachesim.simulate_ap --config runs/example/rejectx/config.json`
+   - Verify RejectX output created in runs/example/rejectx/
+   - Check RejectX simulation uses correct ap_probability (0.508154)
+   - Verify RejectX batch processing with size 512
+   - Confirm RejectX eviction_policy="LRU" is applied
+   - Verify experiment results in runs/example/rejectx/ are not tracked by git: `git status runs/example/rejectx/`
+   - Confirm config.json files remain trackable: `git ls-files runs/example/rejectx/config.json`
+   - Train Baleen ML models (1 min): `./BCacheSim/run_py.sh py -B -m BCacheSim.episodic_analysis.train --exp example --policy PolicyUtilityServiceTimeSize2 --region Region1 --sample-ratio 0.1 --sample-start 0 --trace-group 201910 --supplied-ea physical --target-wrs 34 50 100 75 20 10 60 90 30 --target-csizes 366.475 --output-base-dir runs/example/baleen --eviction-age 5892.856 --rl-init-kwargs filter_=prefetch --train-target-wr 35.599 --train-models admit prefetch --train-split-secs-start 0 --train-split-secs-end 86400 --ap-acc-cutoff 15 --ap-feat-subset meta+block+chunk`
+   - Verify ML models created: `ls -la tmp/example/201910_Region1_0_0.1/ea_5892.86_wr_35.599_admit_threshold_binary.model`
+   - Verify prefetch models created: `ls -la tmp/example/201910_Region1_0_0.1/ea_5892.86_wr_35.599_prefetch_*.model`
+   - Verify offline analysis file exists: `ls -la runs/example/baleen/example/201910_Region1_0_0.1/offline_analysis_ea_5892.86.csv`
+   - Confirm tmp/ directory is not tracked by git: `git status`
+   - Verify Baleen config exists: `cat runs/example/baleen/prefetch_ml-on-partial-hit/config.json`
+   - Run Baleen simulation (30 mins): `./BCacheSim/run_py.sh py -B -m BCacheSim.cachesim.simulate_ap --config runs/example/baleen/prefetch_ml-on-partial-hit/config.json`
+   - Verify Baleen output created in runs/example/baleen/prefetch_ml-on-partial-hit/
+   - Check simulation logs for proper AP threshold (0.798545) usage in Baleen
+   - Verify stats collection starts after 86400 seconds
+   - Confirm log entries are created every 600 seconds
+   - Verify Baleen experiment results are not tracked by git: `git status runs/example/baleen/`
+   - Access JupyterLab via browser at http://localhost:8888 (or server IP if remote)
+   - Open and run notebooks/example/example.ipynb to examine results
+   - Verify plots generated correctly
+   - Confirm .ipynb_checkpoints directories are created but not tracked
+   - Test additional notebooks in notebooks/paper-figs/
+   - Verify figures are generated in notebooks/paper-figs/figs/
+   - Confirm notebooks/paper-figs/figs/ is not tracked by git
+   - Optional: Set up Redis and Brooce for cluster experiments
+   - Optional: Run notebooks/reproduce/commands.ipynb for additional experiments
+   - Verify all outputs match expected results
+   - Check for any error messages in logs
+   - Clean up temporary files if needed (tmp/ contents can be safely deleted)
+   - Verify git status shows clean working directory for tracked files
+   - Confirm data directory only tracks .gitignore and shell scripts
+   - Confirm runs directory only tracks .gitignore and config.json files
+   - Optional: Update BCacheSim submodule to latest version: `cd BCacheSim && git pull origin main && cd ..`
+   - Optional: Commit submodule update if needed: `git add BCacheSim && git commit -m "Update BCacheSim submodule"`
+   - Alternative: Run getting-started.sh script for automated setup
+   - For production deployment: Configure firewall rules for Jupyter port if needed
+   - For production deployment: Set up SSL/TLS for secure Jupyter access
+   - Monitor Jupyter service health: `sudo systemctl is-active jupyter.service`

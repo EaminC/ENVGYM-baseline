@@ -1,0 +1,150 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Ubuntu 20.04 operating system (confirmed compatible with x86_64 architecture)
+   - Linux kernel versions: 4.4, 4.15, 5.4, 5.4.0, 5.15.0, 5.19.7, 6.0.6, 6.2.12, 6.3.0, 6.6.1, or 6.9.4
+   - Linux kernel source code (for NFS kernel module compilation)
+   - Linux kernel headers (linux-headers-$(uname -r))
+   - Linux kernel 6.9.4 source: https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.9.4.tar.xz
+   - Modified brd kernel module source code (from kernel/brd-for-4.15/, kernel/brd-for-4.4/, and kernel/brd-for-5.4.0/)
+   - SPIN model checker (fsl-spin): https://github.com/sbu-fsl/fsl-spin (c-track-hooks branch)
+   - Swarm verification tool (swarm-mcfs): https://github.com/sbu-fsl/swarm-mcfs (swarm-v2 branch)
+   - RefFS: https://github.com/sbu-fsl/RefFS
+   - IOCov: https://github.com/sbu-fsl/IOCov
+   - Metis-Replayer: https://github.com/sbu-fsl/Metis-Replayer.git
+   - NFS-Ganesha: https://github.com/nfs-ganesha/nfs-ganesha.git
+   - xxHash: https://github.com/Cyan4973/xxHash.git (v0.8.0)
+   - zlib: https://github.com/madler/zlib.git (master branch)
+   - eXplode: https://github.com/sbu-fsl/explode-0.1pre (to be installed at /profiling/explode-0.1pre)
+   - VeriFS1 (CRMFS): Checkpoint-Restore in-Memory File System source code
+   - VeriFS2: Reference implementation for comparison testing
+   - NOVA file system source code (for kernel module compilation)
+   - Python 3 with pip3
+   - Python packages: numpy, scipy, matplotlib, PuLP, PLY
+   - mtd-utils (for JFFS2 testing)
+   - rename utility
+   - tmux or screen
+   - General build tools: gcc, g++, make, cmake, git, vim, m4, autoconf, bison, flex
+   - FUSE development libraries (libfuse-dev)
+   - Various system libraries (specified in scripts/setup-deps.sh)
+   - C++ compiler with C++11 and C++17 support (for mcl-demo, libmcfs, and shared memory tests)
+   - Python static analysis tools (for python-demo)
+   - OpenSSL development libraries (libssl-dev, libcrypto-dev)
+   - librt (real-time extensions library for POSIX shared memory)
+   - libprofiler (Google Performance Tools)
+   - libgoogle-perftools-dev
+   - libxxhash-dev (xxHash library)
+   - zlib1g-dev (compression library)
+   - Math library (libm)
+   - C++ filesystem library support (libstdc++fs)
+   - pthread library (libpthread)
+   - NFS-Ganesha dependencies: libnfsidmap-dev, libtirpc-dev, libkrb5-3, libkrb5-dev, libk5crypto3, libgssapi-krb5-2, libgssglue1, libdbus-1-3, libattr1-dev, libacl1-dev, dbus, libdbus-1-dev, libcap-dev, libjemalloc-dev, uuid-dev, libblkid-dev, xfslibs-dev, libwbclient-dev, rpm2cpio, libaio-dev, libibverbs-dev, librdmacm-dev, rpcbind, nfs-common, libboost-all-dev, liburcu-dev
+   - nilfs-tools
+   - NFS kernel module dependencies: nfs-kernel-server, nfs-utils
+   - Kernel build dependencies: build-essential, bc, kmod, cpio, libncurses5-dev, libelf-dev, libncurses-dev
+   - Time measurement libraries (for nanotiming functionality)
+   - POSIX time libraries (for cross-platform time functions)
+   - xfsprogs (XFS file system utilities)
+   - MD5 hash computation libraries (for abstract file system state calculation)
+   - MTD kernel modules: mtd, mtdram, mtdblock (for JFFS2 support)
+   - fio (Flexible I/O tester for benchmarking)
+   - SSH client and server (openssh-client, openssh-server)
+   - ssh-copy-id utility (for SSH key distribution)
+   - JSON parsing/generation libraries (for JSON output format)
+   - Thread-safe random number generation libraries
+   - Mutex and threading libraries (pthread)
+   - MCL (Model Checking Library) from eXplode project
+   - f2fs-tools (F2FS file system utilities)
+   - jfsutils (JFS file system utilities)
+   - btrfs-progs (BtrFS file system utilities)
+   - gcov (GNU coverage testing tool)
+   - lcov (graphical front-end for gcov)
+   - lttng-tools (Linux Trace Toolkit Next Generation)
+   - lttng-modules-dkms (LTTng kernel modules)
+   - liblttng-ust-dev (LTTng userspace tracer development files)
+   - JFS kernel crash bug sample dmesg log: https://drive.google.com/file/d/1EPFGxxNkN8Aj4kwrd9Z7hK0iRl5Ru4ku/view?usp=drive_link
+   - JFS operations sequence log: https://drive.google.com/file/d/1I7uf9K2P47vAGpV99pvyZBSjkMeONbdC/view?usp=drive_link
+   - JFFS2 kernel source code (for write_begin bug patch application)
+   - Linux 5.4 kernel source (for brd-for-5.4.0 module base)
+   - PuLP linear programming Python library
+   - PLY (Python Lex-Yacc) parsing tool
+   - Linear programming solvers compatible with PuLP
+   - less (pager utility for viewing output)
+   - LTP (Linux Test Project) test suite source code
+   - GNU libc with malloc hooks support (glibc-devel)
+   - Debugging tools for heap analysis (valgrind, gdb)
+   - POSIX shared memory support libraries
+
+2. FILES TO CREATE:
+   - ~/.ssh/authorized_keys (for SSH key authentication between master and client machines)
+   - /home/cc/EnvGym/data/Metis/fs-state/swarm.lib (Swarm configuration file)
+   - /home/cc/EnvGym/data/Metis/fs-state/parameters.py (may need modification for specific file systems)
+   - /home/cc/EnvGym/data/Metis/fs-state/parameter_util.py (parameter utility module)
+   - /home/cc/EnvGym/data/Metis/fs-state/replay.c (needs editing for replayer functionality)
+   - /home/cc/EnvGym/data/Metis/fs-state/replay_dump.c (replay dump functionality)
+   - /home/cc/EnvGym/data/Metis/fs-state/min_repro.c (minimal reproduction utility)
+   - /home/cc/EnvGym/data/Metis/fs-state/min_repro_readme.md (minimal reproducer documentation)
+   - /home/cc/EnvGym/data/Metis/fs-state/replayutil.c (replay utility functions)
+   - /home/cc/EnvGym/data/Metis/fs-state/replayutil.o (compiled replay utility object)
+   - /home/cc/EnvGym/data/Metis/fs-state/fileutil.c (file utility functions)
+   - /home/cc/EnvGym/data/Metis/fs-state/fileutil.o (compiled file utility object)
+   - /home/cc/EnvGym/data/Metis/fs-state/perf.c (performance measurement)
+   - /home/cc/EnvGym/data/Metis/fs-state/perf.o (compiled performance object)
+   - /home/cc/EnvGym/data/Metis/fs-state/set.cpp (C++ set operations)
+   - /home/cc/EnvGym/data/Metis/fs-state/set.o (compiled set object)
+   - /home/cc/EnvGym/data/kernel/brd-for-4.15/brd.ko (compiled modified brd kernel module)
+   - /home/cc/EnvGym/data/kernel/brd-for-4.15/Makefile (Makefile for building modified brd module)
+   - /home/cc/EnvGym/data/kernel/brd-for-4.15/brd.c (modified brd source code)
+   - /home/cc/EnvGym/data/kernel/brd-for-4.4/brd.ko (compiled modified brd kernel module for kernel 4.4)
+   - /home/cc/EnvGym/data/kernel/brd-for-4.4/Makefile (Makefile for building modified brd module for kernel 4.4)
+   - /home/cc/EnvGym/data/kernel/brd-for-4.4/brd.c (modified brd source code based on linux 5.4)
+   - /home/cc/EnvGym/data/kernel/brd-for-4.4/README.md (documentation for modified brd driver)
+   - /home/cc/EnvGym/data/kernel/brd-for-5.4.0/brd.ko (compiled modified brd kernel module for kernel 5.4.0)
+   - /home/cc/EnvGym/data/kernel/brd-for-5.4.0/Makefile (Makefile for building modified brd module for kernel 5.4.0)
+   - /home/cc/EnvGym/data/kernel/brd-for-5.4.0/brd.c (modified brd source code based on linux 5.4)
+   - /home/cc/EnvGym/data/kernel/brd-for-5.4.0/README.md (documentation for modified brd driver with individual size support)
+   - /dev/ram0 through /dev/ram{N-1} (ramdisk devices with individual sizes via modified brd module)
+   - /mnt/test-* (mount points for test file systems)
+   - /mnt/test-verifs2 (mount point for RefFS)
+   - /mnt/test-verifs1 (mount point for VeriFS1/CRMFS)
+   - /mnt/test-nfs (mount point for NFS testing)
+   - /mnt/test-nova (mount point for NOVA file system)
+   - /etc/exports (NFS export configuration)
+   - Log files: output-pan*.log, error-pan*.log, sequence-pan*.log
+   - IOCov output files: *.pkl and *.json in /home/cc/EnvGym/data/IOCov/MCFS/
+   - Performance result files: fig7_fs_perf_results, results-*.csv
+   - /home/cc/EnvGym/data/Metis/example/test (compiled example program)
+   - /home/cc/EnvGym/data/Metis/example/test.c (multi-threaded filesystem syscall test program)
+   - /home/cc/EnvGym/data/Metis/example/Makefile (build file for example test program)
+   - /home/cc/EnvGym/data/Metis/example/README.md (documentation for example test program)
+   - /home/cc/EnvGym/data/Metis/example/test.log (plain text output of test execution)
+   - /home/cc/EnvGym/data/Metis/example/test.log.json (JSON format output of test execution)
+   - /home/cc/EnvGym/data/Metis/promela-demo/*.pml (Promela model files)
+   - /home/cc/EnvGym/data/Metis/promela-demo/Makefile (build file for Promela demo)
+   - /home/cc/EnvGym/data/Metis/promela-demo/demo.pml (main Promela demo model file)
+   - /home/cc/EnvGym/data/Metis/promela-demo/pan (compiled SPIN verifier for demo)
+   - /home/cc/EnvGym/data/Metis/promela-demo/pan.c (generated SPIN C code for demo)
+   - /home/cc/EnvGym/data/Metis/promela-demo/fileutil.c (symbolic link or copy of common fileutil.c)
+   - /home/cc/EnvGym/data/Metis/promela-demo/test (test file created during demo execution)
+   - /home/cc/EnvGym/data/Metis/promela-demo/test.txt (test text file created during demo execution)
+   - /home/cc/EnvGym/data/Metis/mcl-demo build artifacts
+   - /home/cc/EnvGym/data/Metis/mcl-demo/README.md (eXplode-MCL demo documentation)
+   - /home/cc/EnvGym/data/Metis/mcl-demo/Makefile (build file for MCL demo)
+   - /home/cc/EnvGym/data/Metis/mcl-demo/example (compiled MCL demo example)
+   - /home/cc/EnvGym/data/Metis/mcl-demo/example.cpp (MCL demo source file)
+   - /home/cc/EnvGym/data/Metis/mcl-demo/path_utils.o (compiled path utilities object)
+   - /home/cc/EnvGym/data/Metis/mcl-demo/path_utils.a (path utilities static library)
+   - /home/cc/EnvGym/data/Metis/include/*.h (header files for common utilities)
+   - /home/cc/EnvGym/data/Metis/common/*.c (common utility C source files)
+   - /home/cc/EnvGym/data/Metis/common/*.o (compiled common utility objects)
+   - /home/cc/EnvGym/data/Metis/common/errnoname.o (compiled errno name utility)
+   - /home/cc/EnvGym/data/Metis/common/nanotiming.o (compiled nanotiming utility)
+   - /home/cc/EnvGym/data/Metis/common/*.c.o and *.cpp.o (compiled C and C++ objects with specific naming)
+   - /home/cc/EnvGym/data/Metis/common/path_utils.cpp (path utilities C++ source)
+   - /home/cc/EnvGym/data/Metis/libmcfs.a (static library archive)
+   - /home/cc/EnvGym/data/Metis/libmcfs.so (shared library)
+   - /home/cc/EnvGym/data/Metis/fs-state/common-libs.a (common libraries archive)
+   - /home/cc/EnvGym/data/Metis/fs-state/libsmcfs.a (static MCFS library for Swarm)
+   - /home/cc/EnvGym/data/Metis/*.c.o and *.cpp.o (compiled object files)
+   - /usr/local/include/mcfs/*.h (installed header files)
+   - /usr/local/lib/libmcfs.so (installed shared library)

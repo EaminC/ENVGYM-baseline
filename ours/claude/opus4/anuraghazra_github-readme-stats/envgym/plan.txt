@@ -1,0 +1,145 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Node.js (v22.x or higher - updated from package.json requirement)
+   - npm (v10.x or higher, comes with Node.js)
+   - Git (latest version)
+   - Vercel CLI (`npm i -g vercel`)
+   - A code editor (VS Code recommended)
+   - Express.js (v4.x) - for non-Vercel deployments
+   - Testing dependencies (from package.json):
+     - Jest (v29.7.0)
+     - @testing-library/dom (v10.4.1)
+     - @testing-library/jest-dom (v6.6.4)
+     - jest-environment-jsdom (v30.0.5)
+     - axios-mock-adapter (v2.1.0)
+     - jest-bench (v29.7.1)
+   - Development tools:
+     - ESLint (v9.33.0)
+     - Prettier (v3.6.2)
+     - Husky (v9.1.7)
+
+2. FILES TO CREATE:
+   - `.env` - Environment variables file containing:
+     - `PAT_1` (GitHub Personal Access Token)
+     - `CACHE_SECONDS` (optional, for cache configuration)
+   - `.env.example` - Template for environment variables
+   - `vercel.json` - Vercel configuration (if modifying default)
+   - `express.js` - Express server file for non-Vercel deployments
+   - `jest.config.js` - Jest testing configuration (likely already exists)
+   - `jest.e2e.config.js` - E2E testing configuration (referenced in scripts)
+   - `jest.bench.config.js` - Benchmark testing configuration (referenced in scripts)
+   - `.gitignore` - Ensure .env files are excluded
+   - `docker-compose.yml` - Optional, for Docker deployment
+   - `Dockerfile` - Optional, for containerization (using linux/amd64 base images)
+   - `.prettierrc` - Prettier configuration
+   - `.eslintrc.js` - ESLint configuration
+   - `.husky/` - Husky git hooks directory
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - API endpoint tests:
+     - Test `/api` stats card generation
+     - Test `/api/pin` repo card generation
+     - Test `/api/gist` gist card generation
+     - Test `/api/top-langs` language card generation
+     - Test `/api/wakatime` WakaTime card generation
+   - Parameter validation tests:
+     - Test all query parameters (username, theme, hide, show, etc.)
+     - Test invalid parameter handling
+     - Test edge cases (empty username, special characters)
+   - Rate limiting tests:
+     - Test cache functionality
+     - Test rate limit handling
+   - Theme tests:
+     - Test all available themes
+     - Test custom color parameters
+     - Test theme generation scripts
+   - Error handling tests:
+     - Test 404 for non-existent users
+     - Test API timeout scenarios
+     - Test invalid GitHub tokens
+   - Unit tests:
+     - Test individual functions and modules
+     - Test data parsing and formatting
+     - Test SVG generation
+   - E2E tests:
+     - Test complete user flows
+     - Test card rendering in browsers
+   - Performance benchmarks:
+     - Test response times
+     - Test memory usage
+
+4. COMPLETE TODO LIST:
+   - Install Node.js v22 or higher and verify installation: `node --version && npm --version`
+   - Navigate to existing project directory: `cd /home/cc/EnvGym/data/anuraghazra_github-readme-stats`
+   - Install project dependencies: `npm install`
+   - Create GitHub Personal Access Token:
+     - Go to https://github.com/settings/tokens/new
+     - Enable `repo` and `user` permissions
+     - Copy the generated token
+   - Create `.env` file in project root with: `PAT_1=your_github_token_here`
+   - Set up development environment:
+     - Run `npm run prepare` to set up Husky git hooks
+     - Verify linting setup: `npm run lint`
+     - Verify formatting setup: `npm run format:check`
+   - For Docker deployment (optimized for x86_64):
+     - Create `Dockerfile` using Node.js linux/amd64 base image:
+       ```dockerfile
+       FROM --platform=linux/amd64 node:22-alpine
+       WORKDIR /app
+       COPY package*.json ./
+       RUN npm ci --only=production
+       COPY . .
+       EXPOSE 3000
+       CMD ["node", "api/index.js"]
+       ```
+     - Build with BuildKit: `DOCKER_BUILDKIT=1 docker build -t github-readme-stats .`
+     - Run container: `docker run -p 3000:3000 --env-file .env github-readme-stats`
+   - For Vercel deployment:
+     - Install Vercel CLI: `npm i -g vercel`
+     - Run `vercel login` and authenticate
+     - Run `vercel` and follow prompts
+     - Add PAT_1 as environment variable in Vercel dashboard
+   - For non-Vercel deployment:
+     - Create `express.js` file with server configuration
+     - Modify package.json to add start script: `"start": "node express.js"`
+     - Install Express if not using Vercel: `npm install express`
+   - Run all test suites to verify setup:
+     - Unit tests: `npm test`
+     - Watch mode for development: `npm run test:watch`
+     - E2E tests: `npm run test:e2e`
+     - Benchmarks: `npm run bench`
+   - Test locally:
+     - For Vercel: `vercel dev`
+     - For Express: `node express.js`
+     - For Docker: `docker run -p 3000:3000 --env-file .env github-readme-stats`
+   - Verify API endpoints:
+     - Test stats card: `http://localhost:3000/api?username=anuraghazra`
+     - Test repo card: `http://localhost:3000/api/pin?username=anuraghazra&repo=github-readme-stats`
+     - Test language card: `http://localhost:3000/api/top-langs?username=anuraghazra`
+   - Configure additional environment variables if needed:
+     - `CACHE_SECONDS` for custom cache duration
+   - Generate and verify theme documentation: `npm run theme-readme-gen`
+   - Test theme preview functionality: `npm run preview-theme`
+   - Generate language JSON data: `npm run generate-langs-json`
+   - Set up monitoring:
+     - Configure error logging
+     - Set up uptime monitoring
+   - Documentation:
+     - Update README with your instance URL
+     - Document any custom configurations
+     - Document deployment process
+   - Security checks:
+     - Ensure `.env` is in `.gitignore`
+     - Verify PAT has minimal required permissions
+     - Enable HTTPS for production deployment
+     - Review ESLint security warnings
+   - Pre-commit setup:
+     - Verify Husky hooks are working
+     - Test lint-staged configuration
+     - Ensure code formatting on commit
+   - Docker optimization for x86_64:
+     - Use multi-stage builds to reduce image size
+     - Leverage BuildKit cache mounts for npm packages
+     - Set appropriate resource limits in docker-compose.yml
+     - Use alpine-based images for smaller footprint

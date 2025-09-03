@@ -1,0 +1,118 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Miniconda/Anaconda (latest version for Linux x86_64)
+   - Python 3.6
+   - PyTorch 1.6.0 **CPU-only version**
+   - torchvision 0.7.0 **CPU-only version**
+   - ~~CUDA Toolkit 10.1~~ **(NOT NEEDED - No GPU)**
+   - matplotlib (latest compatible version)
+   - scipy 1.5.2
+   - pycocotools (from GitHub)
+   - Git (for cloning repositories)
+   - GCC/G++ compiler (for compiling C++ extensions)
+   - Pre-trained model weights:
+     - Visual Genome model: checkpoint0149.pth (from Google Drive)
+     - Open Images V6 model: checkpoint0149_oi.pth (from Google Drive)
+   - Dataset files:
+     - Visual Genome images: Part1 and Part2 from Stanford
+     - Visual Genome annotations in COCO-format (from Google Drive)
+     - Open Images V6 original annotations (oidv6/v4-train/test/validation-annotations-vrd.csv)
+     - Open Images V6 images (from Rongjie Li's repository)
+     - Open Images V6 COCO-like annotations (optional download or generate via process.py)
+
+2. FILES TO CREATE:
+   - `.gitignore` file (already exists, verify content)
+   - `ckpt/` directory for model checkpoints
+   - `data/vg/rel.json` - Visual Genome relationship annotations
+   - `data/vg/test.json` - Visual Genome test split
+   - `data/vg/train.json` - Visual Genome training split
+   - `data/vg/val.json` - Visual Genome validation split
+   - `data/vg/images/` - Visual Genome image directory
+   - `data/oi/rel.json` - Open Images relationship annotations
+   - `data/oi/test.json` - Open Images test split
+   - `data/oi/train.json` - Open Images training split
+   - `data/oi/val.json` - Open Images validation split
+   - `data/oi/images/` - Open Images image directory (with renamed images)
+   - `lib/fpn/make.sh` - Shell script for compiling FPN module (if not exists)
+   - `environment.yml` - Conda environment backup file
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Test case for single image inference **on CPU**
+   - Test case for batch inference **on CPU**
+   - Test case for model loading and checkpoint restoration
+   - Test case for data loader functionality (VG and OI datasets)
+   - ~~Test case for distributed training initialization~~ **(Skip - CPU only)**
+   - Test case for evaluation metrics computation
+   - Test case for FPN module compilation and functionality
+   - Test case for scene graph generation output format
+   - Test case for **CPU-only** device compatibility
+   - Test case for visualization functionality
+   - Test case for process.py image renaming functionality
+   - Test case for COCO-format annotation parsing
+   - Test case for dataset path validation
+   - Test case for .gitignore functionality (verify ignored files)
+   - Test case for __pycache__ directory generation and cleanup
+
+4. COMPLETE TODO LIST:
+   - Install Git if not already installed: `sudo apt-get update && sudo apt-get install -y git`
+   - Clone the RelTR repository: `git clone https://github.com/yrcong/RelTR.git`
+   - Navigate to RelTR directory: `cd /home/cc/EnvGym/data/RelTR`
+   - Verify .gitignore file exists and contains correct entries
+   - Install build essentials for Ubuntu 20.04: `sudo apt-get install -y build-essential`
+   - Download and install Miniconda for Linux x86_64:
+     ```bash
+     wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+     bash Miniconda3-latest-Linux-x86_64.sh -b -p ~/miniconda3
+     ~/miniconda3/bin/conda init bash
+     source ~/.bashrc
+     ```
+   - Create conda environment: `conda create -n reltr python=3.6`
+   - Activate conda environment: `conda activate reltr`
+   - Install **CPU-only** PyTorch and dependencies: `conda install pytorch==1.6.0 torchvision==0.7.0 cpuonly -c pytorch`
+   - Install matplotlib: `conda install matplotlib`
+   - Install scipy: `conda install scipy=1.5.2`
+   - Install pycocotools: `pip install -U 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'`
+   - Create necessary directories: `mkdir -p ckpt data/vg/images data/oi/images`
+   - Verify ckpt/ directory is properly ignored by git: `git status`
+   - Download pre-trained models:
+     - Download VG model from Google Drive and save to `ckpt/checkpoint0149.pth`
+     - Download OI model from Google Drive and save to `ckpt/checkpoint0149_oi.pth`
+   - Verify model files are ignored by git: `git status`
+   - Prepare Visual Genome dataset:
+     - Download VG images Part1 from https://cs.stanford.edu/people/rak248/VG_100K_2/images.zip
+     - Download VG images Part2 from https://cs.stanford.edu/people/rak248/VG_100K_2/images2.zip
+     - Unzip both parts and place all images in `data/vg/images/`
+     - Download VG annotations in COCO-format from Google Drive
+     - Unzip annotations in the `data/` folder
+   - Verify JSON files are ignored by git: `git status`
+   - Prepare Open Images V6 dataset:
+     - Download original OIv6 annotations (v4-train/test/validation-annotations-vrd.csv) from official website
+     - Download OIv6 images from Rongjie Li's repository
+     - Unzip OIv6 images
+     - Option A: Generate annotations using process.py:
+       - Update paths in `data/process.py`
+       - Run `python data/process.py` to rename images and generate COCO-like annotations
+     - Option B: Download pre-processed annotations from Google Drive
+       - Still need to rename images using process.py
+     - Place renamed images in `data/oi/images/`
+     - Ensure annotations are in `data/oi/`
+   - Verify dataset structure matches expected format
+   - Navigate to FPN directory: `cd lib/fpn`
+   - Make the shell script executable: `chmod +x make.sh`
+   - Compile FPN module: `sh make.sh`
+   - Return to project root: `cd /home/cc/EnvGym/data/RelTR`
+   - Clean up any __pycache__ directories: `find . -type d -name __pycache__ -exec rm -rf {} +`
+   - Verify __pycache__ directories are ignored: `git status`
+   - **Modify inference script to use CPU**: Add `--device cpu` flag or modify code to force CPU usage
+   - Test inference on sample image: `python inference.py --img_path demo/vg1.jpg --resume ckpt/checkpoint0149.pth --device cpu`
+   - Verify inference output and visualization
+   - Test evaluation on VG dataset with **reduced batch size for CPU**: `python main.py --dataset vg --img_folder data/vg/images/ --ann_path data/vg/ --eval --batch_size 1 --resume ckpt/checkpoint0149.pth --device cpu`
+   - Test evaluation on OI dataset with **reduced batch size for CPU**: `python main.py --dataset oi --img_folder data/oi/images/ --ann_path data/oi/ --eval --batch_size 1 --resume ckpt/checkpoint0149_oi.pth --device cpu`
+   - Verify CUDA **is NOT** available: `python -c "import torch; print('CUDA available:', torch.cuda.is_available(), '(Should be False)')"`
+   - ~~Test distributed training setup~~ **(Skip - not practical on CPU)**
+   - Create environment backup: `conda env export > environment.yml`
+   - Verify final git status shows clean working directory: `git status`
+   - Document any issues or errors encountered during setup
+   - **Note**: Processing will be significantly slower on CPU. Consider using smaller test datasets or sample images for initial testing.
+   - **Warning**: Some models may have been trained with CUDA-specific operations. Monitor for any compatibility issues and be prepared to modify code to ensure CPU compatibility.

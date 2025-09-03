@@ -1,0 +1,266 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust toolchain (minimum version 1.56.0 for serde core, 1.61.0 for serde_derive based on CI, recommended latest stable)
+   - Cargo (comes with Rust installation)
+   - Git (for version control)
+   - Visual Studio Code or preferred IDE/editor
+   - Rust analyzer extension (for IDE support)
+   - Optional: cargo-watch for automatic rebuilds
+   - Optional: cargo-expand for macro debugging
+   - Optional: cargo-outdated for dependency management
+   - Optional: cargo-workspaces for workspace management
+   - Optional: cargo-readme for generating crates-io.md from README
+   - Optional: cargo-msrv for verifying minimum supported Rust version
+   - Optional: cargo-docs-rs for testing docs.rs builds locally
+   - no_std target toolchain (e.g., thumbv7m-none-eabi) for testing no_std environments
+   - Cross-compilation tools for embedded targets
+   - Rust nightly toolchain (for unstable features and minimal-versions testing)
+   - Rust beta toolchain (for CI testing)
+   - Specific Rust versions: 1.56.0, 1.60.0, 1.61.0, 1.64.0, 1.74.0, 1.77.0, 1.78.0, 1.81.0 (for CI compatibility testing)
+   - Miri (for undefined behavior detection)
+   - Clippy (for linting)
+   - Rustfmt (for code formatting)
+   - serde_json (for example code testing)
+   - Discord client (optional, for community support)
+   - Emscripten toolchain (optional, for asmjs-unknown-emscripten and wasm32-unknown-emscripten targets)
+
+2. FILES TO CREATE:
+   - .gitignore (ignore target/, Cargo.lock for libraries - already provided)
+   - Cargo.toml (workspace manifest with members configuration including serde_derive_internals)
+   - serde/Cargo.toml (serde crate manifest - already provided)
+   - serde/src/lib.rs (serde library implementation)
+   - serde/build.rs (build script - already provided)
+   - serde/README.md (serde crate documentation - already provided)
+   - serde/crates-io.md (readme for crates.io publication, generated from README.md)
+   - serde_derive/Cargo.toml (proc-macro crate manifest - already provided)
+   - serde_derive/src/lib.rs (derive macro implementation)
+   - serde_derive/build.rs (build script - already provided)
+   - serde_derive/README.md (serde_derive crate documentation - already provided)
+   - serde_derive/crates-io.md (readme for serde_derive crates.io publication, generated from README.md)
+   - serde_derive_internals/Cargo.toml (internals crate manifest - already provided)
+   - serde_derive_internals/build.rs (build script - already provided)
+   - serde_derive_internals/src/mod.rs (module entry point for internals)
+   - serde_derive_internals/lib.rs (AST representation implementation)
+   - serde_derive/src/internals (symlink to serde_derive_internals/src)
+   - test_suite/Cargo.toml (test suite manifest - already provided)
+   - test_suite/src/lib.rs (test utilities)
+   - test_suite/tests/ (integration tests directory)
+   - test_suite/tests/ui/ (compile-fail tests directory)
+   - test_suite/no_std/Cargo.toml (no_std test manifest - already provided)
+   - test_suite/no_std/src/main.rs (no_std test implementation)
+   - test_suite/no_std/src/lib.rs (no_std test library)
+   - test_suite/no_std/.gitignore (ignore no_std specific build artifacts - already provided)
+   - README.md (workspace root documentation)
+   - CONTRIBUTING.md (contribution guidelines - already provided)
+   - LICENSE-MIT (MIT license file)
+   - LICENSE-APACHE (Apache-2.0 license file)
+   - .github/workflows/ci.yml (CI configuration - already provided)
+   - rustfmt.toml (code formatting configuration)
+   - clippy.toml (linting configuration)
+   - examples/point.rs (example from README.md)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Basic serialization test (struct to JSON)
+   - Basic deserialization test (JSON to struct)
+   - Complex nested structure serialization/deserialization
+   - Error handling for invalid JSON
+   - Custom serialize/deserialize implementations
+   - Option<T> and Result<T, E> handling
+   - Vector and HashMap serialization (std feature)
+   - String, Box<T>, Vec<T>, Cow<T> tests (alloc feature)
+   - Rc<T> and Arc<T> serialization tests (rc feature)
+   - Enum serialization with different variants
+   - Field renaming and skipping tests
+   - Default value tests
+   - Lifetime and generic type tests
+   - Proc-macro derive tests
+   - Cross-crate integration tests
+   - Performance benchmarks
+   - Feature flag combination tests (std, alloc, rc, derive, unstable)
+   - no_std compatibility tests
+   - no_std::no-alloc compatibility tests
+   - Workspace member interaction tests
+   - Build script functionality tests
+   - deserialize_in_place feature tests
+   - Proc-macro expansion tests
+   - Syn feature integration tests (clone-impls, derive, parsing, printing)
+   - Documentation generation tests
+   - Minimum Rust version compatibility tests (1.56.0, 1.60.0, 1.61.0, 1.64.0, 1.74.0, 1.77.0, 1.78.0, 1.81.0)
+   - Automod-based test organization tests
+   - FoldHash integration tests
+   - Rustversion conditional compilation tests
+   - Trybuild compile-fail tests with diff output
+   - Serde_test integration tests
+   - AST representation tests for serde_derive_internals
+   - Proc-macro2, quote, syn integration tests in internals crate
+   - Cross-crate dependency tests between serde_derive and serde_derive_internals
+   - Internals crate API stability tests
+   - no_std environment tests with libc dependency
+   - Panic abort profile tests for no_std
+   - serde_derive functionality in no_std environment
+   - Memory allocation tests in no_std with libc
+   - Cross-compilation tests for embedded targets
+   - Linux-specific test suite compatibility
+   - UI tests for Linux environment
+   - Exhaustive pattern matching tests (with --cfg exhaustive)
+   - Miri tests for memory safety and undefined behavior
+   - Minimal dependency version tests
+   - Point struct example test from README.md
+   - serde_json integration tests
+   - Playground compatibility tests
+   - Documentation example tests (with derive feature)
+   - Full test suite with unstable features on nightly
+   - Target-specific atomic operation tests (no_std_atomic, no_std_atomic64)
+   - CStr/CString compatibility tests (no_core_cstr)
+   - Saturating number type tests (no_core_num_saturating)
+   - Core::net module tests (no_core_net)
+   - Diagnostic namespace attribute tests (no_diagnostic_namespace)
+   - Core::error::Error trait tests (no_core_error)
+   - Emscripten target tests (asmjs-unknown-emscripten, wasm32-unknown-emscripten)
+   - Build script rustc version detection tests
+   - cfg-check validation tests for Rust 1.77+
+   - serde_derive build script check_cfg tests
+   - serde_derive build script exhaustive cfg tests
+   - serde_derive_internals build script symlink detection tests
+   - serde_derive_internals build script serde_build_from_git cfg tests
+   - Linux symlink handling tests for serde_derive_internals
+   - serde_derive_internals src/mod.rs existence tests
+   - serde_derive_internals deserialize_in_place feature cfg tests
+   - Git ignore functionality tests (verify /target/ and /Cargo.lock are ignored)
+   - no_std subproject git ignore functionality tests (verify test_suite/no_std/target/ and test_suite/no_std/Cargo.lock are ignored)
+
+4. COMPLETE TODO LIST:
+   - Set working directory: `WORKDIR /home/cc/EnvGym/data/serde-rs_serde`
+   - Install Rust toolchain via rustup (https://rustup.rs/) for linux/amd64
+   - Verify installation: `rustc --version` (ensure latest stable)
+   - Install additional Rust versions for CI compatibility:
+     ```bash
+     rustup toolchain install 1.56.0 1.60.0 1.61.0 1.64.0 1.74.0 1.77.0 1.78.0 1.81.0 beta nightly
+     ```
+   - Install Miri: `rustup +nightly component add miri`
+   - Install formatting and linting tools: `rustup component add rustfmt clippy`
+   - Install no_std target: `rustup target add thumbv7m-none-eabi`
+   - Install Emscripten targets (optional): `rustup target add asmjs-unknown-emscripten wasm32-unknown-emscripten`
+   - Create new project directory: `mkdir -p /home/cc/EnvGym/data/serde-rs_serde/serde-workspace && cd /home/cc/EnvGym/data/serde-rs_serde/serde-workspace`
+   - Copy provided .gitignore to workspace root with content:
+     ```
+     /target/
+     /Cargo.lock
+     ```
+   - Initialize git repository: `git init`
+   - Create workspace Cargo.toml with provided content, including serde_derive_internals as member
+   - Create workspace member directories: `mkdir -p serde serde_derive serde_derive_internals/src test_suite test_suite/no_std examples`
+   - Copy provided serde/Cargo.toml to serde directory
+   - Copy provided serde/README.md to serde directory
+   - Copy provided serde/build.rs to serde directory
+   - Generate serde/crates-io.md from README.md: `cd serde && cargo readme > crates-io.md && cd ..`
+   - Copy provided serde_derive/Cargo.toml to serde_derive directory
+   - Copy provided serde_derive/README.md to serde_derive directory
+   - Copy provided serde_derive/build.rs to serde_derive directory
+   - Create serde_derive/src/lib.rs with proc-macro implementation:
+     ```rust
+     use proc_macro::TokenStream;
+     
+     #[proc_macro_derive(Serialize, attributes(serde))]
+     pub fn derive_serialize(input: TokenStream) -> TokenStream {
+         // Implementation
+     }
+     
+     #[proc_macro_derive(Deserialize, attributes(serde))]
+     pub fn derive_deserialize(input: TokenStream) -> TokenStream {
+         // Implementation
+     }
+     ```
+   - Generate serde_derive/crates-io.md from README.md: `cd serde_derive && cargo readme > crates-io.md && cd ..`
+   - Copy provided serde_derive_internals/Cargo.toml to serde_derive_internals directory
+   - Copy provided serde_derive_internals/build.rs to serde_derive_internals directory
+   - Create serde_derive_internals/src/mod.rs as module entry point
+   - Create serde_derive_internals/lib.rs with AST representation implementation
+   - Create symlink from serde_derive/src/internals to serde_derive_internals/src (Linux supports symlinks):
+     ```bash
+     cd serde_derive/src
+     ln -s ../../serde_derive_internals/src internals
+     cd ../..
+     ```
+   - Copy provided test_suite/Cargo.toml to test_suite directory
+   - Create test_suite/src/lib.rs with minimal content for test utilities
+   - Copy provided test_suite/no_std/Cargo.toml to test_suite/no_std directory
+   - Copy provided test_suite/no_std/.gitignore to test_suite/no_std directory with content:
+     ```
+     /target/
+     /Cargo.lock
+     ```
+   - Create test_suite/no_std/src/main.rs with no_std test entry point:
+     ```rust
+     #![no_std]
+     #![no_main]
+     
+     use core::panic::PanicInfo;
+     
+     #[panic_handler]
+     fn panic(_info: &PanicInfo) -> ! {
+         loop {}
+     }
+     
+     #[no_mangle]
+     pub extern "C" fn _start() -> ! {
+         // Test implementation
+         loop {}
+     }
+     ```
+   - Create test_suite/no_std/src/lib.rs with no_std test utilities
+   - Copy provided .github/workflows/ci.yml to .github/workflows directory:
+     ```bash
+     mkdir -p .github/workflows
+     cp ci.yml .github/workflows/
+     ```
+   - Copy provided CONTRIBUTING.md to workspace root
+   - Create examples/point.rs with the Point example from README.md:
+     ```rust
+     use serde::{Deserialize, Serialize};
+     
+     #[derive(Serialize, Deserialize, Debug)]
+     struct Point {
+         x: i32,
+         y: i32,
+     }
+     
+     fn main() {
+         let point = Point { x: 1, y: 2 };
+     
+         // Convert the Point to a JSON string.
+         let serialized = serde_json::to_string(&point).unwrap();
+     
+         // Prints serialized = {"x":1,"y":2}
+         println!("serialized = {}", serialized);
+     
+         // Convert the JSON string back to a Point.
+         let deserialized: Point = serde_json::from_str(&serialized).unwrap();
+     
+         // Prints deserialized = Point { x: 1, y: 2 }
+         println!("deserialized = {:?}", deserialized);
+     }
+     ```
+   - Add serde_json as dev-dependency in workspace Cargo.toml for examples
+   - Create dual license files: LICENSE-MIT and LICENSE-APACHE
+   - Verify git is ignoring correct paths: `git status` (should not show /target/ or /Cargo.lock)
+   - Verify git is ignoring no_std specific paths: `cd test_suite/no_std && git status` (should not show /target/ or /Cargo.lock)
+   - Build entire workspace with multi-core support: `CARGO_BUILD_JOBS=48 cargo build --workspace`
+   - Build with no_std: `CARGO_BUILD_JOBS=48 cargo build --no-default-features`
+   - Build with alloc only: `CARGO_BUILD_JOBS=48 cargo build --no-default-features --features alloc`
+   - Build with rc and alloc: `CARGO_BUILD_JOBS=48 cargo build --no-default-features --features rc,alloc`
+   - Build with unstable features: `CARGO_BUILD_JOBS=48 cargo build --no-default-features --features unstable`
+   - Build serde_derive with deserialize_in_place feature: `CARGO_BUILD_JOBS=48 cargo build -p serde_derive --features deserialize_in_place`
+   - Build serde_derive_internals: `CARGO_BUILD_JOBS=48 cargo build -p serde_derive_internals`
+   - Test serde_derive_internals build script symlink detection:
+     ```bash
+     cd serde_derive_internals
+     # Temporarily rename src/mod.rs to test build script
+     mv src/mod.rs src/mod.rs.bak
+     cargo build # Should set serde_build_from_git cfg
+     mv src/mod.rs.bak src/mod.rs
+     cd ..
+     ```
+   - Build test_suite with unstable feature: `CARGO_BUILD_JOBS=48 cargo build -p serde_test_suite --features unstable`
+   - Build no_std test suite: `cd test_suite/no_std && CARGO

@@ -1,0 +1,29 @@
+=== Docker Execution Log - 20250902_152331 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756826532
+
+=== Build Log ===
+Build Status: Failed
+Build Error:
+> [15/21] RUN cd /tmp/verus/source &&     rustup override set nightly-2024-05-01 &&     export RUST_SRC_PATH="$(rustc +nightly-2024-05-01 --print sysroot)/lib/rustlib/src/rust/library" &&     RUST_BACKTRACE=full cargo +nightly-2024-05-01 build --release --features unstable --verbose 2>&1 || (echo "verus build failed with exit code $?" && exit 1):
+0.276 info: override toolchain for '/tmp/verus/source' set to 'nightly-2024-05-01-x86_64-unknown-linux-gnu'
+0.342 warning: /tmp/verus/dependencies/syn/Cargo.toml: unused manifest key: lints.rust.unexpected_cfgs.check-cfg
+0.342 warning: /tmp/verus/dependencies/prettyplease/Cargo.toml: unused manifest key: lints.rust.unexpected_cfgs.check-cfg
+0.342 warning: /tmp/verus/source/builtin_macros/Cargo.toml: unused manifest key: lints.rust.unexpected_cfgs.check-cfg
+0.342 warning: /tmp/verus/source/state_machines_macros/Cargo.toml: unused manifest key: lints.rust.unexpected_cfgs.check-cfg
+0.342 warning: /tmp/verus/source/builtin/Cargo.toml: unused manifest key: lints.rust.unexpected_cfgs.check-cfg
+0.381 error: none of the selected packages contains these features: unstable
+0.383 verus build failed with exit code 101
+------
+envgym.dockerfile:73
+--------------------
+72 |
+73 | >>> RUN cd /tmp/verus/source && \
+74 | >>>     rustup override set nightly-2024-05-01 && \
+
+=== Runtime Log ===  
+Runtime Status: Failed
+Runtime Error:
+
+
+=== Execution End ===

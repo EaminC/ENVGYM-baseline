@@ -1,0 +1,137 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Node.js (v14.0.0 or higher, recommended v18.x or v20.x LTS) - x86_64 Linux binary
+   - npm (v6.0.0 or higher, comes with Node.js)
+   - Git (latest stable version for Linux x86_64)
+   - Visual Studio Code or preferred code editor (Linux x86_64 version)
+   - Postman or similar API testing tool (optional, Linux x86_64 AppImage/snap)
+   - Browser DevTools (Chrome/Firefox/Safari latest versions for Linux)
+   - TypeScript (v4.9.5 or higher) - via npm
+   - pnpm/yarn/bun (optional package managers) - Linux x86_64 binaries
+   - Karma CLI for browser testing - via npm
+   - Mocha test runner - via npm
+   - ESLint for code linting - via npm
+   - Rollup for building - via npm
+   - Gulp for task automation - via npm
+
+2. FILES TO CREATE:
+   - `package.json` - Project configuration (already exists at /home/cc/EnvGym/data/axios_axios, needs modification)
+   - `.gitignore` - Ignore node_modules, dist, coverage, .env files
+   - `tsconfig.json` - TypeScript configuration with ES module support
+   - `.env` - Environment variables for API endpoints
+   - `index.js` - Main entry point (ES module)
+   - `index.d.ts` - TypeScript definitions
+   - `index.d.cts` - CommonJS TypeScript definitions
+   - `lib/axios.js` - Core axios implementation
+   - `lib/adapters/http.js` - Node.js HTTP adapter
+   - `lib/adapters/xhr.js` - Browser XHR adapter
+   - `lib/helpers/null.js` - Null helper for browser builds
+   - `lib/platform/node/index.js` - Node.js platform specific code
+   - `lib/platform/browser/index.js` - Browser platform specific code
+   - `test/unit/` - Unit test directory
+   - `test/module/test.js` - Module export tests
+   - `.eslintrc.json` - ESLint configuration
+   - `karma.conf.cjs` - Karma test configuration
+   - `rollup.config.js` - Rollup build configuration
+   - `gulpfile.js` - Gulp task definitions
+   - `.husky/` - Git hooks configuration
+   - `commitlint.config.js` - Commit message linting
+   - `bin/ssl_hotfix.js` - SSL certificate fix script
+   - `sandbox/server.js` - Development server
+   - `examples/server.js` - Example server
+   - `CHANGELOG.md` - Version changelog
+   - `.release-it.json` - Release configuration
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - GET request with query parameters
+   - POST request with JSON payload
+   - PUT/PATCH request with data updates
+   - DELETE request functionality
+   - Request/Response interceptors
+   - Error handling (4xx, 5xx errors)
+   - Request cancellation using AbortController
+   - File upload with progress tracking
+   - FormData submission (multipart/form-data)
+   - URLSearchParams handling
+   - Custom headers manipulation
+   - Timeout handling
+   - Concurrent requests with Promise.all
+   - Response transformation
+   - Authentication token handling
+   - Follow redirects functionality
+   - Proxy configuration from environment
+   - ES module exports testing
+   - CommonJS exports testing
+   - React Native compatibility
+   - Browser environment detection
+   - Node.js environment detection
+   - TypeScript type definitions
+   - Adapter switching (http/xhr)
+   - Stream handling in Node.js
+   - HTTPS certificate handling
+   - Cross-browser compatibility (Chrome, Firefox, Safari on Linux)
+   - Bundle size verification
+   - CPU-only performance testing (no GPU acceleration tests)
+
+4. COMPLETE TODO LIST:
+   - Install Node.js x86_64 Linux binary and verify: `node --version` and `npm --version`
+   - Navigate to working directory: `cd /home/cc/EnvGym/data/axios_axios`
+   - Install all dependencies: `npm install`
+   - Install development dependencies from package.json
+   - Set up Husky git hooks: `npm run prepare`
+   - Configure commitlint for conventional commits
+   - Create TypeScript configuration files (tsconfig.json already exists)
+   - Set up ESLint configuration
+   - Configure Karma for browser testing (headless mode for Linux server)
+   - Set up Rollup build configuration
+   - Create Gulp tasks for automation
+   - Implement core axios functionality in lib/axios.js
+   - Create platform-specific implementations (node/browser)
+   - Implement HTTP adapter for Node.js
+   - Implement XHR adapter for browsers
+   - Create helper utilities in lib/helpers/
+   - Set up request/response interceptors
+   - Implement error handling mechanisms
+   - Create FormData handling for both environments
+   - Implement request cancellation with AbortController
+   - Set up proxy support using proxy-from-env
+   - Implement redirect following with follow-redirects
+   - Create TypeScript definition files (index.d.ts, index.d.cts)
+   - Write unit tests in test/unit/
+   - Write module export tests in test/module/
+   - Configure cross-environment testing (Node.js, browsers in headless mode)
+   - Run ESLint: `npm run test:eslint`
+   - Run Mocha tests: `npm run test:mocha`
+   - Run Karma tests in headless mode: `npm run test:karma -- --browsers=ChromeHeadless`
+   - Run TypeScript definition tests: `npm run test:dtslint`
+   - Run export tests: `npm run test:exports`
+   - Test in Firefox headless: `npm run test:karma:firefox -- --browsers=FirefoxHeadless`
+   - Build production bundles: `npm run build`
+   - Verify bundle sizes meet threshold (5kB for axios.min.js)
+   - Set up development server: `npm start`
+   - Set up examples server: `npm run examples`
+   - Configure release process with release-it
+   - Set up automated changelog generation
+   - Test CommonJS compatibility
+   - Test ES module compatibility
+   - Test React Native compatibility
+   - Verify browser field mappings in package.json
+   - Test with different Node.js versions (using nvm or n for Linux)
+   - Create distribution builds for CDN (jsdelivr, unpkg)
+   - Generate source maps for debugging
+   - Set up code coverage with Istanbul
+   - Configure Coveralls integration
+   - Test SSL certificate handling
+   - Implement version checking script
+   - Create sandbox environment for testing
+   - Document all exports and unsafe paths
+   - Test tree-shaking with sideEffects: false
+   - Verify all export paths work correctly
+   - Run full test suite: `npm test`
+   - Prepare for npm publication
+   - Create comprehensive documentation
+   - Set up continuous integration (GitHub Actions for Linux x86_64)
+   - Configure Docker builds if needed (using node:alpine or node:debian base images for amd64)
+   - Ensure all file paths use Linux conventions (forward slashes)
+   - Set appropriate file permissions for executable scripts (chmod +x)

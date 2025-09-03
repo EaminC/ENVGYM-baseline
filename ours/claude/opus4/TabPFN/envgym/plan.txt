@@ -1,0 +1,264 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 3.9, 3.10, 3.11, 3.12, or 3.13
+   - Git (latest stable version)
+   - PyTorch (>=2.1,<3) CPU-only version
+   - pip (latest version)
+   - setuptools (latest version)
+   - wheel (latest version)
+   - uv (latest version) - fast Python package installer
+   - pre-commit (latest version)
+   - ruff==0.8.6
+   - mypy==1.17.0
+   - pytest (latest version)
+   - pytest-xdist (latest version)
+   - psutil (latest version)
+   - commitizen (latest version)
+   - types-pyyaml (for mypy)
+   - types-psutil (for mypy)
+   - pyright (optional)
+   - GitHub CLI (gh) for testing Dependabot integration
+   - pydantic>=2.8.0
+   - pydantic-settings>=2.0.0
+   - python-dotenv (for .env file support)
+   - typing-extensions (for Self type annotation)
+   - TabPFN model weights:
+     - tabpfn-v2-classifier.ckpt
+     - tabpfn-v2-regressor.ckpt
+   - Optional: TabPFN Extensions repository
+   - Optional: ONNX (not available for Python 3.13)
+   - Optional: act (for testing GitHub Actions locally)
+
+2. FILES TO CREATE:
+   - `.env` (project root):
+     ```
+     # TabPFN Settings
+     TABPFN_MODEL_CACHE_DIR=/home/cc/EnvGym/data/TabPFN/models
+     TABPFN_ALLOW_CPU_LARGE_DATASET=true
+     TABPFN_EXCLUDE_DEVICES=cuda,mps
+     
+     # PyTorch Settings
+     PYTORCH_CUDA_ALLOC_CONF=
+     CUDA_VISIBLE_DEVICES=
+     
+     # Testing Settings
+     FORCE_CONSISTENCY_TESTS=0
+     CI=false
+     ```
+   - `.gemini/config.yaml`:
+     ```yaml
+     code_review:
+       pull_request_opened:
+         summary: false
+     ```
+   - `scripts/generate_dependencies.py`: Script to generate requirements for minimum/maximum dependency sets
+   - `tests/test_classifier.py`: Unit tests for TabPFNClassifier
+   - `tests/test_regressor.py`: Unit tests for TabPFNRegressor
+   - `tests/test_classifier_interface.py`: Tests for the TabPFNClassifier interface
+   - `tests/test_regressor_interface.py`: Tests for the TabPFNRegressor interface
+   - `tests/test_utils.py`: Tests for utility functions
+   - `tests/test_consistency.py`: Tests to ensure prediction consistency across code changes
+   - `tests/test_model_loading.py`: Tests for model save/load functionality
+   - `tests/test_cpu_compatibility.py`: Tests for CPU-only functionality
+   - `tests/test_missing_values.py`: Tests for handling missing data
+   - `tests/test_large_datasets.py`: Tests for dataset size limitations
+   - `tests/test_onnx_export.py`: Tests for ONNX export functionality
+   - `tests/test_memory_usage.py`: Tests for memory management
+   - `tests/test_device_exclusion.py`: Tests for device exclusion functionality
+   - `tests/test_config.py`: Tests for ModelInterfaceConfig functionality
+   - `tests/test_preprocessing_config.py`: Tests for preprocessing configuration
+   - `tests/test_outlier_removal.py`: Tests for outlier removal functionality
+   - `tests/test_feature_engineering.py`: Tests for polynomial features and fingerprinting
+   - `tests/test_class_feature_shifting.py`: Tests for class and feature shifting methods
+   - `tests/test_target_preprocessing.py`: Tests for regression target preprocessing
+   - `tests/test_settings.py`: Tests for TabPFNSettings, PytorchSettings, and TestingSettings
+   - `tests/test_model_config.py`: Tests for ModelConfig and ArchitectureConfig
+   - `tests/test_config_upgrade.py`: Tests for config upgrade functionality
+   - `tests/test_deprecated_imports.py`: Tests for deprecated import warnings
+   - `tests/conftest.py`: pytest configuration and fixtures
+   - `tests/README.md`: Documentation for test suite
+   - `tests/reference_predictions/`: Directory for platform-specific reference predictions
+   - `requirements-dev.txt`: Development dependencies (from pyproject.toml[dev])
+   - `requirements-cpu.txt`: CPU-specific dependencies
+   - `requirements-minimum.txt`: Minimum compatible versions
+   - `requirements-maximum.txt`: Maximum compatible versions
+   - `CLAUDE.md`: Documentation file for Claude AI assistant (if needed)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Test TabPFNClassifier basic functionality (fit, predict, predict_proba)
+   - Test TabPFNRegressor basic functionality (fit, predict)
+   - Test TabPFNClassifier interface consistency
+   - Test TabPFNRegressor interface consistency
+   - Test utility functions behavior
+   - Test prediction consistency across code changes
+   - Test platform-specific prediction consistency
+   - Test CI platform compatibility (Linux x86_64 with Python 3.9 and 3.13)
+   - Test reference prediction generation and validation
+   - Test model persistence (save_fitted_tabpfn_model, load_fitted_tabpfn_model)
+   - Test CPU device functionality
+   - Test device exclusion with TABPFN_EXCLUDE_DEVICES environment variable
+   - Test handling of missing values in input data
+   - Test dataset size limitations (warning/error for >10,000 rows)
+   - Test multiclass classification
+   - Test binary classification
+   - Test regression with different data types
+   - Test model download and caching mechanism
+   - Test offline model loading
+   - Test environment variable configuration
+   - Test sklearn compatibility (cross_val_score, GridSearchCV)
+   - Test error handling for invalid inputs
+   - Test memory usage on large datasets
+   - Test ensemble model variants loading
+   - Test ONNX export functionality (Python < 3.13)
+   - Test pydantic settings validation
+   - Test pydantic-settings environment variable loading
+   - Test TabPFNSettings configuration:
+     - Test model_cache_dir with Path and None values
+     - Test allow_cpu_large_dataset boolean flag
+     - Test environment variable prefix (TABPFN_)
+     - Test .env file loading
+     - Test settings extra="ignore" behavior
+   - Test PytorchSettings configuration:
+     - Test pytorch_cuda_alloc_conf string values
+     - Test PYTORCH_CUDA_ALLOC_CONF environment variable
+   - Test TestingSettings configuration:
+     - Test force_consistency_tests boolean flag
+     - Test ci boolean flag
+     - Test CI environment variable detection
+   - Test Settings composite configuration:
+     - Test nested settings structure
+     - Test default factory behavior
+     - Test global settings instance
+   - Test settings integration with TabPFN models
+   - Test settings override precedence (env vars > .env file > defaults)
+   - Test huggingface-hub integration
+   - Test type annotations with mypy
+   - Test memory profiling with psutil on Linux
+   - Test pre-commit hooks functionality
+   - Test commit message format with commitizen
+   - Test Dependabot configuration validation
+   - Test dependency update workflow
+   - Test CPU-only execution
+   - Test minimum dependency compatibility
+   - Test maximum dependency compatibility
+   - Test Linux x86_64 platform compatibility
+   - Test Python version compatibility (3.9-3.13)
+   - Test submodule initialization
+   - Test reproducible random seeds for consistency
+   - Test platform metadata tracking
+   - Test forced consistency test execution with FORCE_CONSISTENCY_TESTS
+   - Test .gitignore functionality (verify ignored files are not tracked)
+   - Test ModelInterfaceConfig.from_user_input() with dict, ModelInterfaceConfig, and None inputs
+   - Test MAX_UNIQUE_FOR_CATEGORICAL_FEATURES threshold behavior
+   - Test MIN_UNIQUE_FOR_NUMERICAL_FEATURES threshold behavior
+   - Test MIN_NUMBER_SAMPLES_FOR_CATEGORICAL_INFERENCE behavior
+   - Test OUTLIER_REMOVAL_STD with "auto", float, and None values
+   - Test FEATURE_SHIFT_METHOD with "shuffle", "rotate", and None
+   - Test CLASS_SHIFT_METHOD with "rotate", "shuffle", and None
+   - Test FINGERPRINT_FEATURE functionality for duplicate detection
+   - Test POLYNOMIAL_FEATURES with "no", "all", and integer values
+   - Test SUBSAMPLE_SAMPLES with None, int, and float values
+   - Test PREPROCESS_TRANSFORMS with PreprocessorConfig and dict inputs
+   - Test REGRESSION_Y_PREPROCESS_TRANSFORMS with all supported methods
+   - Test USE_SKLEARN_16_DECIMAL_PRECISION behavior
+   - Test MAX_NUMBER_OF_CLASSES limit enforcement
+   - Test MAX_NUMBER_OF_FEATURES limit warnings
+   - Test MAX_NUMBER_OF_SAMPLES limit warnings
+   - Test FIX_NAN_BORDERS_AFTER_TARGET_TRANSFORM functionality
+   - Test default outlier removal for classification vs regression
+   - Test PreprocessorConfig integration from config
+   - Test configuration deepcopy behavior
+   - Test unknown kwarg error handling in ModelInterfaceConfig
+   - Test preprocessing configuration for classification defaults
+   - Test preprocessing configuration for regression defaults
+   - Test ModelConfig dataclass functionality:
+     - Test default values for all fields
+     - Test emsize divisibility by nhead validation
+     - Test features_per_group values (1 or 2)
+     - Test feature_positional_embedding options
+     - Test multiquery_item_attention behavior
+     - Test nan_handling_enabled and nan_handling_y_encoder
+     - Test nhid_factor calculation
+     - Test nlayers configuration
+     - Test normalize_by_used_features behavior
+     - Test recompute_attn and recompute_layer flags
+     - Test attention_init_gain configuration
+     - Test item_attention_type and feature_attention_type
+     - Test seed configuration
+   - Test ModelConfig.upgrade_config() functionality:
+     - Test removal of use_flash_attention key
+     - Test attention_init_gain None to default conversion
+     - Test attention_type to item/feature_attention_type migration
+     - Test canonical_y_encoder=False validation
+     - Test bias=False validation
+     - Test two_sets_of_queries removal
+     - Test config deepcopy behavior
+     - Test ValueError for incompatible configs
+   - Test ModelConfig pydantic validation:
+     - Test model_validator for emsize/nhead divisibility
+     - Test validate_consistent method
+     - Test pydantic dataclass integration
+   - Test ArchitectureConfig inheritance
+   - Test typing_extensions.Self usage
+   - Test logger functionality for config upgrades
+   - Test backward compatibility with old checkpoints
+   - Test config serialization and deserialization
+   - Test config field type validation with pydantic
+   - Test deprecated import from tabpfn.model.config:
+     - Test that import from tabpfn.model.config works
+     - Test that all exports from tabpfn.architectures.base.config are available
+     - Test deprecation warning is shown when importing from tabpfn.model.config
+     - Test that functionality remains identical between old and new import paths
+   - Test __future__ annotations compatibility
+   - Test wildcard import behavior with __all__ definition
+
+4. COMPLETE TODO LIST:
+   - Install Python 3.9+ (verify with `python --version`)
+   - Create virtual environment: `python -m venv /home/cc/EnvGym/data/TabPFN/venv`
+   - Activate virtual environment:
+     - Linux: `source /home/cc/EnvGym/data/TabPFN/venv/bin/activate`
+   - Upgrade pip, setuptools, and wheel: `pip install --upgrade pip setuptools wheel`
+   - Install uv package manager: `pip install uv`
+   - Clone TabPFN repository (if not already present): `cd /home/cc/EnvGym/data && git clone https://github.com/priorlabs/tabpfn.git --depth 1`
+   - Navigate to project: `cd /home/cc/EnvGym/data/TabPFN`
+   - Verify .gitignore exists and contains proper Python ignores
+   - Initialize git submodules: `git submodule update --init --recursive`
+   - Create dependency generation script: `scripts/generate_dependencies.py`
+   - Generate minimum requirements: `python scripts/generate_dependencies.py minimum`
+   - Generate maximum requirements: `python scripts/generate_dependencies.py maximum`
+   - Install CPU-only PyTorch: `uv pip install --system torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu`
+   - Install TabPFN without dependencies: `uv pip install --system --no-deps .`
+   - Install core dependencies: `uv pip install --system -r requirements.txt`
+   - Install test dependencies: `uv pip install --system pytest psutil`
+   - Install pydantic and pydantic-settings: `uv pip install --system "pydantic>=2.8.0" "pydantic-settings>=2.0.0"`
+   - Install python-dotenv: `uv pip install --system python-dotenv`
+   - Install typing-extensions: `uv pip install --system typing-extensions`
+   - Install ONNX (if Python < 3.13): `uv pip install --system onnx`
+   - Install development dependencies: `pip install -e ".[dev]"`
+   - Verify all core dependencies:
+     - torch>=2.1,<3: `python -c "import torch; print(torch.__version__); print('CPU only:', not torch.cuda.is_available())"`
+     - scikit-learn>=1.2.0,<1.7: `python -c "import sklearn; print(sklearn.__version__)"`
+     - pandas>=1.4.0,<3: `python -c "import pandas; print(pandas.__version__)"`
+     - scipy>=1.11.1,<2: `python -c "import scipy; print(scipy.__version__)"`
+     - einops>=0.2.0,<0.9: `python -c "import einops; print(einops.__version__)"`
+     - huggingface-hub: `python -c "import huggingface_hub; print(huggingface_hub.__version__)"`
+     - pydantic>=2.8.0: `python -c "import pydantic; print(pydantic.__version__)"`
+     - pydantic-settings>=2.0.0: `python -c "import pydantic_settings; print(pydantic_settings.__version__)"`
+     - typing-extensions: `python -c "import typing_extensions; print(typing_extensions.__version__)"`
+   - Install pre-commit: `pip install pre-commit`
+   - Install commitizen: `pip install commitizen`
+   - Install mypy type stubs: `pip install types-pyyaml types-psutil`
+   - Install pre-commit hooks: `pre-commit install`
+   - Install commit-msg hook for commitizen: `pre-commit install --hook-type commit-msg`
+   - Verify pre-commit configuration: `pre-commit validate-config`
+   - Create `.env` file with environment variables (CPU-only configuration)
+   - Verify .env is properly ignored by git: `git check-ignore .env`
+   - Test settings module import: `python -c "from tabpfn.settings import settings"`
+   - Verify TabPFNSettings configuration: `python -c "from tabpfn.settings import settings; print(settings.tabpfn.model_cache_dir)"`
+   - Verify PytorchSettings configuration: `python -c "from tabpfn.settings import settings; print(settings.pytorch.pytorch_cuda_alloc_conf)"`
+   - Verify TestingSettings configuration: `python -c "from tabpfn.settings import settings; print(settings.testing.force_consistency_tests)"`
+   - Test environment variable override: `TABPFN_ALLOW_CPU_LARGE_DATASET=true python -c "from tabpfn.settings import settings; print(settings.tabpfn.allow_cpu_large_dataset)"`
+   - Test ModelConfig import: `python -c "from tabpfn.architectures.base.config import ModelConfig"`
+   - Verify ModelConfig defaults: `python -c "from tabpfn.architectures.base.config import ModelConfig; mc = ModelConfig(); print(f'emsize={mc.emsize}, nhead={mc.nhead}')"`
+   - Test

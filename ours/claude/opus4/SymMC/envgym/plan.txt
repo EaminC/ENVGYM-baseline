@@ -1,0 +1,148 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - OpenJDK 8 (version 1.8) - compatible with x86_64
+   - Apache Ant (latest stable version)
+   - CMake (version 3.10 or higher)
+   - GCC/G++ compiler (version 7.0 or higher, with C++17 support)
+   - Git (for cloning repositories)
+   - MiniSat dependencies (zlib1g-dev)
+   - GMP library (libgmp-dev)
+   - GMP C++ bindings (libgmpxx4ldbl)
+   - Make build tool
+   - Python 3.x (for potential scripting needs)
+   - java-cup-11a.jar (parser generator)
+   - org.alloytools.alloy.dist.jar (Alloy tools distribution)
+   - org.sat4j.core.jar (SAT4J solver)
+   - org.sat4j.core-src.jar (SAT4J source)
+   - pthread library (usually included with build-essential)
+
+2. FILES TO CREATE:
+   - `/home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/lib/` (directory for JAR dependencies)
+   - `.gitignore` (already exists, needs verification and potential updates)
+   - `/home/cc/EnvGym/data/SymMC/environment_check.sh` (script to verify all dependencies)
+   - `/home/cc/EnvGym/data/SymMC/test_runner.sh` (automated test execution script)
+   - `/home/cc/EnvGym/data/SymMC/config/paths.conf` (configuration file for storing paths)
+   - `/home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/build.properties` (for custom Ant build properties)
+   - `/home/cc/EnvGym/data/SymMC/lib/` (root library directory for shared JAR dependencies)
+   - `.classpath.template` (template for Eclipse classpath configuration)
+   - `.project.template` (template for Eclipse project configuration)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Test case for Enhanced Kodkod translation (verify SAT formula generation)
+   - Test case for symmetry information extraction
+   - Test case for non-isomorphic model enumeration
+   - Test case for isomorphic model counting
+   - Test case for Kodkod pruning metric calculation
+   - Integration test for complete pipeline (Alloy spec → results)
+   - Performance test with sample specifications
+   - Error handling test for invalid input specifications
+   - Boundary test cases for different specification sizes
+   - Test case for Ant build process verification
+   - Test case for JAR dependency loading
+   - Test case for compiled class file integrity
+   - Test case for java-cup parser functionality
+   - Test case for Alloy tools integration
+   - Test case for SAT4J solver integration
+   - Test case for classpath configuration validation
+   - Test case for Java builder functionality
+   - Test case for Enhanced_Kodkod/build.sh script execution
+   - Test case for build.sh error handling and exit codes
+   - Test case for run.sh script execution with valid parameters
+   - Test case for run.sh classpath configuration
+   - Test case for ExampleUsingTheCompiler class execution
+   - Test case for run.sh error handling with missing parameters
+   - Test case for run.sh with different file paths (absolute/relative)
+   - Test case for CMake build configuration (Release mode only)
+   - Test case for minisat_core executable functionality
+   - Test case for minisat_simp executable functionality
+   - Test case for static/shared library builds
+   - Test case for GMP library integration
+   - Test case for pthread functionality in minisat
+   - Test case for MiniSat solver with ZLIB compression
+   - Test case for PermPair and MCSampler functionality
+   - Test case for C++17 standard compliance
+   - Test case for Enumerator_Estimator/build.sh clean build process
+   - Test case for cmake-build-release directory removal and recreation
+   - Test case for CMake -B and -H flag functionality
+   - Test case for .gitignore effectiveness (verify ignored files/directories)
+   - Test case for .idea directory exclusion across all subdirectories
+   - Test case for Enhanced_Kodkod/bin/ directory exclusion
+
+4. COMPLETE TODO LIST:
+   - Change to working directory: `cd /home/cc/EnvGym/data/SymMC`
+   - Update system package manager: `sudo apt-get update`
+   - Install OpenJDK 8: `sudo apt-get install openjdk-8-jdk`
+   - Verify Java installation: `java -version` (should show 1.8.x)
+   - Set JAVA_HOME environment variable: `export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64`
+   - Add JAVA_HOME to bashrc: `echo 'export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64' >> ~/.bashrc`
+   - Install Apache Ant: `sudo apt-get install ant`
+   - Verify Ant installation: `ant -version`
+   - Install build essentials: `sudo apt-get install build-essential`
+   - Install CMake: `sudo apt-get install cmake`
+   - Verify CMake installation: `cmake --version` (should be 3.10 or higher)
+   - Install MiniSat dependencies: `sudo apt-get install zlib1g-dev`
+   - Install GMP library: `sudo apt-get install libgmp-dev`
+   - Install GMP C++ bindings: `sudo apt-get install libgmpxx4ldbl`
+   - Verify GMP installation: `ldconfig -p | grep gmp`
+   - Install Git: `sudo apt-get install git`
+   - Install wget for downloading JARs: `sudo apt-get install wget`
+   - Verify .gitignore exists: `test -f .gitignore && echo ".gitignore exists"`
+   - Verify .gitignore content: `cat .gitignore`
+   - Check if .gitignore needs additional entries: `grep -E "bin/|*.class|*.tmp|*.o|*.a|*.so|lib/*.jar|.classpath|.project" .gitignore`
+   - Update .gitignore if needed: `echo -e "*.tmp\n*.o\n*.a\n*.so\nlib/*.jar\n.classpath\n.project\n" >> .gitignore`
+   - Create root lib directory: `mkdir -p /home/cc/EnvGym/data/SymMC/lib`
+   - Download java-cup-11a.jar: `wget https://www2.cs.tum.edu/projects/cup/releases/java-cup-11a.jar -O /home/cc/EnvGym/data/SymMC/lib/java-cup-11a.jar`
+   - Download org.alloytools.alloy.dist.jar: `wget https://repo1.maven.org/maven2/org/alloytools/org.alloytools.alloy.dist/5.1.0/org.alloytools.alloy.dist-5.1.0.jar -O /home/cc/EnvGym/data/SymMC/lib/org.alloytools.alloy.dist.jar`
+   - Download org.sat4j.core.jar: `wget https://repo1.maven.org/maven2/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5.jar -O /home/cc/EnvGym/data/SymMC/lib/org.sat4j.core.jar`
+   - Download org.sat4j.core-src.jar: `wget https://repo1.maven.org/maven2/org/ow2/sat4j/org.ow2.sat4j.core/2.3.5/org.ow2.sat4j.core-2.3.5-sources.jar -O /home/cc/EnvGym/data/SymMC/lib/org.sat4j.core-src.jar`
+   - Navigate to Enhanced_Kodkod directory: `cd /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod`
+   - Update .project file to use relative project name: `sed -i 's|<name>GenAlloySBP</name>|<name>Enhanced_Kodkod</name>|g' .project`
+   - Create .project.template: `cp .project .project.template`
+   - Create Enhanced_Kodkod lib directory: `mkdir -p lib`
+   - Copy org.alloytools.alloy.dist.jar to Enhanced_Kodkod/lib: `cp ../lib/org.alloytools.alloy.dist.jar lib/`
+   - Create symbolic links to other JAR files: `ln -s ../../lib/java-cup-11a.jar lib/` and `ln -s ../../lib/org.sat4j.*.jar lib/`
+   - Update .classpath file to use relative paths: `sed -i 's|/home/wenxi/eclipse-workspace/GenAlloySBP|..|g' .classpath`
+   - Make build.sh executable: `chmod +x build.sh`
+   - Test build.sh script: `./build.sh`
+   - Verify build.sh executes ant compile successfully
+   - Clean previous builds: `ant clean`
+   - Build Enhanced Kodkod using build.sh: `./build.sh`
+   - Verify Enhanced Kodkod build: check for `bin/` directory with compiled classes
+   - Verify bin/ directory is ignored by git: `git status --ignored | grep -q "Enhanced_Kodkod/bin/" && echo "bin/ is properly ignored"`
+   - Verify run.sh exists and is executable: `test -x run.sh && echo "run.sh is executable"`
+   - Verify run.sh classpath includes src, bin, and lib/org.alloytools.alloy.dist.jar
+   - Test run.sh with missing parameters: `./run.sh` (should show usage or error)
+   - Navigate to Enumerator_Estimator directory: `cd /home/cc/EnvGym/data/SymMC/Enumerator_Estimator`
+   - Verify build.sh exists: `test -f build.sh && echo "build.sh exists"`
+   - Make build script executable: `chmod +x build.sh`
+   - Test build.sh clean build process: `./build.sh`
+   - Verify cmake-build-release directory creation: `test -d cmake-build-release && echo "cmake-build-release created"`
+   - Verify cmake-build-release is ignored by git: `cd /home/cc/EnvGym/data/SymMC && git status --ignored | grep -q "Enumerator_Estimator/cmake-build-release/" && echo "cmake-build-release/ is properly ignored"`
+   - Navigate back to Enumerator_Estimator: `cd /home/cc/EnvGym/data/SymMC/Enumerator_Estimator`
+   - Verify Release build: `test -f cmake-build-release/minisat && echo "minisat executable built successfully"`
+   - Test static library build: `test -f cmake-build-release/libminisat.a && echo "Static library built"`
+   - Test shared library build: `test -f cmake-build-release/libminisat.so && echo "Shared library built"`
+   - Test minisat_core executable: `./cmake-build-release/minisat_core --help`
+   - Test minisat (minisat_simp) executable: `./cmake-build-release/minisat --help`
+   - Verify GMP linking: `ldd cmake-build-release/minisat | grep gmp`
+   - Verify pthread linking: `ldd cmake-build-release/minisat | grep pthread`
+   - Test build.sh idempotency: `./build.sh && ./build.sh` (should rebuild cleanly)
+   - Verify CMake -B and -H flags work correctly: `cmake -Bcmake-build-test -H. && rm -rf cmake-build-test`
+   - Create environment check script: `touch /home/cc/EnvGym/data/SymMC/environment_check.sh && chmod +x /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Add shebang to environment check: `echo '#!/bin/bash' > /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Add JAR verification to environment check: `echo 'ls -la /home/cc/EnvGym/data/SymMC/lib/*.jar' >> /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Add Eclipse project verification: `echo 'test -f /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/.project && echo "Eclipse project file exists"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Add build.sh verification: `echo 'test -x /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/build.sh && echo "Enhanced_Kodkod build.sh is executable"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Add Enumerator_Estimator build.sh verification: `echo 'test -x /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/build.sh && echo "Enumerator_Estimator build.sh is executable"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Add run.sh verification: `echo 'test -x /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/run.sh && echo "Enhanced_Kodkod run.sh is executable"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Add ExampleUsingTheCompiler class verification: `echo 'test -f /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/bin/edu/mit/csail/sdg/alloy4whole/ExampleUsingTheCompiler.class && echo "ExampleUsingTheCompiler compiled"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Add minisat executable verification: `echo 'test -x /home/cc/EnvGym/data/SymMC/Enumerator_Estimator/cmake-build-release/minisat && echo "minisat executable exists"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Add GMP library verification: `echo 'ldconfig -p | grep -q gmp && echo "GMP library installed"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Add C++ compiler version check: `echo 'g++ --version | head -n1' >> /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Add CMake version check: `echo 'cmake --version | head -n1' >> /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Add .gitignore verification: `echo 'test -f /home/cc/EnvGym/data/SymMC/.gitignore && echo ".gitignore exists"' >> /home/cc/EnvGym/data/SymMC/environment_check.sh`
+   - Run environment check: `cd /home/cc/EnvGym/data/SymMC && ./environment_check.sh`
+   - Test .idea directory exclusion: `mkdir -p test/.idea && touch test/.idea/test.xml && git status --ignored | grep -q ".idea" && rm -rf test`
+   - Create .classpath.template from current .classpath: `cp /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/.classpath /home/cc/EnvGym/data/SymMC/Enhanced_Kodkod/.classpath.template`
+   - Create test directory structure:

@@ -1,0 +1,7 @@
+current progress
+
+The base Ubuntu 20.04 environment has been successfully set up with all required system dependencies, Java development tools (OpenJDK 8 & 11, Maven, Gradle, Ant), and the working directory has been created. The Dockerfile includes commands to clone the fastjson2 repository and cache Maven dependencies.
+
+next step
+
+Remove or modify the git clone command since the project files should be mounted as a volume rather than cloned during image build. Add a verification step to check Java and Maven installations, and consider adding a non-root user for better security practices. The mvn dependency:go-offline command should also be removed or moved to a runtime script since it depends on having the actual project files present.

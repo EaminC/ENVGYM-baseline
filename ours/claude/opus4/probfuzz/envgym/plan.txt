@@ -1,0 +1,202 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Python 2.7 (required by install.sh - available in Ubuntu 20.04 repositories)
+   - Python 3.x (3.6 or higher for potential Python 3 components - Ubuntu 20.04 has 3.8)
+   - pip2 (Python 2 package manager - python-pip package)
+   - pip3 (Python 3 package manager - python3-pip package)
+   - bc (command-line calculator)
+   - ANTLR 4.7.1 (antlr-4.7.1-complete.jar)
+   - antlr4-python2-runtime
+   - six
+   - astunparse
+   - ast
+   - Stan (latest stable version)
+   - PyStan (Python interface for Stan)
+   - Edward (TensorFlow-based probabilistic programming)
+   - TensorFlow 1.5.0 CPU version (x86_64 compatible, no GPU support needed)
+   - Pyro 0.2.1 (PyTorch-based probabilistic programming)
+   - PyTorch 0.4.0 (CPU version for Python 2.7, x86_64 compatible)
+   - NumPy
+   - SciPy (with stats module for distributions)
+   - Matplotlib (for potential visualization)
+   - pandas
+   - JSON library (usually comes with Python)
+   - bash/shell environment (for install.sh script)
+   - timeout command (coreutils package in Ubuntu 20.04)
+   - threading support (Python standard library)
+   - Venture (probabilistic programming system)
+   - PSI (probabilistic programming language)
+   - wget (for downloading ANTLR jar)
+   - OpenJDK 8 (for running ANTLR, available in Ubuntu 20.04 repositories instead of Oracle Java)
+   - software-properties-common (for add-apt-repository command)
+
+2. FILES TO CREATE:
+   - install.sh (installation script for dependencies - already exists)
+   - install_java.sh (Java 8 installation script - needs modification for OpenJDK)
+   - check.py (verification script referenced in install.sh)
+   - requirements.txt (Python dependencies list)
+   - /home/cc/EnvGym/data/probfuzz/output/ (directory for program outputs)
+   - /home/cc/EnvGym/data/probfuzz/language/ (directory for language components)
+   - /home/cc/EnvGym/data/probfuzz/language/antlr/ (directory for ANTLR components)
+   - /home/cc/EnvGym/data/probfuzz/language/antlr/run.sh (ANTLR execution script)
+   - /home/cc/EnvGym/data/probfuzz/language/antlr/.gitignore (to exclude ANTLR generated files - already exists)
+   - /home/cc/EnvGym/data/probfuzz/language/templates/ (directory for template files)
+   - /home/cc/EnvGym/data/probfuzz/language/templates/simple.template
+   - /home/cc/EnvGym/data/probfuzz/language/templates/linearregression.template
+   - /home/cc/EnvGym/data/probfuzz/language/templates/mlr.template
+   - /home/cc/EnvGym/data/probfuzz/language/templates/cond.template
+   - /home/cc/EnvGym/data/probfuzz/language/stanmodels.json (distribution and inference configuration file)
+   - /home/cc/EnvGym/data/probfuzz/test/ (directory for test cases)
+   - /home/cc/EnvGym/data/probfuzz/test/test_probfuzz.py (main test file)
+   - /home/cc/EnvGym/data/probfuzz/test/test_backends.py (backend translator tests)
+   - /home/cc/EnvGym/data/probfuzz/test/test_language.py (language grammar tests)
+   - /home/cc/EnvGym/data/probfuzz/test/test_utils.py (utility function tests)
+   - /home/cc/EnvGym/data/probfuzz/test/test_config.py (configuration loading tests)
+   - /home/cc/EnvGym/data/probfuzz/test/test_edward_inferences.py (Edward inference engine tests)
+   - /home/cc/EnvGym/data/probfuzz/test/test_pyro_optimizers.py (Pyro optimizer tests)
+   - /home/cc/EnvGym/data/probfuzz/test/test_metrics.py (metric computation tests)
+   - /home/cc/EnvGym/data/probfuzz/test/test_stanmodels.py (stanmodels.json validation tests)
+   - /home/cc/EnvGym/data/probfuzz/test/test_distributions.py (distribution mapping tests)
+   - /home/cc/EnvGym/data/probfuzz/test/test_tensorflow_utils.py (TensorFlow utility function tests)
+   - /home/cc/EnvGym/data/probfuzz/test/test_antlr_grammar.py (ANTLR grammar parsing tests)
+   - /home/cc/EnvGym/data/probfuzz/.gitignore (to exclude output/, __pycache__/, *.pyc, .idea/*, *~ - already exists)
+   - /home/cc/EnvGym/data/probfuzz/setup.py (for package installation)
+   - /home/cc/EnvGym/data/probfuzz/config.json (configuration file)
+   - /home/cc/EnvGym/data/probfuzz/probfuzz.py (main executable)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - Test program generation functionality on x86_64 architecture
+   - Test template hole completion mechanism
+   - Test ANTLR grammar parsing with Python 2 runtime
+   - Test Stan backend translator with NUTS algorithm
+   - Test Edward backend translator with all inference methods (CPU-only execution)
+   - Test Pyro backend translator with Adam optimizer (CPU-only execution)
+   - Test differential testing comparison logic
+   - Test output parsing for each PPS
+   - Test configuration loading from config.json
+   - Test stanmodels.json parsing and validation
+   - Test error handling for invalid templates
+   - Test metric computation for bug detection (lr_smape metric)
+   - Test timeout functionality (5m timeout for each tool)
+   - Test multi-threading with max_threads configuration on x86_64 CPU
+   - Test structured output format
+   - Test template switching (simple, lr, mlr, lrc)
+   - Test Edward inference parameter validation
+   - Test Pyro optimizer parameter generation
+   - Integration test for full pipeline execution
+   - Test posterior type compatibility for Edward inferences
+   - Test learning rate and other hyperparameter settings
+   - Test all distribution mappings across backends (Stan, Edward, Pyro, Venture, PSI, SciPy)
+   - Test continuous distributions (normal, student_t, cauchy, double_exponential, logistic, gumbel, lognormal, chi_square, inv_chi_square, exponential, gamma, inv_gamma, weibull, beta, uniform)
+   - Test discrete distributions (bernoulli_logit, binomial, beta_binomial, neg_binomial, poisson)
+   - Test distribution parameter type validation (f, f+, p, i+, vector)
+   - Test distribution support validation (f, f+, 0f+, 0i+, b, (0,1), [alpha,beta], [0,N], i+)
+   - Test Edward inference supported_posterior types (Empirical, PointMass, Normal)
+   - Test Edward inference supported_models restrictions
+   - Test inference dataset requirements (HMC requires 2, MAP requires 1)
+   - Test inference learning rate configurations (HMC: 0.05, SGHMC: 0.01, SGLD: 0.05)
+   - Test TensorFlow 1.5.0 CPU utility functions (tf.reciprocal, tf.sin, tf.cos, tf.sigmoid, tf.tan, tf.erf, tf.exp, tf.lgamma)
+   - Test "ig" (ignore) flag handling for distributions and inferences
+   - Test has_proposal flag for MetropolisHastings
+   - Test dimension handling for vector parameters
+   - Test stanmodels.json typo handling (psinam vs psiname)
+   - Test duplicate name field handling in cauchy distribution
+   - Test missing fields in distributions (some lack edward/pyro/venture mappings)
+   - Test string vs numeric learning rate handling in inferences
+   - Test Python 2.7 compatibility for all components on Ubuntu 20.04
+   - Test PyTorch 0.4.0 CPU version functionality on x86_64
+   - Test pandas integration
+   - Test bc calculator integration
+   - Test ANTLR jar execution and grammar compilation with OpenJDK 8
+   - Test check.py verification script functionality
+   - Test Java 8 installation and version verification
+   - Test ANTLR compatibility with OpenJDK 8
+   - Test .gitignore functionality in /home/cc/EnvGym/data/probfuzz/
+   - Test that generated files in output/ directory are not tracked by git
+   - Test that Python bytecode files (*.pyc) are not tracked
+   - Test that IDE configuration files (.idea/) are not tracked
+   - Test that backup files (*~) are not tracked
+   - Test ANTLR generated files exclusion in /home/cc/EnvGym/data/probfuzz/language/antlr/
+   - Test ANTLR grammar compilation generates expected file types
+   - Test cleanup of ANTLR generated files
+   - Test CPU-only execution performance
+   - Test memory usage patterns on x86_64 architecture
+
+4. COMPLETE TODO LIST:
+   - Change to working directory: cd /home/cc/EnvGym/data/probfuzz
+   - Update system packages: sudo apt-get -y update
+   - Install software-properties-common: sudo apt-get install -y software-properties-common
+   - Modify install_java.sh to use OpenJDK 8 instead of Oracle Java 8 for Ubuntu 20.04
+   - Make install_java.sh executable: chmod +x install_java.sh
+   - Execute ./install_java.sh to install OpenJDK 8
+   - Verify Java 8 installation: java -version (should show OpenJDK 1.8.x)
+   - Install Python 2.7: sudo apt-get install -y python2.7 python2.7-dev
+   - Install pip2 for Ubuntu 20.04: wget https://bootstrap.pypa.io/pip/2.7/get-pip.py && sudo python2.7 get-pip.py
+   - Install bc calculator: sudo apt-get install -y bc
+   - Install build essentials for x86_64: sudo apt-get install -y build-essential
+   - Create project directory structure in /home/cc/EnvGym/data/probfuzz
+   - Create language/ directory: mkdir -p /home/cc/EnvGym/data/probfuzz/language
+   - Create language/antlr/ directory: mkdir -p /home/cc/EnvGym/data/probfuzz/language/antlr
+   - Verify language/antlr/.gitignore exists and contains proper entries
+   - Create language/templates/ directory: mkdir -p /home/cc/EnvGym/data/probfuzz/language/templates
+   - Create output/ directory: mkdir -p /home/cc/EnvGym/data/probfuzz/output
+   - Create test/ directory: mkdir -p /home/cc/EnvGym/data/probfuzz/test
+   - Verify .gitignore exists in /home/cc/EnvGym/data/probfuzz
+   - Write check.py verification script
+   - Write language/antlr/run.sh script for ANTLR execution
+   - Make install.sh executable: chmod +x install.sh
+   - Make probfuzz.py executable: chmod +x probfuzz.py
+   - Make check.py executable: chmod +x check.py
+   - Make language/antlr/run.sh executable: chmod +x language/antlr/run.sh
+   - Execute ./install.sh to install all dependencies
+   - Verify Python 2.7 packages installation via pip2
+   - Install antlr4-python2-runtime, six, astunparse via pip2
+   - Install numpy, scipy for x86_64: pip2 install numpy scipy
+   - Install pystan for CPU: pip2 install pystan
+   - Install TensorFlow 1.5.0 CPU version for x86_64: pip2 install tensorflow==1.5.0
+   - Install edward: pip2 install edward
+   - Install pandas: pip2 install pandas matplotlib
+   - Install PyTorch 0.4.0 CPU version for Python 2.7 x86_64: pip2 install torch==0.4.0 -f https://download.pytorch.org/whl/cpu/torch_stable.html
+   - Install Pyro 0.2.1: pip2 install pyro-ppl==0.2.1
+   - Download ANTLR 4.7.1 jar file: wget -O /home/cc/EnvGym/data/probfuzz/language/antlr/antlr-4.7.1-complete.jar https://www.antlr.org/download/antlr-4.7.1-complete.jar
+   - Execute ANTLR setup: cd /home/cc/EnvGym/data/probfuzz/language/antlr/ && ./run.sh
+   - Verify ANTLR generates expected files
+   - Verify generated ANTLR files are ignored by git
+   - Run ./check.py to verify installation
+   - Create requirements.txt with Python 2 package versions
+   - Verify stanmodels.json exists in /home/cc/EnvGym/data/probfuzz/language/
+   - Validate stanmodels.json structure
+   - Check and fix stanmodels.json typos
+   - Check and fix duplicate name field in cauchy distribution
+   - Validate inferences array in stanmodels.json
+   - Validate util_functions array in stanmodels.json
+   - Verify config.json exists in /home/cc/EnvGym/data/probfuzz
+   - Validate config.json structure
+   - Verify all template files exist in /home/cc/EnvGym/data/probfuzz/language/templates/
+   - Test Stan installation: python2.7 -c "import pystan"
+   - Test Edward installation: python2.7 -c "import edward"
+   - Test Pyro installation: python2.7 -c "import pyro"
+   - Test TensorFlow 1.5.0 CPU installation: python2.7 -c "import tensorflow as tf; print(tf.__version__)"
+   - Test PyTorch 0.4.0 CPU installation: python2.7 -c "import torch; print(torch.__version__); print(torch.cuda.is_available())" (should show False)
+   - Test SciPy installation: python2.7 -c "import scipy.stats as st"
+   - Test pandas installation: python2.7 -c "import pandas"
+   - Test ANTLR Python 2 runtime: python2.7 -c "import antlr4"
+   - Test astunparse installation: python2.7 -c "import astunparse"
+   - Verify timeout command availability: which timeout
+   - Verify bc command availability: which bc
+   - Verify wget command availability: which wget
+   - Test ANTLR jar execution with OpenJDK 8: java -jar /home/cc/EnvGym/data/probfuzz/language/antlr/antlr-4.7.1-complete.jar
+   - Write unit tests for language grammar parser with ANTLR
+   - Write unit tests for each backend translator
+   - Write unit tests for configuration parsing
+   - Write unit tests for stanmodels.json parsing and validation
+   - Write unit tests for distribution mapping across all backends
+   - Write unit tests for Edward inference engines (CPU-only)
+   - Write unit tests for inference parameter validation
+   - Write unit tests for Pyro 0.2.1 Adam optimizer configuration
+   - Write unit tests for metric computation (lr_smape)
+   - Write unit tests for TensorFlow 1.5.0 CPU utility functions
+   - Write unit tests for Python 2.7 compatibility on Ubuntu 20.04
+   - Write unit tests for ANTLR file generation and cleanup
+   - Write integration

@@ -1,0 +1,152 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Node.js (version 18 or higher) from https://nodejs.org/ - Alpine/Debian packages available
+   - npm (comes bundled with Node.js)
+   - Git (latest stable version) - install via `apk add git` (Alpine) or `apt-get install git` (Debian/Ubuntu)
+   - Code editor (VS Code recommended) with JavaScript/Node.js extensions
+   - EditorConfig plugin/extension for your code editor
+   - ESLint extension for your code editor (for real-time linting)
+   - Redis server - install via `apk add redis` (Alpine) or `apt-get install redis-server` (Debian/Ubuntu)
+   - nyc (Istanbul) for code coverage reporting - npm package
+   - GitHub CLI (optional) - install via package manager or download Linux x86_64 binary
+   - Dependabot CLI (optional) - download Linux x86_64 binary from releases
+   - lcov - install via `apk add lcov` (Alpine) or `apt-get install lcov` (Debian/Ubuntu)
+   - GitHub Actions CLI (act) - download Linux x86_64 binary from releases
+   - CodeQL CLI (optional) - download Linux x86_64 binary from releases
+   - yamllint - install via `apk add yamllint` (Alpine) or `apt-get install yamllint` (Debian/Ubuntu)
+   - Node.js legacy versions (16, 17) - use n instead of nvm for Alpine compatibility
+   - n (Node Version Manager) - install via npm: `npm install -g n`
+   - OSSF Scorecard CLI (optional) - download Linux x86_64 binary from releases
+   - EJS templating engine (npm package)
+   - Markdown parser (npm package)
+   - Cookie-parser middleware (npm package)
+   - Express-session middleware (npm package)
+   - Connect-redis (npm package)
+   - Body-parser middleware (npm package)
+   - Method-override middleware (npm package)
+   - Serve-static middleware (npm package)
+   - Vhost middleware (npm package)
+   - wrk (HTTP benchmarking tool) - build from source on Alpine or install via `apt-get install wrk` (Debian/Ubuntu)
+   - make (GNU Make) - install via `apk add make` (Alpine) or `apt-get install make` (Debian/Ubuntu)
+   - build-essential (for Alpine: `apk add build-base`, for Debian/Ubuntu: `apt-get install build-essential`)
+
+2. FILES TO CREATE:
+   - package.json (project configuration file with dependencies)
+   - .npmrc (npm configuration file with package-lock=false setting)
+   - .gitignore (already exists - verify it includes node_modules, package-lock.json, npm-shrinkwrap.json, *.log, *.gz, yarn-error.log, yarn.lock, .nyc_output, coverage, benchmarks/graphs)
+   - .editorconfig (editor configuration for consistent coding style)
+   - .eslintrc.yml (ESLint configuration with ES2022 support and Node.js environment)
+   - .eslintignore (ESLint ignore file to exclude coverage and node_modules directories)
+   - .github/dependabot.yml (Dependabot configuration for automated dependency updates)
+   - .github/workflows/ directory for GitHub Actions workflows
+   - .github/workflows/ci.yml (CI workflow configuration for automated testing)
+   - .github/workflows/codeql.yml (CodeQL security analysis workflow configuration)
+   - .github/workflows/legacy.yml (Legacy Node.js versions testing workflow)
+   - .github/workflows/scorecard.yml (OSSF Scorecard supply-chain security workflow)
+   - index.js (main Express application entry point)
+   - .env (environment variables configuration)
+   - nodemon.json (development server configuration)
+   - test/support/env.js (test environment setup file)
+   - test/ directory structure for test files
+   - test/acceptance/ directory for acceptance tests
+   - routes/ directory for route handlers
+   - middleware/ directory for custom middleware
+   - config/ directory for configuration files
+   - lib/ directory for core Express library files
+   - examples/ directory for usage examples
+   - examples/README.md (examples documentation - already exists)
+   - examples/auth/ directory with authentication example
+   - examples/content-negotiation/ directory with content negotiation example
+   - examples/cookie-sessions/ directory with cookie session example
+   - examples/cookies/ directory with cookie handling example
+   - examples/downloads/ directory with file download example
+   - examples/ejs/ directory with EJS templating example
+   - examples/error-pages/ directory with error page example
+   - examples/error/ directory with error middleware example
+   - examples/hello-world/ directory with basic example
+   - examples/markdown/ directory with markdown rendering example
+   - examples/multi-router/ directory with multiple routers example
+   - examples/mvc/ directory with MVC pattern example
+   - examples/online/ directory with online users tracking example
+   - examples/params/ directory with route parameters example
+   - examples/resource/ directory with RESTful resource example
+   - examples/route-map/ directory with route mapping example
+   - examples/route-middleware/ directory with route middleware example
+   - examples/route-separation/ directory with route organization example
+   - examples/search/ directory with search API example
+   - examples/session/ directory with session management example
+   - examples/static-files/ directory with static file serving example
+   - examples/vhost/ directory with virtual host example
+   - examples/view-constructor/ directory with dynamic view rendering example
+   - examples/view-locals/ directory with view locals example
+   - examples/web-service/ directory with API service example
+   - benchmarks/ directory for performance benchmarks
+   - benchmarks/README.md (benchmark documentation - already exists)
+   - benchmarks/Makefile (benchmark automation script)
+   - benchmarks/graphs/ directory (will be auto-generated and ignored by git)
+   - benchmarks/results.log (benchmark results output file - optional)
+   - LICENSE file (already exists - MIT License, verify content matches provided)
+   - History.md (changelog)
+   - Readme.md (project documentation)
+   - SECURITY.md (security policy documentation - already exists, verify content matches provided)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   [Same as original - no changes needed for test cases]
+
+4. COMPLETE TODO LIST:
+   - Verify system requirements and check Node.js version: `node --version` (must be 18+)
+   - Install Node.js if using base Ubuntu/Debian image: `apt-get update && apt-get install -y nodejs npm`
+   - For Alpine-based images, Node.js is pre-installed in node:alpine
+   - Verify npm installation: `npm --version`
+   - Install n for managing multiple Node.js versions: `npm install -g n`
+   - Install Node.js legacy versions using n: `n 16 && n 17`
+   - Install build tools:
+     - Alpine: `apk add --no-cache make build-base git`
+     - Debian/Ubuntu: `apt-get update && apt-get install -y make build-essential git`
+   - Install wrk benchmarking tool:
+     - Alpine: Build from source - `apk add --no-cache gcc musl-dev openssl-dev && git clone https://github.com/wg/wrk.git && cd wrk && make && cp wrk /usr/local/bin/`
+     - Debian/Ubuntu: `apt-get install -y wrk`
+   - Verify wrk installation: `wrk --version`
+   - Install Redis:
+     - Alpine: `apk add --no-cache redis`
+     - Debian/Ubuntu: `apt-get install -y redis-server`
+   - Start Redis service: `redis-server --daemonize yes`
+   - Install lcov for coverage reports:
+     - Alpine: `apk add --no-cache lcov`
+     - Debian/Ubuntu: `apt-get install -y lcov`
+   - Install yamllint:
+     - Alpine: `apk add --no-cache yamllint`
+     - Debian/Ubuntu: `apt-get install -y yamllint`
+   - Create project directory structure in /home/cc/EnvGym/data/expressjs_express
+   - Initialize npm project: `cd /home/cc/EnvGym/data/expressjs_express && npm init -y`
+   - Create .npmrc file with content: `package-lock=false`
+   - Install core Express dependencies: `npm install express@latest`
+   - Install development dependencies: `npm install --save-dev eslint nyc mocha supertest`
+   - Install middleware dependencies: `npm install body-parser cookie-parser express-session method-override serve-static vhost connect-redis`
+   - Install example dependencies: `npm install ejs marked`
+   - Create all required directories: `mkdir -p lib test/acceptance routes middleware config examples benchmarks .github/workflows`
+   - Create all example subdirectories
+   - Copy or create all configuration files (.editorconfig, .eslintrc.yml, .eslintignore)
+   - Create GitHub workflow files in .github/workflows/
+   - Set up test environment files
+   - Create example applications in each examples/ subdirectory
+   - Set up benchmark files and Makefile
+   - Verify .gitignore includes all necessary patterns
+   - Run initial lint check: `npm run lint` (after setting up scripts in package.json)
+   - Run initial tests: `npm test` (after setting up test suite)
+   - Verify all examples run correctly
+   - Test benchmark execution: `cd benchmarks && make`
+   - Set appropriate file permissions: `chmod +x benchmarks/run`
+   - Verify Redis connection for session tests
+   - Test multi-version compatibility with n: `n use 16 npm test && n use 18 npm test`
+   - Create initial commit with all setup files
+   - Document any Alpine-specific or Debian-specific installation notes in README
+   - Set up VS Code remote development if needed (install Remote-SSH extension)
+   - Configure Docker development environment if using containers
+   - Test GitHub Actions locally with act (if installed): `act -P ubuntu-latest=node:18`
+   - Verify all paths use Unix-style separators (forward slashes)
+   - Ensure all shell scripts use LF line endings (not CRLF)
+   - Set up proper user permissions for /home/cc/EnvGym/data/expressjs_express directory
+   - Configure npm to use local cache if needed: `npm config set cache /home/cc/.npm`
+   - Test complete setup in clean Docker container to ensure reproducibility

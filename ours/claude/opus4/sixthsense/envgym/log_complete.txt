@@ -1,0 +1,119 @@
+=== Docker Execution Log - 20250903_130359 ===
+Dockerfile: envgym/envgym.dockerfile
+Image Name: envgym_test_1756904631
+
+=== Build Log ===
+Build Status: Success
+Build Output:
+
+
+Build Error:
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from envgym.dockerfile
+#1 transferring dockerfile: 2.64kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.7-slim
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [ 1/12] FROM docker.io/library/python:3.7-slim@sha256:b53f496ca43e5af6994f8e316cf03af31050bf7944e0e4a308ad86c001cf028b
+#4 DONE 0.0s
+
+#5 [ 3/12] WORKDIR /app
+#5 CACHED
+
+#6 [ 4/12] RUN git clone https://github.com/uiuc-arc/sixthsense.git . || true
+#6 CACHED
+
+#7 [ 6/12] RUN mkdir -p csvs subcategories plots results
+#7 CACHED
+
+#8 [ 5/12] RUN git lfs install
+#8 CACHED
+
+#9 [ 2/12] RUN apt-get update && apt-get install -y     git     git-lfs     wget     curl     build-essential     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [ 7/12] RUN echo "*.csv filter=lfs diff=lfs merge=lfs -text" > csvs/.gitattributes &&     git lfs track "csvs/*.csv"
+#10 CACHED
+
+#11 [ 8/12] RUN pip install --no-cache-dir     scikit-learn     numpy     matplotlib     pandas     jsonpickle     nearpy     treeinterpreter     cleanlab
+#11 CACHED
+
+#12 [ 9/12] RUN wget --tries=3 --timeout=30 -P csvs/ https://zenodo.org/records/6388301/files/lrm_features.csv?download=1 -O csvs/lrm_features.csv || echo "Failed to download lrm_features.csv" &&     wget --tries=3 --timeout=30 -P csvs/ https://zenodo.org/records/6388301/files/lrm_metrics.csv?download=1 -O csvs/lrm_metrics.csv || echo "Failed to download lrm_metrics.csv" &&     wget --tries=3 --timeout=30 -P csvs/ https://zenodo.org/records/6388301/files/timeseries_features.csv?download=1 -O csvs/timeseries_features.csv || echo "Failed to download timeseries_features.csv" &&     wget --tries=3 --timeout=30 -P csvs/ https://zenodo.org/records/6388301/files/timeseries_metrics.csv?download=1 -O csvs/timeseries_metrics.csv || echo "Failed to download timeseries_metrics.csv" &&     wget --tries=3 --timeout=30 -P csvs/ https://zenodo.org/records/6388301/files/mixture_features.csv?download=1 -O csvs/mixture_features.csv || echo "Failed to download mixture_features.csv" &&     wget --tries=3 --timeout=30 -P csvs/ https://zenodo.org/records/6388301/files/mixture_metrics.csv?download=1 -O csvs/mixture_metrics.csv || echo "Failed to download mixture_metrics.csv"
+#12 0.239 --2025-09-03 13:03:51--  https://zenodo.org/records/6388301/files/lrm_features.csv?download=1
+#12 0.252 Resolving zenodo.org (zenodo.org)... 188.185.48.194, 188.185.45.92, 188.185.43.25, ...
+#12 0.313 Connecting to zenodo.org (zenodo.org)|188.185.48.194|:443... connected.
+#12 0.599 HTTP request sent, awaiting response... 404 NOT FOUND
+#12 0.832 2025-09-03 13:03:52 ERROR 404: NOT FOUND.
+#12 0.832 
+#12 0.835 Failed to download lrm_features.csv
+#12 0.840 --2025-09-03 13:03:52--  https://zenodo.org/records/6388301/files/lrm_metrics.csv?download=1
+#12 0.855 Resolving zenodo.org (zenodo.org)... 188.185.43.25, 188.185.45.92, 188.185.48.194, ...
+#12 0.880 Connecting to zenodo.org (zenodo.org)|188.185.43.25|:443... connected.
+#12 1.153 HTTP request sent, awaiting response... 404 NOT FOUND
+#12 1.362 2025-09-03 13:03:52 ERROR 404: NOT FOUND.
+#12 1.362 
+#12 1.363 Failed to download lrm_metrics.csv
+#12 1.369 --2025-09-03 13:03:52--  https://zenodo.org/records/6388301/files/timeseries_features.csv?download=1
+#12 1.382 Resolving zenodo.org (zenodo.org)... 188.185.43.25, 188.185.45.92, 188.185.48.194, ...
+#12 1.444 Connecting to zenodo.org (zenodo.org)|188.185.43.25|:443... connected.
+#12 1.717 HTTP request sent, awaiting response... 404 NOT FOUND
+#12 1.974 2025-09-03 13:03:53 ERROR 404: NOT FOUND.
+#12 1.974 
+#12 1.975 Failed to download timeseries_features.csv
+#12 1.981 --2025-09-03 13:03:53--  https://zenodo.org/records/6388301/files/timeseries_metrics.csv?download=1
+#12 1.994 Resolving zenodo.org (zenodo.org)... 188.185.43.25, 188.185.45.92, 188.185.48.194, ...
+#12 2.020 Connecting to zenodo.org (zenodo.org)|188.185.43.25|:443... connected.
+#12 2.291 HTTP request sent, awaiting response... 404 NOT FOUND
+#12 2.531 2025-09-03 13:03:53 ERROR 404: NOT FOUND.
+#12 2.531 
+#12 2.532 Failed to download timeseries_metrics.csv
+#12 2.537 --2025-09-03 13:03:53--  https://zenodo.org/records/6388301/files/mixture_features.csv?download=1
+#12 2.551 Resolving zenodo.org (zenodo.org)... 188.185.45.92, 188.185.43.25, 188.185.48.194, ...
+#12 2.576 Connecting to zenodo.org (zenodo.org)|188.185.45.92|:443... connected.
+#12 2.851 HTTP request sent, awaiting response... 404 NOT FOUND
+#12 3.064 2025-09-03 13:03:54 ERROR 404: NOT FOUND.
+#12 3.064 
+#12 3.065 Failed to download mixture_features.csv
+#12 3.070 --2025-09-03 13:03:54--  https://zenodo.org/records/6388301/files/mixture_metrics.csv?download=1
+#12 3.086 Resolving zenodo.org (zenodo.org)... 188.185.43.25, 188.185.48.194, 188.185.45.92, ...
+#12 3.113 Connecting to zenodo.org (zenodo.org)|188.185.43.25|:443... connected.
+#12 3.391 HTTP request sent, awaiting response... 404 NOT FOUND
+#12 3.598 2025-09-03 13:03:55 ERROR 404: NOT FOUND.
+#12 3.598 
+#12 3.599 Failed to download mixture_metrics.csv
+#12 DONE 3.6s
+
+#13 [10/12] RUN echo '["model1", "model2", "model3"]' > subcategories/lrm.json &&     echo '["model1", "model2", "model3"]' > subcategories/timeseries.json &&     echo '["model1", "model2", "model3"]' > subcategories/mixture.json
+#13 DONE 0.4s
+
+#14 [11/12] RUN mkdir -p ~/.config/matplotlib &&     echo "backend: Agg" > ~/.config/matplotlib/matplotlibrc
+#14 DONE 0.3s
+
+#15 [12/12] RUN echo -e "*.pyc\n__pycache__/\nplots/\nresults/\n*.egg-info/" > .gitignore
+#15 DONE 0.3s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 3.1s done
+#16 writing image sha256:97942dc6d1bd959e7366ad03339868f6529fe83e77fa1f0a5b6dc22e4af92677 done
+#16 naming to docker.io/library/envgym_test_1756904631 done
+#16 DONE 3.1s
+
+
+=== Runtime Log ===  
+Runtime Status: Success
+Runtime Output:
+
+
+Runtime Error:
+
+
+=== Execution End ===
+

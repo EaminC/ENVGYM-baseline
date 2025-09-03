@@ -1,0 +1,186 @@
+=== ADJUSTED ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Rust toolchain (minimum version 1.88.0, preferably latest stable)
+   - Git (for cloning repository and build-time git hash extraction)
+   - C compiler (gcc/clang for Linux)
+   - pkg-config (for PCRE2 library detection and silver searcher)
+   - PCRE2 library (required for grep-pcre2 crate, version compatible with pcre2 crate v0.2.6)
+   - MUSL library and musl-gcc (optional, for static builds on Linux)
+   - jemalloc development headers (for MUSL 64-bit builds)
+   - Python (for running benchmarks and test scripts)
+   - Make (for Linux kernel benchmark tests and building tools)
+   - cargo-deb (for building Debian packages)
+   - strip utility (for stripping debug symbols from binaries)
+   - Test data files (Linux kernel source, OpenSubtitles.raw.en.gz for benchmarks)
+   - rustfmt (for code formatting, usually included with Rust toolchain)
+   - cargo-timing (optional, for build performance analysis)
+   - curl (for downloading test files, examples, and ripgrep releases)
+   - unzip (for extracting downloaded archives)
+   - pdftotext/poppler-utils (for PDF preprocessing examples)
+   - pzstd (for Zstandard decompression in preprocessing)
+   - file utility (for file type detection in preprocessing)
+   - gzip, bzip2, xz, lz4, brotli, zstd (for compressed file search support)
+   - sed (for search and replace examples)
+   - xargs (for piping filenames to sed)
+   - encoding_rs library v0.8.33 (for UTF-8 transcoding, dependency of grep-searcher)
+   - encoding_rs_io library v0.1.7 (for encoding I/O operations, dependency of grep-searcher)
+   - memmap2 crate v0.9.0 (for memory-mapped file access in grep-searcher)
+   - ldd (Linux only, for verifying static linking)
+   - man (for viewing generated man pages)
+   - fastmod (optional, Facebook's search-and-replace tool)
+   - asciidoctor (for man page generation, replaces a2x)
+   - uncompress (for decompressing .Z files)
+   - cargo-binstall (optional, for binary installation)
+   - Fish shell (for completion testing)
+   - Zsh shell (for completion testing)
+   - Bash shell (for completion testing)
+   - cargo-outdated (for checking semver incompatible dependency updates)
+   - cargo-up (from BurntSushi's dotfiles, for automating version updates)
+   - cargo package (included with Rust, for packaging releases)
+   - cargo publish (included with Rust, for publishing to crates.io)
+   - gpg (for creating signed tags)
+   - sha256sum (for generating release checksums)
+   - cross v0.2.5 (for cross-compilation testing)
+   - qemu (for cross-architecture testing with cross)
+   - GitHub Actions runner (for CI/CD)
+   - dtolnay/rust-toolchain GitHub Action
+   - actions/checkout@v4 GitHub Action
+   - Rust nightly toolchain (for certain CI builds and documentation)
+   - Rust beta toolchain (for CI testing)
+   - i686-unknown-linux-gnu target support
+   - x86_64-unknown-linux-musl target support
+   - aarch64-unknown-linux-gnu target support (via cross-compilation)
+   - armv7-unknown-linux-gnueabihf target support (via cross-compilation)
+   - armv7-unknown-linux-musleabihf target support (via cross-compilation)
+   - armv7-unknown-linux-musleabi target support (via cross-compilation)
+   - powerpc64-unknown-linux-gnu target support (via cross-compilation)
+   - s390x-unknown-linux-gnu target support (via cross-compilation)
+   - wasm32-wasip1 target support
+   - gh CLI tool (for GitHub release uploads)
+   - 7z (for creating archives)
+   - Docker (for cross-compilation with cross-rs)
+   - ghcr.io/cross-rs Docker images for target architectures
+   - x86_64-linux-musl-strip (for stripping Linux musl binaries)
+   - x86_64-linux-gnu-strip (for stripping x86 binaries)
+   - aarch64-linux-gnu-strip (for stripping ARM64 binaries via cross)
+   - arm-linux-gnueabihf-strip (for stripping ARMv7 gnueabihf binaries via cross)
+   - arm-linux-musleabihf-strip (for stripping ARMv7 musleabihf binaries via cross)
+   - arm-linux-musleabi-strip (for stripping ARMv7 musleabi binaries via cross)
+   - powerpc64-linux-gnu-strip (for stripping PowerPC64 binaries via cross)
+   - s390x-linux-gnu-strip (for stripping s390x binaries via cross)
+   - qemu-i386 (for x86 emulation)
+   - qemu-aarch64 (for ARM64 emulation)
+   - qemu-arm (for ARM emulation)
+   - qemu-ppc64 (for PowerPC64 emulation)
+   - qemu-s390x (for s390x emulation)
+   - tar (for creating Unix archives and extracting ripgrep releases)
+   - x86_64-unknown-linux-gnu target support (native)
+   - libc crate v0.2.148 (Unix dependency for grep-cli)
+   - bstr crate v1.6.2 (dependency for grep-cli, globset, ignore dev-dependency, grep-printer, grep-regex, and grep-searcher)
+   - log crate v0.4.20 (dependency for grep-cli, globset, ignore, grep-pcre2, grep-printer, grep-regex, and grep-searcher)
+   - termcolor crate v1.3.0 (dependency for grep-cli, grep dev-dependency, and grep-printer)
+   - grep-cli crate v0.1.11 (workspace crate for CLI utilities)
+   - grep crate v0.3.2 (facade crate for grep functionality)
+   - grep-matcher crate v0.1.7 (dependency for grep-pcre2, grep-printer, grep-regex, grep-searcher, and core matching functionality)
+   - grep-regex crate v0.1.13 (for regex engine integration, grep-printer dev-dependency, and grep-searcher dev-dependency)
+   - grep-searcher crate v0.1.14 (for file searching functionality and grep-printer dependency)
+   - grep-printer crate v0.2.2 (for output formatting)
+   - grep-pcre2 crate v0.1.8 (for PCRE2 support)
+   - pcre2 crate v0.2.6 (dependency for grep-pcre2)
+   - aho-corasick crate v1.1.1 (dependency for globset)
+   - regex-syntax crate v0.8.0 (dependency for globset and grep-regex)
+   - regex-automata crate v0.4.0 (dependency for globset, ignore, and grep-regex)
+   - serde crate v1.0.193 (optional dependency for globset and grep-printer)
+   - glob crate v0.3.1 (dev dependency for globset testing)
+   - serde_json crate v1.0.107 (dev dependency for globset testing and optional dependency for grep-printer)
+   - globset crate v0.4.16 (workspace crate for glob pattern matching)
+   - regex crate v1.9.5 (core dependency for globset pattern compilation, grep-matcher dev-dependency, grep-regex, and grep-searcher dev-dependency)
+   - cargo-bench (for running globset benchmarks)
+   - walkdir crate v2.4.0 (dependency for ignore crate)
+   - ignore crate v0.4.23 (workspace crate for ignore file handling)
+   - crossbeam-deque crate v0.8.3 (dependency for ignore)
+   - memchr crate v2.6.3 (dependency for ignore, grep-matcher, and grep-searcher)
+   - same-file crate v1.0.6 (dependency for ignore)
+   - crossbeam-channel crate v0.5.15 (dev dependency for ignore)
+   - base64 crate (optional dependency for grep-printer JSON output)
+   - serde_derive crate (optional dependency for grep-printer JSON output)
+   - automake (for building the silver searcher)
+   - zlib1g-dev (for the silver searcher)
+   - liblzma-dev (for the silver searcher and ag +lzma feature)
+   - libpcre3 (for the silver searcher)
+   - libpcre3-dev (for the silver searcher)
+   - libtool (for Universal Code Grep)
+   - libpcre2-8-0 (for Universal Code Grep, version 10.30 or compatible)
+   - libpcre2-dev (for Universal Code Grep)
+   - go (for sift and the platinum searcher)
+   - bc (for building Linux kernel)
+   - mkfs.ext4 (for formatting benchmark storage)
+   - benchsuite tool (from ripgrep repository)
+   - the_silver_searcher (ag) version 2.2.0 - for benchmark comparison
+   - Universal Code Grep (ucg) version 0.3.3 - for benchmark comparison
+   - The Platinum Searcher (pt) version 2.1.4 - for benchmark comparison
+   - Sift version 0.9.0 - for benchmark comparison
+   - GNU grep version 3.8 - for benchmark comparison (updated from 3.4)
+   - git grep - for benchmark comparison (part of git version 2.39.0 or later)
+   - autoreconf (for building ucg)
+   - tee (for capturing benchmark output)
+   - g++ compiler with C++17 support (for building ucg with std=gnu++1z)
+   - GCC 7.2.1 or later (for building ucg)
+   - CPU with SSE4.2 and POPCNT support (x86_64 architecture supports these)
+   - CPU with AVX support (check /proc/cpuinfo for avx flag)
+   - CPU with AVX2 support (check /proc/cpuinfo for avx2 flag)
+   - ugrep version 3.9.2 - for benchmark comparison (updated from 3.0.2)
+   - libbz2-dev (for ugrep +bzip2 support)
+   - liblz4-dev (for ugrep +lz4 support)
+   - /dev/shm (shared memory filesystem for benchmark storage)
+   - pcre2jit support (for ugrep optimizations)
+
+2. FILES TO CREATE:
+   - `.github/workflows/ci.yml` - CI/CD pipeline configuration (already exists, verify content matches provided file)
+   - `.github/workflows/release.yml` - Release automation workflow (already exists, verify content matches provided file)
+   - `benchmarks/config.toml` - Benchmark configuration settings
+   - `tests/fixtures/` - Directory for test data files
+   - `.rgignore` - ripgrep ignore patterns for development
+   - `.ignore` - ripgrep ignore file with .github exception
+   - `CONTRIBUTING.md` - Contribution guidelines
+   - `RELEASE-CHECKLIST.md` - Release process documentation (already exists, verify content matches provided file)
+   - `cross-compile-targets.txt` - List of supported compilation targets
+   - `deployment/deb/` - Directory for Debian package assets
+   - `deployment/deb/rg.1` - Man page for Debian package
+   - `deployment/deb/rg.bash` - Bash completion script
+   - `deployment/deb/rg.fish` - Fish completion script
+   - `deployment/deb/_rg` - Zsh completion script
+   - `.gitignore` - Already exists, verify content matches provided file
+   - `build.rs` - Already exists, verify content matches provided file
+   - `GUIDE.md` - Already exists, verify content matches provided file
+   - `FAQ.md` - Already exists, verify content matches provided file
+   - `$HOME/.ripgreprc` - User configuration file (optional)
+   - `preprocess` - Example preprocessor script for PDFs
+   - `preprocessor` - More robust preprocessor script
+   - `processor` - Extended preprocessor script with file type detection
+   - `man/man1/` - Directory for generated man pages
+   - `$XDG_CONFIG_HOME/bash_completion/rg.bash` - Bash completion file
+   - `$XDG_CONFIG_HOME/fish/completions/rg.fish` - Fish completion file
+   - `$HOME/.zsh-complete/_rg` - Zsh completion file
+   - `$HOME/.config/ripgrep/rc` - Alternative configuration file location
+   - `invalid-utf8` - Test file with invalid UTF-8 sequences
+   - `subtitles2016-sample` - Large test file for performance benchmarking
+   - `1995-watson.pdf` - PDF test file for preprocessor testing
+   - `CHANGELOG.md` - Already exists, verify content matches provided file
+   - `doc/` - Documentation directory for release archives
+   - `complete/` - Completions directory for release archives
+   - `$HOME/.config/git/ignore` - Global git ignore file location
+   - `.git/info/exclude` - Repository-specific git exclude file
+   - `crates/core/flags/doc/template.rg.1` - Man page template with date field
+   - `ci/sha256-releases` - Script for generating release checksums
+   - `bin/cargo-up` - Version update automation script (from BurntSushi's dotfiles)
+   - `ci/ubuntu-install-packages` - Script for installing Ubuntu dependencies in CI
+   - `ci/test-complete` - Script for testing shell completions
+   - `target/` - Build output directory (created automatically)
+   - `target/x86_64-unknown-linux-gnu/debug/build/*/stderr` - Build script stderr output
+   - `target/x86_64-unknown-linux-gnu/release/` - Release build output directory
+   - `target/x86_64-unknown-linux-gnu/debian/` - Debian package output directory
+   - `ripgrep-<version>-x86_64-unknown-linux-gnu/` - Release archive directory structure
+   - `ripgrep-<version>-x86_64-unknown-linux-gnu/complete/` - Completions in release archive
+   - `ripgrep-<version>-x86_64-unknown-linux-gnu/doc/` - Documentation in release archive

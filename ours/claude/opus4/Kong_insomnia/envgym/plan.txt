@@ -1,0 +1,255 @@
+=== ENVIRONMENT SETUP PLAN ===
+
+1. DOWNLOADS NEEDED:
+   - Node.js (version 22.17.1 or higher as specified in package.json) - Linux x86_64 version
+   - Git (latest stable version for Linux)
+   - npm (v10+ as specified in package.json for workspaces support)
+   - Visual Studio Code or preferred editor with ESLint and JSX support
+   - libfontconfig-dev (for Ubuntu/Debian Linux)
+   - libcurl-devel (for Fedora Linux)
+   - ESLint extension for your editor
+   - React/JSX syntax highlighting extension for your editor
+   - Tailwind CSS IntelliSense extension for your editor
+   - CodeMirror syntax support extension
+   - Vitest extension for test runner integration
+   - Playwright Test extension for E2E testing
+   - GitHub CLI (optional, for easier issue/PR management)
+   - Markdown preview extension for documentation editing
+   - cross-env (installed via npm, for cross-platform environment variables)
+   - patch-package (installed via npm, for applying patches)
+   - node-pre-gyp (for building native modules)
+
+2. FILES TO CREATE:
+   - .env (for local environment variables if needed)
+   - .gitignore (if not present, to exclude node_modules and build artifacts)
+   - .vscode/settings.json (for VS Code users with ESLint, Tailwind, and formatting configurations)
+   - .editorconfig (for consistent coding styles across different editors)
+   - local.config.js (for any local development configurations)
+   - .vscode/launch.json (for Electron debugging configuration)
+   - playwright.config.js (for E2E test configuration if not present)
+   - vitest.config.js (for unit test configuration if not present)
+   - .github/pull_request_template.md (for consistent PR descriptions)
+   - docs/feature-proposal-template.md (for feature request documentation)
+   - .prettierrc (for Prettier formatting configuration with Tailwind CSS plugin)
+   - .eslintrc.js (for ESLint configuration with TypeScript and React plugins)
+   - patches/ directory (for patch-package patches if needed)
+
+3. NECESSARY TEST CASES IN THE CODEBASE:
+   - API Client Core Tests:
+     - REST API request/response handling
+     - GraphQL query execution
+     - WebSocket connection management
+     - gRPC communication
+     - SSE (Server-Sent Events) handling
+     - libcurl integration tests (@getinsomnia/node-libcurl v3.0.0)
+     - node-libcurl wrapper functionality
+   - Storage Backend Tests:
+     - Local Vault storage operations
+     - Git Sync functionality
+     - Cloud Sync operations
+     - NeDB database operations
+     - localStorage and fake localStorage API tests
+   - UI Component Tests:
+     - React component unit tests (following __tests__ pattern)
+     - OpenAPI editor functionality
+     - Collection runner
+     - Mock server integration
+     - CodeMirror editor instances
+     - Tailwind CSS styling tests
+   - CLI Tests:
+     - Inso CLI command execution
+     - getSendRequestCallbackMemDb functionality
+     - Linting operations
+     - CI/CD pipeline integration
+     - Commander.js command parsing
+     - esbuild transpilation tests
+   - Plugin System Tests:
+     - Plugin loading and execution
+     - Plugin API interactions
+     - Nunjucks templating tests
+     - Bundle plugin verification tests
+   - Cross-Platform Tests:
+     - File system operations on Linux x86_64
+     - Network handling on Linux platform
+     - Electron main/renderer process communication
+     - cross-env environment variable handling
+   - E2E Smoke Tests:
+     - Full application workflow tests using Playwright
+     - Large response handling (~20MB)
+     - Drag and drop functionality
+     - Critical path testing (test:crit:package)
+     - Smoke tests for dev, build, and package stages
+   - Contribution Workflow Tests:
+     - Bug reproduction test cases
+     - Feature implementation test coverage
+     - Regression tests for fixed issues
+   - Workspace-specific Tests:
+     - insomnia-testing package tests
+     - insomnia-scripting-environment tests
+     - Integration tests across workspaces
+
+4. COMPLETE TODO LIST:
+   - Check system requirements:
+     - Verify Linux distribution and version compatibility
+     - Check available disk space in /home/cc/EnvGym/data/Kong_insomnia (minimum 2GB recommended)
+     - Ensure internet connectivity for downloads
+     - Verify Docker version 28.1.1 is properly configured
+     - Check BuildKit support is enabled
+   
+   - Install Node.js:
+     - Download Node.js v22.17.1 or higher Linux x86_64 binary from https://nodejs.org
+     - Or use NodeSource repository: `curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -`
+     - Install: `sudo apt-get install -y nodejs`
+     - Verify installation: `node --version` (should be >=22.17.1)
+     - Verify npm: `npm --version` (should be >=10)
+   
+   - Install Git:
+     - Install via package manager: `sudo apt-get install git`
+     - Verify installation: `git --version`
+     - Configure Git user name and email for commits
+   
+   - Fork and clone repository:
+     - Fork the repository on GitHub (for external contributors)
+     - Navigate to working directory: `cd /home/cc/EnvGym/data`
+     - `git clone https://github.com/[your-username]/insomnia.git Kong_insomnia` (use your fork)
+     - `cd Kong_insomnia`
+     - Add upstream remote: `git remote add upstream https://github.com/Kong/insomnia.git`
+   
+   - Review contribution guidelines:
+     - Read CONTRIBUTING.md thoroughly
+     - Read CODE_OF_CONDUCT.md
+     - Review DEVELOPMENT.md for architecture understanding
+     - Familiarize yourself with GitHub Issues guidelines
+     - Understand the pull request process and requirements
+     - Review workspace structure (5 packages in workspaces)
+   
+   - Install Linux-specific dependencies:
+     - Update package list: `sudo apt-get update`
+     - Install libfontconfig: `sudo apt-get install -y libfontconfig-dev`
+     - Install build essentials: `sudo apt-get install -y build-essential`
+     - Install libcurl development files: `sudo apt-get install -y libcurl4-openssl-dev`
+     - Clear Electron cache: `rm -rf ~/.cache/electron`
+   
+   - Install project dependencies:
+     - Navigate to project root: `cd /home/cc/EnvGym/data/Kong_insomnia`
+     - Run `npm install` in project root
+     - Wait for all dependencies to install including workspace packages
+     - Verify @getinsomnia/node-libcurl@3.0.0 installs correctly for Linux x86_64
+     - Run `npm run postinstall` to apply patches via patch-package
+     - Verify bundle plugins are correctly set up
+   
+   - Install Electron-specific libcurl:
+     - Set target Electron version: `export target=<electron-version>`
+     - Run `npm run install-libcurl-electron` to install Electron-compatible libcurl for Linux x86_64
+     - Verify node-pre-gyp completes successfully
+   
+   - Set up editor:
+     - Install ESLint plugin/extension
+     - Install JSX/React syntax support
+     - Install Tailwind CSS IntelliSense
+     - Install Vitest and Playwright extensions
+     - Install Markdown preview extension
+     - Configure editor to use project's ESLint rules
+     - Set up CodeMirror syntax highlighting
+     - Configure Prettier with Tailwind CSS plugin support
+     - Install TypeScript language support
+   
+   - Search existing issues:
+     - Check GitHub Issues for similar bugs/features
+     - Review closed issues for solutions
+     - Search pull requests for related work
+     - Join Slack team at https://chat.insomnia.rest for discussions
+   
+   - Verify development environment:
+     - Run `npm run lint` to check code style across all workspaces
+     - Run `npm run type-check` for TypeScript validation in all workspaces
+     - Run `npm test` to execute Vitest unit tests in all workspaces
+     - Run `npm run test:smoke:dev` for development smoke tests
+     - All commands should complete without errors
+   
+   - Start development server:
+     - Set display for Electron on Linux: `export DISPLAY=:0` (if running headless)
+     - Run `npm run dev` for live reload (starts insomnia workspace)
+     - Or `npm run dev:autoRestart` for full auto-restart
+     - Or `npm run watch:app` for Playwright-enabled development
+     - Verify application launches successfully
+     - Check Electron main and renderer processes start correctly
+   
+   - Set up Inso CLI development:
+     - Run `npm run inso-start` to start compiler in watch mode
+     - Test CLI after building: `./packages/insomnia-inso/bin/inso -v`
+     - Verify esbuild transpilation works correctly on Linux x86_64
+     - For packaging: `npm run inso-package`
+   
+   - Configure local environment:
+     - Create any necessary .env files
+     - Set up local storage paths for NeDB in /home/cc/EnvGym/data/Kong_insomnia
+     - Configure any API keys or credentials needed
+     - Set up debugging configuration for Electron on Linux
+     - Configure cross-env for consistent environment variables
+   
+   - Build and test the application:
+     - Run `npm run app-build` to build with Playwright support
+     - Run `npm run app-package` to create Linux x86_64 packaged version
+     - Test packaged version: `npm run test:smoke:package`
+     - Run critical tests: `npm run test:crit:package`
+   
+   - Docker development setup (optional):
+     - Create Dockerfile for development environment using node:22-alpine or ubuntu base
+     - Utilize BuildKit features for efficient builds
+     - Set working directory to /app or /workspace
+     - Configure for linux/amd64 platform explicitly
+     - No GPU-specific configurations needed
+   
+   - Prepare for contribution:
+     - Create feature branch: `git checkout -b feature/your-feature-name`
+     - For bugs: Create branch `git checkout -b fix/issue-description`
+     - Write clear, demonstrable test cases for bugs
+     - Document feature proposals with context and use cases
+     - Keep commits focused and avoid unrelated changes
+     - Ensure changes work across all 5 workspace packages
+   
+   - Before submitting PR:
+     - Ensure all tests pass in all workspaces
+     - Run linting: `npm run lint`
+     - Run type checking: `npm run type-check`
+     - Format code with Prettier (including Tailwind CSS classes)
+     - Update documentation if needed
+     - Write clear commit messages
+     - Check for merge conflicts with upstream/master
+     - Verify changes follow project scope and aims
+     - For significant changes, discuss first in GitHub Issues
+     - Test changes in dev, build, and package modes on Linux
+   
+   - Verify complete setup:
+     - Application runs without errors on Linux x86_64
+     - Can create and execute API requests using @getinsomnia/node-libcurl
+     - React components render correctly with Tailwind styles
+     - CodeMirror editors function properly
+     - Tests pass successfully (both Vitest and Playwright)
+     - Linting shows no critical issues
+     - Hot reload works in development mode
+     - Nunjucks templating works correctly
+     - Large responses (~20MB) can be handled
+     - All 5 workspace packages function correctly
+     - Inso CLI builds and runs properly on Linux
+     - patch-package applies any necessary patches
+     - TypeScript compilation succeeds
+     - ESLint with all plugins works correctly
+   
+   - Post-setup tasks:
+     - Explore documentation at https://docs.insomnia.rest/
+     - Familiarize yourself with npm workspaces structure (5 packages)
+     - Understand each workspace package purpose:
+       - insomnia-testing
+       - insomnia (main application)
+       - insomnia-inso (CLI tool)
+       - insomnia-smoke-test (E2E tests)
+       - insomnia-scripting-environment
+     - Review technical debt items for awareness
+     - Set up watches for Electron version updates
+     - Consider applying for Contributor Badge after accepted PR
+     - Monitor GitHub Issues for good first issues
+     - Stay updated with project discussions on Slack
+     - Run `npm run clean` when needed to reset workspace
+     - Configure file watchers for efficient development on Linux
